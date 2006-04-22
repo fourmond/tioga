@@ -27,6 +27,8 @@
 #include "pdfs.h"
 #include "flate.h"
 
+#include <stdio.h>
+
 char *data_dir = NULL;
 
 VALUE cFM; /* the Tioga/FigureMaker class object */
@@ -248,14 +250,41 @@ FM *Get_FM(VALUE fmkr) {
 #define attr_writer(attr) rb_define_method(cFM, #attr "=", FM_##attr##_set, 1);
 #define attr_accessors(attr) attr_reader(attr) attr_writer(attr)
 
-void Init_FigureMaker(void) { /* called by Ruby when the extension is loaded */
+void Init_FigureMakerBin(void) { 
+     /* called by Ruby when the extension is loaded */
 
+   /* this function has been modified by Vincent Fourmond for the splitting
+      out of libraries more general than Tioga */
+
+   /*
    Init_Flate();
    Init_Dvector();
    Init_Dtable();
+   */
+   /* These functions don't belong here anymore, as they will be called
+      by their respective modules. Instead, we require them */
+   /*  
+   rb_require("Dobjects/Dvector");
+   rb_require("Dobjects/Dtable");
+   rb_require("Flate");
+   */
+   /* done by the wrapper FigureMaker.rb */
    
    VALUE mTioga = rb_define_module("Tioga");
+
+   /* and now, we need to import Dobjects and Flate modules*/
+   rb_include_module(mTioga, rb_define_module("Dobjects"));
+   rb_include_module(mTioga, rb_define_module("Flate"));
+
    cFM = rb_define_class_under(mTioga, "FigureMaker", rb_cObject);
+   /* I don't like that much, but then, it works...
+      whereas with only the upper inclusions, it doesn't.
+      My knowledge of ruby internals is limited enough that
+      it doesn't surprise me so much... 
+   */
+   rb_include_module(cFM, rb_define_module("Dobjects"));
+   rb_include_module(cFM, rb_define_module("Flate"));
+   /* end of thing which I don't like -- Vincent Fourmond */
    rb_define_alloc_func(cFM, FM_alloc);
    Init_IDs();
    Init_Font_Dictionary();

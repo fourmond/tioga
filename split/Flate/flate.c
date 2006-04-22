@@ -140,8 +140,10 @@ int flate_expand(unsigned char **new_ptr_ptr, unsigned long *new_len_ptr, unsign
  */
  
 void Init_Flate() {
-   VALUE mTioga = rb_define_module("Tioga");
-   VALUE mFlate = rb_define_module_under(mTioga, "Flate");
+   /* modified by Vincent Fourmond, for the splitting out */
+   /*VALUE mTioga = rb_define_module("Tioga"); 
+     VALUE mFlate = rb_define_module_under(mTioga, "Flate"); */
+   VALUE mFlate = rb_define_module("Flate");
    rb_define_singleton_method(mFlate, "compress", do_compress, 1);
    rb_define_singleton_method(mFlate, "expand", do_expand, 1);
 }

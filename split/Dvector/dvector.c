@@ -4856,8 +4856,12 @@ VALUE dvector_max_of_many(VALUE klass, VALUE ary) {
 
 
 void Init_Dvector() {
-   VALUE mTioga = rb_define_module("Tioga");
-   cDvector = rb_define_class_under(mTioga, "Dvector", rb_cObject);
+  
+  /* modified by Vincent Fourmond for the splitting out:
+     we use the Dvector module. I don't know if it is a good idea...
+  */
+   VALUE mDobjects = rb_define_module("Dobjects");
+   cDvector = rb_define_class_under(mDobjects, "Dvector", rb_cObject);
    rb_include_module(cDvector, rb_mEnumerable);
    
    rb_define_alloc_func(cDvector, dvector_alloc);
@@ -5096,7 +5100,9 @@ void Init_Dvector() {
    rb_global_variable(&dvector_output_fs);
    dvector_output_fs = rb_str_new2(" ");
 
-   rb_require("Tioga/Dvector_extras.rb");
-   rb_require("Tioga/Numeric_extras.rb");
+   /* modified by Vincent Fourmond 22/3/2006 for the splitting out */
+   rb_require("Dobjects/Dvector_extras.rb");
+   rb_require("Dobjects/Numeric_extras.rb");
+   /* end of modifications */
 }
 

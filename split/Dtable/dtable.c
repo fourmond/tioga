@@ -1717,9 +1717,14 @@ VALUE dtable_aset(VALUE ary, VALUE xloc, VALUE yloc, VALUE val) {
  */
 
 
-void Init_Dtable() {
-   VALUE mTioga = rb_define_module("Tioga");
-   cDtable = rb_define_class_under(mTioga, "Dtable", rb_cObject);
+void Init_DtableBin() {
+   /* modified by Vincent Fourmond, for splitting out the libraries */
+  
+   /*rb_require("Dobjects/Dvector");*/ /* done by Dtable.rb */
+   /* we first make sure Dvector is included */
+   VALUE mDobjects = rb_define_module("Dobjects");
+   cDtable = rb_define_class_under(mDobjects, "Dtable", rb_cObject);
+   /* end of modification */
    
    rb_define_alloc_func(cDtable, dtable_alloc);
    rb_define_method(cDtable, "initialize", dtable_initialize, -1);
@@ -1857,6 +1862,8 @@ void Init_Dtable() {
    rb_define_method(cDtable, "safe_asin!", dtable_safe_asin_bang, 0);
    rb_define_method(cDtable, "safe_acos!", dtable_safe_acos_bang, 0);
 
-   rb_require("Tioga/Dtable_extras.rb");
+   /* modified by Vincent Fourmond, for splitting out the libraries */
+   rb_require("Dobjects/Dtable_extras.rb");
+   /* end of modification */
 }
 

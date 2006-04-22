@@ -72,9 +72,9 @@ class TestFMkr < Test::Unit::TestCase
     end
     
     def do_one_string(tst)
-        compressed = Tioga::Flate.compress(tst)
+        compressed = Flate.compress(tst)
         puts "compressed from #{tst.size} to #{compressed.size}"
-        expanded = Tioga::Flate.expand(compressed)
+        expanded = Flate.expand(compressed)
         assert_equal(tst, expanded)
     end
 

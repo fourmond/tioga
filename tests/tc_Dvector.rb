@@ -1,13 +1,12 @@
 #  tc_Dvector.rb
 
-require 'Tioga/tioga'
+require 'Dobjects/Dvector'
 
 require 'test/unit'
 
 class TestDvector < Test::Unit::TestCase
+    include Dobjects
 
-    include Tioga
-    
     def test_tridag
         a = Dvector[-0.5, -0.5, -0.5, -1.0/3.0, -0.5]
         b = Dvector[1, 2, 3, -2, 1]

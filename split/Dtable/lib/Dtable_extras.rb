@@ -13,7 +13,7 @@ end
 class Float
     alias :pre_ddata_add :+
     def +(a)
-        if a.class == Tioga::Dtable
+        if a.class == Dobjects::Dtable
             a+self
         else
             pre_ddata_add(a)
@@ -21,7 +21,7 @@ class Float
     end
     alias :pre_ddata_sub :-
     def -(a)
-        if a.class == Tioga::Dtable
+        if a.class == Dobjects::Dtable
             a.neg+self
         else
             pre_ddata_sub(a)
@@ -29,7 +29,7 @@ class Float
     end
     alias :pre_ddata_mult :*
     def *(a)
-        if a.class == Tioga::Dtable
+        if a.class == Dobjects::Dtable
             a*self
         else
             pre_ddata_mult(a)
@@ -37,7 +37,7 @@ class Float
     end
     alias :pre_ddata_div :/
     def /(a)
-        if a.class == Tioga::Dtable
+        if a.class == Dobjects::Dtable
             a.inv*self
         else
             pre_ddata_div(a)
@@ -45,7 +45,7 @@ class Float
     end
     alias :pre_ddata_pow :**
     def **(a)
-        if a.class == Tioga::Dtable
+        if a.class == Dobjects::Dtable
             a.as_exponent_of(self)
         else
             pre_ddata_pow(a)
@@ -56,7 +56,7 @@ end
 class Fixnum
     alias :pre_ddata_add :+
     def +(a)
-        if a.class == Tioga::Dtable
+        if a.class == Dobjects::Dtable
             a+self
         else
             pre_ddata_add(a)
@@ -64,7 +64,7 @@ class Fixnum
     end
     alias :pre_ddata_sub :-
     def -(a)
-        if a.class == Tioga::Dtable
+        if a.class == Dobjects::Dtable
             a.neg+self
         else
             pre_ddata_sub(a)
@@ -72,7 +72,7 @@ class Fixnum
     end
     alias :pre_ddata_mult :*
     def *(a)
-        if a.class == Tioga::Dtable
+        if a.class == Dobjects::Dtable
             a*self
         else
             pre_ddata_mult(a)
@@ -80,7 +80,7 @@ class Fixnum
     end
     alias :pre_ddata_div :/
     def /(a)
-        if a.class == Tioga::Dtable
+        if a.class == Dobjects::Dtable
             a.inv*self
         else
             pre_ddata_div(a)
@@ -88,7 +88,7 @@ class Fixnum
     end
     alias :pre_ddata_pow :**
     def **(a)
-        if a.class == Tioga::Dtable
+        if a.class == Dobjects::Dtable
             a.as_exponent_of(self)
         else
             pre_ddata_pow(a)

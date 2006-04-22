@@ -1,12 +1,12 @@
 #  tc_Dtable.rb
 
-require 'Tioga/tioga'
+require 'Dobjects/Dtable'
 
 require 'test/unit'
 
 class TestDtable < Test::Unit::TestCase
 
-    include Tioga
+    include Dobjects
 
     def read_data  # do this first to read in the test.data array
         return if @arr != nil

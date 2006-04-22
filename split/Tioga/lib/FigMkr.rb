@@ -994,6 +994,7 @@ class FigureMaker
         if @rainbow_colormap == nil
             @rainbow_colormap = create_colormap(
                 'points' => [0.00, 0.27, 0.46, 0.73, 1.00],  # distorted to reduce size of green
+  # modified for debugging purposes...
                 'Hs' => (Dvector[0.0, 1.0, 2.0, 3.0, 4.0]*90.0 - 20.0)*(340.0/360.0) + 10.0,
                 'Ls' =>     [  0.5,    0.5,    0.5,    0.5,    0.5],
                 'Ss' =>     [  1.0,    1.0,    1.0,    1.0,    1.0]

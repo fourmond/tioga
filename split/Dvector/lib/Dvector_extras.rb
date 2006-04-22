@@ -8,18 +8,20 @@ class Numeric
 
 end
 
+# Modified by Vincent Fourmond to have a nice Dvector module
+# instead of the Tioga module.
 # add arithmetic operators for Float and Fixnum with Dvec
 
 class Array
     def to_dvector
-        Tioga::Dvector[*self]
+        Dobjects::Dvector[*self]
     end
 end
 
 class Float
     alias :pre_dvec_add :+
     def +(a)
-        if a.class == Tioga::Dvector
+        if a.class == Dobjects::Dvector
             a+self
         else
             pre_dvec_add(a)
@@ -27,7 +29,7 @@ class Float
     end
     alias :pre_dvec_sub :-
     def -(a)
-        if a.class == Tioga::Dvector
+        if a.class == Dobjects::Dvector
             a.neg+self
         else
             pre_dvec_sub(a)
@@ -35,7 +37,7 @@ class Float
     end
     alias :pre_dvec_mult :*
     def *(a)
-        if a.class == Tioga::Dvector
+        if a.class == Dobjects::Dvector
             a*self
         else
             pre_dvec_mult(a)
@@ -43,7 +45,7 @@ class Float
     end
     alias :pre_dvec_div :/
     def /(a)
-        if a.class == Tioga::Dvector
+        if a.class == Dobjects::Dvector
             a.inv*self
         else
             pre_dvec_div(a)
@@ -51,7 +53,7 @@ class Float
     end
     alias :pre_dvec_pow :**
     def **(a)
-        if a.class == Tioga::Dvector
+        if a.class == Dobjects::Dvector
             a.as_exponent_of(self)
         else
             pre_dvec_pow(a)
@@ -62,7 +64,7 @@ end
 class Fixnum
     alias :pre_dvec_add :+
     def +(a)
-        if a.class == Tioga::Dvector
+        if a.class == Dobjects::Dvector
             a+self
         else
             pre_dvec_add(a)
@@ -70,7 +72,7 @@ class Fixnum
     end
     alias :pre_dvec_sub :-
     def -(a)
-        if a.class == Tioga::Dvector
+        if a.class == Dobjects::Dvector
             a.neg+self
         else
             pre_dvec_sub(a)
@@ -78,7 +80,7 @@ class Fixnum
     end
     alias :pre_dvec_mult :*
     def *(a)
-        if a.class == Tioga::Dvector
+        if a.class == Dobjects::Dvector
             a*self
         else
             pre_dvec_mult(a)
@@ -86,7 +88,7 @@ class Fixnum
     end
     alias :pre_dvec_div :/
     def /(a)
-        if a.class == Tioga::Dvector
+        if a.class == Dobjects::Dvector
             a.inv*self
         else
             pre_dvec_div(a)
@@ -94,7 +96,7 @@ class Fixnum
     end
     alias :pre_dvec_pow :**
     def **(a)
-        if a.class == Tioga::Dvector
+        if a.class == Dobjects::Dvector
             a.as_exponent_of(self)
         else
             pre_dvec_pow(a)
