@@ -1,0 +1,24 @@
+This is the README for the Tioga samples folder.
+
+The samples can serve both as a tutorial and a source of code
+fragments to provide a start on writing your own Tioga documents.
+
+The "figures" folder has the most basic stuff.
+
+Next comes "plots" which extends the discussion to the methods
+needed to make plots.
+
+The "pythagorian_3_body" makes plots and a movie of the evolution of
+a system of 3 "stars" that start from rest at the corners of a 3-4-5 right
+triangle.  The star opposite the side of length 3 has a mass of 3 units,
+the one opposite the length 4 side has a mass of 4 units, and the final
+one has a mass of 5 units.  The output file has a record of one particular
+integration run show how this system might evolve under the influence of
+the mutual gravitational attractions.
+
+The final three folders, "star_history", "star_profile", and "zams",
+come from my own stellar evolution work.  They give further "real life"
+examples of non-trivial applications.
+
+For more information and a suggested exploration path, see
+the Tutorial in the Tioga documentation.

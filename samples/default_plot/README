@@ -1,0 +1,13 @@
+You can use this as a start for making your own command-line driven plotting tool based on IRB-Tioga.
+
+In irb, with IRB_Tioga loaded, try this:
+
+    >> load 'plot.rb'
+    >> plot 'forward.out'
+    >> plot 'forward1.out'
+    >> plot 'forward2.out'
+
+If all goes well, each call on plot should create a plot of the data in the named file and preview it.  It assumes the first column of data has the x values and the second column has the y values.  All other data is ignored.
+
+To change the default appearance of the plot, edit the set_style routine in default_plot.rb.  If you get ambitious, you can add commands to set options from the irb command line.
+
