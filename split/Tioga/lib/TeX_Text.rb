@@ -1,0 +1,346 @@
+#  TeX_Text.rb
+
+module Tioga
+
+# These are the methods and attributes for using TeX for typesetting in plots and figures.  See also Tutorial::TextForTeX for information about how to add packages and how (and how not) to enter text for TeX.
+
+class TeX_Text < Doc < FigureMaker
+
+=begin rdoc
+This routine takes care of text that is being sent to TeX for typesetting (see also show_marker
+for text being used as graphics and sent directly to PDF).
+
+The location of the reference point for the text can be given either in figure coordinates ('x' and 'y', or 'at')
+or relative to an edge of the frame ('side', 'position', and 'shift').
+
+You can optionally provide a color as an RGB triple which will be used in a 'textcolor' command for TeX
+enclosing the rest of the text.
+
+The text is scaled by the product of the 'scale' entry times the current value of the
+default_text_scale attribute.  It is rotated by the given 'angle'.
+
+The reference point can be specified horizontally ('justification') and vertically ('alignment').
+
+The 'text' to be sent to TeX can contain anything that TeX will let you put in a box.  In addition to
+the usual text and inline math, you can also do display math, lists, tables, etc.
+
+You can even define your own commands in your TeX preamble and then use those commands as part of the text in 
+the figure.
+
+NOTE: When entering text for TeX in your Ruby program, you'll generally want to use single quotes around the
+string rather than double quotes.  With single quotes, backslashes are treated as normal characters (except
+for the two special cases of \' and \\), so TeX commands using backslashes don't cause trouble.  
+With double quotes, Ruby uses backslash for a variety of escape characters such as newline (\n) and tab (\t),
+so the backslashes for TeX need to be entered as \\ pairs to be safe.
+Compare '$\nu\sim\tau$' to the equivalent form "$\\nu\\sim\\tau$" and the incorrect form "$\nu\sim\tau$".
+
+Dictionary Entries
+    'text'            => a_string        # to be processed by TeX
+    'side'            => a_side          # +TOP+, +BOTTOM+, +LEFT+, or +RIGHT+
+    'loc'                                # alias for 'side'
+    'position'        => a_float         # fractional distance along side from bottom left
+    'pos'                                # alias for 'position'
+    'shift'           => a_float         # distance away from side in units of text height
+    'at'              => [ x, y ]        # figure coordinates for text reference point
+    'point'                              # alias for 'at'
+    'x'               => a_float         # x location for reference point
+    'y'               => a_float         # y location for reference point
+    'color'           => a_color         # default is to omit color specification
+    'scale'           => a_float         # scale relative to default_text_scale.  default 1
+    'angle'           => a_float         # degrees to rotate.  default 0
+    'alignment'       => an_alignment    # see #alignment
+    'justification'   => a_justification # see #justification
+
+Examples
+
+    def math_typesetting
+        t.landscape
+        background
+        centerx = t.bounds_xmin + 0.5 * t.bounds_width
+        equation =
+            '\int_{-\infty}^{\infty} e^{\color{Red}-x^{2}}\, ' +
+            '\! dx = \color{Green}\sqrt{\pi}'
+        t.justification = CENTERED
+        t.rescale_text(0.8)
+        t.show_text(
+            'text'=>'Inline Math Mode',
+            'x'=>centerx,
+            'y' => t.bounds_ymin + 0.88 * t.bounds_height)
+        t.show_text(
+            'text'=>'Display Math Mode',
+            'x'=> centerx, 
+            'y' => t.bounds_ymin + 0.46 * t.bounds_height)
+        t.rescale_text(0.8)
+        t.show_text(
+            'text'=>'$' + equation + '$',
+            'x'=> centerx,
+            'y' => t.bounds_ymin + 0.78 * t.bounds_height,
+            'scale'=>1.3)
+        t.show_text(
+            'text'=>'$' + equation + '$',
+            'x'=> centerx,
+            'y' => t.bounds_ymin + 0.64 * t.bounds_height,
+            'angle' => 10, 'scale'=>1.3)
+        equation = '\begin{displaymath}' + equation + '\end{displaymath}'
+        equation = '\parbox{15em}{' + equation + '}'
+        t.show_text(
+            'text'=>equation,
+            'x'=> centerx,
+            'y' => t.bounds_ymin + 0.33 * t.bounds_height,
+            'scale'=>1.3)
+        t.show_text(
+            'text'=>equation,
+            'x' => centerx,
+            'y' => t.bounds_ymin + 0.16 * t.bounds_height,
+            'angle' => 10,
+            'scale'=>1.3)
+    end
+    
+http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Math_Typesetting.jpg
+
+    def strings
+        t.stroke_rect(0,0,1,1)
+        center_x = 0.5; center_y = 0.5; len = 0.125
+        hls = t.rgb_to_hls(Red)
+        angles = 10
+        delta = 360.0/angles
+        equation = '\int_{-\infty}^{\infty} \! e^{-x^{2}}\, \! dx = \sqrt{\pi}'
+        text =
+            '\parbox{15em}{\begin{displaymath}' + 
+            equation + '\end{displaymath}}'
+        angles.times do |angle|
+            angle *= delta
+            dx = len*cos(angle*RADIANS_PER_DEGREE)
+            dy = len*sin(angle*RADIANS_PER_DEGREE)
+            x = center_x + 2*dx; y = center_y + 2*dy;
+            text_color = t.hls_to_rgb([angle/1.8 + 200, hls[1], hls[2]])
+            t.show_text('text' => text, 'color' => text_color, 'x' => x, 'y' => y,
+                'alignment' => ALIGNED_AT_MIDHEIGHT,
+                'scale' => 0.7, 'angle' => t.convert_to_degrees(dx,dy)) 
+        end
+    end
+
+http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Strings.jpg
+
+    def minipages
+        t.landscape
+        background
+        centerx = t.bounds_xmin + 0.5 * t.bounds_width
+        t.show_text(
+            'text' => 'Examples using paragraph boxes',
+            'x' => centerx,
+            'y' => 0.9)
+        t.rescale_text(0.5)
+        t.justification = CENTERED
+        str2 =
+            'The \textcolor{Red}{minipage} is a vertical alignment ' +
+            'environment with a \textcolor{Red}{specified width}.  ' +
+            'It can contain paragraphs, lists, tables, ' +
+            'and equations.  Hyphenation and formatting is automatic.'
+        str2 = '\parbox{15em}{' + str2 + '}'
+        t.show_text(
+            'text' => str2,
+            'x'=> centerx,
+            'y' => t.bounds_ymin + 0.68 * t.bounds_height)
+        t.show_text(
+            'text' => str2,
+            'x'=> centerx,
+            'y' => t.bounds_ymin + 0.30 * t.bounds_height, 'angle' => 20)
+    end
+    
+http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Minipages.jpg
+
+    def framebox
+        t.landscape
+        background
+        centerx = t.bounds_xmin + 0.5 * t.bounds_width
+        t.justification = CENTERED
+        t.show_text(
+            'text' => 'Examples using \textbackslash framebox',
+            'x' => centerx, 'y' =>0.8)
+        dx = 0.05; y = 0.6; dy = -0.15; t.line_width = 0.7; t.stroke_color = Blue
+        t.rescale_text(0.75)
+        t.show_text(
+            'text' => '\framebox[20em][c]{\textbackslash framebox[20em][c]\{ a, b, c \}}',
+            'at' => [centerx, y])
+        y += dy
+        t.show_text(
+            'text' => '\framebox[20em][l]{\textbackslash framebox[20em][l]\{ a, b, c \}}',
+            'at' => [centerx, y])
+        y += dy 
+        t.show_text(
+            'text' => '\framebox[20em][r]{\textbackslash framebox[20em][r]\{ a, b, c \}}',
+            'at' => [centerx, y])
+        y += dy
+        t.show_text(
+            'text' => '\framebox[20em][s]{\textbackslash framebox[20em][s]\{ a, b, c \}}',
+            'at' => [centerx, y])
+    end
+         
+http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Framebox.jpg
+
+=end
+    def show_text(dict)
+    end
+
+# Changes the default_text_scale attribute by multiplying it times _scale_.
+# This also updates the default_text_height_dx and default_text_height_dy
+# attributes to match the new setting for default_text_scale.
+# See also #rescale.
+    def rescale_text(scale)
+    end
+    
+# Calls check_label_clip with the location for the text reference point from the _dict_.
+# If check_label_clip returns +false+, this routine simply returns.  Otherwise, it passes
+# the _dict_ to show_text.
+    def show_label(dict)
+    end
+
+# Returns +true+ if the point given by the figure coordinates (_x_, _y_)
+# is inside the current label clipping margins.  The routine show_label
+# uses this to filter out unwanted text by testing the reference point.
+# If the point passes this test, then show_label calls show_text; otherwise,
+# it simply returns without showing the text.
+    def check_label_clip(x, y)
+    end
+
+# :call-seq:
+#               justification                                     
+#               justification = a_justification
+#
+# Default  for text horizontal justification.  Valid settings are predefined
+# constants: +LEFT_JUSTIFIED+, +CENTERED+, and +RIGHT_JUSTIFIED+.
+# See also #alignment.
+# 
+# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Text_J_and_A.jpg
+   def justification
+   end
+
+# :call-seq:
+#               alignment                              
+#               alignment = an_alignment
+#
+# Default  for text vertical alignment.  Valid settings are predefined
+# constants: +ALIGNED_AT_TOP+, +ALIGNED_AT_MIDHEIGHT+, +ALIGNED_AT_BASELINE+, and +ALIGNED_AT_BOTTOM+.
+# See also #justification.
+   def alignment
+   end
+
+# :call-seq:
+#               default_text_height_dx                                     
+#
+# Height of text having the default_text_scale as measured in x figure coordinates.
+   def default_text_height_dx
+   end
+
+# :call-seq:
+#               default_text_height_dy                                     
+#
+# Height of text having the default_text_scale as measured in y figure coordinates.
+   def default_text_height_dy
+   end
+
+# :call-seq:
+#               label_left_margin                                     
+#               label_left_margin = a_float
+#
+# Size of margin on left of frame measured as a fraction of frame width, with positive values
+# corresponding to margins on the inside of the frame, and negative values to margins on
+# the outside.
+# The show_label routine discards text having its reference point to the left of this position.
+   def label_left_margin
+   end
+
+# :call-seq:
+#               label_right_margin                                     
+#               label_right_margin = a_float
+#
+# Size of margin on right of frame measured as a fraction of frame width, with positive values
+# corresponding to margins on the inside of the frame, and negative values to margins on
+# the outside.
+# The show_label routine discards text having its reference point to the right of this position.
+   def label_right_margin
+   end
+
+# :call-seq:
+#               label_top_margin                                     
+#               label_top_margin = a_float
+#
+# Size of margin on top of frame measured as a fraction of frame height, with positive values
+# corresponding to margins on the inside of the frame, and negative values to margins on
+# the outside.
+# The show_label routine discards text having its reference point above this position.
+   def label_top_margin
+   end
+
+# :call-seq:
+#               label_bottom_margin                                     
+#               label_bottom_margin = a_float
+#
+# Size of margin on bottom of frame measured as a fraction of frame height, with positive values
+# corresponding to margins on the inside of the frame, and negative values to margins on
+# the outside.
+# The show_label routine discards text having its reference point below this position.
+   def label_bottom_margin
+   end
+   
+# :call-seq:
+#               text_shift_on_left                                     
+#               text_shift_on_left = a_float
+#
+# Default value for "shift" in show_text when "side" is +LEFT+.
+   def text_shift_on_left
+   end
+   
+# :call-seq:
+#               text_shift_on_right                                     
+#               text_shift_on_right = a_float
+#
+# Default value for "shift" in show_text when "side" is +RIGHT+.
+   def text_shift_on_right
+   end
+   
+# :call-seq:
+#               text_shift_on_top                                    
+#               text_shift_on_top = a_float
+#
+# Default value for "shift" in show_text when "side" is +TOP+.
+   def text_shift_on_top
+   end
+   
+# :call-seq:
+#               text_shift_on_bottom                                     
+#               text_shift_on_bottom = a_float
+#
+# Default value for "shift" in show_text when "side" is +BOTTOM+.
+   def text_shift_on_bottom
+   end
+   
+# :call-seq:
+#               text_shift_from_x_origin                                     
+#               text_shift_from_x_origin = a_float
+#
+# Default value for "shift" in show_yaxis when "loc" is +AT_X_ORIGIN+.
+   def text_shift_from_x_origin
+   end
+   
+# :call-seq:
+#               text_shift_from_y_origin                                     
+#               text_shift_from_y_origin = a_float
+#
+# Default value for "shift" in show_xaxis when "loc" is +AT_Y_ORIGIN+.
+   def text_shift_from_y_origin
+   end
+   
+# :call-seq:
+#               default_text_scale                                     
+#
+# Default factor determining text size (relative to 12 point text).
+# Is initialized to 1.0 and changed by rescale_text.
+   def default_text_scale
+   end
+
+
+
+end # class
+end # module Tioga
