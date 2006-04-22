@@ -2,6 +2,14 @@
 
 require 'Dobjects/Dvector'
 
+# a test to show that the symbols are present
+
+module Dobjects
+class Dvector
+p self,@_exported_C_symbols
+end
+end
+
 require 'test/unit'
 
 class TestDvector < Test::Unit::TestCase

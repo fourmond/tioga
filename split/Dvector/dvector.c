@@ -28,7 +28,9 @@
 #include <math.h>
 #include "ruby.h"
 #include "intern.h"
-#include "dvector.h"
+#include "dvector_intern.h"
+
+#include <symbols.h>
 
 #define is_a_dvector(d) ( TYPE(d) == T_DATA && RDATA(d)->dfree == (RUBY_DATA_FUNC)dvector_free )
 
@@ -5104,5 +5106,21 @@ void Init_Dvector() {
    rb_require("Dobjects/Dvector_extras.rb");
    rb_require("Dobjects/Numeric_extras.rb");
    /* end of modifications */
+
+   /* now, the fun part: exporting binary symbols.
+      see include/dvector.h for their meaning 
+   */
+   RB_EXPORT_SYMBOL(cDvector, Dvector_Data_for_Read);
+   RB_EXPORT_SYMBOL(cDvector, Dvector_Data_Copy);
+   RB_EXPORT_SYMBOL(cDvector, Dvector_Data_for_Write);
+   RB_EXPORT_SYMBOL(cDvector, Dvector_Data_for_Read);
+   RB_EXPORT_SYMBOL(cDvector, Dvector_Data_Resize);
+   RB_EXPORT_SYMBOL(cDvector, Dvector_Data_Replace);
+   RB_EXPORT_SYMBOL(cDvector, Dvector_Create);
+   RB_EXPORT_SYMBOL(cDvector, Dvector_Store_Double);
+   RB_EXPORT_SYMBOL(cDvector, c_dvector_spline_interpolate);
+   RB_EXPORT_SYMBOL(cDvector, c_dvector_linear_interpolate);
+   RB_EXPORT_SYMBOL(cDvector, c_dvector_create_spline_interpolant);
+   /* I guess that this should be all */
 }
 

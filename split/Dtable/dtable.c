@@ -19,7 +19,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
    
-#include "dtable.h"
+#include "dtable_intern.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -1717,10 +1717,10 @@ VALUE dtable_aset(VALUE ary, VALUE xloc, VALUE yloc, VALUE val) {
  */
 
 
-void Init_DtableBin() {
+void Init_Dtable() {
    /* modified by Vincent Fourmond, for splitting out the libraries */
   
-   /*rb_require("Dobjects/Dvector");*/ /* done by Dtable.rb */
+   rb_require("Dobjects/Dvector");
    /* we first make sure Dvector is included */
    VALUE mDobjects = rb_define_module("Dobjects");
    cDtable = rb_define_class_under(mDobjects, "Dtable", rb_cObject);
@@ -1865,5 +1865,31 @@ void Init_DtableBin() {
    /* modified by Vincent Fourmond, for splitting out the libraries */
    rb_require("Dobjects/Dtable_extras.rb");
    /* end of modification */
+
+   /* first, we export the symbols needed by other libraries
+      see include/dtable.h for their description 
+   */
+   RB_EXPORT_SYMBOL(cDtable, Read_Dtable);
+   RB_EXPORT_SYMBOL(cDtable, Dtable_Ptr);
+
+   /* now we import the symbols from Dvector */
+
+   VALUE cDvector = rb_define_class_under(mDobjects, "Dvector", rb_cObject);
+   RB_IMPORT_SYMBOL(cDvector, Dvector_Create);
+   RB_IMPORT_SYMBOL(cDvector, Dvector_Data_Resize);
+   RB_IMPORT_SYMBOL(cDvector, Dvector_Data_Replace);
+   RB_IMPORT_SYMBOL(cDvector, Dvector_Data_for_Read);
+   RB_IMPORT_SYMBOL(cDvector, Dvector_Store_Double);
+
 }
+
+/* implementing the symnbols just means that the location
+   of the global variable with the pointer function will be here 
+*/
+IMPLEMENT_SYMBOL(Dvector_Create);
+IMPLEMENT_SYMBOL(Dvector_Data_Resize);
+IMPLEMENT_SYMBOL(Dvector_Data_Replace);
+IMPLEMENT_SYMBOL(Dvector_Data_for_Read);
+IMPLEMENT_SYMBOL(Dvector_Store_Double);
+
 

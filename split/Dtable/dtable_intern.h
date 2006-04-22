@@ -22,11 +22,14 @@
 #ifndef __dtable_H__
 #define __dtable_H__
 
+#include <ruby.h>
 #include "dvector.h"
 
 /*======================================================================*/
 
 extern void Init_Dtable();
+/* again the dirty hack: (see dvector_intern.h) */
+#define extern static
 extern VALUE Read_Dtable(VALUE dest, char *filename, int skip_lines);
 extern double **Dtable_Ptr(VALUE dtable, long *num_cols, long *num_rows);
 
@@ -136,6 +139,9 @@ extern VALUE dtable_read(int argc, VALUE *argv, VALUE self);
 extern VALUE dtable_at(VALUE ary, VALUE xloc, VALUE yloc);
 extern VALUE dtable_aset(VALUE ary, VALUE xloc, VALUE yloc, VALUE val);
 extern void dtable_store(VALUE ary, long i, long j, double v);
+
+/* end of dirty hack */
+#undef extern 
 
 #endif   /* __dtable_H__ */
 

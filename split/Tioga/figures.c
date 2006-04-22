@@ -27,6 +27,8 @@
 #include "pdfs.h"
 #include "flate.h"
 
+#include <symbols.h>
+
 #include <stdio.h>
 
 char *data_dir = NULL;
@@ -250,7 +252,7 @@ FM *Get_FM(VALUE fmkr) {
 #define attr_writer(attr) rb_define_method(cFM, #attr "=", FM_##attr##_set, 1);
 #define attr_accessors(attr) attr_reader(attr) attr_writer(attr)
 
-void Init_FigureMakerBin(void) { 
+void Init_FigureMaker(void) { 
      /* called by Ruby when the extension is loaded */
 
    /* this function has been modified by Vincent Fourmond for the splitting
@@ -261,20 +263,22 @@ void Init_FigureMakerBin(void) {
    Init_Dvector();
    Init_Dtable();
    */
+
    /* These functions don't belong here anymore, as they will be called
       by their respective modules. Instead, we require them */
-   /*  
+
    rb_require("Dobjects/Dvector");
    rb_require("Dobjects/Dtable");
    rb_require("Flate");
-   */
-   /* done by the wrapper FigureMaker.rb */
+
    
    VALUE mTioga = rb_define_module("Tioga");
 
    /* and now, we need to import Dobjects and Flate modules*/
-   rb_include_module(mTioga, rb_define_module("Dobjects"));
-   rb_include_module(mTioga, rb_define_module("Flate"));
+   VALUE mDobjects = rb_define_module("Dobjects");
+   VALUE mFlate = rb_define_module("Flate");
+   rb_include_module(mTioga, mDobjects);
+   rb_include_module(mTioga, mFlate);
 
    cFM = rb_define_class_under(mTioga, "FigureMaker", rb_cObject);
    /* I don't like that much, but then, it works...
@@ -282,8 +286,8 @@ void Init_FigureMakerBin(void) {
       My knowledge of ruby internals is limited enough that
       it doesn't surprise me so much... 
    */
-   rb_include_module(cFM, rb_define_module("Dobjects"));
-   rb_include_module(cFM, rb_define_module("Flate"));
+   rb_include_module(cFM, mDobjects);
+   rb_include_module(cFM, mFlate);
    /* end of thing which I don't like -- Vincent Fourmond */
    rb_define_alloc_func(cFM, FM_alloc);
    Init_IDs();
@@ -595,5 +599,45 @@ void Init_FigureMakerBin(void) {
    attr_accessors(legend_justification)
       
    rb_require("Tioga/FigMkr.rb");
+   /* We now need to import the symbols */
+
+   /* imports from Dvector */
+   VALUE cDvector = rb_define_class_under(mDobjects, "Dvector", rb_cObject);
+   RB_IMPORT_SYMBOL(cDvector, Dvector_Create);
+   RB_IMPORT_SYMBOL(cDvector, Dvector_Data_Resize);
+   RB_IMPORT_SYMBOL(cDvector, Dvector_Data_Replace);
+   RB_IMPORT_SYMBOL(cDvector, Dvector_Data_for_Read);
+   RB_IMPORT_SYMBOL(cDvector, Dvector_Data_for_Write);
+   RB_IMPORT_SYMBOL(cDvector, Dvector_Store_Double);
+   RB_IMPORT_SYMBOL(cDvector, c_dvector_spline_interpolate);
+   RB_IMPORT_SYMBOL(cDvector, c_dvector_linear_interpolate);
+   RB_IMPORT_SYMBOL(cDvector, c_dvector_create_spline_interpolant);
+
+   /* imports from Flate */
+   RB_IMPORT_SYMBOL(mFlate, flate_compress);
+   RB_IMPORT_SYMBOL(mFlate, flate_expand);
+
+   /* imports from Dtable */
+   VALUE cDtable = rb_define_class_under(mDobjects, "Dtable", rb_cObject);
+   RB_IMPORT_SYMBOL(cDtable, Dtable_Ptr);
+   RB_IMPORT_SYMBOL(cDtable, Read_Dtable);
 }
+
+/* implementation of the various functions */
+IMPLEMENT_SYMBOL(Dvector_Create);
+IMPLEMENT_SYMBOL(Dvector_Data_Resize);
+IMPLEMENT_SYMBOL(Dvector_Data_Replace);
+IMPLEMENT_SYMBOL(Dvector_Data_for_Read);
+IMPLEMENT_SYMBOL(Dvector_Data_for_Write);
+IMPLEMENT_SYMBOL(Dvector_Store_Double);
+IMPLEMENT_SYMBOL(c_dvector_spline_interpolate);
+IMPLEMENT_SYMBOL(c_dvector_linear_interpolate);
+IMPLEMENT_SYMBOL(c_dvector_create_spline_interpolant);
+
+IMPLEMENT_SYMBOL(flate_compress);
+IMPLEMENT_SYMBOL(flate_expand);
+
+IMPLEMENT_SYMBOL(Dtable_Ptr);
+IMPLEMENT_SYMBOL(Read_Dtable);
+
 

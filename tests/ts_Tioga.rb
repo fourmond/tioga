@@ -10,7 +10,7 @@ require 'tc_Dvector.rb'
 
 require 'tc_Dtable.rb'
 
-
+require 'tc_Flate.rb'
 
 
 

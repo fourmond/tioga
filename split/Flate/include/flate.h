@@ -20,20 +20,25 @@
 */
 
 
+/* This file has been heavily modified by Vincent Fourmond for the 'RCR330'
+   symbol export scheme 
+*/
 #ifndef __flate_H__
 #define __flate_H__
 
-#include "ruby.h"
+#include <symbols.h>
 
-/* and once again, the dirty trick */
-#define extern static
-extern int flate_compress(unsigned char *new_ptr, unsigned long *new_len_ptr, unsigned char *ptr, long len);
+DECLARE_SYMBOL(int, flate_compress, 
+	       (unsigned char *new_ptr, unsigned long *new_len_ptr, 
+		unsigned char *ptr, long len));
 // source is given by ptr and is len bytes in length.
 // new_ptr is destination buffer of size *new_len_ptr.  
 // NOTE: the destination buffer for flate_compress should be LARGER than the source buffer to be safe.
 // The minimal extra is 0.1% larger than the source plus 12 bytes.
 // My rule is to use (len * 11)/10 + 100 just to be sure.
-extern int flate_expand(unsigned char **new_ptr_ptr, unsigned long *new_len_ptr, unsigned char *ptr, long len);
+DECLARE_SYMBOL(int, flate_expand,
+	       (unsigned char **new_ptr_ptr, unsigned long *new_len_ptr, 
+		unsigned char *ptr, long len));
 // source is given by ptr and is len bytes in length.
 // *new_ptr_ptr is destination buffer of size *new_len_ptr.  
 // NOTE: the destination buffer for flate_expand will be reallocated if it isn't large enough.
@@ -52,9 +57,6 @@ extern int flate_expand(unsigned char **new_ptr_ptr, unsigned long *new_len_ptr,
 #define FLATE_MEM_ERROR     (-4)
 #define FLATE_BUF_ERROR     (-5)
 #define FLATE_VERSION_ERROR (-6)
-
-#undef extern 
-extern void Init_Flate(void);
 
 // If this simple interface isn't enough for your needs, the next stop is zlib.h
 // for the full interface.

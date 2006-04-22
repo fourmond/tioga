@@ -1,8 +1,9 @@
 /* flate.c -- main file for Ruby extension
  */
 
+#include <symbols.h>
 #include "zlib.h"
-#include "flate.h"
+#include "flate_intern.h"
 /*
    Copyright (C) 2005  Bill Paxton
 
@@ -56,7 +57,7 @@
 
 /* 
  *  call-seq:
- *     Tioga::Flate.compress(str)  ->  string
+ *     Flate.compress(str)  ->  string
  *
  *  Returns a compressed verion of _str_ in a new string.
  */
@@ -82,7 +83,7 @@ int flate_compress(unsigned char *new_ptr, unsigned long *new_len_ptr, unsigned 
  
 /* 
  *  call-seq:
- *     Tioga::Flate.expand(str)  ->  string
+ *     Flate.expand(str)  ->  string
  *
  *  Returns a decompressed verion of _str_ in a new string.
  *  Assumes that _str_ was compressed using <code>Flate.compress</code>.
@@ -125,7 +126,7 @@ int flate_expand(unsigned char **new_ptr_ptr, unsigned long *new_len_ptr, unsign
 }
  
 /* 
- * Document-module: Tioga::Flate
+ * Document-module: Flate
  *
  * The Flate module implements an efficient lossless compression/decompression algorithm suitable for text and data.
  * It is a Ruby-wrapper around code from the 'zlib' compression library, written by
@@ -146,5 +147,9 @@ void Init_Flate() {
    VALUE mFlate = rb_define_module("Flate");
    rb_define_singleton_method(mFlate, "compress", do_compress, 1);
    rb_define_singleton_method(mFlate, "expand", do_expand, 1);
+
+   /* exporting the symbols that might be needed by other modules */
+   RB_EXPORT_SYMBOL(mFlate, flate_expand);
+   RB_EXPORT_SYMBOL(mFlate, flate_compress);
 }
 

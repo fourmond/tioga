@@ -26,6 +26,8 @@
 /*======================================================================*/
 
 extern void Init_Dvector();
+/* dirty hack to prevent namespace conflicts */
+#define extern static
 extern bool Is_Dvector(VALUE obj);
 extern double *Dvector_Data_for_Read(VALUE dvector, long *len_ptr); /* returns pointer to the dvector's data (which may be shared) */
 extern double *Dvector_Data_Copy(VALUE dvector, long *len_ptr); /* like Dvector_Data_for_Read, but returns pointer to a copy of the data */
@@ -131,6 +133,9 @@ extern VALUE dvector_spline_interpolate(int argc, VALUE *argv, VALUE klass);
 
 extern double c_dvector_linear_interpolate(int num_pts, double *xs, double *ys, double x);
 extern VALUE dvector_linear_interpolate(int argc, VALUE *argv, VALUE klass);
+
+/* end of dirty hack */
+#undef extern
 
 #endif   /* __Dvector_H__ */
 
