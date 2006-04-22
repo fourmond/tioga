@@ -1,0 +1,158 @@
+This is the README for the Tioga kernel, version 1.0.M, April 13, 2006.
+
+    Copyright (C) 2005, 2006  Bill Paxton
+    
+    This file is part of Tioga.
+    
+    Tioga is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Library Public License as published
+    by the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+    
+    Tioga is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Library General Public License for more details.
+    
+    You should have received a copy of the GNU Library General Public License
+    along with Tioga; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+
+<< What's new >>
+
+    Version 1.0.M no longer raises error for calls on 'stroke', 'fill', and such with an empty path.
+It has also been reconfigured to support the new Mac GUI which now works with both PowerPC and Intel
+processors.
+
+
+<< What's old >>
+
+    Version 1.0.L adds 'transparency' as a synonym for (1.0 - opacity).  So
+now you can set 'fill_transparency' to 0.3 instead of setting 'fill_opacity'
+to 0.7.  I'm sure that makes your day.  The documentation has also been
+updated of course.
+
+
+    Version 1.0.K was Vincent Fourmond's fault!  The same day that J was released,
+he sent me an email pointing out an oversight in the legend functionality.
+Not only that, he sent along an implementation to fix the problem!  What could I do?
+I had to put it in and make a new release.  So thanks to Vincent, you can now include 
+markers on the lines in legends.  Details in the new documentation for 'save_legend_info'.
+
+
+<< Quick Installation of Tioga >>
+
+    Are you feeling lucky?  If so, try QUICK_INSTALL.  This simply does
+the steps for you that are described below.  The install needs to copy some
+files to the ruby directory.  On the Mac, this probably means you need to do
+the whole thing with a 'sudo'.  For Linux, you may have to become root.
+Once you've taken care of that, just run the QUICK_INSTALL script and
+keep your fingers crossed.
+
+    Please check that there are 0 failures and 0 errors at the end of the test.
+Then, in your favorite PDF previewer, open the newly created 'tests/Icon_Test.pdf'
+and compare it to the prebuilt 'samples/Icon.pdf'.  They should be very similar!
+If it all seems to be working, go directly to the << Documentation >> section below.
+
+
+<< Step-by-Step Installation >>
+
+    To get Tioga running, you need to have a working Ruby, a C compiler,
+make, and pdflaxtex.  Assuming you've got all that (more later if you don't),
+connect to the Tioga directory that you just unpacked and do the following:
+
+    cd make
+    ruby extconf.rb
+    make
+    make install
+    
+This creates the Makefile, runs it, and finally does the actual
+installation.  The "make install" needs to copy some files to the ruby directory.
+On the Mac, this probably means you need to do the whole thing inside a 'sudo'.
+For Linux, you may have to become root.
+
+Note that on Linux, the make will compile all the source files.  On the Mac,
+the tar file includes precompiled versions of everything, so the make won't
+have anything to do.  That's okay.  Do the whole sequence anyway just to be safe.
+
+
+<< Checking The Installation >>
+
+    To make sure at least something works of out the newly installed stuff,
+change directory to your new Tioga folder.  Then enter this to the shell:
+
+    cd tests
+    ruby ts_Tioga.rb
+    
+This should produce something like the following if the install worked:
+
+	Loaded suite ts_Tioga
+	Started
+	.....................................................
+	compressed from 0 to 8
+	compressed from 13 to 21
+	compressed from 70 to 69
+	compressed from 3631 to 1642
+	.pdflatex -interaction nonstopmode Icon_Test.tex > pdflatex.log
+ 
+ 
+ 
+	>>> NOTE: please look at tests/Icon_Test.pdf and compare it to samples/Icon.pdf
+	.
+	Finished in 0.501211 seconds.
+
+	55 tests, 647 assertions, 0 failures, 0 errors
+
+These tests ensure that Tioga is accessible and that some of the basic stuff is working.
+Don't skip the visual check of the newly created file 'tests/Icon_Test.pdf'.
+If that's ok, there's a good chance your installation is up and running.
+
+The next step is to do the tutorial found in the documentation.
+
+
+
+<< Tutorial >>
+
+    Once you have Tioga installed, the on-line tutorial will help you
+get started using it.
+    
+http://theory.kitp.ucsb.edu/~paxton/tioga_doc/classes/Tioga/Tutorial.html
+
+
+<< Documentation >>
+
+    Visit this website to access the documentation:
+    
+        http://theory.kitp.ucsb.edu/~paxton/tioga_doc/index.html
+
+If for some reason that link isn't working, go to my website,
+
+        http://theory.kitp.ucsb.edu/~paxton
+
+and check there for a new link to the Tioga stuff.
+
+    Try to get by with the on-line documentation, but if you really
+have a need to rebuild the documentation using Rdoc, I've
+included a .document file in the release folder.  However, all
+the figures have direct links to jpegs on my website, so you'll
+either have to live with that, or do a bunch of edits.  Send me
+an email if you'd like a tar file of the images.
+
+
+<< Open Source >>
+
+    You are welcome to take the Tioga source and do what you want with it
+(within the bounds of the GNU license of course).  But don't even think about
+asking for support from me for debugging your new stuff!  I have enough trouble
+with my own bugs to keep me busy endlessly!  But if it looks like a bug in Tioga,
+please do let me know so I can try to fix it.  Or even better, let me know
+the fix along with the bug!
+
+
+----------------------------------
+
+For more, visit my website:  http://theory.kitp.ucsb.edu/~paxton
+
+Best wishes,
+Bill Paxton

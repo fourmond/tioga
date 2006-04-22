@@ -1,0 +1,6 @@
+cd make
+ruby extconf.rb
+make
+make install
+cd ../tests
+ruby ts_Tioga.rb
