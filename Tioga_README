@@ -63,10 +63,14 @@ If it all seems to be working, go directly to the << Documentation >> section be
 make, and pdflaxtex.  Assuming you've got all that (more later if you don't),
 connect to the Tioga directory that you just unpacked and do the following:
 
-    cd make
+  [ this has been changed, be careful ! ]
+
+    cd split 
     ruby extconf.rb
     make
     make install
+
+  [ but hopefully it works fine as before ]
     
 This creates the Makefile, runs it, and finally does the actual
 installation.  The "make install" needs to copy some files to the ruby directory.
@@ -158,8 +162,3 @@ For more, visit my website:  http://theory.kitp.ucsb.edu/~paxton
 Best wishes,
 Bill Paxton
 
-CVS: 
-
-  The CVS version won't work as simply as stated before. You need to get the developer tar.gz file 
-from the file release system on rubyforge and unpack it to this directory. Then, the above step should 
-work fine.

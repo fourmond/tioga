@@ -1,4 +1,4 @@
-cd make
+cd split
 ruby extconf.rb
 make
 make install
