@@ -1,4 +1,4 @@
-doc/tutorial*.rb
+tutorial/tutorial*.rb
 split/Tioga/lib/Coordinate_Conversions.rb
 split/Tioga/lib/Figures_and_Plots.rb
 split/Tioga/lib/Page_Frame_Bounds.rb
@@ -26,4 +26,4 @@ split/Dvector/dvector.c
 split/Dtable/dtable.c
 split/Flate/flate.c
 split/Tioga/lib/Doc.rb
-doc/tioga_doc.rb
+tutorial/tioga_doc.rb
