@@ -18,7 +18,6 @@ This is the README for the Tioga kernel, version 1.0.M, April 13, 2006.
     along with Tioga; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-[ for CVS see at end ]
 
 << What's new >>
 
@@ -51,6 +50,10 @@ the whole thing with a 'sudo'.  For Linux, you may have to become root.
 Once you've taken care of that, just run the QUICK_INSTALL script and
 keep your fingers crossed.
 
+    You now have the option to run HOME_INSTALL instead, which will install the files to 
+your home directory (no root privileges needed). You just need to set your RUBYLIB 
+environment variable as reminded at the end of the file.
+
     Please check that there are 0 failures and 0 errors at the end of the test.
 Then, in your favorite PDF previewer, open the newly created 'tests/Icon_Test.pdf'
 and compare it to the prebuilt 'samples/Icon.pdf'.  They should be very similar!
@@ -70,8 +73,6 @@ connect to the Tioga directory that you just unpacked and do the following:
     make
     make install
 
-  [ but hopefully it works fine as before ]
-    
 This creates the Makefile, runs it, and finally does the actual
 installation.  The "make install" needs to copy some files to the ruby directory.
 On the Mac, this probably means you need to do the whole thing inside a 'sudo'.
@@ -80,6 +81,16 @@ For Linux, you may have to become root.
 Note that on Linux, the make will compile all the source files.  On the Mac,
 the tar file includes precompiled versions of everything, so the make won't
 have anything to do.  That's okay.  Do the whole sequence anyway just to be safe.
+
+    You now have another option to install: if you replace the line
+    ruby extconf.rb
+with 
+    ruby extconf.rb --home
+it will install the files to your home directory, namely ~/lib/ruby. You don't need root 
+privileges to do that, but make sure that you set RUBYLIB=~/lib/ruby somewhere, so that ruby 
+can find it.
+
+
 
 
 << Checking The Installation >>

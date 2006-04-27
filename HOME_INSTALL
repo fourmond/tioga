@@ -1,0 +1,8 @@
+cd split
+ruby extconf.rb --home
+make
+make install
+export RUBYLIB=$HOME/lib/ruby
+cd ../tests
+ruby ts_Tioga.rb
+echo "Don't" 'forget to set the RUBYLIB=$HOME/lib/ruby !'

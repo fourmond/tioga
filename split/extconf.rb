@@ -1,6 +1,6 @@
 # main Tioga installation file
 
-require 'mkmf2'
+require './mkmf2.rb'
 
 # install Dvector include and library files into base dirs,
 # and builds Dvector.so
