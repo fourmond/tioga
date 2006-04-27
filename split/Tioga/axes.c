@@ -247,17 +247,24 @@ static char *Create_Label(double value, int scale, int prec, bool log_values, bo
    int exponent = ROUND(value);
    buff[0] = 0;
    if (log_values && use_fixed_pt) {   /* Logarithmic */
+     double sav_val = value, pow_val;
      value = pow(10.0, exponent);
+     pow_val = pow(10.0, sav_val);
      if (exponent < 0) {
         char form[10];
-        sprintf(form, "%%.%df", ABS(exponent));
-        sprintf(buff, form, value);
+        int numdig = ABS(exponent)+1;
+        sprintf(form, "%%.%df", numdig);
+        sprintf(buff, form, pow_val);
+     } else if (abs(value - pow_val) > 0.1) {
+        sprintf(buff, "%0.2f", pow_val);
      } else {
         sprintf(buff, "%d", (int) value);
      }
-   } else if (log_values && value == exponent) {
+   } else if (log_values) {
      /* Exponential, i.e. 10^-1, 1, 10, 10^2, etc */
-     if (exponent == 0) strcpy(buff, "1");
+     double abs_diff = fabs(value - exponent);
+     if (abs_diff > 0.1) sprintf(buff, "$\\mathrm{10^{%0.1f}}$", value);
+     else if (exponent == 0) strcpy(buff, "1");
      else if (exponent == 1) strcpy(buff, "10");
      else sprintf(buff, "$\\mathrm{10^{%d}}$", exponent);
    } else {   /* Linear */
@@ -490,6 +497,10 @@ static void draw_major_ticks(FM *p, PlotAxis *s)
       long len;
       s->majors = Dvector_Data_for_Read(s->locations_for_major_ticks, &len);
       s->nmajors = len;
+      if (len > 1) {
+        s->interval = s->majors[1] - s->majors[0];
+        if (s->interval < 0.0) { s->interval = -s->interval; }
+      }
    } else { // calculate major tick locations
       s->interval = s->tick_interval;
       double height = ((s->vertical)? p->default_text_height_dy : p->default_text_height_dx);

@@ -28,9 +28,10 @@ class MyPlots
         @have_data = false
         @big_blues = Dvector.new
         @big_blues_scale = 11.0
-        @reds_plot = t.def_figure("Reds") { reds }
         @blues_plot = t.def_figure("Blues") { blues }
         @reds_plot = t.def_figure("Greens") { greens }
+        @reds_plot = t.def_figure("Reds") { reds }
+        t.def_figure("Log_Reds") { log_reds }
         @side_by_side_plot = t.def_figure("Side_by_Side") { side_by_side }
         @two_yaxes_plot = t.def_figure("Two_Ys") { two_yaxes }
         @legend_inside_plot = t.def_figure("Legends") { legends }
@@ -110,6 +111,18 @@ class MyPlots
         show_model_number
         xs = @positions
         ys = @reds
+        t.show_plot(plot_boundaries(xs,ys,@margin,-1,1)) { t.show_polyline(xs,ys,Red) }
+    end
+    
+    def log_reds
+        read_data
+        t.do_box_labels('log log Reds Plot', 'Position', '\textcolor[rgb]{1,0,0}{Reds}')
+        show_model_number
+        xs = @positions
+        ys = @reds
+        t.xaxis_log_values = true
+        t.yaxis_log_values = true
+        t.xaxis_number_of_minor_intervals = 1
         t.show_plot(plot_boundaries(xs,ys,@margin,-1,1)) { t.show_polyline(xs,ys,Red) }
     end
     
