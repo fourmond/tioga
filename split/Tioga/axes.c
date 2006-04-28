@@ -459,7 +459,7 @@ static int Pick_Number_of_Minor_Intervals(double length)
    return num_subintervals;
 }
 
-static void Pick_Major_Tick_Interval(FM *p, double tick_min, double tick_gap, double length, double *tick)
+static void Pick_Major_Tick_Interval(FM *p, double tick_min, double tick_gap, bool log_values, double length, double *tick)
 {
    double t1, t2, tick_reasonable, base_interval;
    int np;
@@ -474,12 +474,15 @@ static void Pick_Major_Tick_Interval(FM *p, double tick_min, double tick_gap, do
    else if (t1 > 1.5) { t2 = 5.0; np--; }
    else { t2 = 2.0; np--; }
    /* Now compute reasonable tick spacing */
-   base_interval = pow(10.0, (double) np);
-   if (t2 == 2.0 && t2 * base_interval < tick_gap) t2 = 1.0;
-   while (true) {
-      tick_reasonable = t2 * base_interval;
-      if (tick_reasonable >= tick_min) break;
-      t2++;
+   if (log_values) tick_reasonable = 1.0;
+   else {
+       base_interval = pow(10.0, (double) np);
+       if (t2 == 2.0 && t2 * base_interval < tick_gap) t2 = 1.0;
+       while (true) {
+          tick_reasonable = t2 * base_interval;
+          if (tick_reasonable >= tick_min) break;
+          t2++;
+       }
    }
    if (*tick == 0) *tick = tick_reasonable;
    else { // check the given interval compared to the default
@@ -506,7 +509,7 @@ static void draw_major_ticks(FM *p, PlotAxis *s)
       double height = ((s->vertical)? p->default_text_height_dy : p->default_text_height_dx);
       double tick_min = s->min_between_major_ticks * height;
       double tick_gap = 10.0 * height;
-      Pick_Major_Tick_Interval(p, tick_min, tick_gap, s->length, &s->interval);
+      Pick_Major_Tick_Interval(p, tick_min, tick_gap, s->length, s->log_values, &s->interval);
       s->majors = Pick_Locations_for_Major_Ticks(s->interval, s->axis_min, s->axis_max, &s->nmajors);
       s->free_majors = true;
    }
@@ -538,7 +541,10 @@ static double log_subintervals[8] =
 static void draw_minor_ticks(FM *p, PlotAxis *s)
 {
    if (s->number_of_minor_intervals <= 0) {
-      s->number_of_minor_intervals = (s->log_values)? ((s->interval != 1.0)? 1 : 9) : Pick_Number_of_Minor_Intervals(s->interval);
+      if (s->log_values) {
+         double interval = s->majors[1] - s->majors[0];
+         s->number_of_minor_intervals = (abs(interval) != 1.0)? 1 : 9; 
+      }  else s->number_of_minor_intervals = Pick_Number_of_Minor_Intervals(s->interval);
    }
    int i, j, nsub = s->number_of_minor_intervals;
    double inside=0.0, outside=0.0, length;

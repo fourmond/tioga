@@ -116,7 +116,7 @@ class MyPlots
     
     def log_reds
         read_data
-        t.do_box_labels('log log Reds Plot', 'Position', '\textcolor[rgb]{1,0,0}{Reds}')
+        t.do_box_labels('loglog Reds Plot', 'Position', '\textcolor[rgb]{1,0,0}{Reds}')
         show_model_number
         xs = @positions
         ys = @reds
