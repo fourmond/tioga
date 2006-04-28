@@ -459,10 +459,10 @@ static int Pick_Number_of_Minor_Intervals(double length)
    return num_subintervals;
 }
 
-static void Pick_Major_Tick_Interval(FM *p, double tick_min, double tick_gap, bool log_values, double length, double *tick)
+static void Pick_Major_Tick_Interval(FM *p, double tick_min, double tick_gap, double length, bool log_values, double *tick)
 {
    double t1, t2, tick_reasonable, base_interval;
-   int np;
+   int np, i;
    /* Magnitude of min/max difference to get tick spacing */
    t1 = (double) log10(length);
    np = (int) floor(t1);
@@ -474,14 +474,16 @@ static void Pick_Major_Tick_Interval(FM *p, double tick_min, double tick_gap, bo
    else if (t1 > 1.5) { t2 = 5.0; np--; }
    else { t2 = 2.0; np--; }
    /* Now compute reasonable tick spacing */
-   if (log_values) tick_reasonable = 1.0;
-   else {
+   if (log_values) {
+    tick_reasonable = 1.0; 
+   } else {
        base_interval = pow(10.0, (double) np);
        if (t2 == 2.0 && t2 * base_interval < tick_gap) t2 = 1.0;
-       while (true) {
+       i = 0;
+       while (i < 100) {
           tick_reasonable = t2 * base_interval;
           if (tick_reasonable >= tick_min) break;
-          t2++;
+          t2++; i++;
        }
    }
    if (*tick == 0) *tick = tick_reasonable;
