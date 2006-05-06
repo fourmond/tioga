@@ -1,6 +1,7 @@
 #  tc_Dvector.rb
 
 require 'Dobjects/Dvector'
+require 'stringio'
 
 # a test to show that the symbols are present
 
@@ -660,24 +661,30 @@ class TestDvector < Test::Unit::TestCase
         assert((dest[4]-x3).abs < 1e-6)
         assert((dest[5]-y3).abs < 1e-6)
     end
+
+    FANCY_READ_TEXT = <<"EOT"
+# some comments
+
+# and a blank line above
+1.2  2.4
+1.3 2.4\t3.5
+1.2
+EOT
+
+    def test_fancy_read 
+      stream = StringIO.new(FANCY_READ_TEXT)
+      cols = Dvector.fancy_read(stream, nil, 'default'=> 0.0)
+      cols2 = [Dvector[1.2, 1.3, 1.2], Dvector[2.4, 2.4, 0.0],
+               Dvector[0.0, 3.5, 0.0]]
+      3.times do |i|
+        assert_equal(cols[i], cols2[i])
+      end
+
+      cols = Dvector.fancy_read(stream, [1,2], 'default'=> 0.0)
+      p cols
+      assert_equal(cols[0], cols2[1])
+      assert_equal(cols[1], cols2[2])
+
+    end
     
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
