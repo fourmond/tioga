@@ -86,8 +86,13 @@ class FigureMaker
     
     attr_accessor :num_error_lines
 
+    # Wether or not to create +save_dir+ if it doesn't exist
+    attr_accessor :create_save_dir
+
     def initialize
-    
+
+        @create_save_dir = true # creates +save_dir+ by default
+
         @name = nil
         @auto_refresh_filename = nil
         @figure_names = [ ]
@@ -1300,6 +1305,7 @@ class FigureMaker
     end
     
     def make_portfolio_pdf(name=nil)
+        ensure_safe_save_dir
         if !(name.kind_of?String)
             puts "Sorry: arg for make_portfolio must be a filename string"
             return
@@ -1329,6 +1335,7 @@ class FigureMaker
     end
     
     def make_preview_pdf(num)
+        ensure_safe_save_dir
         run_directory = @run_dir; pdflatex = @which_pdflatex; quiet = @quiet_mode
         num = num.to_i
         num_figures = @figure_names.size
@@ -1401,6 +1408,7 @@ class FigureMaker
     end
     
     def make_portfolio(name)
+        ensure_safe_save_dir
         if @save_dir != nil
             if @save_dir[-1..-1] != '/'
                 fullname = @save_dir + '//' + name
@@ -1614,6 +1622,24 @@ class FigureMaker
             raise "Sorry: '#{name}' must be a Dvector for '#{who_called}'"
         end
         return val
+    end
+
+    # We make sure that save_dir exists and is a directory, creating it
+    # if necessary.
+    def ensure_safe_save_dir
+      if @save_dir
+        if File.exists?(@save_dir) and not File.directory?(@save_dir)
+          raise "save_dir (#{@save_dir}) exists and is not a directory"
+        else
+          # we create the directory if possible
+          if @create_save_dir
+            Dir.mkdir @save_dir
+          else
+            raise "save_dir (#{@save_dir}) doesn't exist " +
+              " and I was told not to create it"
+          end
+        end
+      end
     end
     
 end # class FigureMaker

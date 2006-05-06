@@ -11,7 +11,7 @@ class Default_Plot
     end
 
     def initialize
-        $data = 'la.data'
+        $data = 'forward.out' # better use a default file that exists !
         $y_column = 2
         $first_line = 1
         @figure_maker = FigureMaker.default
