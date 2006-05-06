@@ -1628,8 +1628,8 @@ class FigureMaker
     # if necessary.
     def ensure_safe_save_dir
       if @save_dir
-        if File.exists?(@save_dir) and not File.directory?(@save_dir)
-          raise "save_dir (#{@save_dir}) exists and is not a directory"
+        if File.exists?(@save_dir) 
+          raise "save_dir (#{@save_dir}) exists and is not a directory" unless File.directory?(@save_dir)
         else
           # we create the directory if possible
           if @create_save_dir
