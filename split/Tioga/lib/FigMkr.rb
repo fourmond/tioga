@@ -34,9 +34,9 @@ class FigureMaker
     CVS_TAG = "$Name$"
     
     # Version now uses the CVS_TAG to create the version number. CVS_TAG should
-    # look like '$Name$ for the 1.1.0 release. 
+    # look like 'rel_1_1_0' for the 1.1.0 release. 
     def FigureMaker.version
-      CVS_TAG =~ /\D+(.*?)\$?$/
+      CVS_TAG =~ /\D+(.*?)\s*\$?$/
       return $1.tr("-_", "..")
     end
 
