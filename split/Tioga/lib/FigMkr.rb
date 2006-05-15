@@ -29,9 +29,15 @@ class FigureMaker
     
     @@default_figure_maker = nil
     @@initialized = false  # set true by the C code when first make a figure
+
+    # The tag used for cvs export 
+    CVS_TAG = "$Name$"
     
+    # Version now uses the CVS_TAG to create the version number. CVS_TAG should
+    # look like '$Name$ for the 1.1.0 release. 
     def FigureMaker.version
-        'Tioga_1.0.M'
+      CVS_TAG =~ /\D+(.*?)\$?$/
+      return $1.tr("-_", "..")
     end
 
     def FigureMaker.default

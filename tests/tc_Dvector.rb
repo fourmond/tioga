@@ -680,8 +680,8 @@ EOT
         assert_equal(cols[i], cols2[i])
       end
 
+      stream = StringIO.new(FANCY_READ_TEXT)
       cols = Dvector.fancy_read(stream, [1,2], 'default'=> 0.0)
-      p cols
       assert_equal(cols[0], cols2[1])
       assert_equal(cols[1], cols2[2])
 

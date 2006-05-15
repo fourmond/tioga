@@ -203,14 +203,9 @@ module Dobjects
       end
 
       return columns unless cols
-      p cols
-      p o
       return cols.collect { |i| 
-        p i
-        p columns[i]
         columns[i]
       }
-
     end
 
   end
