@@ -180,7 +180,7 @@ class MyPlots
         read_data
         show_model_number
         t.show_plot_with_legend(
-            'legend_left_margin' => 0.6,
+            'legend_left_margin' => 0.7,
             'plot_scale' => 1,
             'legend_scale' => 1.3,
             'plot_right_margin' => 0) { reds_blues }
