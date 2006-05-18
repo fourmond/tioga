@@ -36,7 +36,7 @@ Compare '$\nu\sim\tau$' to the equivalent form "$\\nu\\sim\\tau$" and the incorr
 
 Dictionary Entries
     'text'            => a_string        # to be processed by TeX
-    'side'            => a_side          # +TOP+, +BOTTOM+, +LEFT+, or +RIGHT+
+    'side'            => a_side          # TOP, BOTTOM, LEFT, or RIGHT
     'loc'                                # alias for 'side'
     'position'        => a_float         # fractional distance along side from bottom left
     'pos'                                # alias for 'position'
@@ -48,8 +48,8 @@ Dictionary Entries
     'color'           => a_color         # default is to omit color specification
     'scale'           => a_float         # scale relative to default_text_scale.  default 1
     'angle'           => a_float         # degrees to rotate.  default 0
-    'alignment'       => an_alignment    # see #alignment
-    'justification'   => a_justification # see #justification
+    'alignment'       => an_alignment    # see discussion of alignment
+    'justification'   => a_justification # see discussion of justification
 
 Examples
 

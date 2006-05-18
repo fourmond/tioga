@@ -16,7 +16,7 @@ class MyPlots
         @data_filename = "data/datalog.data"
         t.auto_refresh_filename = @data_filename
         t.add_model_number = true
-
+        
         @image_right_margin = 0.07
         @margin = 0.1
         @header = Dvector.new
@@ -35,6 +35,7 @@ class MyPlots
         @side_by_side_plot = t.def_figure("Side_by_Side") { side_by_side }
         @two_yaxes_plot = t.def_figure("Two_Ys") { two_yaxes }
         @legend_inside_plot = t.def_figure("Legends") { legends }
+        @legend_inside_plot = t.def_figure("Reds_and_Blues") { reds_blues }
         @legend_inside_plot = t.def_figure("Legend_Inside") { legend_inside }
         @legend_outside_plot = t.def_figure("Legend_Outside") { legend_outside }
         @column_triplets_plot = t.def_figure("Column_Triplets") { column_triplets }
@@ -179,7 +180,8 @@ class MyPlots
         read_data
         show_model_number
         t.show_plot_with_legend(
-            'legend_left_margin' => 0.7,
+            'legend_left_margin' => 0.6,
+            'plot_scale' => 1,
             'legend_scale' => 1.3,
             'plot_right_margin' => 0) { reds_blues }
     end

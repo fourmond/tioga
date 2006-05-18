@@ -133,7 +133,7 @@ class FigureMaker
             'plot_bottom_margin' => 0.0,
             'plot_left_margin' => 0.0,
             'plot_right_margin' => 0.18,
-            'plot_scale' => 0.9,
+            'plot_scale' => 1,
             'legend_scale' => 1 }
         
         @marker_defaults = { 
