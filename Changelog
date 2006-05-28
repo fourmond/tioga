@@ -1,0 +1,7 @@
+tioga (1.1.0)
+
+  * Added a brand new rch-based changelog
+  * Added utils/rch to maintain that changelog...
+
+ -- Vincent Fourmond <vincent.fourmond@9online.fr>, Sun May 28 12:42:33 CEST 2006
+
