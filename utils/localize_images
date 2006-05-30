@@ -1,0 +1,30 @@
+#!/usr/bin/ruby
+
+# This file provides a way to extract links to images from ruby files
+# converting the files and getting the images into static links.
+
+target_dir = $*.shift           # The dir where to put images
+link= $*.shift                  # How to reference them from the doc
+files= $*                  # The files to be processed
+
+for file in files 
+  puts file
+  open(file) do |f|
+    o = file + ".new"
+    output = open(o, "w")
+    for line in f
+      if line =~/(http:.*(jpg|gif|jpeg))/
+        puts line
+        image = $1
+        puts image
+        image =~ /.*\/(.*)/
+        file_name = $1
+        puts file_name
+        output.print line.sub(image,"link:#{link}/#{file_name}")
+        system "wget -O #{target_dir}/#{file_name} #{image}"
+      else
+        output.print line
+      end
+    end
+  end 
+end 
