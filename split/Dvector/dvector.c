@@ -175,7 +175,7 @@ static Dvector *Get_Dvector(VALUE obj) {
 
 #define DVEC_TMPLOCK  FL_USER1
 
-static inline VALUE dvector_modify_check(VALUE ary) {
+static inline void dvector_modify_check(VALUE ary) {
    if (OBJ_FROZEN(ary)) rb_error_frozen("dvector");
    if (FL_TEST(ary, DVEC_TMPLOCK))
       rb_raise(rb_eRuntimeError, "can't modify dvector during iteration");
