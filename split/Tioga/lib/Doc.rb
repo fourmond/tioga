@@ -1,8 +1,9 @@
 #  Doc.rb
 
+
 =begin rdoc
 
-This is the reference document for the FigureMaker class which implements the Tioga kernel for creating figures and plots using Ruby, PDF, and TeX.
+This is the reference document for the class which implements the Tioga kernel for creating figures and plots using Ruby, PDF, and TeX.
 
 Understand that this reference material is more like a dictionary than a textbook.  It is written assuming that you've already familiarized yourself with how things work to the level covered in the Tutorial.  Without that background, much of the following will be incomprehensible.
 
@@ -54,8 +55,10 @@ For more information on PDF, consult the Adode PDF Reference document.  It's a h
 
 =end
 
-module Tioga
 
+
+module Tioga
+    
 class FigureMaker
 
 # :call-seq:
