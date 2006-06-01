@@ -358,7 +358,8 @@ class CLFile
   # modify the file)
   def add_new_entry(target_file,email, 
                     version = nil, entry = nil,
-                    editor = "nano") 
+                    editor = "nano",
+                    verbose = false) 
     if version.nil? or version == latest_version
       line_number, lines = @sections[0].add_entry(email, entry)
       text = lines.join('') + "\n" +  
@@ -391,7 +392,9 @@ class CLFile
     if(entry.nil?) 
       # interactive edition
       time_before = File::mtime(target_file.path)
-      system "#{editor} +#{line_number} #{target_file.path}"
+      cmd = "#{editor} +#{line_number} #{target_file.path}"
+      puts cmd if verbose
+      system cmd
       time_after = File::mtime(target_file.path)
       return time_before < time_after
     end
@@ -446,6 +449,8 @@ if ENV.has_key? "EDITOR"
 else
   options.editor = "nano"       # nano by default
 end
+
+options.verbose = false
 
 opts = OptionParser.new do |opts|
   opts.banner = "$0 [options]"
@@ -504,6 +509,11 @@ opts = OptionParser.new do |opts|
     options.tag = tag
   end
 
+  opts.on("-v","--verbose", 
+          "Prints out a command before executing it") do 
+    options.verbose = true
+  end
+
 
   opts.on("","--repository REP", 
           "Chooses the repository REP for --cvs") do |rep|
@@ -540,8 +550,10 @@ else
   temp_file = Tempfile.new('changelog')
   if cl.add_new_entry(temp_file, options.email,
                       options.version, options.entry,
-                      options.editor)
-    system "cp '#{temp_file.path}' '#{file}'"
+                      options.editor, options.verbose)
+    cmd = "cp '#{temp_file.path}' '#{file}'"
+    puts cmd if options.verbose
+    system cmd
   end
 end
 
