@@ -124,6 +124,7 @@ class FigureMaker
         @tex_xoffset = -0.2
         @tex_yoffset = -3.55
         
+        
         @legend_defaults = { 
             'legend_top_margin' => 0.03,
             'legend_bottom_margin' => 0.03,

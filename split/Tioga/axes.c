@@ -23,6 +23,7 @@
 
 typedef struct {
    int type;
+   int other_axis_type;
    double line_width;
    VALUE stroke_color;
    double major_tick_width; // same units as line_width
@@ -100,6 +101,7 @@ void figure_join_and_stroke(FM *p, double x0, double y0, double x1, double y1) /
 static void Get_xaxis_Specs(FM *p, PlotAxis *s)
 {
    s->type = p->xaxis_type;
+   s->other_axis_type = p->yaxis_type;
    s->line_width = p->xaxis_line_width; // for axis line
    s->stroke_color = p->xaxis_stroke_color; // for axis line and tick marks
    s->major_tick_width = p->xaxis_major_tick_width; // same units as line_width
@@ -128,6 +130,7 @@ static void Get_xaxis_Specs(FM *p, PlotAxis *s)
 static void Get_yaxis_Specs(FM *p, PlotAxis *s)
 {
    s->type = p->yaxis_type;
+   s->other_axis_type = p->xaxis_type;
    s->line_width = p->yaxis_line_width; // for axis line
    s->stroke_color = p->yaxis_stroke_color; // for axis line and tick marks
    s->major_tick_width = p->yaxis_major_tick_width; // same units as line_width
@@ -383,12 +386,18 @@ static char **Get_Labels(FM *p, PlotAxis *s)
    if (s->tick_labels==Qnil) { // create label strings
       int mode, prec, scale;
       Pick_Label_Precision(s->axis_min, s->axis_max, s->interval, s->use_fixed_pt, &mode, &prec, s->digits_max, &scale);
-      int i, upper_right = (s->reversed)? 0 : s->nmajors-1;
+      int i, upper_right = (s->reversed)? 0 : s->nmajors-1, lower_left = (s->reversed)? s->nmajors-1 : 0;
       for (i = 0; i < s->nmajors; i++) {
          ps = NULL;
          if (i == upper_right && !s->log_values && mode && scale)
             sprintf(ps = postfix, " (x$\\mathrm{10^{%d}}$)", scale);
-         labels[i] = Create_Label(s->majors[i], scale, prec, s->log_values, s->use_fixed_pt, ps, s);
+         if (i == lower_left && s->nmajors >= 3 && s->vertical && 
+                (s->other_axis_type == AXIS_WITH_MAJOR_TICKS_AND_NUMERIC_LABELS ||
+                 s->other_axis_type == AXIS_WITH_TICKS_AND_NUMERIC_LABELS)) {
+            labels[i] = NULL;
+         } else {
+            labels[i] = Create_Label(s->majors[i], scale, prec, s->log_values, s->use_fixed_pt, ps, s);
+        }
       }
       s->free_strings_for_labels = true;
    } else { // use the given label strings
@@ -603,7 +612,7 @@ static void draw_numeric_labels(FM *p , VALUE fmkr, int location, PlotAxis *s)
    shift += s->numeric_label_shift;
    s->labels = Get_Labels(p, s);
    for (i=0; i < s->nmajors; i++) {
-      show_numeric_label(p, fmkr, s, s->labels[i], location, s->majors[i], shift);
+      if (s->labels[i] != NULL) show_numeric_label(p, fmkr, s, s->labels[i], location, s->majors[i], shift);
    }
 }
 
@@ -629,7 +638,7 @@ static void c_show_side(VALUE fmkr, FM *p, PlotAxis *s) {
    if (s->labels != NULL) {
       if (s->free_strings_for_labels) {
          for (i = 0; i < s->nmajors; i++)
-            free(s->labels[i]);
+            if (s->labels[i] != NULL) free(s->labels[i]);
       }
       free(s->labels);
    }

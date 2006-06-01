@@ -140,6 +140,7 @@ class MyPlots
     end
     
     def reds_blues
+        set_physical_aspect_ratio(1)
         read_data
         t.do_box_labels("Reds and Blues", "Position", "Values")
         boundaries = setup_lines(@positions, [@blues, @reds], -1, 1)
@@ -176,11 +177,17 @@ class MyPlots
         show_model_number
     end
     
+    def set_physical_aspect_ratio(width_to_height)
+        wd = t.convert_frame_to_page_dx(1)
+        ht = t.convert_frame_to_page_dy(1)
+        t.set_aspect_ratio(width_to_height * ht / wd)
+    end
+    
     def legend_inside
         read_data
         show_model_number
         t.show_plot_with_legend(
-            'legend_left_margin' => 0.7,
+            'legend_left_margin' => 0.65,
             'plot_scale' => 1,
             'legend_scale' => 1.3,
             'plot_right_margin' => 0) { reds_blues }
