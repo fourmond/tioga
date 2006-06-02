@@ -391,7 +391,8 @@ static char **Get_Labels(FM *p, PlotAxis *s)
          ps = NULL;
          if (i == upper_right && !s->log_values && mode && scale)
             sprintf(ps = postfix, " (x$\\mathrm{10^{%d}}$)", scale);
-         if (i == lower_left && s->nmajors >= 3 && s->vertical && 
+         if (i == lower_left && s->nmajors >= 2 && s->vertical && 
+                (s->majors[i] == ((s->reversed)? s->axis_max : s->axis_min)) &&
                 (s->other_axis_type == AXIS_WITH_MAJOR_TICKS_AND_NUMERIC_LABELS ||
                  s->other_axis_type == AXIS_WITH_TICKS_AND_NUMERIC_LABELS)) {
             labels[i] = NULL;

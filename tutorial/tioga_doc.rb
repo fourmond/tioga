@@ -24,24 +24,25 @@
 
 :main: Tioga
 
-=== Tioga
+===Tioga
 
-Designed, implemented, and documented by {Bill Paxton}[http://theory.kitp.ucsb.edu/~paxton/]
-
-    Kavli Institute for Theoretical Physics
-    University of California, Santa Barbara
-
-The Tutorial will get you started, and the FigureMaker reference material will keep you going.  
-For your first visit, you should read on to see about licenses, credits, etc.
 
 http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Icon.jpg
 
 Tioga is a program for creating figures and plots using Ruby, PDF, and TeX.
 
-The Tioga kernel, called FigureMaker, is a Ruby extension providing a set of classes and modules
-for producing output with graphics using PDF functionality (including
+It was originally designed, implemented, and documented by {Bill Paxton}[http://theory.kitp.ucsb.edu/~paxton/].
+
+    Kavli Institute for Theoretical Physics
+    University of California, Santa Barbara
+
+The Tioga kernel is a {Ruby}[http://www.rubycentral.com/misc/intro.html] 
+extension providing a set of classes and modules
+for producing output with graphics using {PDF}[http://www.adobe.com/products/postscript/pdf.html] functionality (including
 Bezier curves, clipping, images, shading, and transparency), and with text
-typesetting using the full abilities of TeX.  You write Ruby programs
+typesetting using the full abilities of TeX (well, actually, {LaTeX}[http://www.latex-project.org/]).  
+
+You write Ruby programs
 for specifying the content of the figures and plots, and Tioga puts the graphics
 into a PDF file and the text into a TeX file.  These get combined when you
 include the figure or plot in a TeX document by placing the graphics in a box first
@@ -49,6 +50,10 @@ and then adding a layer with the text on top of the graphics.
 
 There is a simple command-line front-end that can be loaded into irb, the standard "interactive Ruby shell".
 There is also a graphical user interface for the Mac.
+
+The {Tutorial}[http://theory.kitp.ucsb.edu/~paxton/tioga_doc/classes/Tioga/Tutorial.html] will get you started, 
+and the {FigureMaker}[http://theory.kitp.ucsb.edu/~paxton/tioga_doc/classes/Tioga.html] reference material will keep you going.  
+For your first visit, you should read on to see about licenses, credits, etc.
 
 = Open Source Licenses
 
@@ -129,4 +134,10 @@ This document was created with Rdoc[http://rdoc.sourceforge.net/doc/files/README
 
 ---
 =end
+
+
+module TiogaDoc
+
+end
+
 

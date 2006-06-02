@@ -330,7 +330,15 @@ class FigureMaker
         line_ht_x = char_dx * self.legend_scale
         line_ht_y = char_dy * self.legend_scale
         x = self.legend_text_xstart*line_ht_x
-        xright = x + self.legend_text_width*line_ht_x
+        ltw = self.legend_text_width
+        if ltw == -1
+            if @pr_margin == 0
+                ltw = 1
+            else
+                ltw = 7
+            end
+        end
+        xright = x + ltw*line_ht_x
         y = 1.0 - self.legend_text_ystart*line_ht_y
         update_bbox(xright, y)
         dy = -self.legend_text_dy*line_ht_y
@@ -675,6 +683,7 @@ class FigureMaker
         subplot([plot_left_margin, plot_right_margin, plot_top_margin, plot_bottom_margin]) { cmd.call }
         set_subframe([legend_left_margin, legend_right_margin, legend_top_margin, legend_bottom_margin])
         rescale(legend_scale) # note that legend_scale is an addition to the plot_scale, not a replacement
+        @pr_margin = plot_right_margin
         show_legend
     end
 
