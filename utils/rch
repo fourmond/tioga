@@ -359,7 +359,8 @@ class CLFile
   def add_new_entry(target_file,email, 
                     version = nil, entry = nil,
                     editor = "nano",
-                    verbose = false) 
+                    verbose = false,
+                    editor_line_syntax = "+%d") 
     if version.nil? or version == latest_version
       line_number, lines = @sections[0].add_entry(email, entry)
       text = lines.join('') + "\n" +  
@@ -392,7 +393,8 @@ class CLFile
     if(entry.nil?) 
       # interactive edition
       time_before = File::mtime(target_file.path)
-      cmd = "#{editor} +#{line_number} #{target_file.path}"
+      line_number_spec = sprintf(editor_line_syntax, line_number)
+      cmd = "#{editor} #{line_number_spec} #{target_file.path}"
       puts cmd if verbose
       system cmd
       time_after = File::mtime(target_file.path)
@@ -450,6 +452,15 @@ else
   options.editor = "nano"       # nano by default
 end
 
+
+# The editor's specification for a command-line 
+if ENV.has_key? "EDITOR_LINE_SPEC"
+  options.editor_line_spec = ENV["EDITOR_LINE_SPEC"]
+else
+  options.editor_line_spec = "+%d" # works for nano, and for others as well
+end
+
+
 options.verbose = false
 
 opts = OptionParser.new do |opts|
@@ -486,9 +497,15 @@ opts = OptionParser.new do |opts|
     options.create = true
   end
 
-  opts.on("","--editor", 
-          "Specifies your default editor for editing the changelog") do 
-    options.create = true
+  opts.on("","--editor EDITOR", 
+          "Specifies your default editor for editing the changelog") do |e| 
+    options.editor = e
+  end
+
+  opts.on("","--line_spec SPEC", 
+          "How rch should tell the editor which line to edit" +
+          " (like for sprintf)") do |l| 
+    options.editor_line_spec = l 
   end
 
   opts.on("","--release", 
@@ -550,7 +567,8 @@ else
   temp_file = Tempfile.new('changelog')
   if cl.add_new_entry(temp_file, options.email,
                       options.version, options.entry,
-                      options.editor, options.verbose)
+                      options.editor, options.verbose,
+                      options.editor_line_spec)
     cmd = "cp '#{temp_file.path}' '#{file}'"
     puts cmd if options.verbose
     system cmd
