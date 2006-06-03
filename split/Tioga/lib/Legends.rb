@@ -114,7 +114,8 @@ the full range of marker functionality in legends -- perhaps you'd like to use a
 # of text height.  The corresponding width in figure coordinates is
 # (legend_text_width * legend_scale * default_text_height_dx).
 # The figure bounding box is expanded if necessary to provide for this
-# much space.
+# much space.  If legend_text_width is negative, then the system will
+# provide a default value depending on the placement of the legend.
    def legend_text_width
    end
 

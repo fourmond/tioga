@@ -331,7 +331,7 @@ class FigureMaker
         line_ht_y = char_dy * self.legend_scale
         x = self.legend_text_xstart*line_ht_x
         ltw = self.legend_text_width
-        if ltw == -1
+        if ltw < 0
             if @pr_margin == 0
                 ltw = 1
             else
