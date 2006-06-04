@@ -15,6 +15,11 @@ require 'test/unit'
 
 class TestDvector < Test::Unit::TestCase
     include Dobjects
+    
+    def test_vector_length
+        a = Dvector[3.0, 4.0]
+        assert_equal(a.vector_length, 5.0)
+    end
 
     def test_tridag
         a = Dvector[-0.5, -0.5, -0.5, -1.0/3.0, -0.5]

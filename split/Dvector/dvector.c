@@ -2844,6 +2844,24 @@ VALUE dvector_dot(VALUE ary1, VALUE ary2) {
    return rb_float_new(sum);
 }
 
+/*
+ *  call-seq:
+ *     dvector.vector_length   ->  number
+ *  
+ *  Returns square root of the dot product of the vector with itself.
+ *     
+ *     a = Dvector[ 3, 5 ]
+ *     a.vector_length -> 5.0
+ */
+
+VALUE dvector_vector_length(VALUE ary) {
+   Dvector *d = Get_Dvector(ary);
+   double *p = d->ptr, sum = 0.0;
+   long len = d->len, i;
+   for (i=0; i<len; i++) sum += p[i] * p[i];
+   return rb_float_new(sqrt(sum));
+}
+
 VALUE dvector_apply_math_op_bang(VALUE ary, double (*op)(double)) {
    Dvector *d= dvector_modify(ary);
    double *p = d->ptr;
@@ -4990,6 +5008,7 @@ void Init_Dvector() {
    
    rb_define_method(cDvector, "sum", dvector_sum, 0);
    rb_define_method(cDvector, "dot", dvector_dot, 1);
+   rb_define_method(cDvector, "vector_length", dvector_vector_length, 0);
    
    rb_define_method(cDvector, "add", dvector_add, 1);
    rb_define_alias(cDvector,  "+", "add");

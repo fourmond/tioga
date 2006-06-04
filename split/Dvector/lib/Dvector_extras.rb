@@ -116,6 +116,10 @@ end
 
 module Dobjects
   class Dvector
+      
+    def to_dvector
+      self
+    end
 
     # Dvector.fancy_read's defaults options. See that function for
     # more details
