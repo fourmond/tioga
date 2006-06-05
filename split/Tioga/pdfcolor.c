@@ -175,6 +175,17 @@ void Free_Shadings()
    }
 }
 
+void Free_Triangles()
+{
+   Triangles_Info *to;
+   while (triangles_list != NULL) {
+      to = triangles_list;
+      triangles_list = to->next;
+      if (to->strm_data != NULL) free(to->strm_data);
+      free(to);
+   }
+}
+
 void Write_Shadings(void)
 {
    Shading_Info *so;
@@ -195,6 +206,162 @@ void Write_Shadings(void)
       fprintf(OF, ">> endobj\n");
    }
 }
+
+void Write_Triangles(void)
+{
+   Triangles_Info *to;
+   for (to = triangles_list; to != NULL; to = to->next) {
+    Record_Object_Offset(to->obj_num);
+    fprintf(OF, "%i 0 obj <<\n", to->obj_num);
+    // for testing, I've used 8 bit RGB.  to convert to 16bit, change Decode, BitsPerComponent, and stream 
+    fprintf(OF, "\t/ShadingType 4\n\t/Decode [0 1 0 1 0 255 0 255 0 255]\n"); // change to 16 bit RGB
+    fprintf(OF, "\t/ColorSpace /DeviceRGB\n");
+    fprintf(OF, "\t/BitsPerCoordinate 16\n");
+    fprintf(OF, "\t/BitsPerComponent 8\n"); // change to 16 bit RGB
+    fprintf(OF, "\t/BitsPerFlag 8\n");
+    fprintf(OF, "\t/Length %i\n\t>>\nstream\n", to->strm_len);
+    if (fwrite(to->strm_data, 1, to->strm_len, OF) < to->strm_len)
+        rb_raise(rb_eArgError, "Error writing triangles data");
+    fprintf(OF, "\nendstream\nendobj\n");
+    }
+}
+
+
+// This seems okay when i look at the stuff it is putting in the PDF file, but I don't get any output -- UGH.
+
+void c_triangle_mesh_shading(FM *p, long len, double *xs, double *ys, double *rs, double *gs, double *bs, double *fs)
+{
+   double xmin, xmax, ymin, ymax, x, y, r, g, b, f;
+   long i, strm_len, ival;
+   unsigned char *strm_data, *s;
+   Triangles_Info *to;
+   if (len <= 0) return;
+   to = ALLOC(Triangles_Info);
+   to->next = triangles_list;
+   triangles_list = to;
+   to->shade_num = next_available_shade_number++;
+   to->obj_num = next_available_object_number++;
+    // change to 16 bit RGB
+   //strm_len = len * (1 + 2*2 + 3*2); // 1 1-byte flag, 2 2-byte coords, and 3 2-byte color components
+   strm_len = len * (1 + 2*2 + 3*1); // 1 1-byte flag, 2 2-byte coords, and 3 1-byte color components
+   strm_data = ALLOC_N(unsigned char, strm_len+1);
+   s = strm_data;
+   xmin = xmax = convert_figure_to_output_x(p,xs[0]);
+   ymin = ymax = convert_figure_to_output_y(p,ys[0]);
+   for (i=0; i <len; i++) {
+      x = convert_figure_to_output_x(p,xs[i]);
+      y = convert_figure_to_output_y(p,ys[i]);
+      
+      if (i > 0) { // need mins and maxs so can update bbox
+          if (x > xmax) xmax = x;
+          if (x < xmin) xmin = x;
+          if (y > ymax) ymax = y;
+          if (y < ymin) ymin = y;
+      }
+            
+      ival = ROUND(fs[i]);
+      printf("ival for f is %li\n\n", ival);
+      if (ival > 2 || ival < 0) {
+        free(to); free(strm_data);
+        rb_raise(rb_eArgError, "Sorry: flags must be 0, 1, or 2 for triangle shading");
+      }
+      *s++ = ival && 3; 
+
+      ival = ROUND(x);
+      printf("ival for x is %li\n", ival);
+       *s++ = (ival >> 8) & 255; *s++ = ival & 255;
+      
+      ival = ROUND(y);
+      printf("ival for y is %li\n", ival);
+      *s++ = (ival >> 8) & 255; *s++ = ival & 255; 
+      
+       // change to 16 bit RGB
+      if (0) {
+          ival = ROUND(rs[i] * 65535);
+          printf("ival for r is %li\n", ival);
+          if (ival > 65535 || ival < 0) {
+            free(to); free(strm_data);
+            rb_raise(rb_eArgError, "Sorry: RGB colors must be between 0.0 and 1.0 for triangle shading");
+          }
+          *s++ = (ival >> 8) & 255; *s++ = ival & 255; 
+          
+          ival = ROUND(gs[i] * 65535);
+          printf("ival for g is %li\n", ival);
+          if (ival > 65535 || ival < 0) {
+            free(to); free(strm_data);
+            rb_raise(rb_eArgError, "Sorry: RGB colors must be between 0.0 and 1.0 for triangle shading");
+          }
+          *s++ = (ival >> 8) & 255; *s++ = ival & 255; 
+          
+          ival = ROUND(bs[i] * 65535);
+          printf("ival for b is %li\n", ival);
+          if (ival > 65535 || ival < 0) {
+            free(to); free(strm_data);
+            rb_raise(rb_eArgError, "Sorry: RGB colors must be between 0.0 and 1.0 for triangle shading");
+          }
+          *s++ = (ival >> 8) & 255; *s++ = ival & 255; 
+          
+        } else { // use 8 bit colors for testing
+        
+          ival = ROUND(rs[i] * 255);
+          printf("ival for r is %li\n", ival);
+          if (ival > 255 || ival < 0) {
+            free(to); free(strm_data);
+            rb_raise(rb_eArgError, "Sorry: RGB colors must be between 0.0 and 1.0 for triangle shading");
+          }
+          *s++ = ival & 255; 
+          
+          ival = ROUND(gs[i] * 255);
+          printf("ival for g is %li\n", ival);
+          if (ival > 255 || ival < 0) {
+            free(to); free(strm_data);
+            rb_raise(rb_eArgError, "Sorry: RGB colors must be between 0.0 and 1.0 for triangle shading");
+          }
+          *s++ = ival & 255; 
+          
+          ival = ROUND(bs[i] * 255);
+          printf("ival for b is %li\n", ival);
+          if (ival > 255 || ival < 0) {
+            free(to); free(strm_data);
+            rb_raise(rb_eArgError, "Sorry: RGB colors must be between 0.0 and 1.0 for triangle shading");
+          }
+          *s++ = ival & 255; 
+        }
+   }
+
+   update_bbox(p, xmin, ymin);
+   update_bbox(p, xmax, ymin);
+   update_bbox(p, xmin, ymax);
+   update_bbox(p, xmax, ymax);
+
+   to->strm_len = strm_len;
+   to->strm_data = strm_data;
+   fprintf(TF, "/Shade%i sh\n", to->shade_num);
+   
+   printf("xmin %g xmax %g ymin %g ymax %g len %li strm_len %li s-strm_data %li\n", xmin, xmax, ymin, ymax, len, strm_len, s-strm_data);
+   for (i=0; i<strm_len; i++) 
+     printf("%i ", strm_data[i]);
+   printf("\n");
+   
+}
+
+VALUE FM_private_triangle_mesh_shading(VALUE fmkr, VALUE xs_vec, VALUE ys_vec, VALUE rs_vec, VALUE gs_vec, VALUE bs_vec, VALUE fs_vec)
+{
+   FM *p = Get_FM(fmkr);
+   long xlen, ylen, rlen, glen, blen, flen;
+   double *xs = Dvector_Data_for_Read(xs_vec, &xlen);
+   double *ys = Dvector_Data_for_Read(ys_vec, &ylen);
+   double *rs = Dvector_Data_for_Read(rs_vec, &rlen);
+   double *gs = Dvector_Data_for_Read(gs_vec, &glen);
+   double *bs = Dvector_Data_for_Read(bs_vec, &blen);
+   double *fs = Dvector_Data_for_Read(fs_vec, &flen);
+   if (xlen <= 0) return fmkr;
+   if (xlen != ylen || xlen != rlen || xlen != glen || xlen != blen || xlen != flen) 
+      rb_raise(rb_eArgError, "Sorry: must have same number length vectors for triangle shading");
+   c_triangle_mesh_shading(p, xlen, xs, ys, rs, gs, bs, fs);
+   return fmkr;
+}
+
 
 void c_axial_shading(FM *p, double x0, double y0, double x1, double y1,
       int hival, int lookup_len, unsigned char *lookup, bool extend_start, bool extend_end)

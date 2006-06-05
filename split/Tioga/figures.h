@@ -568,6 +568,8 @@ extern VALUE FM_clip_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VAL
 
 /* Shading */
 
+extern VALUE FM_private_triangle_mesh_shading(VALUE fmkr, VALUE xs_vec, VALUE ys_vec,
+        VALUE rs_vec, VALUE gs_vec, VALUE bs_vec, VALUE fs_vec);
 extern VALUE FM_private_axial_shading(VALUE fmkr, VALUE x0, VALUE y0,
         VALUE x1, VALUE y1, VALUE colormap, VALUE extend_start, VALUE extend_end);
 extern VALUE FM_private_radial_shading(VALUE fmkr, VALUE x0, VALUE y0, VALUE r0,

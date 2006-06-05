@@ -448,6 +448,7 @@ void Init_FigureMaker(void) {
    rb_define_method(cFM, "stroke_rounded_rect", FM_stroke_rounded_rect, 6);
    rb_define_method(cFM, "fill_and_stroke_rounded_rect", FM_fill_and_stroke_rounded_rect, 6);
 /* shading */
+   rb_define_method(cFM, "private_triangle_mesh_shading", FM_private_triangle_mesh_shading, 6);
    rb_define_method(cFM, "private_axial_shading", FM_private_axial_shading, 7);
    rb_define_method(cFM, "private_radial_shading", FM_private_radial_shading, 13);
 /* markers */
