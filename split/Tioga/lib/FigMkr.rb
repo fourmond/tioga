@@ -37,7 +37,12 @@ class FigureMaker
     # look like 'rel_1_1_0' for the 1.1.0 release. 
     def FigureMaker.version
       CVS_TAG =~ /\D+(.*?)\s*\$?$/
-      return $1.tr("-_", "..")
+      version = $1.tr("-_", "..")
+      if version.length > 0
+        return version
+      else
+        return "CVS_version"    # Can't do better than that.
+      end
     end
 
     def FigureMaker.default

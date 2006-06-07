@@ -1,7 +1,12 @@
+tioga (1.1.1)
+
+  * Few different things around, time for a beta release (and next time, a better changelog)
+
+ -- Vincent Fourmond <vincent.fourmond@9online.fr>, Wed Jun  7 22:14:52 CEST 2006
+
 tioga (1.1.0)
 
   * Added a brand new rch-based changelog
   * Added utils/rch to maintain that changelog...
 
  -- Vincent Fourmond <vincent.fourmond@9online.fr>, Sun May 28 12:42:33 CEST 2006
-
