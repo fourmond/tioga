@@ -229,6 +229,9 @@ void Write_Triangles(void)
 
 // This seems okay when i look at the stuff it is putting in the PDF file, but I don't get any output -- UGH.
 
+// NOTE: Apple's Quartz seems to support only axial and radial shadings, not triangle mesh.
+// perhaps this will need to wait for more complete PDF support?
+
 void c_triangle_mesh_shading(FM *p, long len, double *xs, double *ys, double *rs, double *gs, double *bs, double *fs)
 {
    double xmin, xmax, ymin, ymax, x, y, r, g, b, f;
@@ -236,6 +239,7 @@ void c_triangle_mesh_shading(FM *p, long len, double *xs, double *ys, double *rs
    unsigned char *strm_data, *s;
    Triangles_Info *to;
    if (len <= 0) return;
+   printf("TRIANGLE MESH SHADING NOT YET SUPPORTED.  FOR DEBUGGING ONLY.\n");
    to = ALLOC(Triangles_Info);
    to->next = triangles_list;
    triangles_list = to;

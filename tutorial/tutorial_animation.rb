@@ -238,8 +238,8 @@ are appearing there.  Stop the refresh after you've created a few dozen versions
     cd movie_out
     rm *.txt *.aux *.log *.tex *_figure.pdf
 
-The next job is to convert all those PDFs into a movie.  I'm currently using GraphicConverter, Version 5.6.
-(If you don't have it, or only have an earlier version, cough up the $30 -- 25 euro -- and get it.  The site
+The next job is to convert all those PDFs into a movie.  I'm currently using GraphicConverter, Version 5.9.
+(If you don't have it, or only have an earlier version, cough up the $30 and get it.  The site
 is lemkesoft[http://www.lemkesoft.com/en/graphcon.htm].)
 GraphicConverter has an operation that does just what we need.  It's called "Export Slide Show to Movie...", and it's found
 under the "File" menu.
