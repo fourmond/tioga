@@ -1,3 +1,9 @@
+tioga (1.1.2)
+
+  * Added Dvector.compute_formula;
+
+ -- Vincent Fourmond <vincent.fourmond@9online.fr>, Tue Jun 13 00:48:04 CEST 2006
+
 tioga (1.1.1)
 
   * Few different things around, time for a beta release (and next time, a better changelog)

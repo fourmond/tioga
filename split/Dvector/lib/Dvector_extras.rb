@@ -212,5 +212,70 @@ module Dobjects
       }
     end
 
+    # This function is a rudimentary formula computing stuff. Give it
+    # a text _formula_ and an array of Dvectors (_a_), and it returns a
+    # Dvector with the result. The formula should contain the following;
+    # column[n]:: represents the current element of the n-1th
+    #             Dvector of the array
+    # column[0]:: represents the index of the current element
+    #
+    # This is just a try, and should be implemented in C rather than in
+    # Ruby. But if you're looking for simplicity, here you go ;-) !
+
+    def Dvector.compute_formula(formula, a)
+      # we first compile the formula:
+      begin
+        block = eval "proc { |column| #{formula} }"
+      rescue
+        raise "Compiling the formula did fail"
+      end
+
+      # if we reach this place, it means that there a no big syntax errors ;-)
+      
+      # we now need to inspect the array given, and make sure that there is
+      # and transform it into a clean stuff (an array with only Dvectors and
+      # nil elements).
+      
+      target = []
+      last = nil
+      a.each { |elem| 
+        if elem.is_a? Dvector
+          target << elem
+          last = elem
+        else
+          target << nil
+        end
+      }
+      
+      raise "No Dvector found" unless last
+      
+      # we check all the vectors have the same length
+      target.each {|x| 
+        if x && x.length != last.length
+          raise "Dvectors should have all the same length !" 
+        end
+      }
+      
+      res = Dvector.new
+      
+      last.each_index { |i|
+        args = target.collect { |val| 
+          if val
+            val[i]
+          else 
+            nil
+          end
+        }
+        # we add the index at the beginning:
+        args.unshift(i) 
+        
+        # then we call the block:
+        elem = block.call(args)
+        res << elem
+      }
+      
+      return res
+    end
+    
   end
 end
