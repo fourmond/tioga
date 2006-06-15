@@ -26,6 +26,9 @@
 #include <math.h>
 #include "intern.h"
 
+// should use isfinite instead of is_okay_number, but some C's don't support it yet.
+#define is_okay_number(x) ((x) - (x) == 0.0)
+
 #define is_a_dtable(d) ( TYPE(d) == T_DATA && RDATA(d)->dfree == (RUBY_DATA_FUNC)dtable_free )
 
 #ifndef MAX
@@ -1614,9 +1617,9 @@ VALUE dtable_div_bang(VALUE ary, VALUE arg) {
 VALUE Read_Dtable(VALUE dest, char *filename, int skip_lines) {
    FILE *file = NULL;
    long num_cols, num_rows;
-   int i, j;
+   int i, j, k;
    const int buff_len = 10000;
-   char buff[buff_len];
+   char c, buff[buff_len], *p;
    double *data, **ptr = Dtable_Ptr(dest, &num_cols, &num_rows);
    if ((file=fopen(filename,"r")) == NULL)
       rb_raise(rb_eArgError, "failed to open %s", filename);
@@ -1627,10 +1630,26 @@ VALUE Read_Dtable(VALUE dest, char *filename, int skip_lines) {
             skip_lines, filename);
       }
    }
+   
+   // rewrite to use atof instead of fscanf since atof deals with things like 0.501-129 for 0.501E-129, but fscanf doesn't
+   
    for (i = 0; i < num_rows; i++) {
       data = ptr[i];
       for (j = 0; j < num_cols; j++) {
-         if (fscanf(file, "%lg", data+j) != 1) {
+         // skip over blanks (includes end-of-line and tab)
+         p = buff; k = 0;
+         while ((c=getc(file)) != EOF) {
+            if (!isspace(c)) break;
+         }
+         // save the non-blanks
+         *p++ = c;
+         while ((c=getc(file)) != EOF) {
+            if (isspace(c) || k > 1000) break;
+            *p++ = c;
+         }
+         *p++ = ' ';
+         data[j] = atof(buff);
+         if (!is_okay_number(data[j])) {
             fclose(file);
             rb_raise(rb_eArgError,
                "reached end of file before reading requested amount of data in %s (asked for %i xs and %i ys; found only %i and %i)",
