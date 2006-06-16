@@ -147,7 +147,7 @@ module Dobjects
     def Dvector.fancy_read(stream, cols = nil, opts = {})
       # first, we turn the stream into a real IO stream
       if stream.is_a?(String)
-        stream = IO.open(stream)
+        stream = File.open(stream)
       end
       raise ArgumentError.new("'stream' should have a gets method") unless 
         stream.respond_to? :gets
