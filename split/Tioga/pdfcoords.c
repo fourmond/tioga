@@ -154,15 +154,6 @@ VALUE FM_private_set_bounds(VALUE fmkr, VALUE left, VALUE right, VALUE top, VALU
    return fmkr;
 }
 
-void c_set_page_rect(FM *p, double page_left, double page_bottom, double page_width, double page_height)
-{
-   if (writing_file) rb_raise(rb_eArgError, "Sorry: cannot change page rect while doing a figure.");
-   if (page_width <=0) rb_raise(rb_eArgError, "Sorry: page width must be positive (%g).", page_width);
-   if (page_height <= 0) rb_raise(rb_eArgError, "Sorry: page height must be positive (%g).", page_height);
-   p->page_left = page_left; p->page_bottom = page_bottom;
-   p->page_width = page_width; p->page_height = page_height;
-   Recalc_Font_Hts(p);
-}
 
 // Conversions
 

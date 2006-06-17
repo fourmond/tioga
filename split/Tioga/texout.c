@@ -299,14 +299,8 @@ void Create_wrapper(VALUE fmkr, char *fname, bool quiet_mode)
    fprintf(file, "\\newcommand{\\TiogaFigure}[1]{\n\t\\TiogaFigureSized{#1}{\\columnwidth}{!}}\n\t%% The default is to resize to fit the column width.\n\n");
 
    fprintf(file, "\\begin{document}\n");
-   fprintf(file, "\\pagestyle{%s}\n", Get_tex_preview_pagestyle(fmkr));
-   
-   if (1) {
-      fprintf(file, "\\TiogaFigureSized{%s}{%s}{%s}\n", simple_name, Get_tex_preview_figure_width(fmkr), Get_tex_preview_figure_height(fmkr));
-   } else {
-      fprintf(file, "\\TiogaFigure{%s}\n", simple_name);
-   }
-   
+   fprintf(file, "\\pagestyle{%s}\n", Get_tex_preview_pagestyle(fmkr));   
+   fprintf(file, "\\TiogaFigureSized{%s}{%s}{%s}\n", simple_name, Get_tex_preview_figure_width(fmkr), Get_tex_preview_figure_height(fmkr));   
    fprintf(file, "\\end{document}\n");
    fclose(file);
 }
