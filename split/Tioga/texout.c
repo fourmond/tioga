@@ -263,10 +263,9 @@ void Create_wrapper(VALUE fmkr, char *fname, bool quiet_mode)
       strcpy(simple_name, base_name);
       }
    file = fopen(tex_fname, "w");
-   fprintf(file, "%%      Sample LaTeX file for combining %s_figure.pdf and %s_figure.txt\n\n", base_name, base_name);
-   fprintf(file, "\\documentclass{%s}\n", Get_tex_preview_documentclass(fmkr));
-   fprintf(file, "%s\n", Get_tex_preview_preamble(fmkr));
-   fprintf(file, "%% Set lengths to make the preview page fit the figure.\n");
+   fprintf(file, "%% Tioga preview LaTeX file for %s_figure.pdf and %s_figure.txt\n\n", base_name, base_name);
+   fprintf(file, "\\documentclass{%s}\n\n", Get_tex_preview_documentclass(fmkr));
+   fprintf(file, "%s\n\n", Get_tex_preview_preamble(fmkr));
    
    x = bbox_urx - bbox_llx; if (x < 0) x = bbox_urx = bbox_llx = 0;
    y = bbox_ury - bbox_lly; if (y < 0) y = bbox_ury = bbox_lly = 0;
@@ -279,6 +278,15 @@ void Create_wrapper(VALUE fmkr, char *fname, bool quiet_mode)
    //paperwidth *= figure_scale;
    //paperheight *= figure_scale;
       
+   fprintf(file, "%% Set page margins.\n");
+   fprintf(file, "\\setlength{\\topmargin}{0pt}\n");
+   fprintf(file, "\\setlength{\\headsep}{0pt}\n");
+   fprintf(file, "\\setlength{\\topskip}{0pt}\n");
+   fprintf(file, "\\setlength{\\headheight}{0pt}\n");
+   fprintf(file, "\\setlength{\\oddsidemargin}{0pt}\n");
+   fprintf(file, "\\setlength{\\evensidemargin}{0pt}\n");
+   fprintf(file, "\n");
+   fprintf(file, "%% Set page size and orientation.\n");
    fprintf(file, "\\setlength{\\paperwidth}{%s}\n", Get_tex_preview_paper_width(fmkr));
    fprintf(file, "\\setlength{\\paperheight}{%s}\n", Get_tex_preview_paper_height(fmkr));
    fprintf(file, "\\setlength{\\hoffset}{%s}\n", Get_tex_preview_hoffset(fmkr));
@@ -291,13 +299,14 @@ void Create_wrapper(VALUE fmkr, char *fname, bool quiet_mode)
    fprintf(file, "\t\\begin{picture}(0,0)(0,0)\n");
    fprintf(file, "\t\\includegraphics[scale=1.0,clip]{#1_figure.pdf}\n");
    fprintf(file, "\t\\end{picture}\n");
-   fprintf(file, "\t\\input{#1_figure.txt}}}\n");
+   fprintf(file, "\t\\input{#1_figure.txt}}}\n\n");
    fprintf(file, "\\newcommand{\\TiogaFigureSized}[3]{\n\t\\centering{\\resizebox{#2}{#3}{\\TiogaFigureShow{#1}}}}\n");
    fprintf(file, "\t%% The 1st arg is the base name for the pdf and txt files.\n");
-   fprintf(file, "\t%% The 2nd arg is a width.\n");
-   fprintf(file, "\t%% The 3rd arg is a height.\n");
+   fprintf(file, "\t%% The 2nd arg determines the figure width.\n");
+   fprintf(file, "\t%% The 3rd arg determines the figure height.\n\n");
    fprintf(file, "\\newcommand{\\TiogaFigure}[1]{\n\t\\TiogaFigureSized{#1}{\\columnwidth}{!}}\n\t%% The default is to resize to fit the column width.\n\n");
 
+   fprintf(file, "%% Here's the page with the figure.\n");
    fprintf(file, "\\begin{document}\n");
    fprintf(file, "\\pagestyle{%s}\n", Get_tex_preview_pagestyle(fmkr));   
    fprintf(file, "\\TiogaFigureSized{%s}{%s}{%s}\n", simple_name, Get_tex_preview_figure_width(fmkr), Get_tex_preview_figure_height(fmkr));   

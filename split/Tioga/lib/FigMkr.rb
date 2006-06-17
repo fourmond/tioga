@@ -173,7 +173,7 @@ class FigureMaker
         self.tex_preview_paper_width = '297mm'
         self.tex_preview_paper_height = '210mm'
         self.tex_preview_hoffset = '0mm'
-        self.tex_preview_voffset = '-11mm'
+        self.tex_preview_voffset = '0mm'
         self.tex_preview_figure_width = fig_width
         self.tex_preview_figure_height = fig_height
     end
@@ -181,8 +181,8 @@ class FigureMaker
     def set_A5_landscape(fig_width = '!', fig_height = '123mm')
         self.tex_preview_paper_width = '210mm'
         self.tex_preview_paper_height = '148mm'
-        self.tex_preview_hoffset = '-11mm'
-        self.tex_preview_voffset = '-18mm'
+        self.tex_preview_hoffset = '0mm'
+        self.tex_preview_voffset = '0mm'
         self.tex_preview_figure_width = fig_width
         self.tex_preview_figure_height = fig_height
     end
@@ -190,7 +190,7 @@ class FigureMaker
     def set_A4_portrait(fig_width = '173mm', fig_height = '!')
         self.tex_preview_paper_width = '210mm'
         self.tex_preview_paper_height = '297mm'
-        self.tex_preview_hoffset = '-19mm'
+        self.tex_preview_hoffset = '0mm'
         self.tex_preview_voffset = '0mm'
         self.tex_preview_figure_width = fig_width
         self.tex_preview_figure_height = fig_height
@@ -199,8 +199,44 @@ class FigureMaker
     def set_A5_portrait(fig_width = '123mm', fig_height = '!')
         self.tex_preview_paper_width = '148mm'
         self.tex_preview_paper_height = '210mm'
-        self.tex_preview_hoffset = '-38mm'
-        self.tex_preview_voffset = '-11mm'
+        self.tex_preview_hoffset = '0mm'
+        self.tex_preview_voffset = '0mm'
+        self.tex_preview_figure_width = fig_width
+        self.tex_preview_figure_height = fig_height
+    end
+     
+    def set_USLetter_portrait(fig_width = '7in', fig_height = '!')
+        self.tex_preview_paper_width = '8.5in'
+        self.tex_preview_paper_height = '11in'
+        self.tex_preview_hoffset = '0in'
+        self.tex_preview_voffset = '0in'
+        self.tex_preview_figure_width = fig_width
+        self.tex_preview_figure_height = fig_height
+    end
+     
+    def set_USLegal_portrait(fig_width = '7in', fig_height = '!')
+        self.tex_preview_paper_width = '8.5in'
+        self.tex_preview_paper_height = '14in'
+        self.tex_preview_hoffset = '0in'
+        self.tex_preview_voffset = '0in'
+        self.tex_preview_figure_width = fig_width
+        self.tex_preview_figure_height = fig_height
+    end
+    
+    def set_USLetter_landscape(fig_width = '!', fig_height = '7in')
+        self.tex_preview_paper_width = '11in'
+        self.tex_preview_paper_height = '8.5in'
+        self.tex_preview_hoffset = '0in'
+        self.tex_preview_voffset = '0in'
+        self.tex_preview_figure_width = fig_width
+        self.tex_preview_figure_height = fig_height
+    end
+    
+    def set_USLegal_landscape(fig_width = '!', fig_height = '7in')
+        self.tex_preview_paper_width = '14in'
+        self.tex_preview_paper_height = '8.5in'
+        self.tex_preview_hoffset = '0in'
+        self.tex_preview_voffset = '0in'
         self.tex_preview_figure_width = fig_width
         self.tex_preview_figure_height = fig_height
     end
