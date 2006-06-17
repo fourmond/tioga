@@ -25,8 +25,9 @@
 VALUE rb_Integer_class, rb_Numeric_class;
 ID save_dir_ID, model_number_ID, add_model_number_ID, quiet_mode_ID;
 ID tex_preview_documentclass_ID, tex_preview_preamble_ID, tex_preview_pagestyle_ID;
-ID tex_preview_left_margin_ID, tex_preview_right_margin_ID, tex_preview_top_margin_ID;
-ID tex_preview_bottom_margin_ID, tex_preview_left_fudge_ID, tex_preview_top_fudge_ID;
+ID tex_preview_paper_width_ID, tex_preview_paper_height_ID;
+ID tex_preview_hoffset_ID, tex_preview_voffset_ID;
+ID tex_preview_figure_width_ID, tex_preview_figure_height_ID;
 ID do_cmd_ID, initialized_ID, tex_xoffset_ID, tex_yoffset_ID;
 
 void Init_IDs(void)
@@ -40,18 +41,19 @@ void Init_IDs(void)
 	save_dir_ID = rb_intern("@save_dir");
 	model_number_ID = rb_intern("@model_number");
 	add_model_number_ID = rb_intern("@add_model_number");
-	quiet_mode_ID = rb_intern("@quiet_mode");
+	quiet_mode_ID = rb_intern("@quiet_mode");    
 	tex_xoffset_ID = rb_intern("@tex_xoffset");
 	tex_yoffset_ID = rb_intern("@tex_yoffset");
-   tex_preview_documentclass_ID = rb_intern("@tex_preview_documentclass");
-   tex_preview_preamble_ID = rb_intern("@tex_preview_preamble");
-   tex_preview_pagestyle_ID = rb_intern("@tex_preview_pagestyle");
-   tex_preview_left_margin_ID = rb_intern("@tex_preview_left_margin");
-   tex_preview_right_margin_ID = rb_intern("@tex_preview_right_margin");
-   tex_preview_top_margin_ID = rb_intern("@tex_preview_top_margin");
-   tex_preview_bottom_margin_ID = rb_intern("@tex_preview_bottom_margin");
-   tex_preview_left_fudge_ID = rb_intern("@tex_preview_left_fudge");
-   tex_preview_top_fudge_ID = rb_intern("@tex_preview_top_fudge");
+    tex_preview_documentclass_ID = rb_intern("@tex_preview_documentclass");
+    tex_preview_preamble_ID = rb_intern("@tex_preview_preamble");
+    tex_preview_pagestyle_ID = rb_intern("@tex_preview_pagestyle");
+    
+    tex_preview_paper_width_ID = rb_intern("@tex_preview_paper_width");
+    tex_preview_paper_height_ID = rb_intern("@tex_preview_paper_height");
+    tex_preview_hoffset_ID = rb_intern("@tex_preview_hoffset");
+    tex_preview_voffset_ID = rb_intern("@tex_preview_voffset");
+    tex_preview_figure_width_ID = rb_intern("@tex_preview_figure_width");
+    tex_preview_figure_height_ID = rb_intern("@tex_preview_figure_height");
 }
 
 void Initialize_Figure(VALUE fmkr) {
@@ -259,12 +261,43 @@ double Get_double(VALUE obj, ID name_ID) {
    return NUM2DBL(v);
 }
 
-double Get_tex_preview_left_margin(VALUE fmkr) { return Get_double(fmkr, tex_preview_left_margin_ID); }
-double Get_tex_preview_right_margin(VALUE fmkr) { return Get_double(fmkr, tex_preview_right_margin_ID); }
-double Get_tex_preview_top_margin(VALUE fmkr) { return Get_double(fmkr, tex_preview_top_margin_ID); }
-double Get_tex_preview_bottom_margin(VALUE fmkr) { return Get_double(fmkr, tex_preview_bottom_margin_ID); }
-double Get_tex_preview_left_fudge(VALUE fmkr) { return Get_double(fmkr, tex_preview_left_fudge_ID); }
-double Get_tex_preview_top_fudge(VALUE fmkr) { return Get_double(fmkr, tex_preview_top_fudge_ID); }
+
+char *Get_tex_preview_paper_width(VALUE fmkr) {
+   VALUE v = rb_ivar_get(fmkr, tex_preview_paper_width_ID);
+   if (v == Qnil) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_preview_paper_height(VALUE fmkr) {
+   VALUE v = rb_ivar_get(fmkr, tex_preview_paper_height_ID);
+   if (v == Qnil) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_preview_hoffset(VALUE fmkr) {
+   VALUE v = rb_ivar_get(fmkr, tex_preview_hoffset_ID);
+   if (v == Qnil) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_preview_voffset(VALUE fmkr) {
+   VALUE v = rb_ivar_get(fmkr, tex_preview_voffset_ID);
+   if (v == Qnil) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_preview_figure_width(VALUE fmkr) {
+   VALUE v = rb_ivar_get(fmkr, tex_preview_figure_width_ID);
+   if (v == Qnil) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_preview_figure_height(VALUE fmkr) {
+   VALUE v = rb_ivar_get(fmkr, tex_preview_figure_height_ID);
+   if (v == Qnil) return NULL;
+   return StringValuePtr(v);
+}
+
 double Get_tex_xoffset(VALUE fmkr) { return Get_double(fmkr, tex_xoffset_ID); }
 double Get_tex_yoffset(VALUE fmkr) { return Get_double(fmkr, tex_yoffset_ID); }
 

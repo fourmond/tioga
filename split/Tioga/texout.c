@@ -241,10 +241,12 @@ void Close_tex(VALUE fmkr, bool quiet_mode)
 void Create_wrapper(VALUE fmkr, char *fname, bool quiet_mode)
 {  // create the wrapper TeX file to combine the text and graphics to make a figure
    double x, y;
-   x = bbox_urx - bbox_llx; if (x < 0) x = bbox_urx = bbox_llx = 0;
-   y = bbox_ury - bbox_lly; if (y < 0) y = bbox_ury = bbox_lly = 0;
    char *dot;
    char tex_fname[100], base_name[100], simple_name[100];
+   float preview_paper_width, preview_paper_height;
+   float preview_hoffset, preview_voffset;
+   float preview_figure_width, preview_figure_height;
+   float figure_width, figure_height, paperwidth, paperheight;
    FILE *file;
    if ((dot=strrchr(fname,'.')) != NULL) {
       strncpy(base_name, fname, dot-fname); base_name[dot-fname] = '\0';
@@ -265,19 +267,22 @@ void Create_wrapper(VALUE fmkr, char *fname, bool quiet_mode)
    fprintf(file, "\\documentclass{%s}\n", Get_tex_preview_documentclass(fmkr));
    fprintf(file, "%s\n", Get_tex_preview_preamble(fmkr));
    fprintf(file, "%% Set lengths to make the preview page fit the figure.\n");
-   float left_margin = Get_tex_preview_left_margin(fmkr);
-   float right_margin = Get_tex_preview_right_margin(fmkr);
-   float top_margin = Get_tex_preview_top_margin(fmkr);
-   float bottom_margin = Get_tex_preview_bottom_margin(fmkr);
-   float left_fudge = Get_tex_preview_left_fudge(fmkr);
-   float top_fudge = Get_tex_preview_top_fudge(fmkr);
-   float figure_width = x/ENLARGE, figure_height = y/ENLARGE;
-   float paperwidth = figure_width + left_margin + right_margin;
-   float paperheight = figure_height + top_margin + bottom_margin;
-   fprintf(file, "\\setlength{\\paperwidth}{%ipt}\n", ROUND(paperwidth));
-   fprintf(file, "\\setlength{\\paperheight}{%ipt}\n", ROUND(paperheight));
-   fprintf(file, "\\setlength{\\hoffset}{%ipt}\n", -ROUND(left_margin + left_fudge));
-   fprintf(file, "\\setlength{\\voffset}{%ipt}\n", -ROUND(top_margin + top_fudge));
+   
+   x = bbox_urx - bbox_llx; if (x < 0) x = bbox_urx = bbox_llx = 0;
+   y = bbox_ury - bbox_lly; if (y < 0) y = bbox_ury = bbox_lly = 0;
+   figure_width = x/ENLARGE;
+   figure_height = y/ENLARGE;
+
+   paperwidth = figure_width;
+   paperheight = figure_height; // plus margins?
+
+   //paperwidth *= figure_scale;
+   //paperheight *= figure_scale;
+      
+   fprintf(file, "\\setlength{\\paperwidth}{%s}\n", Get_tex_preview_paper_width(fmkr));
+   fprintf(file, "\\setlength{\\paperheight}{%s}\n", Get_tex_preview_paper_height(fmkr));
+   fprintf(file, "\\setlength{\\hoffset}{%s}\n", Get_tex_preview_hoffset(fmkr));
+   fprintf(file, "\\setlength{\\voffset}{%s}\n", Get_tex_preview_voffset(fmkr));
 
    fprintf(file, "\n%% We need the graphicx package.\n");
    fprintf(file, "\\usepackage{graphicx}\n\n");
@@ -287,16 +292,21 @@ void Create_wrapper(VALUE fmkr, char *fname, bool quiet_mode)
    fprintf(file, "\t\\includegraphics[scale=1.0,clip]{#1_figure.pdf}\n");
    fprintf(file, "\t\\end{picture}\n");
    fprintf(file, "\t\\input{#1_figure.txt}}}\n");
-   fprintf(file, "\\newcommand{\\TiogaFigureSized}[2]{\n\t\\centering{\\resizebox{#2}{!}{\\TiogaFigureShow{#1}}}}\n");
+   fprintf(file, "\\newcommand{\\TiogaFigureSized}[3]{\n\t\\centering{\\resizebox{#2}{#3}{\\TiogaFigureShow{#1}}}}\n");
    fprintf(file, "\t%% The 1st arg is the base name for the pdf and txt files.\n");
-   fprintf(file, "\t%% The 2nd arg is a dimension such as 6in or \\columnwidth.\n");
-   fprintf(file, "\\newcommand{\\TiogaFigureScaled}[2]{\n\t\\centering{\\scalebox{#2}{\\TiogaFigureShow{#1}}}}\n");
-   fprintf(file, "\t%% The 1st arg is the base name for the pdf and txt files.\n");
-   fprintf(file, "\t%% The 2nd arg is a scale factor such as 1.2 to enlarge by 20%%.\n");
-   fprintf(file, "\\newcommand{\\TiogaFigure}[1]{\n\t\\TiogaFigureSized{#1}{\\columnwidth}}\n\t%% The default is to resize to fit the column width.\n\n");
+   fprintf(file, "\t%% The 2nd arg is a width.\n");
+   fprintf(file, "\t%% The 3rd arg is a height.\n");
+   fprintf(file, "\\newcommand{\\TiogaFigure}[1]{\n\t\\TiogaFigureSized{#1}{\\columnwidth}{!}}\n\t%% The default is to resize to fit the column width.\n\n");
+
    fprintf(file, "\\begin{document}\n");
    fprintf(file, "\\pagestyle{%s}\n", Get_tex_preview_pagestyle(fmkr));
-   fprintf(file, "\\TiogaFigureShow{%s}\n", simple_name);
+   
+   if (1) {
+      fprintf(file, "\\TiogaFigureSized{%s}{%s}{%s}\n", simple_name, Get_tex_preview_figure_width(fmkr), Get_tex_preview_figure_height(fmkr));
+   } else {
+      fprintf(file, "\\TiogaFigure{%s}\n", simple_name);
+   }
+   
    fprintf(file, "\\end{document}\n");
    fclose(file);
 }

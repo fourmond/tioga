@@ -97,7 +97,11 @@ class FigureMaker
     
     attr_accessor :num_error_lines
 
-    # Wether or not to create +save_dir+ if it doesn't exist
+    attr_accessor :tex_preview_paper_width, :tex_preview_paper_height
+    attr_accessor :tex_preview_hoffset, :tex_preview_voffset
+    attr_accessor :tex_preview_figure_width, :tex_preview_figure_height
+
+    # Whether or not to create +save_dir+ if it doesn't exist
     attr_accessor :create_save_dir
 
     def initialize
@@ -154,21 +158,55 @@ class FigureMaker
             'italic_angle' => 0.0,
             'ascent_angle' => 0.0 }
         
-        # until the margin stuff is better understood, let's keep it private.  no accessors.
-        default_margin = 6
-        @tex_preview_left_margin = default_margin
-        @tex_preview_right_margin = default_margin
-        @tex_preview_top_margin = default_margin
-        @tex_preview_bottom_margin = default_margin
-        @tex_preview_left_fudge = 101
-        @tex_preview_top_fudge = 81
+        
+        # default TeX preview page size info
+        set_A4_landscape
 
         @plot_box_command = lambda { show_plot_box }
         
         reset_figures
 
     end
+
     
+    def set_A4_landscape(fig_width = '!', fig_height = '173mm')
+        self.tex_preview_paper_width = '297mm'
+        self.tex_preview_paper_height = '210mm'
+        self.tex_preview_hoffset = '0mm'
+        self.tex_preview_voffset = '-11mm'
+        self.tex_preview_figure_width = fig_width
+        self.tex_preview_figure_height = fig_height
+    end
+    
+    def set_A5_landscape(fig_width = '!', fig_height = '123mm')
+        self.tex_preview_paper_width = '210mm'
+        self.tex_preview_paper_height = '148mm'
+        self.tex_preview_hoffset = '-11mm'
+        self.tex_preview_voffset = '-18mm'
+        self.tex_preview_figure_width = fig_width
+        self.tex_preview_figure_height = fig_height
+    end
+     
+    def set_A4_portrait(fig_width = '173mm', fig_height = '!')
+        self.tex_preview_paper_width = '210mm'
+        self.tex_preview_paper_height = '297mm'
+        self.tex_preview_hoffset = '-19mm'
+        self.tex_preview_voffset = '0mm'
+        self.tex_preview_figure_width = fig_width
+        self.tex_preview_figure_height = fig_height
+    end
+
+    def set_A5_portrait(fig_width = '123mm', fig_height = '!')
+        self.tex_preview_paper_width = '148mm'
+        self.tex_preview_paper_height = '210mm'
+        self.tex_preview_hoffset = '-38mm'
+        self.tex_preview_voffset = '-11mm'
+        self.tex_preview_figure_width = fig_width
+        self.tex_preview_figure_height = fig_height
+    end
+
+    
+
     def figure_name(num)
         @figure_names[num]
     end

@@ -737,12 +737,13 @@ extern char *Get_tex_preview_preamble(VALUE fmkr);
 extern char *Get_tex_preview_pagestyle(VALUE fmkr);
 extern double Get_tex_xoffset(VALUE fmkr);
 extern double Get_tex_yoffset(VALUE fmkr);
-extern double Get_tex_preview_left_margin(VALUE fmkr);
-extern double Get_tex_preview_right_margin(VALUE fmkr);
-extern double Get_tex_preview_top_margin(VALUE fmkr);
-extern double Get_tex_preview_bottom_margin(VALUE fmkr);
-extern double Get_tex_preview_left_fudge(VALUE fmkr);
-extern double Get_tex_preview_top_fudge(VALUE fmkr);
+
+extern char *Get_tex_preview_paper_width(VALUE fmkr);
+extern char *Get_tex_preview_paper_height(VALUE fmkr);
+extern char *Get_tex_preview_hoffset(VALUE fmkr);
+extern char *Get_tex_preview_voffset(VALUE fmkr);
+extern char *Get_tex_preview_figure_width(VALUE fmkr);
+extern char *Get_tex_preview_figure_height(VALUE fmkr);
 
 #ifndef USE_P
 #define USE_P p = NULL;
