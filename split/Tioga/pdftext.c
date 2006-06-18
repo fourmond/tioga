@@ -277,6 +277,9 @@ VALUE FM_marker_string_info(VALUE fmkr, VALUE font_number, VALUE string, VALUE s
 
 #define TRANSFORM_VEC(dx,dy) tmp = dx; dx = (dx) * a + (dy) * c; dy = tmp * b + (dy) * d;
 
+/* This macro checks that it's a real number we're looking at */
+#define is_okay_number(x) ((x) - (x) == 0.0)
+
 void c_rotated_string_at_points(FM *p, double rotation, int font_number, unsigned char *text, double scale,
    int n, double *xs, double *ys, int alignment, int justification, double horizontal_scaling, double vertical_scaling,
    double italic_angle, double ascent_angle)
@@ -341,6 +344,10 @@ void c_rotated_string_at_points(FM *p, double rotation, int font_number, unsigne
       unsigned char *cp = text, char_code;
       x = convert_figure_to_output_x(p,xs[i]) + shiftx;
       y = convert_figure_to_output_y(p,ys[i]) + shifty;
+      if(!is_okay_number(x) || ! is_okay_number(y))
+	continue; /* we forget this point if at least one coordinate is not
+		     'real'
+		  */
       update_bbox(p,x+llx, y+lly);
       update_bbox(p,x+urx, y+ury);
       update_bbox(p,x+llx2, y+ury2);
