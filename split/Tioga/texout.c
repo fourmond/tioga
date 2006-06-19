@@ -300,7 +300,7 @@ void Create_wrapper(VALUE fmkr, char *fname, bool quiet_mode)
    fprintf(file, "\t\\includegraphics[scale=1.0,clip]{#1_figure.pdf}\n");
    fprintf(file, "\t\\end{picture}\n");
    fprintf(file, "\t\\input{#1_figure.txt}}}\n\n");
-   fprintf(file, "\\newcommand{\\TiogaFigureSized}[3]{\n\t\\centering{\\resizebox{#2}{#3}{\\TiogaFigureShow{#1}}}}\n");
+   fprintf(file, "\\newcommand{\\TiogaFigureSized}[3]{\n\t\\resizebox{#2}{#3}{\\TiogaFigureShow{#1}}}\n");
    fprintf(file, "\t%% The 1st arg is the base name for the pdf and txt files.\n");
    fprintf(file, "\t%% The 2nd arg determines the figure width.\n");
    fprintf(file, "\t%% The 3rd arg determines the figure height.\n\n");

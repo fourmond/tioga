@@ -3,6 +3,7 @@
 module Tioga
 
 # These are the methods and attributes for controlling the FigureMaker executive routines.
+# Included in this are controls for the TeX preview page size and orientation.
 
 class Executive < Doc < FigureMaker
 
@@ -220,6 +221,280 @@ adds the 'marvosym' package by inserting the following line into the 'initialize
 =end 
    def tex_preview_preamble
    end
+
+
+
+
+
+
+=begin rdoc
+:call-seq:
+               tex_preview_paper_width                                     
+               tex_preview_paper_width = a_string
+
+The string will be used as the paper width specification in the preview TeX file.  It will be inserted
+into a TeX preamble 'setlength' command, so the string can be any valid length string.  For example, to set
+the page width to 8.5 inches, set tex_preview_paper_width to '8.5in'; the preview preamble will then include
+the following:
+
+        \setlength{\paperwidth}{8.5in}
+        
+See also: tex_preview_paper_height, tex_preview_figure_width, and tex_preview_figure_height.
+        
+=end 
+   def tex_preview_paper_width
+   end
+
+
+=begin rdoc
+:call-seq:
+               tex_preview_paper_height                                     
+               tex_preview_paper_height = a_string
+
+The string will be used as the paper height specification in the preview TeX file.  It will be inserted
+into a TeX preamble 'setlength' command, so the string can be any valid length string.  For example, to set
+the page height to 11 inches, set tex_preview_paper_height to '11in'; the preview preamble will then include
+the following:
+
+        \setlength{\paperheight}{11in}
+        
+See also: tex_preview_paper_width, tex_preview_figure_width, and tex_preview_figure_height.
+        
+=end 
+   def tex_preview_paper_height
+   end
+
+
+
+=begin rdoc
+:call-seq:
+               tex_preview_figure_width                                     
+               tex_preview_figure_width = a_string
+
+The string will be used as the figure width specification in the preview TeX file.  It will be inserted
+into a TeX graphics 'resizebox' command, so the string can be any valid length string, including '!' which
+means use the height scale factor for the width also in order to preserve the figure aspect ratio.
+
+Warning: results are unpredictable if the figure width is set too large for the current paperwidth.  One
+of the effects I've seen is to get a blank page!  
+        
+See also: tex_preview_hoffset, tex_preview_figure_height, tex_preview_paper_width, and tex_preview_paper_height.
+        
+=end 
+   def tex_preview_figure_width
+   end
+
+=begin rdoc
+:call-seq:
+               tex_preview_figure_height                                     
+               tex_preview_figure_height = a_string
+
+The string will be used as the figure height specification in the preview TeX file.  It will be inserted
+into a TeX graphics 'resizebox' command, so the string can be any valid length string, including '!' which
+means use the width scale factor for the height also in order to preserve the figure aspect ratio.
+
+Warning: results are unpredictable if the figure height is set too large for the current paperheight.  One
+of the effects I've seen is to get a blank page!  
+        
+See also: tex_preview_voffset, tex_preview_figure_width, tex_preview_paper_width, and tex_preview_paper_height.
+        
+=end 
+   def tex_preview_figure_height
+   end
+
+
+=begin rdoc
+:call-seq:
+               tex_preview_hoffset                                     
+               tex_preview_hoffset = a_string
+
+This string will be used as the horizontal offset specification in the preview TeX file.  It will be inserted
+into a TeX preamble 'setlength' command, so the string can be any valid length string.  The figure will be
+shifted horizontally by the offset distance (positive means to the right, negative to the left).
+        
+See also: tex_preview_voffset, tex_preview_paper_height, tex_preview_figure_width, and tex_preview_figure_height.
+        
+=end 
+   def tex_preview_hoffset
+   end
+
+=begin rdoc
+:call-seq:
+               tex_preview_voffset                                     
+               tex_preview_voffset = a_string
+
+This string will be used as the vertical offset specification in the preview TeX file.  It will be inserted
+into a TeX preamble 'setlength' command, so the string can be any valid length string.  The figure will be
+shifted vertically by the offset distance (positive means down, negative up).
+        
+See also: tex_preview_hoffset, tex_preview_paper_height, tex_preview_figure_width, and tex_preview_figure_height.
+        
+=end 
+   def tex_preview_voffset
+   end
+
+
+
+
+
+=begin rdoc
+
+Sets tex_preview_paper_width and tex_preview_paper_height to the A4 standard values (297mm and 210mm), 
+and sets tex_preview_figure_width and tex_preview_figure_height to the strings given as fig_width and fig_height.
+The default values for the figure width and height scale the figure equally in both directions to make its height 184mm.
+        
+See also: set_A4_portrait, set_A5_landscape, set_A5_portrait, set_B5_landscape, and set_B5_portrait.
+        
+=end 
+   def set_A4_landscape(fig_width = '!', fig_height = '184mm')
+   end
+
+
+=begin rdoc
+
+Sets tex_preview_paper_width and tex_preview_paper_height to the A5 standard values (210mm and 148mm), 
+and sets tex_preview_figure_width and tex_preview_figure_height to the strings given as fig_width and fig_height.
+The default values for the figure width and height scale the figure equally in both directions to make its height 122mm.
+        
+See also: set_A5_portrait, set_A4_landscape, set_A4_portrait, set_B5_landscape, and set_B5_portrait.
+        
+=end 
+   def set_A5_landscape(fig_width = '!', fig_height = '122mm')
+   end
+
+
+=begin rdoc
+
+Sets tex_preview_paper_width and tex_preview_paper_height to the B5 standard values (250mm and 176mm), 
+and sets tex_preview_figure_width and tex_preview_figure_height to the strings given as fig_width and fig_height.
+The default values for the figure width and height scale the figure equally in both directions to make its height 150mm.
+        
+See also: set_B5_portrait, set_A5_landscape, set_A5_portrait, set_A4_landscape, and set_A4_portrait.
+        
+=end 
+   def set_B5_landscape(fig_width = '!', fig_height = '150mm')
+   end
+
+
+
+
+=begin rdoc
+
+Sets tex_preview_paper_width and tex_preview_paper_height to the A4 standard values (210mm and 297mm), 
+and sets tex_preview_figure_width and tex_preview_figure_height to the strings given as fig_width and fig_height.
+The default values for the figure width and height scale the figure equally in both directions to make its width 184mm.
+        
+See also: set_A4_landscape, set_A5_landscape, set_A5_portrait, set_B5_landscape, and set_B5_portrait.
+        
+=end 
+   def set_A4_portrait(fig_width = '184mm', fig_height = '!')
+   end
+
+
+=begin rdoc
+
+Sets tex_preview_paper_width and tex_preview_paper_height to the A5 standard values (148mm and 210mm), 
+and sets tex_preview_figure_width and tex_preview_figure_height to the strings given as fig_width and fig_height.
+The default values for the figure width and height scale the figure equally in both directions to make its width 122mm.
+        
+See also: set_A5_portrait, set_A4_landscape, set_A4_portrait, set_B5_landscape, and set_B5_portrait.
+        
+=end 
+   def set_A5_portrait(fig_width = '122mm', fig_height = '!')
+   end
+
+=begin rdoc
+
+Sets tex_preview_paper_width and tex_preview_paper_height to the B5 standard values (176mm and 250mm), 
+and sets tex_preview_figure_width and tex_preview_figure_height to the strings given as fig_width and fig_height.
+The default values for the figure width and height scale the figure equally in both directions to make its width 150mm.
+        
+See also: set_B5_landscape, set_A4_landscape, set_A4_portrait, set_A5_landscape, and set_A5_portrait.
+        
+=end 
+   def set_B5_portrait(fig_width = '150mm', fig_height = '!')
+   end
+
+
+
+=begin rdoc
+
+Sets tex_preview_paper_width and tex_preview_paper_height to the JB5 standard values (182mm and 257mm), 
+and sets tex_preview_figure_width and tex_preview_figure_height to the strings given as fig_width and fig_height.
+The default values for the figure width and height scale the figure equally in both directions to make its width 156mm.
+        
+See also: set_JB5_landscape, set_B5_landscape, and set_B5_portrait.
+        
+=end 
+   def set_JB5_portrait(fig_width = '156mm', fig_height = '!')
+   end
+
+
+=begin rdoc
+
+Sets tex_preview_paper_width and tex_preview_paper_height to the JB5 standard values (257mm and 182mm), 
+and sets tex_preview_figure_width and tex_preview_figure_height to the strings given as fig_width and fig_height.
+The default values for the figure width and height scale the figure equally in both directions to make its height 156mm.
+        
+See also: set_JB5_landscape, set_B5_landscape, and set_B5_portrait.
+        
+=end 
+   def set_JB5_landscape(fig_width = '!', fig_height = '156mm')
+   end
+
+
+=begin rdoc
+
+Sets tex_preview_paper_width and tex_preview_paper_height to the US letter standard values (11in and 8.5in), 
+and sets tex_preview_figure_width and tex_preview_figure_height to the strings given as fig_width and fig_height.
+The default values for the figure width and height scale the figure equally in both directions to make its height 7.5in.
+        
+See also: set_USLetter_portrait, set_USLegal_portrait, and set_USLegal_landscape.
+        
+=end 
+   def set_USLetter_landscape(fig_width = '!', fig_height = '7.5in')
+   end
+
+=begin rdoc
+
+Sets tex_preview_paper_width and tex_preview_paper_height to the US letter standard values (8.5in and 11in), 
+and sets tex_preview_figure_width and tex_preview_figure_height to the strings given as fig_width and fig_height.
+The default values for the figure width and height scale the figure equally in both directions to make its width 7.5in.
+        
+See also: set_USLetter_landscape, set_USLegal_portrait, and set_USLegal_landscape.
+        
+=end 
+   def set_USLetter_portrait(fig_width = '7.5in', fig_height = '!')
+   end
+
+
+
+=begin rdoc
+
+Sets tex_preview_paper_width and tex_preview_paper_height to the US letter standard values (14in and 8.5in), 
+and sets tex_preview_figure_width and tex_preview_figure_height to the strings given as fig_width and fig_height.
+The default values for the figure width and height scale the figure equally in both directions to make its height 7.5in.
+        
+See also: set_USLegal_portrait, set_USLetter_portrait, and set_USLetter_landscape.
+        
+=end 
+   def set_USLegal_landscape(fig_width = '!', fig_height = '7.5in')
+   end
+
+=begin rdoc
+
+Sets tex_preview_paper_width and tex_preview_paper_height to the US letter standard values (8.5in and 14in), 
+and sets tex_preview_figure_width and tex_preview_figure_height to the strings given as fig_width and fig_height.
+The default values for the figure width and height scale the figure equally in both directions to make its width 7.5in.
+        
+See also: set_USLegal_landscape, set_USLetter_portrait, and set_USLetter_landscape.
+        
+=end 
+   def set_USLegal_portrait(fig_width = '7.5in', fig_height = '!')
+   end
+
+
+
 
 # :call-seq:
 #               tex_xoffset                                     
