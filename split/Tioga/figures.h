@@ -700,8 +700,11 @@ extern bool Get_bool(VALUE obj, ID name_ID);
 extern int Get_int(VALUE obj, ID name_ID);
 #define Get_value(obj, name_ID) rb_ivar_get(obj, name_ID)
 
+
 extern VALUE FM_private_make(VALUE fmkr, VALUE name, VALUE cmd);
 extern VALUE FM_get_save_filename(VALUE fmkr, VALUE name);
+
+extern VALUE FM_private_make_portfolio(VALUE fmkr, VALUE filename, VALUE fignames);
 
 extern void Init_PlotAxis(void);
 extern void Initialize_Figure(VALUE fmkr);
@@ -720,6 +723,7 @@ extern void c_stroke_scale_set(FM *p, double stroke_scale);
 extern void c_clip_rect(FM *p, double x, double y, double width, double height); // in output coords
 
 extern int Blank_String(char *str);
+extern char *Get_String(VALUE ary, int index);
 
 extern void c_show_rotated_text(FM *p, char *text, int frame_side, double shift, double fraction,
    double scale, double angle, int justification, int alignment);

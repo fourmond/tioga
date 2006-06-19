@@ -237,47 +237,11 @@ void Close_tex(VALUE fmkr, bool quiet_mode)
    fprintf(fp,"\\begin{picture}(%d,%d)(%d,%d)", ROUND(x), ROUND(y), ROUND(xoff), ROUND(yoff));
    fclose(fp);
 }   
-   
-void Create_wrapper(VALUE fmkr, char *fname, bool quiet_mode)
-{  // create the wrapper TeX file to combine the text and graphics to make a figure
-   double x, y;
-   char *dot;
-   char tex_fname[100], base_name[100], simple_name[100];
-   float preview_paper_width, preview_paper_height;
-   float preview_hoffset, preview_voffset;
-   float preview_figure_width, preview_figure_height;
-   float figure_width, figure_height, paperwidth, paperheight;
-   FILE *file;
-   if ((dot=strrchr(fname,'.')) != NULL) {
-      strncpy(base_name, fname, dot-fname); base_name[dot-fname] = '\0';
-      sprintf(tex_fname, "%s.tex", base_name);
-      }
-   else {
-      strcpy(base_name, fname);
-      sprintf(tex_fname, "%s.tex", fname);
-      }
-   if ((dot=strrchr(base_name,'/')) != NULL) {
-      strcpy(simple_name, dot+1);
-      }
-   else {
-      strcpy(simple_name, base_name);
-      }
-   file = fopen(tex_fname, "w");
-   fprintf(file, "%% Tioga preview LaTeX file for %s_figure.pdf and %s_figure.txt\n\n", base_name, base_name);
+
+
+void Write_preview_header(VALUE fmkr, FILE *file) {
    fprintf(file, "\\documentclass{%s}\n\n", Get_tex_preview_documentclass(fmkr));
    fprintf(file, "%s\n\n", Get_tex_preview_preamble(fmkr));
-   
-   x = bbox_urx - bbox_llx; if (x < 0) x = bbox_urx = bbox_llx = 0;
-   y = bbox_ury - bbox_lly; if (y < 0) y = bbox_ury = bbox_lly = 0;
-   figure_width = x/ENLARGE;
-   figure_height = y/ENLARGE;
-
-   paperwidth = figure_width;
-   paperheight = figure_height; // plus margins?
-
-   //paperwidth *= figure_scale;
-   //paperheight *= figure_scale;
-      
    fprintf(file, "%% Set page margins.\n");
    fprintf(file, "\\setlength{\\topmargin}{0pt}\n");
    fprintf(file, "\\setlength{\\headsep}{0pt}\n");
@@ -305,6 +269,32 @@ void Create_wrapper(VALUE fmkr, char *fname, bool quiet_mode)
    fprintf(file, "\t%% The 2nd arg determines the figure width.\n");
    fprintf(file, "\t%% The 3rd arg determines the figure height.\n\n");
    fprintf(file, "\\newcommand{\\TiogaFigure}[1]{\n\t\\TiogaFigureSized{#1}{\\columnwidth}{!}}\n\t%% The default is to resize to fit the column width.\n\n");
+}
+
+   
+void Create_wrapper(VALUE fmkr, char *fname, bool quiet_mode)
+{  // create the wrapper TeX file to combine the text and graphics to make a figure
+   char *dot;
+   char tex_fname[100], base_name[100], simple_name[100];
+   FILE *file;
+   if ((dot=strrchr(fname,'.')) != NULL) {
+      strncpy(base_name, fname, dot-fname); base_name[dot-fname] = '\0';
+      sprintf(tex_fname, "%s.tex", base_name);
+      }
+   else {
+      strcpy(base_name, fname);
+      sprintf(tex_fname, "%s.tex", fname);
+      }
+   if ((dot=strrchr(base_name,'/')) != NULL) {
+      strcpy(simple_name, dot+1);
+      }
+   else {
+      strcpy(simple_name, base_name);
+      }
+   file = fopen(tex_fname, "w");
+   fprintf(file, "%% Tioga preview LaTeX file for %s_figure.pdf and %s_figure.txt\n\n", base_name, base_name);
+
+   Write_preview_header(fmkr, file);
 
    fprintf(file, "%% Here's the page with the figure.\n");
    fprintf(file, "\\begin{document}\n");
@@ -326,5 +316,33 @@ void Rename_tex(char *oldname, char *newname)
    rename(old_ofile, new_ofile); // from stdio.h
 }
 
+VALUE FM_private_make_portfolio(VALUE fmkr, VALUE filename, VALUE fignames)
+{
+    FM *p = Get_FM(fmkr);
+    FILE *file;
+    VALUE figname;
+    char *fname, *fig_str, *fig_width, *fig_height;
+    int i, len;
+    filename = rb_String(filename);
+    fname = RSTRING(filename)->ptr;
+    file = fopen(fname, "w");
+    fprintf(file, "%% %s\n", fname);
+    Write_preview_header(fmkr, file);
+    fprintf(file, "%% The actual document contents start here.\n");
+    fprintf(file, "\\begin{document}\n");
+    fprintf(file, "\\pagestyle{%s}\n", Get_tex_preview_pagestyle(fmkr));   
+    fprintf(file, "%% Start of figures, one per page\n\n");
+    fignames = rb_Array(fignames);
+    len = RARRAY(fignames)->len;
+    fig_width = Get_tex_preview_figure_width(fmkr);
+    fig_height = Get_tex_preview_figure_height(fmkr);
+    for (i=0; i < len; i++) {
+        fig_str = Get_String(fignames, i);
+        fprintf(file, "\\begin{figure}\n\\TiogaFigureSized{%s}{%s}{%s}\n\\end{figure}\n\\clearpage\n\n", fig_str, fig_width, fig_height);
+    }
+    fprintf(file, "\\end{document}\n");
+    fclose(file);
+    return fmkr;
+}
 
 

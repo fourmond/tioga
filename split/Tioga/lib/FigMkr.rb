@@ -1549,36 +1549,7 @@ class FigureMaker
         else
                 fullname = name
         end
-        file = File.open(fullname, 'w')
-        file.puts(
-            '% ' + name, '',
-            '\documentclass{article}', '',
-            '% start of the usual stuff for Tioga figures',
-            '\usepackage[dvipsnames,usenames]{color}',
-            '\usepackage{graphicx}',
-            '\newcommand{\TiogaFigureShow}[1]{',
-            '    \rotatebox{0.0}{',
-            '    \begin{picture}(0,0)(0,0)',
-            '    \includegraphics[scale=1.0,clip]{#1_figure.pdf}',
-            '    \end{picture}',
-            '    \input{#1_figure.txt}}}',
-            '\newcommand{\TiogaFigureSized}[2]{',
-            '    \centering{\resizebox{#2}{!}{\TiogaFigureShow{#1}}}}',
-            '\newcommand{\TiogaFigureScaled}[2]{',
-            '    \centering{\scalebox{#2}{\TiogaFigureShow{#1}}}}',
-            '\newcommand{\TiogaFigure}[1]{',
-            '    \TiogaFigureSized{#1}{\columnwidth}}',
-            '% end of the usual stuff for Tioga figures', '')
-        file.puts('\newcommand{\ShowFigure}[1]{\TiogaFigure{#1}}')
-        file.puts('', '% the actual document contents start here', '',
-            '\begin{document}',
-            '\pagestyle{empty}', '',
-            '% start of figures, one per page.')
-        @figure_names.each do |name|
-            file.puts('\begin{figure}', '\ShowFigure{'+name+'}', '\end{figure}', '\clearpage', '')
-        end
-        file.puts('\end{document}')
-        file.close
+        private_make_portfolio(fullname, @figure_names)
     end
     
     private
