@@ -329,7 +329,7 @@ VALUE FM_private_make_portfolio(VALUE fmkr, VALUE name, VALUE filename, VALUE fi
     file = fopen(fname, "w");
     fprintf(file, "%% Portfolio file %s\n", RSTRING(name)->ptr);
     Write_preview_header(fmkr, file);
-    fprintf(file, "%% The actual document contents start here.\n");
+    fprintf(file, "%% The document starts here.\n");
     fprintf(file, "\\begin{document}\n");
     fprintf(file, "\\pagestyle{%s}\n\n", Get_tex_preview_pagestyle(fmkr));   
     fprintf(file, "%% Start of figures, one per page\n\n");
