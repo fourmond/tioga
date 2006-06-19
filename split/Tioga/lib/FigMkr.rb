@@ -1542,14 +1542,14 @@ class FigureMaker
         ensure_safe_save_dir
         if @save_dir != nil
             if @save_dir[-1..-1] != '/'
-                fullname = @save_dir + '//' + name
+                fullname = @save_dir + '/' + name
             else
                 fullname = @save_dir + name
             end
         else
                 fullname = name
         end
-        private_make_portfolio(fullname, @figure_names)
+        private_make_portfolio(name, fullname, @figure_names)
     end
     
     private

@@ -316,21 +316,22 @@ void Rename_tex(char *oldname, char *newname)
    rename(old_ofile, new_ofile); // from stdio.h
 }
 
-VALUE FM_private_make_portfolio(VALUE fmkr, VALUE filename, VALUE fignames)
+VALUE FM_private_make_portfolio(VALUE fmkr, VALUE name, VALUE filename, VALUE fignames)
 {
     FM *p = Get_FM(fmkr);
     FILE *file;
     VALUE figname;
     char *fname, *fig_str, *fig_width, *fig_height;
     int i, len;
+    name = rb_String(name);
     filename = rb_String(filename);
     fname = RSTRING(filename)->ptr;
     file = fopen(fname, "w");
-    fprintf(file, "%% %s\n", fname);
+    fprintf(file, "%% Portfolio file %s\n", RSTRING(name)->ptr);
     Write_preview_header(fmkr, file);
     fprintf(file, "%% The actual document contents start here.\n");
     fprintf(file, "\\begin{document}\n");
-    fprintf(file, "\\pagestyle{%s}\n", Get_tex_preview_pagestyle(fmkr));   
+    fprintf(file, "\\pagestyle{%s}\n\n", Get_tex_preview_pagestyle(fmkr));   
     fprintf(file, "%% Start of figures, one per page\n\n");
     fignames = rb_Array(fignames);
     len = RARRAY(fignames)->len;
