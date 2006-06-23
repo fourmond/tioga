@@ -55,7 +55,7 @@ void rb_export_symbol(VALUE module, const char * symbol_name,
 			    void * symbol)
 {
   VALUE hash = get_symbol_hash(module);
-  rb_hash_aset(hash, rb_str_new2(symbol_name),INT2NUM((int) symbol));
+  rb_hash_aset(hash, rb_str_new2(symbol_name),LONG2NUM((long) symbol));
 }
 
 void * rb_import_symbol_no_raise(VALUE module, const char * symbol_name)
@@ -68,7 +68,7 @@ void * rb_import_symbol_no_raise(VALUE module, const char * symbol_name)
   VALUE symbol = rb_hash_aref(hash, rb_str_new2(symbol_name));
   
   if(TYPE(symbol) == T_FIXNUM || TYPE(symbol) == T_BIGNUM)
-    return (void *) NUM2INT(symbol);
+    return (void *) NUM2LONG(symbol);
   return NULL;
 }
 
