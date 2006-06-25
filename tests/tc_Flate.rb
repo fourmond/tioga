@@ -1,10 +1,5 @@
 #  tc_Dtable.rb
 
-require 'Flate'
-module Flate
-p self, @_exported_C_symbols
-end
-
 require 'test/unit'
 
 class TestDtable < Test::Unit::TestCase

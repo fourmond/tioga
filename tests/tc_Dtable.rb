@@ -1,14 +1,7 @@
 #  tc_Dtable.rb
 
 require 'Dobjects/Dtable'
-
 require 'test/unit'
-
-module Dobjects
-class Dtable
-p self, @_exported_C_symbols
-end
-end
 
 class TestDtable < Test::Unit::TestCase
 
