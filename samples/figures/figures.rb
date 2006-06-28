@@ -11,7 +11,9 @@ class MyFigures
 
     def initialize
         @figure_maker = FigureMaker.default
+        
         t.save_dir = 'figures_out'
+        t.def_eval_function { |str| eval(str) }
 
         t.def_figure("Icon") { icon }
         t.def_figure("Rounded_Rect") { rounded_rect }

@@ -10,8 +10,7 @@ as determined by the boundary attributes.  Things like the title and axis labels
 "frame" coordinates that run from (0, 0) at the lower left corner of the frame to (1, 1) at the upper right
 corner.  The frame is positioned on the page using "page" coordinates that run from (0, 0)
 at the lower left of the page to (1, 1) at the upper right.  The actual numbers used in PDF and TeX files
-are given in "output" coordinates which are simply scaled-up page coordinates (so that locations
-can be represented using small integers rather than floats).
+are given in "output" coordinates which are a tenth of a point (i.e., 720 in output coords equals 1 inch).
 
 The coordinate systems are naturally related in the following manner:
 

@@ -90,6 +90,11 @@ class FigureMaker
     
     attr_accessor :tex_preview_preamble
     
+    attr_accessor :tex_preview_fontsize    
+    attr_accessor :tex_preview_fontfamily    
+    attr_accessor :tex_preview_fontseries    
+    attr_accessor :tex_preview_fontshape
+    
     attr_accessor :tex_preview_pagestyle
     
     attr_accessor :tex_xoffset
@@ -126,8 +131,6 @@ class FigureMaker
 % end of preview preamble'
         @tex_preview_pagestyle = 'empty'
         
-        @eval_command = nil
-        
         @num_error_lines = 6
 
         @tex_xoffset = -0.2
@@ -136,6 +139,11 @@ class FigureMaker
         @tex_preview_hoffset = '-0.5in'
         @tex_preview_voffset = '-0.25in'
         
+        @tex_preview_fontsize = '10.0'  
+        @tex_preview_fontfamily = 'rmdefault'
+        @tex_preview_fontseries = 'mddefault'
+        @tex_preview_fontshape = 'updefault'
+
         @legend_defaults = { 
             'legend_top_margin' => 0.03,
             'legend_bottom_margin' => 0.03,
@@ -159,6 +167,8 @@ class FigureMaker
             'vertical_scale' => 1.0,
             'italic_angle' => 0.0,
             'ascent_angle' => 0.0 }
+                
+        @eval_command = nil
         
         
         # default TeX preview page size info
@@ -170,6 +180,11 @@ class FigureMaker
 
     end
 
+    def set_default_font_size(size, update_preview_size_string = true)
+        private_set_default_font_size(size)
+        return unless update_preview_size_string == true
+        self.tex_preview_fontsize = sprintf("%0.2fpt", size)
+    end
     
     def set_A4_landscape(fig_width = '!', fig_height = '184mm')
         self.tex_preview_paper_width = '297mm'
@@ -504,7 +519,7 @@ class FigureMaker
         end
     end
     
-    def set_aspect_ratio(width_to_height)
+    def set_aspect_ratio_relative_to_frame(width_to_height)
         if width_to_height >= 1
             margin = (1 - 1.0/width_to_height) * 0.5
             set_subframe('top_margin' => margin, 'bottom_margin' => margin)
@@ -512,6 +527,16 @@ class FigureMaker
             margin = (1 - width_to_height) * 0.5
             set_subframe('left_margin' => margin, 'right_margin' => margin)
         end
+    end
+    
+    def set_physical_aspect_ratio(width_to_height)
+        wd = convert_frame_to_page_dx(1)
+        ht = convert_frame_to_page_dy(1)
+        set_aspect_ratio_relative_to_frame(width_to_height * ht / wd)
+    end
+    
+    def set_aspect_ratio(width_to_height)
+        set_physical_aspect_ratio(width_to_height)
     end
 
     def set_landscape

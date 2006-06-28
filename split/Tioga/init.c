@@ -29,6 +29,8 @@ ID tex_preview_paper_width_ID, tex_preview_paper_height_ID;
 ID tex_preview_hoffset_ID, tex_preview_voffset_ID;
 ID tex_preview_figure_width_ID, tex_preview_figure_height_ID;
 ID do_cmd_ID, initialized_ID, tex_xoffset_ID, tex_yoffset_ID;
+ID tex_preview_fontsize_ID, tex_preview_fontfamily_ID, tex_preview_fontseries_ID, tex_preview_fontshape_ID;
+
 
 void Init_IDs(void)
 {
@@ -54,30 +56,73 @@ void Init_IDs(void)
     tex_preview_voffset_ID = rb_intern("@tex_preview_voffset");
     tex_preview_figure_width_ID = rb_intern("@tex_preview_figure_width");
     tex_preview_figure_height_ID = rb_intern("@tex_preview_figure_height");
+    
+    tex_preview_fontsize_ID = rb_intern("@tex_preview_fontsize");
+    tex_preview_fontfamily_ID = rb_intern("@tex_preview_fontfamily");
+    tex_preview_fontseries_ID = rb_intern("@tex_preview_fontseries");
+    tex_preview_fontshape_ID = rb_intern("@tex_preview_fontshape");
 }
 
-void Initialize_Figure(VALUE fmkr) {
-   FM *p = Get_FM(fmkr);
-   /* Page */
-   p->root_figure = true;
-   p->in_subplot = false;
+void c_set_device_pagesize(FM *p, double width, double height) { // sizes in points
    p->page_left = 0;
-   p->page_right = 5 * 72 * ENLARGE;
+   p->page_right = width;
    p->page_bottom = 0;
-   p->page_top = 5 * 72 * ENLARGE;
+   p->page_top = height;
    p->page_width = p->page_right - p->page_left;
    p->page_height = p->page_top - p->page_bottom;
    p->clip_left = p->page_left;
    p->clip_right = p->page_right;
    p->clip_top = p->page_top;
    p->clip_bottom = p->page_bottom;
+}
+
+
+VALUE FM_set_device_pagesize(VALUE fmkr, VALUE width, VALUE height)
+{
+   FM *p = Get_FM(fmkr);
+   width = rb_Float(width);
+   height = rb_Float(height);
+   c_set_device_pagesize(p, NUM2DBL(width), NUM2DBL(height));
+   return fmkr;
+}
+
+
+void c_set_frame_sides(FM *p, double left, double right, double top, double bottom) { // sizes in page coords [0..1]
+   if (left > 1.0 || left < 0.0) rb_raise(rb_eArgError, "Sorry: value of left must be between 0 and 1 for set_frame_sides");
+   if (right > 1.0 || right < 0.0) rb_raise(rb_eArgError, "Sorry: value of right must be between 0 and 1 for set_frame_sides");
+   if (top > 1.0 || top < 0.0) rb_raise(rb_eArgError, "Sorry: value of top must be between 0 and 1 for set_frame_sides");
+   if (bottom > 1.0 || bottom < 0.0) rb_raise(rb_eArgError, "Sorry: value of bottom must be between 0 and 1 for set_frame_sides");
+   if (left >= right) rb_raise(rb_eArgError, "Sorry: value of left must be smaller than value of right for set_frame_sides");
+   if (bottom >= top) rb_raise(rb_eArgError, "Sorry: value of bottom must be smaller than value of top for set_frame_sides");
+   p->frame_left = left;
+   p->frame_right = right;
+   p->frame_bottom = bottom;
+   p->frame_top = top;
+   p->frame_width = right - left;
+   p->frame_height = top - bottom;
+}
+
+VALUE FM_set_frame_sides(VALUE fmkr, VALUE left, VALUE right, VALUE top, VALUE bottom)
+{
+   FM *p = Get_FM(fmkr);
+   left = rb_Float(left);
+   right = rb_Float(right);
+   top = rb_Float(top);
+   bottom = rb_Float(bottom);
+   c_set_frame_sides(p, NUM2DBL(left), NUM2DBL(right), NUM2DBL(top), NUM2DBL(bottom));
+   return fmkr;
+}
+
+
+void Initialize_Figure(VALUE fmkr) {
+   FM *p = Get_FM(fmkr);
+   /* Page */
+   p->root_figure = true;
+   p->in_subplot = false;
+   c_private_set_default_font_size(p, 12.0);
+   c_set_device_pagesize(p, 5 * 72.0 * ENLARGE, 5 * 72.0 * ENLARGE);
    /* default frame */
-   p->frame_left = 0.2;
-   p->frame_right = 1.0 - p->frame_left;
-   p->frame_bottom = 0.2;
-   p->frame_top = 1.0 - p->frame_bottom;
-   p->frame_width = p->frame_right - p->frame_left;
-   p->frame_height = p->frame_top - p->frame_bottom;
+   c_set_frame_sides(p, 0.2, 0.8, 0.8, 0.2);
    /* default bounds */
    p->bounds_left = p->bounds_bottom = p->bounds_xmin = p->bounds_ymin = 0;
    p->bounds_right = p->bounds_top = p->bounds_xmax = p->bounds_ymax = 1;
@@ -297,6 +342,32 @@ char *Get_tex_preview_figure_height(VALUE fmkr) {
    if (v == Qnil) return NULL;
    return StringValuePtr(v);
 }
+
+
+char *Get_tex_preview_fontsize(VALUE fmkr) {
+   VALUE v = rb_ivar_get(fmkr, tex_preview_fontsize_ID);
+   if (v == Qnil) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_preview_fontfamily(VALUE fmkr) {
+   VALUE v = rb_ivar_get(fmkr, tex_preview_fontfamily_ID);
+   if (v == Qnil) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_preview_fontseries(VALUE fmkr) {
+   VALUE v = rb_ivar_get(fmkr, tex_preview_fontseries_ID);
+   if (v == Qnil) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_preview_fontshape(VALUE fmkr) {
+   VALUE v = rb_ivar_get(fmkr, tex_preview_fontshape_ID);
+   if (v == Qnil) return NULL;
+   return StringValuePtr(v);
+}
+
 
 double Get_tex_xoffset(VALUE fmkr) { return Get_double(fmkr, tex_xoffset_ID); }
 double Get_tex_yoffset(VALUE fmkr) { return Get_double(fmkr, tex_yoffset_ID); }

@@ -255,7 +255,7 @@ VALUE FM_marker_string_info(VALUE fmkr, VALUE font_number, VALUE string, VALUE s
    string = rb_String(string);
    unsigned char *text = (unsigned char *)(RSTRING(string)->ptr);
    scale = rb_Float(scale);
-   double ft_ht = p->default_text_scale * NUM2DBL(scale) * DEFAULT_FONT_HT * ENLARGE;
+   double ft_ht = p->default_text_scale * NUM2DBL(scale) * p->default_font_size * ENLARGE;
    int ft_height = ROUND(ft_ht);
    ft_ht = ft_height;
    double llx, lly, urx, ury, width;
@@ -284,7 +284,7 @@ void c_rotated_string_at_points(FM *p, double rotation, int font_number, unsigne
    int n, double *xs, double *ys, int alignment, int justification, double horizontal_scaling, double vertical_scaling,
    double italic_angle, double ascent_angle)
 {
-   double ft_ht = p->default_text_scale * scale * DEFAULT_FONT_HT * ENLARGE;
+   double ft_ht = p->default_text_scale * scale * p->default_font_size * ENLARGE;
    int i, ft_height = ROUND(ft_ht);
    ft_ht = ft_height;
    if (constructing_path) rb_raise(rb_eArgError, "Sorry: must not be constructing a path when show marker");

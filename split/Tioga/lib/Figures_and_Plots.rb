@@ -229,11 +229,19 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Legends.jpg
     def show_edges
     end
     
-# Calls set_subframe to adjust the frame margins to give the requested aspect ratio.
+# Alias for set_physical_aspect_ratio.
     def set_aspect_ratio(width_to_height)
     end
+    
+# Calls set_subframe to adjust the frame margins to give the requested aspect ratio relative to the page dimensions.
+    def set_physical_aspect_ratio(width_to_height)
+    end
+    
+# Calls set_subframe to adjust the frame margins to give the requested aspect ratio relative to the current frame dimensions.
+    def set_aspect_ratio_relative_to_frame(width_to_height)
+    end
 
-# Calls set_aspect_ratio to give width to height ratio of (11.0/8.5).
+# Calls set_aspect_ratio to give width to height ratio of (11.0/8.5) relative to the page dimensions.
     def set_landscape
     end
     
@@ -241,7 +249,7 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Legends.jpg
     def landscape
     end
     
-# Calls set_aspect_ratio to give width to height ratio of (8.5/11.0).
+# Calls set_aspect_ratio to give width to height ratio of (8.5/11.0) relative to the page dimensions.
     def set_portrait
     end
     

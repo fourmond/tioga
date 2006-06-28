@@ -22,6 +22,7 @@ class ProfilePlots
         
         @figure_maker = FigureMaker.default
         t.save_dir = 'profiles_out'
+        t.def_eval_function { |str| eval(str) }
 
         t.def_figure("Abundances_by_Mass") { abundances_by_mass }
         t.def_figure("Abundances_by_logP") { abundances_by_logP }

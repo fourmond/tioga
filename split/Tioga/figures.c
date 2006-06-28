@@ -77,6 +77,8 @@ FM *Get_FM(VALUE fmkr) {
 /* page attribute accessors */
    RO_BOOL_ATTR(root_figure)
    RO_BOOL_ATTR(in_subplot)
+
+/* device page size accessors -- can set these using set_device_pagesize */
    RO_DBL_ATTR(page_left)
    RO_DBL_ATTR(page_bottom)
    RO_DBL_ATTR(page_top)
@@ -84,7 +86,7 @@ FM *Get_FM(VALUE fmkr) {
    RO_DBL_ATTR(page_width)
    RO_DBL_ATTR(page_height)
    
-/* frame attribute accessors */
+/* frame attribute accessors -- can set these using set_frame_sides */
    RO_DBL_ATTR(frame_left)
    RO_DBL_ATTR(frame_right)
    RO_DBL_ATTR(frame_top)
@@ -107,6 +109,7 @@ FM *Get_FM(VALUE fmkr) {
    RO_BOOL_ATTR(yaxis_reversed)
    
 /* text attribute accessors */
+   RO_DBL_ATTR(default_font_size)
    RO_DBL_ATTR(default_text_scale)
    INT_ATTR(justification)
    INT_ATTR(alignment)
@@ -326,6 +329,7 @@ void Init_FigureMaker(void) {
    attr_reader(xaxis_reversed)
    attr_reader(yaxis_reversed)
 /* text attribute accessors */
+   attr_reader(default_font_size)
    attr_reader(default_text_scale)
    attr_accessors(justification)
    attr_accessors(alignment)
@@ -395,6 +399,7 @@ void Init_FigureMaker(void) {
    rb_define_method(cFM, "convert_output_to_figuret_dy", FM_convert_output_to_figure_dy, 1);
    rb_define_method(cFM, "convert_to_degrees", FM_convert_to_degrees, 2);
 /* text */
+   rb_define_method(cFM, "private_set_default_font_size", FM_private_set_default_font_size, 1);
    rb_define_method(cFM, "rescale_text", FM_rescale_text, 1);
    rb_define_method(cFM, "show_rotated_text", FM_show_rotated_text, 8);
    rb_define_method(cFM, "show_rotated_label", FM_show_rotated_label, 7);
@@ -470,6 +475,8 @@ void Init_FigureMaker(void) {
    rb_define_method(cFM, "convert_to_colormap", FM_convert_to_colormap, 3);
    rb_define_method(cFM, "get_color_from_colormap", FM_get_color_from_colormap, 2);
 /* plots */
+   rb_define_method(cFM, "set_frame_sides", FM_set_frame_sides, 4);
+   rb_define_method(cFM, "set_device_pagesize", FM_set_device_pagesize, 2);
    rb_define_method(cFM, "doing_subplot", FM_doing_subplot, 0);
    rb_define_method(cFM, "show_axis", FM_show_axis, 1);
    rb_define_method(cFM, "show_edge", FM_show_edge, 1);

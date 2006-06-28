@@ -223,9 +223,6 @@ extern double bbox_llx, bbox_lly, bbox_urx, bbox_ury;
 extern FILE *OF; // for the PDF file
 extern FILE *TF; // for the temp file holding the uncompressed stream
 
-// default margins are in points
-#define DEFAULT_MARGIN 36
-
 extern void Unpack_RGB(VALUE rgb, double *rp, double *gp, double *bp);
 
 extern void Start_Axis_Standard_State(FM *p, VALUE color, double line_width);

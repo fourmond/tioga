@@ -338,6 +338,67 @@ See also: tex_preview_hoffset, tex_preview_paper_height, tex_preview_figure_widt
 
 
 =begin rdoc
+:call-seq:
+               tex_preview_fontsize                                     
+               tex_preview_fontsize = a_string  # giving the size in points, e.g., '10' is okay, but not '10pt'.
+
+This string will be used as the basic font size specification in the preview TeX file.
+        
+See also: tex_preview_fontfamily, tex_preview_fontseries, and tex_preview_fontshape.
+        
+=end 
+   def tex_preview_fontsize
+   end
+
+
+=begin rdoc
+:call-seq:
+               tex_preview_fontfamily                                     
+               tex_preview_fontfamily = a_string  # giving the font family 
+
+This string will be used as the basic font family specification in the preview TeX file.  Valid strings include
+'rmdefault', 'sfdefault', and 'ttdefault', for roman face, sans serif face, and typewriter face, respectively.
+        
+See also: tex_preview_fontsize, tex_preview_fontseries, and tex_preview_fontshape.
+        
+=end 
+   def tex_preview_fontfamily
+   end
+
+=begin rdoc
+:call-seq:
+               tex_preview_fontseries                                    
+               tex_preview_fontseries = a_string  # giving the font series 
+
+This string will be used as the basic font series specification in the preview TeX file.  Valid strings include
+'mddefault' and 'bfdefault', for medium and bold face, respectively.
+        
+See also: tex_preview_fontsize, tex_preview_fontfamily, and tex_preview_fontshape.
+        
+=end 
+   def tex_preview_fontseries
+   end
+
+
+=begin rdoc
+:call-seq:
+               tex_preview_fontshape                                   
+               tex_preview_fontshape = a_string  # giving the font shape 
+
+This string will be used as the basic font shape specification in the preview TeX file.  Valid strings include
+'updefault', 'itdefault', 'sldefault', and 'scdefault', for upright, italic, slant, and small caps, respectively.
+        
+See also: tex_preview_fontsize, tex_preview_fontfamily, and tex_preview_fontseries.
+        
+=end 
+   def tex_preview_fontshape
+   end
+
+
+
+
+
+=begin rdoc
 
 Sets tex_preview_paper_width and tex_preview_paper_height to the A4 standard values (297mm and 210mm), 
 and sets tex_preview_figure_width and tex_preview_figure_height to the strings given as fig_width and fig_height.

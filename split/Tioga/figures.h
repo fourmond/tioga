@@ -123,6 +123,7 @@ typedef struct {
     int justification;
     int alignment;
     
+    double default_font_size; // in points
     double default_text_scale;
     double default_text_height_dx; // in figure coords.  READ ONLY from Ruby.  set when change default_text_scale.
     double default_text_height_dy; // in figure coords.  READ ONLY from Ruby.  set when change default_text_scale.
@@ -302,6 +303,9 @@ extern bool Is_FM(VALUE fmkr);
 
 /*======================================================================*/
 
+extern VALUE FM_set_device_pagesize(VALUE fmkr, VALUE width, VALUE height); // size in output coords (decipoints)
+extern VALUE FM_set_frame_sides(VALUE fmkr, VALUE left, VALUE right, VALUE top, VALUE bottom); // in page coords [0..1]
+
 extern VALUE FM_doing_subplot(VALUE fmkr);
 extern VALUE FM_doing_subfigure(VALUE fmkr);
 
@@ -314,6 +318,9 @@ extern VALUE FM_no_left_edge(VALUE fmkr);
 extern VALUE FM_no_right_edge(VALUE fmkr);
 extern VALUE FM_no_top_edge(VALUE fmkr);
 extern VALUE FM_no_bottom_edge(VALUE fmkr);
+
+extern VALUE FM_private_set_default_font_size(VALUE fmkr, VALUE size); // size in points
+
 
 /* Colors */
 
@@ -351,10 +358,6 @@ extern double llx_margin, lly_margin, urx_margin, ury_margin;
 extern double bbox_llx, bbox_lly, bbox_urx, bbox_ury;
 
 #define ENLARGE 10.0
-/* units for output are (points/ENLARGE) -- i.e., 72*ENLARGE units per inch */
-/* so multiply size or location given in points by ENLARGE to get output values */
-
-#define DEFAULT_FONT_HT 12.0 /* pts */
 
 #define convert_points_to_output(pts) (ENLARGE*(pts))
 #define convert_output_to_points(pts) ((pts)/ENLARGE)
@@ -748,6 +751,11 @@ extern char *Get_tex_preview_hoffset(VALUE fmkr);
 extern char *Get_tex_preview_voffset(VALUE fmkr);
 extern char *Get_tex_preview_figure_width(VALUE fmkr);
 extern char *Get_tex_preview_figure_height(VALUE fmkr);
+
+extern char *Get_tex_preview_fontsize(VALUE fmkr);
+extern char *Get_tex_preview_fontfamily(VALUE fmkr);
+extern char *Get_tex_preview_fontseries(VALUE fmkr);
+extern char *Get_tex_preview_fontshape(VALUE fmkr);
 
 #ifndef USE_P
 #define USE_P p = NULL;

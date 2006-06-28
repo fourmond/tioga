@@ -45,6 +45,7 @@ class ZAMSPlots
 
     def initialize
         @figure_maker = FigureMaker.default
+        t.def_eval_function { |str| eval(str) }
         t.save_dir = 'zams_out'
         @zams_data_array = [
             @z0001_data = ZAMS_Data.new("zams_data/z0001.log"),

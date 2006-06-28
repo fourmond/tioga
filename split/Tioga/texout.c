@@ -61,7 +61,7 @@ void tex_show_rotated_text(FM *p, char *text, double x, double y, double scale, 
    double ft_ht, sz;
    if (String_Is_Blank(text)) return; /* blank strings break TeX! */
    scale *= p->default_text_scale;
-   ft_ht = scale * DEFAULT_FONT_HT;
+   ft_ht = scale * p->default_font_size;
    sz = ft_ht * ENLARGE;
    ref = (alignment == ALIGNED_AT_BASELINE)? 'B' : 
          (alignment == ALIGNED_AT_BOTTOM)? 'b' :
@@ -134,7 +134,7 @@ static void Convert_Frame_Text_Position_To_Output_Location(FM *p, int frame_side
 void c_show_rotated_text(FM *p, char *text, int frame_side, double shift, double fraction,
    double scale, double angle, int justification, int alignment)
 {
-   double x, y, base_angle, ft_ht = p->default_text_scale * scale * DEFAULT_FONT_HT;
+   double x, y, base_angle, ft_ht = p->default_text_scale * scale * p->default_font_size;
    Convert_Frame_Text_Position_To_Output_Location(p, frame_side, shift*ft_ht*ENLARGE, fraction, &x, &y, &base_angle, text);
    tex_show_rotated_text(p, text, x, y, scale, angle + base_angle, justification, alignment);
 }
@@ -213,8 +213,7 @@ void Open_tex(VALUE fmkr, char *filename, bool quiet_mode)
    fprintf(fp,"\\setlength{\\unitlength}{%fbp}%%\n", 1.0/ENLARGE);
    fprintf(fp,"\\begingroup\\makeatletter\\ifx\\SetFigFont\\undefined%%\n");
    fprintf(fp,"\\gdef\\FF{%%\n");
-   fprintf(fp,"\\reset@font\\fontsize{%0.1f}{12pt}%%\n", DEFAULT_FONT_HT);
-   fprintf(fp,"\\fontfamily{\\rmdefault}\\fontseries{\\mddefault}\\fontshape{\\updefault}%%\n");
+   fprintf(fp,"\\reset@font\\SetTiogaFontInfo%%\n");
    fprintf(fp,"\\selectfont}%%\n");
    fprintf(fp,"\\fi\\endgroup%%\n"); 
    cur_pos = ftell(fp);
@@ -243,32 +242,56 @@ void Write_preview_header(VALUE fmkr, FILE *file) {
    fprintf(file, "\\documentclass{%s}\n\n", Get_tex_preview_documentclass(fmkr));
    fprintf(file, "%s\n\n", Get_tex_preview_preamble(fmkr));
    fprintf(file, "%% Set page margins.\n");
-   fprintf(file, "\\setlength{\\topmargin}{0pt}\n");
-   fprintf(file, "\\setlength{\\headsep}{0pt}\n");
-   fprintf(file, "\\setlength{\\topskip}{0pt}\n");
-   fprintf(file, "\\setlength{\\headheight}{0pt}\n");
-   fprintf(file, "\\setlength{\\oddsidemargin}{0pt}\n");
-   fprintf(file, "\\setlength{\\evensidemargin}{0pt}\n");
+   fprintf(file, "\t\\setlength{\\topmargin}{0pt}\n");
+   fprintf(file, "\t\\setlength{\\headsep}{0pt}\n");
+   fprintf(file, "\t\\setlength{\\topskip}{0pt}\n");
+   fprintf(file, "\t\\setlength{\\headheight}{0pt}\n");
+   fprintf(file, "\t\\setlength{\\oddsidemargin}{0pt}\n");
+   fprintf(file, "\t\\setlength{\\evensidemargin}{0pt}\n");
    fprintf(file, "\n");
    fprintf(file, "%% Set page size and orientation.\n");
-   fprintf(file, "\\setlength{\\paperwidth}{%s}\n", Get_tex_preview_paper_width(fmkr));
-   fprintf(file, "\\setlength{\\paperheight}{%s}\n", Get_tex_preview_paper_height(fmkr));
-   fprintf(file, "\\setlength{\\hoffset}{%s}\n", Get_tex_preview_hoffset(fmkr));
-   fprintf(file, "\\setlength{\\voffset}{%s}\n", Get_tex_preview_voffset(fmkr));
+   fprintf(file, "\t\\setlength{\\paperwidth}{%s}\n", Get_tex_preview_paper_width(fmkr));
+   fprintf(file, "\t\\setlength{\\paperheight}{%s}\n", Get_tex_preview_paper_height(fmkr));
+   fprintf(file, "\t\\setlength{\\hoffset}{%s}\n", Get_tex_preview_hoffset(fmkr));
+   fprintf(file, "\t\\setlength{\\voffset}{%s}\n", Get_tex_preview_voffset(fmkr));
 
    fprintf(file, "\n%% We need the graphicx package.\n");
-   fprintf(file, "\\usepackage{graphicx}\n\n");
-   fprintf(file, "%% Here are some commands for doing our figures.\n");
+   fprintf(file, "\t\\usepackage{graphicx}\n\n");
+   fprintf(file, "%% Here are some commands for doing Tioga figures.\n");
+   
+   
    fprintf(file, "\\newcommand{\\TiogaFigureShow}[1]{\n\t\\rotatebox{0.0}{\n");
    fprintf(file, "\t\\begin{picture}(0,0)(0,0)\n");
    fprintf(file, "\t\\includegraphics[scale=1.0,clip]{#1_figure.pdf}\n");
    fprintf(file, "\t\\end{picture}\n");
    fprintf(file, "\t\\input{#1_figure.txt}}}\n\n");
+
+   fprintf(file, "\\newcommand{\\TiogaFigureScaled}[2]{\n");
+   fprintf(file, "\t\\scalebox{#2}{\\TiogaFigureShow{#1}}}\n");
+   fprintf(file, "\t%% The 1st arg is the base name for the pdf and txt files.\n");
+   fprintf(file, "\t%% The 2nd arg determines the scale.\n\n");
+
+   fprintf(file, "\\newcommand{\\TiogaFigureScaledXY}[3]{\n");
+   fprintf(file, "\t\\scalebox{#2}[#3]{\\TiogaFigureShow{#1}}}\n");
+   fprintf(file, "\t%% The 1st arg is the base name for the pdf and txt files.\n");
+   fprintf(file, "\t%% The 2nd arg determines the horizontal scale.\n");
+   fprintf(file, "\t%% The 3rd arg determines the vertical scale.\n\n");
+   
    fprintf(file, "\\newcommand{\\TiogaFigureSized}[3]{\n\t\\resizebox{#2}{#3}{\\TiogaFigureShow{#1}}}\n");
    fprintf(file, "\t%% The 1st arg is the base name for the pdf and txt files.\n");
    fprintf(file, "\t%% The 2nd arg determines the figure width.\n");
    fprintf(file, "\t%% The 3rd arg determines the figure height.\n\n");
+   
    fprintf(file, "\\newcommand{\\TiogaFigure}[1]{\n\t\\TiogaFigureSized{#1}{\\columnwidth}{!}}\n\t%% The default is to resize to fit the column width.\n\n");
+      
+   fprintf(file, "\\def \\SetTiogaFontInfo\n");
+   fprintf(file, "%% this is called from within the figure.txt file with the TeX for the text of the figure\n");
+   fprintf(file, "{%% DO NOT PUT SPACES IN THE FOLLOWING FONT INFO -- they'll be added to the output text and mess up the alignment!\n");
+   fprintf(file, "\\fontsize{%s}{10pt}%% {sz}{line_sp}, 1st is size of font in points, 2nd is line spacing (not used by Tioga).\n", Get_tex_preview_fontsize(fmkr));
+   fprintf(file, "\\fontfamily{\\%s}%% \\rmdefault, \\sfdefault, \\ttdefault  -- roman, sans serif, typewriter \n", Get_tex_preview_fontfamily(fmkr));
+   fprintf(file, "\\fontseries{\\%s}%% \\mddefault, \\bfdefault -- medium, bold \n", Get_tex_preview_fontseries(fmkr));
+   fprintf(file, "\\fontshape{\\%s}%% \\updefault, \\itdefault, \\sldefault, \\scdefault -- upright, italic, slant, small caps\n", Get_tex_preview_fontshape(fmkr));
+   fprintf(file, "}\n\n");
 }
 
    
@@ -298,8 +321,8 @@ void Create_wrapper(VALUE fmkr, char *fname, bool quiet_mode)
 
    fprintf(file, "%% Here's the page with the figure.\n");
    fprintf(file, "\\begin{document}\n");
-   fprintf(file, "\\pagestyle{%s}\n", Get_tex_preview_pagestyle(fmkr));   
-   fprintf(file, "\\TiogaFigureSized{%s}{%s}{%s}\n", simple_name, Get_tex_preview_figure_width(fmkr), Get_tex_preview_figure_height(fmkr));   
+   fprintf(file, "\\pagestyle{%s}\n\n", Get_tex_preview_pagestyle(fmkr));   
+   fprintf(file, "\\TiogaFigureSized{%s}{%s}{%s}\n\n", simple_name, Get_tex_preview_figure_width(fmkr), Get_tex_preview_figure_height(fmkr));   
    fprintf(file, "\\end{document}\n");
    fclose(file);
 }

@@ -23,6 +23,7 @@ class StarHistory
 
     def initialize
         @figure_maker = FigureMaker.default
+        t.def_eval_function { |str| eval(str) }
         t.save_dir = 'history_out'
         t.def_figure("H_R_T_RHO") { plot_H_R_T_RHO }
         t.def_figure("R_L_Ts_Tc_Rho_Psi") { plot_R_L_Ts_Tc_Rho_Psi }

@@ -23,11 +23,10 @@
 #include "pdfs.h"
 
 /* Frame and Bounds */
-
 void Recalc_Font_Hts(FM *p)
 {
    double dx, dy;
-   dx = dy = ENLARGE * DEFAULT_FONT_HT * p->default_text_scale;  // font height in output coords
+   dx = dy = ENLARGE * p->default_font_size * p->default_text_scale;  // font height in output coords
    dx = convert_output_to_page_dx(p,dx);
    dx = convert_page_to_frame_dx(p,dx);
    p->default_text_height_dx = convert_frame_to_figure_dx(p,dx);
@@ -64,6 +63,21 @@ VALUE FM_private_set_subframe(VALUE fmkr, VALUE left_margin, VALUE right_margin,
    c_set_subframe(p, NUM2DBL(left_margin), NUM2DBL(right_margin), NUM2DBL(top_margin), NUM2DBL(bottom_margin));
    return fmkr;
 }
+
+
+void c_private_set_default_font_size(FM *p, double size) {
+    p->default_font_size = size;
+    Recalc_Font_Hts(p);
+}
+
+VALUE FM_private_set_default_font_size(VALUE fmkr, VALUE size) {
+   FM *p = Get_FM(fmkr);
+   size = rb_Float(size);
+   c_private_set_default_font_size(p, NUM2DBL(size));
+   return fmkr;
+}
+
+
 
 // We need to do some extra work to use 'ensure' around 'context'
 // which is necessary in case code does 'return' from the block being executed in the context

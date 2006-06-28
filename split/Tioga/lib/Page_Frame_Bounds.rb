@@ -7,44 +7,52 @@ module Tioga
 class Page_Frame_Bounds < Doc < FigureMaker
 
 # :call-seq:
+#               set_device_pagesize(width, height) # measured in tenths of points                                 
+#
+# The page coordinates go from 0.0 to 1.0 with (0,0) at the lower left and (1,1) at the upper right.
+# This command sets the physical size of this rectangle in the output coordinate 
+   def set_device_pagesize(width, height)
+   end
+
+# :call-seq:
 #               page_left                                     
 #
-# The position of the left of the page in the output coordinate system.
+# The position of the left of the page in the device coordinate system (measured in tenths of points).
    def page_left
    end
 
 # :call-seq:
 #               page_right                                     
 #
-# The position of the right of the page in the output coordinate system.
+# The position of the right of the page in the device coordinate system (measured in tenths of points).
    def page_right
    end
 
 # :call-seq:
 #               page_bottom                                     
 #
-# The position of the bottom of the page in the output coordinate system.
+# The position of the bottom of the page in the device coordinate system (measured in tenths of points).
    def page_bottom
    end
 
 # :call-seq:
 #               page_top                                     
 #
-# The position of the top of the page in the output coordinate system.
+# The position of the top of the page in the device coordinate system (measured in tenths of points).
    def page_top
    end
 
 # :call-seq:
 #               page_width                                     
 #
-# The width of the page in output coordinates.
+# The width of the page in the device coordinate system (measured in tenths of points).
    def page_width
    end
 
 # :call-seq:
 #               page_height                                     
 #
-# The height of the page in output coordinates.
+# The height of the page in the device coordinate system (measured in tenths of points).
    def page_height
    end
    

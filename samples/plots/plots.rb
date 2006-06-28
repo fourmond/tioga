@@ -13,6 +13,8 @@ class MyPlots
     def initialize
         @figure_maker = FigureMaker.default
         t.save_dir = 'plots_out'
+        t.def_eval_function { |str| eval(str) }
+
         @data_filename = "data/datalog.data"
         t.auto_refresh_filename = @data_filename
         t.add_model_number = true
@@ -140,8 +142,8 @@ class MyPlots
     end
     
     def reds_blues
-        set_physical_aspect_ratio(1)
         read_data
+        t.set_aspect_ratio(1)
         t.do_box_labels("Reds and Blues", "Position", "Values")
         boundaries = setup_lines(@positions, [@blues, @reds], -1, 1)
         xs = @positions
@@ -175,12 +177,6 @@ class MyPlots
             t.yaxis_loc = t.ylabel_side = RIGHT;
             t.left_edge_type = AXIS_HIDDEN; greens }
         show_model_number
-    end
-    
-    def set_physical_aspect_ratio(width_to_height)
-        wd = t.convert_frame_to_page_dx(1)
-        ht = t.convert_frame_to_page_dy(1)
-        t.set_aspect_ratio(width_to_height * ht / wd)
     end
     
     def legend_inside

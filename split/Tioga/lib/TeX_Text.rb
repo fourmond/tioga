@@ -340,6 +340,27 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Framebox.jpg
    def default_text_scale
    end
 
+   
+# :call-seq:
+#               default_font_size                                    
+#
+# Default font size in points (relative to the default_font_size).
+# Is initialized to 12.0 and changed by set_default_font_size.
+# The intention is that this gets set rarely and most font sizing is done
+# using rescale_text.
+   def default_font_size
+   end
+   
+# :call-seq:
+#               set_default_font_size(size, update_preview_size_string) # size in points                                    
+#
+# Sets the font size in points. If the 'update_preview_size_string' flag is true,
+# then the 'tex_preview_fontsize' attribute will be set to match the new font size.
+# The intention is that set_default_font_size gets called rarely and most font sizing is done
+# using rescale_text.
+   def set_default_font_size(size, update_preview_size_string = true)
+   end
+
 
 
 end # class
