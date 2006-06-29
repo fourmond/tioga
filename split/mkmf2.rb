@@ -1,6 +1,9 @@
 require 'rbconfig'
 require 'fileutils'
 
+# some global variables: 
+$LOCAL_LIBS = ""
+
 # A string extension from old mkmf.rb
 class String
   def quote
@@ -80,8 +83,11 @@ module Mkmf2
 
   include Config
 
-  # The module version --- will definitely come in useful !
-  VERSION = "0.2"
+  # The CVS tag used for the release.
+  CVS_TAG = '$Name$'
+
+  # The module version; it is computed from CVS_TAG
+  VERSION = CVS_TAG.match(/\D+(.*?)\s*\$?$/)[1].tr('_-','..')
 
   # The entities: a list of Mkmf2::MfEntity representing what
   # we are currently building.
@@ -384,8 +390,6 @@ module Mkmf2
         f.gsub(/\.[^.]+$/, ".#{CONFIG["OBJEXT"]}")
       end
       
-      p @objects
-
     end
     # 
     def build_rules
@@ -444,60 +448,6 @@ module Mkmf2
   end 
 
 
-=begin
-  # This code is not necessary because use the logging facilities provided
-  # by the old mkmf.rb (copied nearly verbatim).
-
-  # Tries to execute the command +cmd+. If the parameter +log+ is not nil,
-  # it is either the name of a file where to log, or an IO object. If
-  # +error_msg+ is +nil+, a value of +false+ is returned in case of an error.
-  # If not, it is used as an argument to +raise+ in case the execution fails.
-  
-  def Mkmf2.try_command(cmd, log = nil , error_msg = nil)
-    success = true
-    if log
-      
-      msg = "Trying command #{cmd}\n"
-      
-      f = nil
-      
-      # we first try to open the log target
-      if log.is_a? String
-        f = File::open(log, File::APPEND|
-                       File::WRONLY|File::CREAT)
-      elsif log.is_a? IO
-        f = log
-      else
-        raise "try_command: log doesn't have the right type"
-      end
-
-      # we try the command:
-      msg += `#{cmd}`
-      if $?.exitstatus == 0
-        success = true
-      else
-        success = false
-      end
-
-      # we log
-      f.print msg
-      # we ensure that the buffer are written to the file, if not
-      # it leads to quite confusing results...
-      f.flush
-    else
-      success = system(cmd)
-    end
-
-    if success
-      return true
-    else
-      raise error_msg unless error_msg.nil?
-    end
-    return false
-  end
-=end
-
-
   # This function declares a shared binary library that will be built
   # and installed using the appropriate functions.
   #
@@ -542,6 +492,12 @@ module Mkmf2
     declare_file_set(target_dir, files, 'lib', true, &b)
   end
 
+  # Declares a set of files that should be executed directly be the user.
+  def declare_exec(*files, &b)
+    # No need for a target directory.
+    declare_file_set("", files, 'exec', true, 'install_script',&b)
+  end
+
   # Declares a documentation that doesn't need to be built. For the arguments,
   # see #declare_library.
   def declare_doc(target_dir, *files,&b)
@@ -574,7 +530,9 @@ module Mkmf2
   #          be excluded. Defaults to /~$/.
 
   def declare_file_set(target_dir, files, kind = 'lib', 
-                       basename = true, skip = /~$/, &b)
+                       basename = true, 
+                       rule = 'install_data',
+                       skip = /~$/, &b)
     source_files = []
     for glob in files
       source_files += Dir[glob]
@@ -594,7 +552,8 @@ module Mkmf2
         install_hash[f] = File.join(target_dir, filename) 
       end
     end
-    add_entity(MfEntity.new(target_dir, install_hash, kind), &b)
+    add_entity(MfEntity.new(target_dir, install_hash, 
+                            kind, rule), &b)
   end
   
   @@model = "local"
@@ -634,6 +593,8 @@ module Mkmf2
         "$(DESTDIR)$(HOME)/lib/ruby"
       MAKEFILE_CONFIG["INCLUDE_INSTALL_DIR"] = 
         "$(DESTDIR)$(HOME)/include"
+      MAKEFILE_CONFIG["EXEC_INSTALL_DIR"] = 
+        "$(DESTDIR)$(HOME)/bin"
         
     when "dist"
       # shares some code with the previous item, don't forget to
@@ -644,6 +605,8 @@ module Mkmf2
         "$(DESTDIR)$(archdir)"
       MAKEFILE_CONFIG["INCLUDE_INSTALL_DIR"] = 
         "$(DESTDIR)$(includedir)"
+      MAKEFILE_CONFIG["EXEC_INSTALL_DIR"] = 
+        File.join("$(prefix)", "bin")
 
     when "local"
       MAKEFILE_CONFIG["RUBYLIB_INSTALL_DIR"] = 
@@ -657,8 +620,10 @@ module Mkmf2
       # 'include' then. Whether this is a good idea, I don't know.
 
       basedir = File.dirname(File.dirname(MAKEFILE_CONFIG["sitedir"]))
-      MAKEFILE_CONFIG["INCLUDE_INSTALL_DIR"] = File.join(basedir,
-                                                         "include")
+      MAKEFILE_CONFIG["INCLUDE_INSTALL_DIR"] = 
+        File.join(basedir,"include")
+      MAKEFILE_CONFIG["EXEC_INSTALL_DIR"] = 
+        File.join(basedir,"bin")
     end
 
   end
@@ -678,6 +643,8 @@ module Mkmf2
     case what
     when 'lib'
       return Mkmf2.config_var('RUBYLIB_INSTALL_DIR')
+    when 'exec'
+      return Mkmf2.config_var('EXEC_INSTALL_DIR')
     when 'bin_lib'
       return Mkmf2.config_var('RUBYARCHLIB_INSTALL_DIR')
     when 'include'
@@ -757,12 +724,11 @@ module Mkmf2
   CONFIG_DEFAULTS = {
     # first, a short for the rest...
     "RB_FILE_UTILS" => "$(RUBY_INSTALL_NAME) -r fileutils", 
-    "INSTALL" => 
+    "INSTALL_SCRIPT" => 
     "$(RB_FILE_UTILS) -e 'FileUtils.install(ARGV[0],ARGV[1],:mode => 0755)'",
     "INSTALL_DATA" => 
     "$(RB_FILE_UTILS) -e 'FileUtils.install(ARGV[0],ARGV[1],:mode => 0644)'",
-    "INSTALL_PROGRAM" =>  "$(INSTALL) ",
-    "INSTALL_SCRIPT" =>  "$(INSTALL) ",
+    "INSTALL_PROGRAM" =>  "$(INSTALL_SCRIPT) ",
     "MAKEDIRS" => 
     "$(RB_FILE_UTILS) -e 'FileUtils.makedirs(ARGV)'",
     "RM" => 
@@ -777,6 +743,8 @@ module Mkmf2
   # This functions checks for missing features in the CONFIG hash and 
   # supplements them using the FILE_UTILS_COMMAND hash if necessary.
   def check_missing_features
+    CONFIG.delete("INSTALL_SCRIPT")   # Not consistent, it's better to use
+    # the Fileutils stuff
     for key, val in CONFIG_DEFAULTS 
       if CONFIG.key?(key) and CONFIG[key] =~ /\w/
         # everything is fine
@@ -856,7 +824,7 @@ module Mkmf2
   
   # Adds one or more +paths+ to the current include path.
   def add_include_path(*paths)
-    @@include_path += paths
+    @@include_path += paths.flatten
   end
 
   def output_include_path
@@ -869,7 +837,7 @@ module Mkmf2
 
   # Adds one or more +paths+ to the current library path.
   def add_library_path(*paths)
-    @@library_path += paths
+    @@library_path += paths.flatten
   end
 
   def output_library_path
@@ -1189,6 +1157,11 @@ module Mkmf2
     [lib, binlib, include]
   end
 
+  # the module variable that will hold the command-line arguments:
+  # even with a similar name, the contents of this variable will
+  # be quite different from the old $configure_args
+  @@configure_args = {}
+
   # Parses command-line arguments, wiping the ones that we understood.
   def parse_cmdline
     $*.delete_if do |arg|
@@ -1203,6 +1176,20 @@ module Mkmf2
         when "home"
           Mkmf2.set_model("home")
           true
+        when /^--with(.*)/ # this is my understanding of the
+          # with-config stuff. It is a complete rewrite, I don't like
+          # much the old code
+          rhs = $1 # right-hand side
+          case rhs
+          when /-([\w-]+)=(.*)/
+            @@configure_args[$1] = $2
+          when /out-([\w-]+)$/
+            @@configure_args[$1] = false
+          when /-([\w-]+)$/
+            @@configure_args[$1] = true
+          else
+            raise "Argument #{arg} not understood"
+          end
         else
           false
         end
@@ -1210,6 +1197,34 @@ module Mkmf2
         false
       end
     end
+  end
+
+  # This function is a try at reproducing the functionnality of the
+  # old mkmf.rb's dir_config. It is not a copy, and might not work
+  # well in all situations. Basically, if --with-target-dir has been
+  # specified, use dir/include dir/lib. If --with-target-(include|lib)
+  # have been specified, use them !
+  def dir_config(target)
+    ldir = nil
+    idir = nil
+    if @@configure_args.key?("#{target}-lib") 
+      ldir = @@configure_args["#{target}-lib"]
+    elsif @@configure_args.key?("#{target}-dir") 
+      ldir = File::join(@@configure_args["#{target}-dir"], "lib")
+    end
+    if ldir
+      add_library_path(ldir.split(File::PATH_SEPARATOR))
+    end
+
+    if @@configure_args.key?("#{target}-include") 
+      idir = @@configure_args["#{target}-include"]
+    elsif @@configure_args.key?("#{target}-dir") 
+      idir = File::join(@@configure_args["#{target}-dir"], "include")
+    end
+    if idir
+      add_include_path(idir.split(File::PATH_SEPARATOR))
+    end
+    return [idir, ldir]
   end
 
   ###########################################################################

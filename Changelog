@@ -1,8 +1,9 @@
 tioga (1.1.2)
 
   * Added Dvector.compute_formula;
+  * Bill added a whole new way of choosing sizes
 
- -- Vincent Fourmond <vincent.fourmond@9online.fr>, Tue Jun 13 00:48:04 CEST 2006
+ -- Vincent Fourmond <vincent.fourmond@9online.fr>, Thu Jun 29 08:43:36 CEST 2006
 
 tioga (1.1.1)
 
