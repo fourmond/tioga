@@ -150,7 +150,7 @@ end
 def load_figures(fname)
     fm = FigureMaker.default
     $have_loaded_figure_file = false
-    fm.reset_figures
+    fm.reset_state
     load(fname)
     $have_loaded_figure_file = true
     $figure_filename = fname

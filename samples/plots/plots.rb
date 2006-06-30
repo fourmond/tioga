@@ -110,7 +110,8 @@ class MyPlots
     
     def reds
         read_data
-        t.do_box_labels('Reds Plot', 'Position', '\textcolor[rgb]{1,0,0}{Reds}')
+        #t.do_box_labels('Reds Plot', 'Position', '\textcolor[rgb]{1,0,0}{Reds}')
+        t.do_box_labels('Reds Plot', 'Position', '\textcolor{Crimson}{Reds}')
         show_model_number
         xs = @positions
         ys = @reds

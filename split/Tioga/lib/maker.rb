@@ -45,7 +45,7 @@ end
 def loadfile(fname, cmd)
     fm = FigureMaker.default
     have_loaded = false
-    fm.reset_figures
+    fm.reset_state
     begin
         puts "load #{fname}"
         load(fname) # this should define the TiogaFigures class

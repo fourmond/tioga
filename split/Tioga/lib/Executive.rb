@@ -46,11 +46,18 @@ class Executive < Doc < FigureMaker
     end
 
 # :call-seq:
-#   reset_figures
+#   reset_state
 #
-# Clears the list of figures.
-    def reset_figures
+# Reinitializes the FigureMaker.  This is automatically called when you load or reload a Tioga document file.
+    def reset_state
     end
+   
+# :call-seq:
+#   reset_figures                                     
+#
+# Alias for reset_state.
+   def reset_figures
+   end
 
 # Opens a file with the given _name_ and writes a small TeX program to include
 # all of the currently defined figures, each on a separate page.

@@ -1,7 +1,7 @@
 #  FigMkr.rb
 
 =begin
-   Copyright (C) 2005  Bill Paxton
+   Copyright (C) 2005, 2006  Bill Paxton
 
    This file is part of Tioga.
 
@@ -109,8 +109,11 @@ class FigureMaker
     # Whether or not to create +save_dir+ if it doesn't exist
     attr_accessor :create_save_dir
 
-    def initialize
-
+    
+    def reset_figures # set the state to default values
+        
+        @figure_commands = []
+        @num_figures = 0
         @create_save_dir = true # creates +save_dir+ by default
 
         @name = nil
@@ -128,7 +131,7 @@ class FigureMaker
         @tex_preview_preamble = '% start of preview preamble.  
     \usepackage[dvipsnames,usenames]{color} % need this for text colors
     \usepackage[pdftex]{geometry} % need this for setting page size for preview
-% end of preview preamble'
+'
         @tex_preview_pagestyle = 'empty'
         
         @num_error_lines = 6
@@ -169,15 +172,20 @@ class FigureMaker
             'ascent_angle' => 0.0 }
                 
         @eval_command = nil
-        
-        
+                
         # default TeX preview page size info
         set_A4_landscape
 
         @plot_box_command = lambda { show_plot_box }
-        
-        reset_figures
 
+    end
+
+    def initialize        
+        reset_figures
+    end
+
+    def reset_state        
+        reset_figures
     end
 
     def set_default_font_size(size, update_preview_size_string = true)
@@ -1555,12 +1563,6 @@ class FigureMaker
             return pdfname
         end
         return false
-    end
-    
-    def reset_figures
-        @figure_names = []
-        @figure_commands = []
-        @num_figures = 0
     end
     
     def make_portfolio(name)

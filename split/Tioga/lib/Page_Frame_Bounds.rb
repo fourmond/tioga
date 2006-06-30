@@ -58,6 +58,13 @@ class Page_Frame_Bounds < Doc < FigureMaker
    
 
 # :call-seq:
+#               set_frame_sides(left, right, top, bottom) # sizes in page coords [0..1]                                 
+#
+# This command sets frame_left, frame_right, frame_top, and frame_bottom to the given values. 
+   def set_frame_sides(left, right, top, bottom)
+   end
+
+# :call-seq:
 #               frame_left                                     
 #
 # The position of the left of the frame in the page x coordinate system which runs from 0 at the left to 1 at the right.
