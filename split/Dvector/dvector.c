@@ -50,6 +50,9 @@ typedef struct {
    long capa; /* current capacity which must be >= len */
    VALUE shared; /* if not Qnil, then is the base object we're sharing with others */
    double *ptr; /* the data */
+   int dirty; 	/* set to 1 if data has been modified since the last time
+		   it was cleared
+		*/
 } Dvector;
 
 static VALUE dvector_make_shared(VALUE ary);
@@ -188,6 +191,8 @@ static Dvector *dvector_modify(VALUE ary) {
    Dvector *d;
    dvector_modify_check(ary);
    d = Get_Dvector(ary);
+   /* we set the dirty bit */
+   d->dirty = 1;
    if (d->shared != Qnil) {
       ptr = ALLOC_N(double, d->len);
       d->shared = Qnil;
@@ -200,6 +205,52 @@ static Dvector *dvector_modify(VALUE ary) {
       d->capa = DVEC_DEFAULT_SIZE;
    }
    return d;
+}
+
+/*
+ *  call-seq:
+ *    dvector.dirty? -> _true_ or _false_
+ *
+ *  Returns _true_ if the vector has been modified since the last time
+ *  dirty was cleared. When a Dvector is created or copied, dirty is set
+ *  to false. It is set to true whenever the vector is modified. You need
+ *  to reset it manually using dirty=.
+ */
+VALUE dvector_is_dirty(VALUE ary) {
+  Dvector *d;
+  d = Get_Dvector(ary);
+  if(d->dirty)
+    return Qtrue;
+  else
+    return Qfalse;
+}
+
+/*
+ *  call-seq:
+ *    dvector.clean? -> _true_ or _false_
+ *
+ *  Returns _true_ if the vector hasn't been modified since the last time
+ *  dirty was cleared. See dirty?.
+ */
+VALUE dvector_is_clean(VALUE ary) {
+  if(RTEST(dvector_is_dirty(ary)))
+    return Qfalse;
+  return Qtrue;
+}
+
+
+/*
+ *  call-seq:
+ *    dvector.dirty= _true_ or _false_ -> dvector
+ *
+ *  Sets (or unsets) the _dirty_ flag. Returns _dvector_.
+ */
+
+VALUE dvector_set_dirty(VALUE ary, VALUE b) {
+  Dvector *d;
+  d = Get_Dvector(ary);
+  d->dirty = RTEST(b);
+  return ary;
 }
 
 /*
@@ -239,6 +290,8 @@ VALUE make_new_dvector(VALUE klass, long len, long capa) {
    d->ptr = ALLOC_N(double, capa);
    d->capa = capa;
    dvector_mem_clear(d->ptr, capa);
+   /* we set dirty to 0 */
+   d->dirty = 0;
    return ary;
 }
 
@@ -344,6 +397,8 @@ VALUE dvector_initialize(int argc, VALUE *argv, VALUE ary) {
       dvector_memfill(d->ptr, len, NUM2DBL(val));
       d->len = len;
    }
+   /* we ensure that the vector is clean on exit of initialize */
+   d->dirty = 0;
    return ary;
 }
 
@@ -5116,6 +5171,12 @@ void Init_Dvector() {
    rb_define_method(cDvector, "safe_sqrt!", dvector_safe_sqrt_bang, 0);
    rb_define_method(cDvector, "safe_asin!", dvector_safe_asin_bang, 0);
    rb_define_method(cDvector, "safe_acos!", dvector_safe_acos_bang, 0);
+
+   /* dirty flag related methods */
+   rb_define_method(cDvector, "dirty?", dvector_is_dirty, 0);
+   rb_define_method(cDvector, "clean?", dvector_is_clean, 0);
+   rb_define_alias(cDvector,  "dirty", "dirty?");
+   rb_define_method(cDvector, "dirty=", dvector_set_dirty, 1);
 
    dvector_output_fs = Qnil;
    rb_global_variable(&dvector_output_fs);

@@ -682,5 +682,15 @@ EOT
       assert_equal(cols[1], cols2[2])
 
     end
+
+    def test_dirtyness
+      v = Dvector.new(10)
+      assert(! v.dirty?)
+      assert(v.clean?)
+      v[1] = 1
+      assert(v.dirty?)
+      v.dirty = false
+      assert(! v.dirty?)
+    end
     
 end
