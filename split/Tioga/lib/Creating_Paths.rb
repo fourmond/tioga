@@ -72,7 +72,7 @@ class Creating_Paths < Doc < FigureMaker
 
 # Adds the figure coordinates point (_x_, _y_) to the bounding box.  Not usually needed, but
 # can be helpful with text that is outside the box determined by the graphics since the
-# Tioga kernel does not have exact information about how large the text bbox will be once
+# tioga kernel does not have exact information about how large the text bbox will be once
 # TeX has done the typesetting.
    def update_bbox(x, y)
    end

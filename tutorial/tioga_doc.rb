@@ -36,14 +36,14 @@ It was originally designed, implemented, and documented by {Bill Paxton}[http://
     Kavli Institute for Theoretical Physics
     University of California, Santa Barbara
 
-The Tioga kernel is a {Ruby}[http://www.rubycentral.com/misc/intro.html] 
+The tioga kernel is a {Ruby}[http://www.rubycentral.com/misc/intro.html] 
 extension providing a set of classes and modules
 for producing output with graphics using {PDF}[http://www.adobe.com/products/postscript/pdf.html] functionality (including
 Bezier curves, clipping, images, shading, and transparency), and with text
 typesetting using the full abilities of TeX (well, actually, {LaTeX}[http://www.latex-project.org/]).  
 
 You write Ruby programs
-for specifying the content of the figures and plots, and Tioga puts the graphics
+for specifying the content of the figures and plots, and tioga puts the graphics
 into a PDF file and the text into a TeX file.  These get combined when you
 include the figure or plot in a TeX document by placing the graphics in a box first
 and then adding a layer with the text on top of the graphics.
@@ -62,7 +62,7 @@ the {GNU Lesser General Library Public License}[http://www.gnu.org/licenses/lice
 The complete Xcode project file for the Mac GUI is also available at the website under the terms of
 the {GNU General Public License}[http://www.gnu.org/licenses/licenses.html#GPL].
 
-The Tioga documentation is also freely available, both in this on-line form, and for
+The tioga documentation is also freely available, both in this on-line form, and for
 downloading (from my website[http://theory.kitp.ucsb.edu/~paxton/]), copying, and redistribution, under the terms of the
 {GNU Free Documentation License}[http://www.gnu.org/licenses/fdl.html].
 
@@ -75,12 +75,13 @@ downloading (from my website[http://theory.kitp.ucsb.edu/~paxton/]), copying, an
       the section entitled "GNU Free Documentation License".
 
 All the example code in the documentation is freely available under the same terms
-as the Tioga source code ({GNU General Public License}[http://www.gnu.org/licenses/licenses.html#GPL]).
+as the tioga source code ({GNU General Public License}[http://www.gnu.org/licenses/licenses.html#GPL]).
 Please copy, modify, and use the examples in any way that you find useful.
 
-= What does "Tioga" stand for anyway?
+= What does "tioga" stand for anyway?
 
-"Tioga" is not an acronym.  It is the name of a beautiful, high mountain pass at the east entrance to Yosemite National Park in California (elevation 9,945 feet, 3,031 meters; location N 37.91, W 119.26).  "Tioga" is actually a term used by the Mohawk Tribe of the Iroquois Confederation in New York and Pennsylvania.   It means literally "where it forks", perhaps a prescient reference to the split sending graphics to PDF and text to TeX.
+The name "tioga" is not an acronym.  It is the name of a beautiful, high mountain pass at the east entrance to 
+Yosemite National Park in California (elevation 9,945 feet, 3,031 meters; location N 37.91, W 119.26).  "Tioga" is actually a term used by the Mohawk Tribe of the Iroquois Confederation in New York and Pennsylvania.   It means literally "where it forks", perhaps a prescient reference to the split sending graphics to PDF and text to TeX.
 
 http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Tioga_Pass_Yosemite.jpg
 

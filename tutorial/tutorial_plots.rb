@@ -7,19 +7,19 @@ module Tutorial
 = The extras for making plots
 
 As usual, I'll be assuming you've been working your way through the sections of the tutorial in order,
-so by the time you get here, you're familiar with the basic structure of a Tioga document and the
+so by the time you get here, you're familiar with the basic structure of a tioga document and the
 fundamentals of making figures with FigureMaker.  This section builds on that knowledge to add the tools needed for
 making figures that are plots.  We'll use "plots.rb" as a source of examples. 
 
 You'll find "plots.rb" file in the "samples/plots" folder.  Load it in irb,
 do a make_all and a make_portfolio, and take a look through the resulting "plots.pdf" to see what's there.
-Alternatively, if you're on a Mac, drag the "plots.rb" file to the Tioga icon and look through
+Alternatively, if you're on a Mac, drag the "plots.rb" file to the tioga icon and look through
 the plots (the down-arrow key is useful for this, or you can turn on "slide show" under the "View" menu).
 
 As you can see, the examples range from the simple ("Blues") to the complex ("Contours").  Along the way,
 they illustrate ways of combining plots ("Side_by_Side", "Two_Ys", "Rows", "Columns", etc.), and
 provide samples of various techniques for adding information to plots ("Legend_Inside", "Legend_Outside",
-"Labels", "Error_Bars", "Arrows", and "Special_Y").  Finally, there are several cases where Tioga includes
+"Labels", "Error_Bars", "Arrows", and "Special_Y").  Finally, there are several cases where tioga includes
 tools for creating things to be shown in the plots ("Sampled_Splines", "Steps", "Splines", and
 "Sampled_Data").  
 
@@ -54,7 +54,7 @@ boundaries, and a block of code to do the work of creating the contents of the p
 We'll go through show_plot in detail, but first a few words about frames and boundaries and coordinate systems.  Here's 
 what it says in the introduction to the CoordinateConversions module.
 
-[]  There are four different coordinate systems used in Tioga.  The contents of the figure or plot
+[]  There are four different coordinate systems used in tioga.  The contents of the figure or plot
     are positioned using "figure" coordinates which correspond to the values along the x and y axes
     as determined by the boundary attributes.  Things like the title and axis labels are positioned using
     "frame" coordinates that run from (0, 0) at the lower left corner of the frame to (1, 1) at the upper right
@@ -242,7 +242,7 @@ This is the "rows" routine from "plots.rb" that does this one.
     
 There are a few new features here.  On line 5, we do a #rescale to 80%. This changes the
 scale of text and lines to 80% of their previous height and width.  Text and line widths
-don't scale 1:1 with graphics in Tioga.  When you shrink a plot to use it as a subplot, the
+don't scale 1:1 with graphics in tioga.  When you shrink a plot to use it as a subplot, the
 graphics might get smaller by 50%, but the text might only get smaller by 80%.  Another new
 feature is the use of the row_margins routine, on lines 7, 11, and 16, to calculate the subplot margins for us.
 In the various code blocks, we adjust the appearance of the horizontal axes so that the

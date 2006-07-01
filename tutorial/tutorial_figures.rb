@@ -78,7 +78,7 @@ On Linux, you might type something like this:
 
 Let's take a
 quick detour to look at the "figures.tex" file too.  Open it in your TeX editor.
-It starts by setting the "documentclass", then loads some standard TeX packages that Tioga needs,
+It starts by setting the "documentclass", then loads some standard TeX packages that tioga needs,
 and finally gives the contents as one figure per page using command sequences like this:
 
     \begin{figure}

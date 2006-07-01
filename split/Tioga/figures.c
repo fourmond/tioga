@@ -365,6 +365,10 @@ void Init_FigureMaker(void) {
    rb_define_method(cFM, "hls_to_rgb", FM_hls_to_rgb, 1);
    rb_define_method(cFM, "rgb_to_hls", FM_rgb_to_hls, 1);
 /* coordinate system conversions */
+   rb_define_method(cFM, "convert_inches_to_output", FM_convert_inches_to_output, 1);
+   rb_define_method(cFM, "convert_output_to_inches", FM_convert_output_to_inches, 1);
+   rb_define_method(cFM, "convert_mm_to_output", FM_convert_mm_to_output, 1);
+   rb_define_method(cFM, "convert_output_to_mm", FM_convert_output_to_mm, 1);
    rb_define_method(cFM, "convert_page_to_output_x", FM_convert_page_to_output_x, 1);
    rb_define_method(cFM, "convert_page_to_output_y", FM_convert_page_to_output_y, 1);
    rb_define_method(cFM, "convert_page_to_output_dx", FM_convert_page_to_output_dx, 1);
@@ -454,7 +458,6 @@ void Init_FigureMaker(void) {
    rb_define_method(cFM, "stroke_rounded_rect", FM_stroke_rounded_rect, 6);
    rb_define_method(cFM, "fill_and_stroke_rounded_rect", FM_fill_and_stroke_rounded_rect, 6);
 /* shading */
-   rb_define_method(cFM, "private_triangle_mesh_shading", FM_private_triangle_mesh_shading, 6);
    rb_define_method(cFM, "private_axial_shading", FM_private_axial_shading, 7);
    rb_define_method(cFM, "private_radial_shading", FM_private_radial_shading, 13);
 /* markers */

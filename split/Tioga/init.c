@@ -63,7 +63,7 @@ void Init_IDs(void)
     tex_preview_fontshape_ID = rb_intern("@tex_preview_fontshape");
 }
 
-void c_set_device_pagesize(FM *p, double width, double height) { // sizes in decipoints
+void c_set_device_pagesize(FM *p, double width, double height) { // sizes in units of 1/720 inch
    p->page_left = 0;
    p->page_right = width;
    p->page_bottom = 0;

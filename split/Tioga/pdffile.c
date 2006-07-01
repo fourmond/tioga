@@ -56,7 +56,6 @@ Fill_Opacity_State *fill_opacities = NULL;
 XObject_Info *xobj_list = NULL;
 Function_Info *functions_list;
 Shading_Info *shades_list = NULL;
-Triangles_Info *triangles_list = NULL;
 Font_Dictionary *font_dictionaries = NULL;
 Old_Font_Dictionary *old_font_dictionaries = NULL;
 FILE *OF = NULL; // for the PDF file
@@ -82,7 +81,6 @@ void Free_XObjects(void)
 void Init_pdf(void)
 {
    int i;
-   llx_margin = lly_margin = urx_margin = ury_margin = 0;
    writing_file = false;
    capacity_obj_offsets = 1000;
    num_objects = 0;
@@ -127,7 +125,7 @@ static void Write_XObjects(void)
 
 static void Free_Records()
 {
-   Free_Stroke_Opacities(); Free_Fill_Opacities(); Free_XObjects(); Free_Shadings(); Free_Triangles(); Free_Functions();
+   Free_Stroke_Opacities(); Free_Fill_Opacities(); Free_XObjects(); Free_Shadings(); Free_Functions();
 }
 
 static void Get_pdf_name(char *ofile, char *filename, int maxlen)
@@ -302,15 +300,11 @@ void Close_pdf(VALUE fmkr, bool quiet_mode)
       }
       fprintf(OF, "    >>\n"); // end of /XObject
    }
-   if (shades_list != NULL || triangles_list != NULL) { // Shadings go here (including triangles)
+   if (shades_list != NULL) { // Shadings go here
       Shading_Info *so;
-      Triangles_Info *to;
       fprintf(OF, "    /Shading <<\n");
       for (so = shades_list; so != NULL; so = so->next) {
          fprintf(OF, "      /Shade%i %i 0 R\n", so->shade_num, so->obj_num);
-      }
-      for (to = triangles_list; to != NULL; to = to->next) {
-         fprintf(OF, "      /Shade%i %i 0 R\n", to->shade_num, to->obj_num);
       }
       fprintf(OF, "    >>\n"); // end of /Shading
    }
@@ -326,7 +320,6 @@ void Close_pdf(VALUE fmkr, bool quiet_mode)
    Write_XObjects();
    Write_Functions();
    Write_Shadings();
-   Write_Triangles();
    xref_offset = ftell(OF);
    fprintf(OF, "xref\n0 %i\n0000000000 65535 f \n", num_objects);
    for (i = 1; i < num_objects; i++) Print_Xref(obj_offsets[i]); // NB: DONT USE OBJECT 0

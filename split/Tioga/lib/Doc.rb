@@ -3,19 +3,22 @@
 
 =begin rdoc
 
-This is the reference document for the class which implements the Tioga kernel for creating figures and plots using Ruby, PDF, and TeX.
+:main: Tioga
 
-Understand that this reference material is more like a dictionary than a textbook.  It is written assuming that you've already familiarized yourself with how things work to the level covered in the Tutorial.  Without that background, much of the following will be incomprehensible.
+===The tioga kernel
+
+This is the reference document for using of the tioga kernel to create figures and plots using Ruby, PDF, and TeX.
+Please understand that this is more like a dictionary than a textbook.  
+It is written assuming that you've already familiarized yourself with how things work to the level covered in the Tutorial.  
+Without that background, much of the following may be incomprehensible.
 
 
 
 Page Layout and System Control
 
-- Coordinate_Conversions
-- Figures_and_Plots
 - Page_Frame_Bounds
+- Figures_and_Plots
 - Executive
-- Flate (Lossless Compression Scheme)
 
 Graphics
 
@@ -47,14 +50,13 @@ Extras for Plots
 
 Facilities for Storing Numeric Data
 
-- Dvector
-- Dtable
+- Dobjects::Dvector
+- Dobjects::Dtable
 
-For more information on PDF, consult the Adode PDF Reference document.  It's a huge collection of details (1172 pages at last count), and I've borrowed extensively from it in some of the following descriptions of methods that map directly to PDF operations.
+For more information on PDF, consult the Adode PDF Reference document.  It's a huge collection of details (over 1000 pages at last count), and I've borrowed extensively from it in some of the following descriptions of methods that map directly to PDF operations.
 
 
 =end
-
 
 
 module Tioga
@@ -65,7 +67,7 @@ class FigureMaker
 #               FigureMaker.default                         
 #               FigureMaker.default = a_FigureMaker
 #
-# The default FigureMaker is typically the one to use.  Most Tioga figure class definitions begin their
+# The default FigureMaker is typically the one to use.  Most tioga figure class definitions begin their
 # initialization by storing this in an instance variable for easy access in the figure methods.
     def FigureMaker.default
     end
@@ -76,7 +78,7 @@ class FigureMaker
 # :call-seq:
 #               FigureMaker.version
 #
-# Returns a string defining the current Tioga version.
+# Returns a string defining the current tioga version.
     def FigureMaker.version
     end
 

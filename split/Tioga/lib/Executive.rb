@@ -48,7 +48,7 @@ class Executive < Doc < FigureMaker
 # :call-seq:
 #   reset_state
 #
-# Reinitializes the FigureMaker.  This is automatically called when you load or reload a Tioga document file.
+# Reinitializes the FigureMaker.  This is automatically called when you load or reload a tioga document file.
     def reset_state
     end
    
@@ -153,7 +153,7 @@ class Executive < Doc < FigureMaker
 #               need_to_reload_data                                     
 #               need_to_reload_data = true_or_false
 #
-# This flag is set to +true+ by the Tioga front end for "refresh" commands.  Plot routines that support
+# This flag is set to +true+ by the tioga front end for "refresh" commands.  Plot routines that support
 # auto-refresh can use this flag to avoid unnecessary reloading of data.  For example, a read_data method
 # that is called by all of the plotting definitions
 # might look like the following (in this example, the method "t" returns the default FigureMaker):
@@ -347,9 +347,12 @@ See also: tex_preview_hoffset, tex_preview_paper_height, tex_preview_figure_widt
 =begin rdoc
 :call-seq:
                tex_preview_fontsize                                     
-               tex_preview_fontsize = a_string  # giving the size in points, e.g., '10' is okay, but not '10pt'.
+               tex_preview_fontsize = a_string  # giving the size in units of "big points" (1bp = 1/72 inch)
 
-This string will be used as the basic font size specification in the preview TeX file.
+This string will be used as the basic font size specification in the preview TeX file.  (Note that this is the
+same font size specification as used in PostScript and PDF -- "10 scalefont" in PostScript gives a font that is
+10 units in size where the unit is defined as 1/72 inch.  That unit has become known as a "big point" in comparison to
+the printer point which is defined to be 1/72.27 inch, so there are 1.00375 points per big point.)
         
 See also: tex_preview_fontfamily, tex_preview_fontseries, and tex_preview_fontshape.
         

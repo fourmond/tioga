@@ -85,7 +85,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               top_edge_visible                                     
 #               top_edge_visible = false
 #
-# If +true+, then it is okay for Tioga to show the top edge of a plot.  If +false+,
+# If +true+, then it is okay for tioga to show the top edge of a plot.  If +false+,
 # then calls on show_top_edge return immediately.
 # This attribute is "one-way-only" in that it starts +true+ and can be
 # set +false+, but cannot be reset to +true+ except by restoring the
@@ -112,7 +112,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               bottom_edge_visible                                     
 #               bottom_edge_visible = false
 #
-# If +true+, then it is okay for Tioga to show the bottom edge of a plot.  If +false+,
+# If +true+, then it is okay for tioga to show the bottom edge of a plot.  If +false+,
 # then calls on show_bottom_edge return immediately.
 # This attribute is "one-way-only" in that it starts +true+ and can be
 # set +false+, but cannot be reset to +true+ except by restoring the
@@ -140,7 +140,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               left_edge_visible                                     
 #               left_edge_visible = false
 #
-# If +true+, then it is okay for Tioga to show the left edge of a plot.  If +false+,
+# If +true+, then it is okay for tioga to show the left edge of a plot.  If +false+,
 # then calls on show_left_edge return immediately.
 # This attribute is "one-way-only" in that it starts +true+ and can be
 # set +false+, but cannot be reset to +true+ except by restoring the
@@ -166,7 +166,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               right_edge_visible                                     
 #               right_edge_visible = false
 #
-# If +true+, then it is okay for Tioga to show the right edge of a plot.  If +false+,
+# If +true+, then it is okay for tioga to show the right edge of a plot.  If +false+,
 # then calls on show_right_edge return immediately.
 # This attribute is "one-way-only" in that it starts +true+ and can be
 # set +false+, but cannot be reset to +true+ except by restoring the
@@ -196,7 +196,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               xaxis_visible
 #               xaxis_visible = false
 #
-# If +true+, then it is okay for Tioga to show the x axis of a plot.  If +false+,
+# If +true+, then it is okay for tioga to show the x axis of a plot.  If +false+,
 # then calls on show_axis for the x axis return immediately.
 # This attribute is "one-way-only" in that it starts +true+ and can be
 # set +false+, but cannot be reset to +true+ except by restoring the
@@ -240,7 +240,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               xaxis_digits_max
 #               xaxis_digits_max = an_integer_value
 #
-# If non-zero and Tioga is creating numeric labels for the x axis, then numeric label 
+# If non-zero and tioga is creating numeric labels for the x axis, then numeric label 
 # will be switched to exponential format if it requires more than this number of digits.
    def xaxis_digits_max
    end
@@ -249,7 +249,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               xaxis_use_fixed_pt
 #               xaxis_use_fixed_pt = true_or_false
 #
-# If this flag is +true+, and Tioga is creating numeric labels for the x axis,
+# If this flag is +true+, and tioga is creating numeric labels for the x axis,
 # and the xaxis_log_values flag is also +true+,
 # then the labels will be shown using fixed point notation rather than exponential.
 # For example, a label at x location 3.0 will display as "1000" rather than as "10^3",
@@ -262,7 +262,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               xaxis_number_of_minor_intervals = an_integer_value
 #
 # Determines the number of minor intervals making up the distance between major ticks marks
-# on the x axis.  If this is set to 0, then Tioga will pick the number.
+# on the x axis.  If this is set to 0, then tioga will pick the number.
    def xaxis_number_of_minor_intervals
    end
 
@@ -270,7 +270,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               xaxis_min_between_major_ticks
 #               xaxis_min_between_major_ticks = a_float
 #
-# When Tioga picks the interval between major tick marks on the x axis, it will ensure that
+# When tioga picks the interval between major tick marks on the x axis, it will ensure that
 # the interval is at least this large.  Note that this distance is given in units of the
 # default text height rather than in x coordinates.
    def xaxis_min_between_major_ticks
@@ -280,7 +280,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               xaxis_tick_labels
 #               xaxis_tick_labels = array_or_nil
 #
-# If +nil+, then Tioga will create numeric labels for the major ticks on the x axis.
+# If +nil+, then tioga will create numeric labels for the major ticks on the x axis.
 # Otherwise, you must also specify xaxis_locations_for_major_ticks, and xaxis_tick_labels
 # must be an equal length array of strings giving the corresponding labels.
 #
@@ -292,7 +292,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               xaxis_locations_for_major_ticks
 #               xaxis_locations_for_major_ticks = a_dvector_or_nil
 #
-# If +nil+, then Tioga will pick locations for major ticks on the x axis.  Otherwise, this should be
+# If +nil+, then tioga will pick locations for major ticks on the x axis.  Otherwise, this should be
 # Dvector of locations in x figure coordinates in strictly increasing order. 
    def xaxis_locations_for_major_ticks
    end
@@ -301,7 +301,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               xaxis_locations_for_minor_ticks
 #               xaxis_locations_for_minor_ticks = a_dvector_or_nil
 #
-# If +nil+, then Tioga will pick locations for minor ticks on the x axis.  Otherwise, this should be
+# If +nil+, then tioga will pick locations for minor ticks on the x axis.  Otherwise, this should be
 # Dvector of locations in x figure coordinates in strictly increasing order. 
    def xaxis_locations_for_minor_ticks
    end
@@ -310,7 +310,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               xaxis_numeric_label_decimal_digits
 #               xaxis_numeric_label_decimal_digits = an_integer_value
 #
-# If 0, then Tioga will pick the interval between major tick marks on the y axis.
+# If 0, then tioga will pick the interval between major tick marks on the y axis.
 # Otherwise, this will be used as the interval in y coordinates for the spacing between major ticks.
    def yaxis_tick_interval
    end
@@ -436,7 +436,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               yaxis_visible
 #               yaxis_visible = false
 #
-# If +true+, then it is okay for Tioga to show the y axis of a plot.  If +false+,
+# If +true+, then it is okay for tioga to show the y axis of a plot.  If +false+,
 # then calls on show_axis for the y axis return immediately.
 # This attribute is "one-way-only" in that it starts +true+ and can be
 # set +false+, but cannot be reset to +true+ except by restoring the
@@ -480,7 +480,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               yaxis_digits_max
 #               yaxis_digits_max = an_integer_value
 #
-# If non-zero and Tioga is creating numeric labels for the y axis, then numeric label 
+# If non-zero and tioga is creating numeric labels for the y axis, then numeric label 
 # will be switched to exponential format if it requires more than this number of digits.
    def yaxis_digits_max
    end
@@ -489,7 +489,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               yaxis_use_fixed_pt
 #               yaxis_use_fixed_pt = true_or_false
 #
-# If this flag is +true+, and Tioga is creating numeric labels for the y axis,
+# If this flag is +true+, and tioga is creating numeric labels for the y axis,
 # and the yaxis_log_values flag is also +true+,
 # then the labels will be shown using fixed point notation rather than exponential.
 # For example, a label at y location 3.0 will display as "1000" rather than as "10^3",
@@ -502,14 +502,14 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               yaxis_number_of_minor_intervals = an_integer_value
 #
 # Determines the number of minor intervals making up the distance between major ticks marks
-# on the y axis.  If this is set to 0, then Tioga will pick the number.
+# on the y axis.  If this is set to 0, then tioga will pick the number.
    def yaxis_number_of_minor_intervals
    end
 # :call-seq:
 #               yaxis_min_between_major_ticks
 #               yaxis_min_between_major_ticks = a_float
 #
-# When Tioga picks the interval between major tick marks on the y axis, it will ensure that
+# When tioga picks the interval between major tick marks on the y axis, it will ensure that
 # the interval is at least this large.  Note that this distance is given in units of the
 # default text height rather than in y coordinates.
    def yaxis_min_between_major_ticks
@@ -520,7 +520,7 @@ class X_and_Y_Axes < Doc < FigureMaker
                yaxis_tick_labels
                yaxis_tick_labels = array_or_nil
 
-If +nil+, then Tioga will create numeric labels for the major ticks on the y axis.
+If +nil+, then tioga will create numeric labels for the major ticks on the y axis.
 Otherwise, you must also specify yaxis_locations_for_major_ticks, and yaxis_tick_labels
 must be an equal length array of strings giving the corresponding labels.
 
@@ -558,7 +558,7 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Special_Y.jpg
 #               yaxis_locations_for_major_ticks
 #               yaxis_locations_for_major_ticks = a_dvector_or_nil
 #
-# If +nil+, then Tioga will pick locations for major ticks on the y axis.  Otherwise, this should be
+# If +nil+, then tioga will pick locations for major ticks on the y axis.  Otherwise, this should be
 # Dvector of locations in y figure coordinates in strictly increasing order. 
 #
 # See also yaxis_tick_labels.
@@ -570,7 +570,7 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Special_Y.jpg
 #               yaxis_locations_for_minor_ticks
 #               yaxis_locations_for_minor_ticks = a_dvector_or_nil
 #
-# If +nil+, then Tioga will pick locations for minor ticks on the y axis.  Otherwise, this should be
+# If +nil+, then tioga will pick locations for minor ticks on the y axis.  Otherwise, this should be
 # Dvector of locations in x figure coordinates in strictly increasing order. 
    def yaxis_locations_for_minor_ticks
    end
@@ -696,7 +696,7 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Special_Y.jpg
 #               yaxis_tick_interval
 #               yaxis_tick_interval = a_float
 #
-# If 0, then Tioga will pick the interval between major tick marks on the x axis.
+# If 0, then tioga will pick the interval between major tick marks on the x axis.
 # Otherwise, this will be used as the interval in x coordinates for the spacing between major ticks.
    def xaxis_tick_interval
    end

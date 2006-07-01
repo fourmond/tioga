@@ -130,15 +130,6 @@ typedef struct shading_info {
 } Shading_Info;
 extern Shading_Info *shades_list;
 
-typedef struct triangles_info {
-   struct triangles_info *next;
-   int shade_num;   // NOTE: triangles are a kind of shading, so get numbers along with shades
-   int obj_num;
-   int strm_len;
-   unsigned char *strm_data;
-} Triangles_Info;
-extern Triangles_Info *triangles_list;
-
 typedef struct { 
    int font_num; // for making font resource name such as /F7
    char *font_name;
@@ -202,12 +193,10 @@ extern void Write_Functions(void);
 extern void Write_Stroke_Opacity_Objects(void);
 extern void Write_Fill_Opacity_Objects(void);
 extern void Write_Shadings(void);
-extern void Write_Triangles(void);
 extern void Write_JPG(JPG_Info *xo);
 extern void Write_Sampled(Sampled_Info *xo);
 extern void Free_Stroke_Opacities(void);
 extern void Free_Shadings();
-extern void Free_Triangles();
 extern void Free_Functions();
 extern void Free_JPG(JPG_Info *xo);
 extern void Free_Sampled(Sampled_Info *xo);
@@ -217,7 +206,6 @@ extern void c_append_rect(FM *p, double x, double y, double width, double height
 extern void c_clip(FM *p);
 
 extern bool have_current_point, constructing_path, writing_file;
-extern double llx_margin, lly_margin, urx_margin, ury_margin;
 extern double bbox_llx, bbox_lly, bbox_urx, bbox_ury;
 
 extern FILE *OF; // for the PDF file

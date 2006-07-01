@@ -12,7 +12,7 @@ an understanding of the samples that will let you pick and choose from them as a
 getting started on your own applications.
 
 The tutorial also contains material introducing the command
-line interface and the graphical interface (for the Mac) along with hints and suggestions for using Tioga
+line interface and the graphical interface (for the Mac) along with hints and suggestions for using tioga
 effectively.
 
 The first step is to locate the samples folder and take a look at what's inside.  You should find a +README+ and 5 subfolders.
@@ -31,19 +31,19 @@ examples of non-trivial applications.
 
 Here are the sections of the tutorial, in the order they are intended to be read.
 
-UsingRuby -- The bare essentials for using Ruby with Tioga
+UsingRuby -- The bare essentials for using ruby with tioga
 
-DocStructure -- The basic anatomy of a Tioga document and "batch-mode" operation
+DocStructure -- The basic anatomy of a tioga document and "batch-mode" operation
 
-Sample -- Intro to using "irb" as a Tioga front-end
+Sample -- Intro to using "irb" as a tioga front-end
 
-Figures -- How Tioga uses PDF and TeX to make figures
+Figures -- How tioga uses PDF and TeX to make figures
 
-SimpleFigure -- A first look at a nontrivial Tioga figure definition
+SimpleFigure -- A first look at a nontrivial tioga figure definition
 
 TextForTeX -- How to Add Packages and How (and How Not) to Enter Text for TeX
 
-MacGUI -- Intro to Tioga's graphical user interface for the Mac
+MacGUI -- Intro to tioga's graphical user interface for the Mac
 
 Plots -- The extras for making plots
 
@@ -55,7 +55,7 @@ Animation -- How to create a sequence of PDFs and convert it to a movie
 
 OtherStuff -- A few "real life" examples
 
-Epilog -- "Do it yourself" using the Tioga kernel for making figures
+Epilog -- "Do it yourself" using the tioga kernel for making figures
 
 
 =end

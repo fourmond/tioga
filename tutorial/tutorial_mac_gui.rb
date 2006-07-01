@@ -14,7 +14,7 @@ interface in irb.
 
 The Mac front-end is simply called 'Tioga'.  Installation should be a trivial drag-and-drop
 of the icon from the disk image to the folder where you keep applications.  Double-click
-the icon now to launch Tioga.  We'll use the "figures.rb" file to illustrate, so open it
+the icon now to launch tioga.  We'll use the "figures.rb" file to illustrate, so open it
 using the "Open" command in the "File" menu (recall that the file we want is located in
 the samples/figures subfolder of the FigureMaker folder).  You should get a window that
 looks similar to this:
@@ -22,24 +22,24 @@ looks similar to this:
 http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/startup.jpg
 
 If instead you got something like the following alert, you'll need to tinker with the
-Ruby installation or the Tioga preferences so that Tioga can find the right
-Ruby to launch.  (When it first starts up, Tioga checks to see if there is a file
+Ruby installation or the tioga preferences so that tioga can find the right
+Ruby to launch.  (When it first starts up, tioga checks to see if there is a file
 named "/usr/local/bin/ruby".  If so, that is used as the default.  Otherwise,
 it uses "/usr/bin/ruby" as the default.)
 
 http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/ruby_alert.jpg
 
 If the window comes up blank, check the log at the bottom.  It may have a message
-like this, indicating that Tioga was able to launch Ruby but was unable to
+like this, indicating that tioga was able to launch Ruby but was unable to
 load the FigureMaker extension.
 
 http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/tioga_trouble.jpg
 
-A blank window might also mean that Tioga couldn't find pdflatex.  In that case the message will look something like this.
+A blank window might also mean that tioga couldn't find pdflatex.  In that case the message will look something like this.
 
 http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/pdflatexerror.jpg
 
-In this case, open the Tioga Preferences panel and fill in the correct path to the pdflatex you want to use.
+In this case, open the tioga Preferences panel and fill in the correct path to the pdflatex you want to use.
 
 http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/preferences.jpg
 
@@ -64,7 +64,7 @@ Here's an example.  In my "star history" plotting code, there are parameters for
 there are times when I'd like to zoom in on a particular era.  I can do that by using Eval with a
 private eval_function in my program.  Let's say I want to change the starting age for the plots.
 Since I wrote the code, I know that the start age is determined by an attribute called "@track_start_param".
-I'm looking at the plot in Tioga, and now I want to change the start.  First, I put
+I'm looking at the plot in tioga, and now I want to change the start.  First, I put
 
     @track_start_param
 
@@ -86,7 +86,7 @@ you can quickly learn by poking buttons to see what happens.  However, here are 
 that might take you a bit longer to discover on your own (as a reward to those of you
 who are still reading this!).
 
--- You can drag-and-drop a Tioga file onto the icon to open it.   
+-- You can drag-and-drop a tioga file onto the icon to open it.   
 
 -- Use the up and down arrow keys to move up and down in the list of figures.
 
@@ -119,7 +119,7 @@ so they don't interfere with each other.
 
 -- The Print command prints what's currently showing in the window -- clipping, 
 scaling, cross-hair lines,
-and all.  If you just want to print the pdf file for the figure, you don't need Tioga to do it
+and all.  If you just want to print the pdf file for the figure, you don't need tioga to do it
 for you!
 
 -- Hold down the right mouse button with the cursor over the figure to bring up a menu for controlling

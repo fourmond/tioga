@@ -3,10 +3,10 @@ module Tioga
 # = Color names
 #
 # The table at the end of this webpage has about 200 color names
-# and the corresponding red-green-blue triples of intensities.  These color names can be used wherever a color is called for in Tioga.
+# and the corresponding red-green-blue triples of intensities.  These color names can be used wherever a color is called for in tioga.
 # To use the same colors in text, your TeX preamble should have the following:
 #        \include{color_names}
-# The file <tt>color_names.tex</tt> is included in the Tioga download and defines the full set of
+# The file <tt>color_names.tex</tt> is included in the tioga download and defines the full set of
 # color names given below.  To set some text in color, simply use something like the following:
 #        \textcolor{Crimson}{This will appear in crimson.}
 #

@@ -23,7 +23,6 @@
 #include "pdfs.h"
 
 bool have_current_point, constructing_path, writing_file;
-double llx_margin, lly_margin, urx_margin, ury_margin;
 double bbox_llx, bbox_lly, bbox_urx, bbox_ury;
 
 /* PDF graphics */

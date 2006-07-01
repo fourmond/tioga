@@ -324,7 +324,7 @@ end
 # :call-seq:
 #  version
 #
-# Print the Tioga FigureMaker version string.
+# Print the tioga FigureMaker version string.
 def version
     FigureMaker.version
 end

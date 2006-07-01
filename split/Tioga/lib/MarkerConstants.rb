@@ -4,9 +4,9 @@ module Tioga
 #
 # Text is normally sent to TeX, allowing you to use any font that can be accessed from your TeX documents.  
 # However, in certain special cases you may need to use text in a "graphical" manner and have it processed directly in the 
-# PDF output.  In that case, Tioga needs to have metric information for the font (in the form of an "afm" file), and any 
+# PDF output.  In that case, tioga needs to have metric information for the font (in the form of an "afm" file), and any 
 # output device needs to have access to the font definitions.  Providing a general solution to this is still a bit messy, and for the 
-# expected use in Tioga, I decided that it wasn't worth it.  All PDF devices are guaranteed to have the 14 standard Adobe 
+# expected use in tioga, I decided that it wasn't worth it.  All PDF devices are guaranteed to have the 14 standard Adobe 
 # fonts, so they are easy to provide -- and that's what I've done.
 #
 # Here are the abc's of the PDF fonts, clockwise from the top: Times_Roman, Times_Italic, Times_Bold, Times_BoldItalic, Helvetica, Helvetica_Oblique, Helvetica_Bold, Helvetica_BoldOblique, Courier, Courier_Oblique, Courier_Bold, Courier_BoldOblique, Symbol, and ZapfDingbats.

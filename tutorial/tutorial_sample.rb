@@ -4,7 +4,7 @@ module Tutorial
 
 =begin rdoc
 
-= Using irb, "Interactive Ruby", as a Tioga front-end
+= Using irb, "Interactive Ruby", as a tioga front-end
 
 Ruby comes with a very useful interface called "irb" for "interactive Ruby".  If you'd like to
 learn lots more details about it than I'll be giving here, check out Chapter 15 of the 2nd edition of
@@ -15,7 +15,7 @@ First, start irb by a command to the shell of the form:
     irb [ irb-options ] [ ruby_script ] [ program arguments ]
 
 For most cases, a simple "irb" will suffice.
-At the prompt from irb, load the Tioga command line tool by typing:
+At the prompt from irb, load the tioga command line tool by typing:
     
     require 'Tioga/irb_tioga.rb'
     
@@ -161,7 +161,7 @@ With any luck, your previewer is now displaying Red.pdf for you.
 
 * NOTE: If you are using Linux, you may type something like "xpdf Blue.pdf" instead of "open Blue.pdf".
   Then you need
-  to tell Tioga what to do when you ask to preview a file.  It uses a global variable holding
+  to tell tioga what to do when you ask to preview a file.  It uses a global variable holding
   a string specifying the previewer to use -- the default for this is 'open', but you can
   change it to something else.  For example, if you want to use xpdf, 
   then after loading irb_tioga, type
@@ -182,7 +182,7 @@ Now, back in irb again, reload the file and remake the figure as follows:  first
 previously.  Now the Red.pdf should be displayed in green (my apologies to  color blind
 readers!).  
 
-This sequence illustrates the basic development cycle for Tioga:  run the program in Ruby,
+This sequence illustrates the basic development cycle for tioga:  run the program in Ruby,
 look at the result in a previewer, edit the source file, then reload and rerun to see the
 changes.  It goes fairly smoothly even with a command line interface, and with a GUI,
 it gets even better.

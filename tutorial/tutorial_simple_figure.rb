@@ -4,7 +4,7 @@ module Tutorial
 
 =begin rdoc
 
-= A first look at a nontrivial Tioga figure definition
+= A first look at a nontrivial tioga figure definition
 
 Back in irb with "figures.rb" loaded, make and preview the "Curve" figure (use "ls" to find the figure number).
 This is what you should see.

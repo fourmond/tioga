@@ -1,13 +1,99 @@
 #  Page_Frame_Bounds.rb
 
 module Tioga
+    
+=begin rdoc
 
-# These are the methods and attributes related to setting the coordinate systems and margins for plots.  See also Coordinate_Conversions and the Tutorial::DocStructure.
+This section describes the coordinate systems used by tioga for page layout.
+
+The "output page" is defined in "output coordinates"
+having units equal to 1/720 of an inch.  This unit is 1/10 of a "big point" that is the basic size used in PostScript and PDF.
+By making the unit this size, we can write output coordinates to the PDF file as integers, getting a significant size reduction in
+the file without giving up noticable accuracy.  The (0, 0) point of the output coordinate system is at the lower-left hand corner
+of the output page.  The x axis increases horizontally, and the y axis increases vertically.  The  dimensions of the page
+are given by the attributes page_width and page_height.  
+The attributes page_right and page_top are aliases for these.
+The attributes page_left and page_bottom are always zero.  The default page size is 5 inches square, 
+but you can set the size to anything you like using the set_device_pagesize routine. 
+
+While the output coordinates have a fixed physical size, all the other coordinate systems are relative rather than absolute.
+At the next level comes "page coordinates" that are defined relative to the output page with (0, 0) in page coordinates 
+at the lower left corner  of the output page and (1, 1) at the upper right.  Page coordinates are used to define the location of
+the current "frame".  The current frame location is held in the attributes frame_left, frame_right, frame_top, and frame_bottom,
+all in page coordinates.  In addition, the attribute frame_width is defined to be frame_right - frame_left, and frame_height is frame_top -
+frame_bottom.  The defaults are (0.2, 0.2) for the lower left corner of the frame and (0.8, 0.8) for the upper right.
+You can change these by calling the routine set_frame_sides.
+
+The "frame coordinates" are defined with (0, 0) at the lower left corner of the frame and (1, 1) at the upper right.  Subframes are
+sized and located using frame coordinates.  The routine set_subframe does this job.  In addition, subframes are used to
+give a desired aspect ratio.  The routine set_aspect_ratio_relative_to_frame does this in terms of frame coordinates -- in
+other words, it creates a subframe having the requested ratio of width to height relative to the frame.  In some cases
+that will be what you want, but it is more common to want to specify the width to height ratio relative to the output page, i.e.,
+in absolute rather than relative terms.   This is provided by the routine set_physical_aspect_ratio (with set_aspect_ratio is an alias).
+
+Note that text and graphics are not in general restricted to the current frame -- drawing outside the lines can be good!  For example,
+in plots the title and axis labels are typically positioned outside of the frame while the plot itself is limited to the interior.
+
+When doing a plot, you want yet another coordinate system, one that matches the data.  This is called the "figure coordinate system"
+and is set by the "bounds" attributes that give the locations in figure coordinates of the edges of the frame.  These attributes are
+called bounds_right, bounds_left, bounds_top, and bounds_bottom.  Note that you can "reverse" the x axis, for example, by making
+bounds_right smaller than bounds_left.  To help with the bookkeeping for this, the attribute bounds_xmin holds the minimum
+of bounds_left and bounds_right, while bounds_ymin has the minimum of bounds_top and bounds_bottom.  Finally, bounds_width holds
+the absolute value of bounds_right - bounds_left and bounds_height has abs(bounds_top - bounds_bottom).  The default bounds
+are 0 for left and bottom and 1 for right and top, making figure coordinates identical to frame coordinates.  The bounds can be
+changed by calling the set_bounds routine.
+
+That takes care of getting the page layout done, but we still need to put the tioga output page into a TeX document, whether
+as part of a larger document or only for previewing by itself.  In either case, we get one more chance to specify size and location.
+Let's discuss the previewing case first.  The preview TeX document that is constructed automatically has a very simple structure --
+it has no content except the figure!  You can specify the size of the TeX page in tioga by setting tex_preview_paper_width and
+tex_preview_paper_height.  These attributes hold string values that are directly passed to TeX, so you can use any units of length
+that TeX understands.  There are several routines to set these to standard values, such as set_USLetter_landscape and set_USLetter_portrait
+("landscape" meaning width greater than height and "portrait" meaning the reverse).  Similarly, you can control the location of the
+tioga output page on the TeX page using tex_preview_hoffset and tex_preview_voffset.
+
+Independently of what size the
+tioga output page had when it was created, you can now rescale it to whatever size you want on the TeX page using the
+attributes tex_preview_figure_width and tex_preview_figure_height.  These sizes are also given as TeX strings.  I suggest opening
+a preview TeX file in your favorite TeX editor and taking a look.  In the heading of the file, you'll find various "setlength" commands for setting the
+paper size and the offsets.  Try changing these by hand in the TeX editor and retypesetting the page.  The values for the figure
+size will be found in the call on the TiogaFigureSized command from inside the document body at the bottom of the file.
+It looks something like this:
+
+        % Here's the page with the figure.
+        \begin{document}
+        \pagestyle{empty}
+
+        \TiogaFigureSized{MyPlot}{!}{184mm}
+
+        \end{document}
+
+The TiogaFigureSized routine is included in the preamble section -- it takes the name of the plot ("MyPlot" in this case),
+and specification strings for the width and height in the second and third arguments.  In the example, we're
+setting the height to 184mm; the "!" for the width means that the width will be scaled the same as the height to keep
+the aspect ratio of the figure unchanged.  As you did for the page size, try editing the figure size arguments
+in the TeX editor.  If you want to give a relative scale for the figure size, use the TiogaFigureScaled command;
+if you want different horizontal and vertical scales, use TiogaFigureScaledXY.
+
+Once you've finished creating a figure and have previewed it, you'll probably want to put it in a document.  One option
+is to use the PDF file created for previewing directly in the document with something like "includegraphics" -- you can see how this is done
+by looking at the TiogaFigureShow command in the preview TeX file.  However, if you are doing a set of figures
+that should have a coordinated appearance, such as sharing the same fonts, it is probably better to recreate the
+figure when the document is typeset in the same manner that the PDF preview is produced in the preview TeX file: include
+a copy of the TiogaFigure commands and use calls on them to place the figures in the document.  By doing this, you
+"delay binding" of the selection of fonts for the figures until the last possible moment.  An entire set of figures
+can be redone with a different typeface simply by retypesetting the TeX after changing the SetTiogaFontInfo definitions
+in the preamble.
+
+For more information about font selection, see TeX_Text.
+
+=end
+
 
 class Page_Frame_Bounds < Doc < FigureMaker
 
 # :call-seq:
-#               set_device_pagesize(width, height) # measured in tenths of points                                 
+#               set_device_pagesize(width, height) # measured in output page coordinates (1/720 inch)                                 
 #
 # The page coordinates go from 0.0 to 1.0 with (0,0) at the lower left and (1,1) at the upper right.
 # This command sets the physical size of this rectangle in the output coordinate 
@@ -17,42 +103,42 @@ class Page_Frame_Bounds < Doc < FigureMaker
 # :call-seq:
 #               page_left                                     
 #
-# The position of the left of the page in the device coordinate system (measured in tenths of points).
+# The position of the left of the page in the device coordinate system -- measured in output page coordinates (1/720 inch).
    def page_left
    end
 
 # :call-seq:
 #               page_right                                     
 #
-# The position of the right of the page in the device coordinate system (measured in tenths of points).
+# The position of the right of the page in the device coordinate system -- measured in output page coordinates (1/720 inch).
    def page_right
    end
 
 # :call-seq:
 #               page_bottom                                     
 #
-# The position of the bottom of the page in the device coordinate system (measured in tenths of points).
+# The position of the bottom of the page in the device coordinate system -- measured in output page coordinates (1/720 inch).
    def page_bottom
    end
 
 # :call-seq:
 #               page_top                                     
 #
-# The position of the top of the page in the device coordinate system (measured in tenths of points).
+# The position of the top of the page in the device coordinate system -- measured in output page coordinates (1/720 inch).
    def page_top
    end
 
 # :call-seq:
 #               page_width                                     
 #
-# The width of the page in the device coordinate system (measured in tenths of points).
+# The width of the page in the device coordinate system -- measured in output page coordinates (1/720 inch).
    def page_width
    end
 
 # :call-seq:
 #               page_height                                     
 #
-# The height of the page in the device coordinate system (measured in tenths of points).
+# The height of the page in the device coordinate system -- measured in output page coordinates (1/720 inch).
    def page_height
    end
    
@@ -316,6 +402,189 @@ The following forms are also supported for calls to set_bounds:
     end
 
 
+    
+# Convert the distance _d_ measured in output coordinates to millimeters.
+    def convert_output_to_mm(d)
+    end
+    
+# Convert the distance _d_ measured in millimeters to output coordinates.
+    def convert_mm_to_output(d)
+    end
+    
+# Convert the distance _d_ measured in output coordinates to inches.
+    def convert_output_to_inches(d)
+    end
+    
+# Convert the distance _d_ measured in inches to output coordinates.
+    def convert_inches_to_output(d)
+    end
+    
+    
+# Convert the position _x_ measured in page x coordinates to the 
+# position in output x coordinates.
+    def convert_page_to_output_x(x)
+    end
+
+    
+# Convert the position _y_ measured in page y coordinates to the 
+# position in output y coordinates.
+    def convert_page_to_output_y(y)
+    end
+
+# Convert the distance _dx_ measured in page x coordinates to the 
+# distance in output x coordinates.
+    def convert_page_to_output_dx(dx)
+    end
+
+# Convert the distance _dy_ measured in page y coordinates to the 
+# distance in output y coordinates.
+    def convert_page_to_output_dy(dy)
+    end
+
+# Convert the position _x_ measured in output x coordinates to the 
+# position in page x coordinates.
+    def convert_output_to_page_x(x)
+    end
+
+# Convert the position _y_ measured in output y coordinates to the 
+# position in page y coordinates.
+    def convert_output_to_page_y(y)
+    end
+
+# Convert the distance _dx_ measured in output x coordinates to the 
+# distance in page x coordinates.
+    def convert_output_to_page_dx(dx)
+    end
+
+# Convert the distance _dy_ measured in output y coordinates to the same
+# distance in page y coordinates.
+    def convert_output_to_page_dy(dy)
+    end
+
+# Convert the position _x_ measured in page x coordinates to the 
+# position in frame x coordinates.
+    def convert_page_to_frame_x(x)
+    end
+
+# Convert the position _y_ measured in page y coordinates to the 
+# position in frame y coordinates.
+    def convert_page_to_frame_y(y)
+    end
+
+# Convert the distance _dx_ measured in page x coordinates to the 
+# distance in frame x coordinates.
+    def convert_page_to_frame_dx(dx)
+    end
+
+# Convert the distance _dy_ measured in page y coordinates to the 
+# distance in frame y coordinates.
+    def convert_page_to_frame_dy(dy)
+    end
+
+# Convert the position _x_ measured in frame x coordinates to the 
+# position in page x coordinates.
+    def convert_frame_to_page_x(x)
+    end
+
+# Convert the position _y_ measured in frame y coordinates to the 
+# position in page y coordinates.
+    def convert_frame_to_page_y(y)
+    end
+
+# Convert the distance _dx_ measured in frame x coordinates to the 
+# distance in page x coordinates.
+    def convert_frame_to_page_dx(dx)
+    end
+
+# Convert the distance _dy_ measured in frame y coordinates to the 
+# distance in page y coordinates.
+    def convert_frame_to_page_dy(dy)
+    end
+
+# Convert the position _x_ measured in figure x coordinates to the 
+# position in frame x coordinates.
+    def convert_figure_to_frame_x(x)
+    end
+
+# Convert the position _y_ measured in figure y coordinates to the 
+# position in frame y coordinates.
+    def convert_figure_to_frame_y(y)
+    end
+
+# Convert the distance _dx_ measured in figure x coordinates to the 
+# distance in frame x coordinates.
+    def convert_figure_to_frame_dx(dx)
+    end
+
+# Convert the distance _dy_ measured in figure y coordinates to the 
+# distance in frame y coordinates.
+    def convert_figure_to_frame_dy(dy)
+    end
+
+# Convert the position _x_ measured in frame x coordinates to the 
+# position in figure x coordinates.
+    def convert_frame_to_figure_x(x)
+    end
+
+# Convert the position _y_ measured in frame y coordinates to the 
+# position in figure y coordinates.
+    def convert_frame_to_figure_y(y)
+    end
+
+# Convert the distance _dx_ measured in frame x coordinates to the 
+# distance in figure x coordinates.
+    def convert_frame_to_figure_dx(dx)
+    end
+
+# Convert the distance _dy_ measured in frame y coordinates to the 
+# distance in figure y coordinates.
+    def convert_frame_to_figure_dy(dy)
+    end
+
+# Convert the position _x_ measured in figure x coordinates to the 
+# position in output x coordinates.
+    def convert_figure_to_output_x(x)
+    end
+
+# Convert the position _y_ measured in figure y coordinates to the 
+# position in output y coordinates.
+    def convert_figure_to_output_y(y) 
+    end
+
+# Convert the distance _dx_ measured in figure x coordinates to the 
+# distance in output x coordinates.
+    def convert_figure_to_output_dx(dx)
+    end
+
+# Convert the distance _dy_ measured in figure y coordinates to the 
+# distance in output y coordinates.
+    def convert_figure_to_output_dy(dy)
+    end
+
+# Convert the position _x_ measured in output x coordinates to the 
+# position in figure x coordinates.
+    def convert_output_to_figure_x(x)
+    end
+
+# Convert the position _y_ measured in output y coordinates to the 
+# position in figure y coordinates.
+    def convert_output_to_figure_y(y)
+    end
+
+# Convert the distance _dx_ measured in output x coordinates to the 
+# distance in figure x coordinates.
+    def convert_output_to_figure_dx(dx)
+    end
+
+# Convert the distance _dy_ measured in output y coordinates to the 
+# distance in figure y coordinates.
+    def convert_output_to_figure_dy(dy)
+    end
+
+# Returns the angle measured in degrees clockwise from the horizontal for the
+# slope specified by _dx_ and _dy_ given in figure coordinates.
+    def convert_to_degrees(dx, dy)
+    end
 
 
 

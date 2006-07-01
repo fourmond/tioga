@@ -67,12 +67,16 @@ stencil mask that is determined on-the-fly by the sample values themselves.  The
 has options for doing value masking.
 
 Image Interpolation:  When the resolution of a source image is significantly lower than that of the output
-device, each source sample covers many device pixels. This can cause images
-to appear "jaggy".  These visual artifacts can be reduced by applying an
+device, 
+each source sample covers many device pixels. This can cause images
+to appear "jaggy".  These visual artifacts can 
+be reduced by applying an
 image interpolation algorithm during rendering. Instead of painting all pixels covered
 by a source sample with the same color, image interpolation attempts to produce
-a smooth transition between adjacent sample values. Image interpolation is enabled by
-default in Tioga; setting the 'interpolate' entry in the image dictionary to +false+ should disable it
+a smooth transition between 
+adjacent sample values. Image interpolation is enabled by
+default in Tioga; setting the 'interpolate' entry 
+in the image dictionary to +false+ should disable it
 (but note that some PDF viewer implementations seem to ignore this flag).
 
 Dictionary Entries

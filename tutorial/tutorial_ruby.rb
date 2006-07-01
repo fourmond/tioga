@@ -4,14 +4,14 @@ module Tutorial
 
 =begin rdoc
 
-= The bare essentials for using Ruby with Tioga
+= The bare essentials for using ruby with tioga
 
 If you're asking  "What's Ruby?", then take a moment to visit the {What's Ruby}[http://www.ruby-lang.org/en/20020101.html] page.
 Briefly, Ruby is an object-oriented, highly dynamic "scripting" language created by Yukihiro Matsumoto with the intent to "maximize the joy of programming".  I think he succeeded!
 
 First, a disclaimer: this is NOT a complete tutorial for Ruby.  As a matter of fact, this isn't even an incomplete
 tutorial for Ruby.  I'm just going to cover enough
-so that you can use Ruby to write simple definitions for Tioga figures and plots.  At the end, I'll give
+so that you can use Ruby to write simple definitions for tioga figures and plots.  At the end, I'll give
 some links to places where you can get much more information.
 
 http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/append_curve.jpg
@@ -56,7 +56,7 @@ Don't worry about understanding the details of what's going on (we'll be discuss
              'marker' => Circled3, 'scale' => scale);
  21  end
 
-The "t." stuff simply means we're talking to Tioga, either to get
+The "t." stuff simply means we're talking to tioga, either to get
 values of variables (which in Ruby are called "attributes") or to get it to execute one of its
 procedures (which are called "methods").  There are cases in which we're setting attributes,
 such as line_width and line_color (lines 11 and 12), or using the values of attributes, such as default_text_height_dy (line 17).
@@ -102,9 +102,9 @@ is the order in which the entries are listed significant to the way the code wor
 
 ---
 
-There's much more to Ruby, but you don't need to know all of it in order to write programs for Tioga.
+There's much more to Ruby, but you don't need to know all of it in order to write programs for tioga.
 I've intentionally limited the use of the language to make the learning startup as simple and painless as possible.
-Once you've started to be comfortable with Ruby in the context of Tioga, I expect that you'll begin to use
+Once you've started to be comfortable with Ruby in the context of tioga, I expect that you'll begin to use
 it for many other tasks as well.
 
 There are lots of resources available to assist you in learning Ruby.  Here are just a few of the ones
@@ -112,7 +112,7 @@ that I've found most helpful.
 
 {Programming Ruby: The Pragmatic Programmer's Guide}[http://www.ruby-doc.org/docs/ProgrammingRuby/].  This book
 is available on the web in its first edition, and in paperback in its second.  It has been a constant
-companion during my work on Tioga.
+companion during my work on tioga.
 
 {Ruby Home Page}[http://www.ruby-lang.org/en/] has basic info (of the "What's Ruby" form) as well as downloads
 and documentation.

@@ -25,7 +25,7 @@ module Tioga
 require 'Tioga/MarkerConstants.rb'
 require 'Tioga/ColorConstants.rb'
 
-# These constants are for use in making figures and plots with Tioga.
+# These constants are for use in making figures and plots with tioga.
 #
 # They cover the choices for justification, vertical alignment, frame sides,
 # axis types, line types, stroke caps, stroke joins, and rendering modes.

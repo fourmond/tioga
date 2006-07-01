@@ -4,7 +4,7 @@ module Tutorial
 
 =begin rdoc
 
-= The basic anatomy of a Tioga document: making "sample.rb" and running it in "batch-mode"
+= The basic anatomy of a tioga document: making "sample.rb" and running it in "batch-mode"
 
 Tioga files are Ruby programs of a particular form and content.  The overall form is described in this section.  Some details of the content are discussed in the rest of the tutorial.
 
@@ -17,7 +17,7 @@ create an instance of it.  We'll start with those operations, then add bit-by-bi
     
     MyFigures.new
 
-The class MyFigures will contain the methods to create the figures.  It will use the FigureMaker extension defined in Tioga, so we'll "require" that to make sure that it is loaded.  We'll also "include" the Tioga and FigureConstants modules to make it easy to reference the methods and attributes they define.  (+require+ tells Ruby to load the required item if it hasn't already been loaded -- +include+ makes everything defined in the module available as if defined here.)
+The class MyFigures will contain the methods to create the figures.  It will use the FigureMaker extension defined in tioga, so we'll "require" that to make sure that it is loaded.  We'll also "include" the tioga and FigureConstants modules to make it easy to reference the methods and attributes they define.  (+require+ tells Ruby to load the required item if it hasn't already been loaded -- +include+ makes everything defined in the module available as if defined here.)
 
 
 In this and the following, we'll use ">>" to mark the newly added lines.  At the end, we'll give a
@@ -34,8 +34,8 @@ complete listing without any of those marks which are not really part of the cod
     
     MyFigures.new
 
-The default Tioga FigureMaker will be doing the work for us, so our initialize method will get it and
-put it in an instance variable for us that we'll name "@figure_maker" (the "@" is Ruby's way of saying that this is an attribute associated with a particular object).  The Tioga front end
+The default tioga FigureMaker will be doing the work for us, so our initialize method will get it and
+put it in an instance variable for us that we'll name "@figure_maker" (the "@" is Ruby's way of saying that this is an attribute associated with a particular object).  The tioga front end
 will also be talking to the default FigureMaker to find out what figures we've defined and ask
 for various ones to be created in response to our requests.
 
@@ -180,7 +180,7 @@ by setting the FigureMaker "save_dir" attribute.  That'll be our last addition. 
     
     MyFigures.new
 
-Now we have a working file that can be loaded into a Tioga front-end.  Alternatively, you may want to use Tioga in "batch-mode" to make PDF's for the figures.  In that case, you don't need to change the main file that defines the figures -- it is ready for use with a Tioga front end and we don't want to mess that up.  Instead, you should simply create a separate small driver program such as the following (see "samples/figures/sample_batch.rb"):
+Now we have a working file that can be loaded into a tioga front-end.  Alternatively, you may want to use tioga in "batch-mode" to make PDF's for the figures.  In that case, you don't need to change the main file that defines the figures -- it is ready for use with a tioga front end and we don't want to mess that up.  Instead, you should simply create a separate small driver program such as the following (see "samples/figures/sample_batch.rb"):
 
     require 'Tioga/FigureMaker'
     require 'sample.rb'

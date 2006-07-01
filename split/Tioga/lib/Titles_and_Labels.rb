@@ -36,7 +36,7 @@ class Titles_and_Labels < Doc < FigureMaker
 #               title_visible                                     
 #               title_visible = false
 #
-# If +true+, then it is okay for Tioga to show the title of a plot.  If +false+,
+# If +true+, then it is okay for tioga to show the title of a plot.  If +false+,
 # then calls on show_title return immediately.
 # This attribute is "one-way-only" in that it starts +true+ and can be
 # set +false+, but cannot be reset to +true+ except by restoring the
@@ -51,7 +51,7 @@ class Titles_and_Labels < Doc < FigureMaker
 #               xlabel_visible                                     
 #               xlabel_visible = false
 #
-# If +true+, then it is okay for Tioga to show the x label of a plot.  If +false+,
+# If +true+, then it is okay for tioga to show the x label of a plot.  If +false+,
 # then calls on show_xlabel return immediately.
 # This attribute is "one-way-only" in that it starts +true+ and can be
 # set +false+, but cannot be reset to +true+ except by restoring the
@@ -66,7 +66,7 @@ class Titles_and_Labels < Doc < FigureMaker
 #               ylabel_visible                                     
 #               ylabel_visible = false
 #
-# If +true+, then it is okay for Tioga to show the y label of a plot.  If +false+,
+# If +true+, then it is okay for tioga to show the y label of a plot.  If +false+,
 # then calls on show_ylabel return immediately.
 # This attribute is "one-way-only" in that it starts +true+ and can be
 # set +false+, but cannot be reset to +true+ except by restoring the

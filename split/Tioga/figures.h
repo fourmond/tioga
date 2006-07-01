@@ -354,13 +354,24 @@ extern void Recalc_Font_Hts(FM *p);
 extern VALUE FM_rescale_text(VALUE fmkr, VALUE scaling);
 extern VALUE FM_rescale_lines(VALUE fmkr, VALUE scaling);
 
-extern double llx_margin, lly_margin, urx_margin, ury_margin;
 extern double bbox_llx, bbox_lly, bbox_urx, bbox_ury;
 
+// ENLARGE = the conversion factor from "big points" to output units
 #define ENLARGE 10.0
+#define BIG_POINTS_PER_INCH 72.0
+#define INCHES_PER_MM 0.0393700787
 
-#define convert_points_to_output(pts) (ENLARGE*(pts))
-#define convert_output_to_points(pts) ((pts)/ENLARGE)
+#define convert_inches_to_output(inches) ((ENLARGE*BIG_POINTS_PER_INCH)*(inches))
+#define convert_output_to_inches(output) ((output)/(ENLARGE*BIG_POINTS_PER_INCH))
+
+extern VALUE FM_convert_inches_to_output(VALUE fmkr, VALUE value);
+extern VALUE FM_convert_output_to_inches(VALUE fmkr, VALUE value);
+
+#define convert_mm_to_output(mm) ((ENLARGE*BIG_POINTS_PER_INCH*INCHES_PER_MM)*(mm))
+#define convert_output_to_mm(output) ((output)/(ENLARGE*BIG_POINTS_PER_INCH*INCHES_PER_MM))
+
+extern VALUE FM_convert_mm_to_output(VALUE fmkr, VALUE value);
+extern VALUE FM_convert_output_to_mm(VALUE fmkr, VALUE value);
 
 #define convert_page_to_output_x(p,x) ((p)->page_left + (x)*(p)->page_width)
 #define convert_page_to_output_y(p,y) ((p)->page_bottom + (y)*(p)->page_height)
@@ -571,8 +582,6 @@ extern VALUE FM_clip_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VAL
 
 /* Shading */
 
-extern VALUE FM_private_triangle_mesh_shading(VALUE fmkr, VALUE xs_vec, VALUE ys_vec,
-        VALUE rs_vec, VALUE gs_vec, VALUE bs_vec, VALUE fs_vec);
 extern VALUE FM_private_axial_shading(VALUE fmkr, VALUE x0, VALUE y0,
         VALUE x1, VALUE y1, VALUE colormap, VALUE extend_start, VALUE extend_end);
 extern VALUE FM_private_radial_shading(VALUE fmkr, VALUE x0, VALUE y0, VALUE r0,

@@ -8,7 +8,7 @@ module Tutorial
 
 We've now been through the "figures" folder and the "plots" folder in
 the samples.  The remaining ones are included as examples of "real"
-cases using Tioga to make plots.  The plots and the data they
+cases using tioga to make plots.  The plots and the data they
 represent come from my stellar evolution program, "EZ[http://theory.kitp.ucsb.edu/~paxton/#EZ]".
 Here's the answer to what's a "zams":
 
@@ -19,11 +19,11 @@ Here's the answer to what's a "zams":
 The name EZ stands for "Evolve ZAMS",
 and the remaining samples are all taken from the general topic of stellar
 evolution.  However, the point of the samples is not to teach astrophysics, but to provide a set of more
-complex plots to illustrate Tioga.  We'll take a quick look at what's there, and I'll point out a few highlights
+complex plots to illustrate tioga.  We'll take a quick look at what's there, and I'll point out a few highlights
 along the way.
 
 The starting place is the "zero age" stars, so go to the "zams" folder in "samples", and open "zams.rb" in your editor.
-If you're on a Mac, drag the file to the Tioga icon and look through the plots.  If you're using irb, load "zams.rb",
+If you're on a Mac, drag the file to the tioga icon and look through the plots.  If you're using irb, load "zams.rb",
 do a make_all and a make_portfolio, and load the "zams.pdf" that results in your PDF viewer.
 
 http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/zams.jpg
@@ -79,7 +79,7 @@ The "ZAMS fancy" plot is mainly for fun.  But it gives examples of setting up sp
 
 ---
 
-Let's move on to the next folder in samples, "star_history".  Load "history.rb" in Tioga (GUI or irb) and take a look at the plots.  Here's the first one:
+Let's move on to the next folder in samples, "star_history".  Load "history.rb" in tioga (GUI or irb) and take a look at the plots.  Here's the first one:
 
 http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/H_R_T_RHO.jpg
 

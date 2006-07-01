@@ -191,6 +191,38 @@ VALUE FM_convert_to_degrees(VALUE fmkr, VALUE dx, VALUE dy) // dx and dy in figu
    return rb_float_new(c_convert_to_degrees(p, NUM2DBL(dx), NUM2DBL(dy)));
 }
 
+
+
+VALUE FM_convert_inches_to_output(VALUE fmkr, VALUE v)
+{
+   v = rb_Float(v); double val = NUM2DBL(v);
+   val = convert_inches_to_output(val);
+   return rb_float_new(val);
+}
+
+VALUE FM_convert_output_to_inches(VALUE fmkr, VALUE v)
+{
+   v = rb_Float(v); double val = NUM2DBL(v);
+   val = convert_output_to_inches(val);
+   return rb_float_new(val);
+}
+
+
+VALUE FM_convert_mm_to_output(VALUE fmkr, VALUE v)
+{
+   v = rb_Float(v); double val = NUM2DBL(v);
+   val = convert_mm_to_output(val);
+   return rb_float_new(val);
+}
+
+VALUE FM_convert_output_to_mm(VALUE fmkr, VALUE v)
+{
+   v = rb_Float(v); double val = NUM2DBL(v);
+   val = convert_output_to_mm(val);
+   return rb_float_new(val);
+}
+
+
 VALUE FM_convert_page_to_output_x(VALUE fmkr, VALUE v)
 {
    FM *p = Get_FM(fmkr); v = rb_Float(v); double val = NUM2DBL(v);

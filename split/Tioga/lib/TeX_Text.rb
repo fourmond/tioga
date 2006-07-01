@@ -1,8 +1,35 @@
 #  TeX_Text.rb
 
 module Tioga
+=begin rdoc
 
-# These are the methods and attributes for using TeX for typesetting in plots and figures.  See also Tutorial::TextForTeX for information about how to add packages and how (and how not) to enter text for TeX.
+Text in tioga goes to TeX for typesetting: you aren't using a partial emulation that is sort-of-like TeX, you are
+using the real thing.
+
+Since text strings in tioga are passed directly to TeX, you can basically do anything in the text of figures that
+you can do with text in TeX.  The text string can include embedded commands to change font size, family, or whatever.
+However, more commonly the text string will leave the font selection to a higher level in the document.
+In tioga it is easy for you to use the "NFSS", TeX's "New Font Selection Scheme" that specifies
+the font by independently setting family, series, shape, and size.  Families include roman, sans serif, and typewriter.  
+Series include medium and bold face.  Shapes include upright, italic, slant, and small caps.  All these, and the size, are
+set in the SetTiogaFontInfo command in the TeX file preamble.  The tioga defaults for size, family, series, and shape are
+10 point roman, medium, and upright.  You can change these by means of the attributes
+tex_preview_fontfamily, tex_preview_fontseries, tex_preview_fontshape, and tex_preview_fontsize.  Just like for
+the tex_preview page and figure sizes, these are given as strings to be copied to the TeX preview file as part
+of the SetTiogaFontInfo definition.
+
+Text is
+sized by giving a scale factor relative to a base size.  The base size is given by the attribute default_font_size,
+that is initialized to 10 and can be changed using set_default_font_size.  The scale factor is called default_text_scale, is 
+initialized to 1.0, and is changed by rescale_text.  When you do a show_text command in tioga, the call can include an additional scale factor.
+The product of this extra factor times the default_text_scale times the default_font_size determines the size
+in big points on the output page.  At least that's the size the text will have if the output page doesn't get scaled up or down,
+and the TeX document doesn't decide to change things!  With text that is being passed to TeX for typesetting, the final
+decisions aren't made until the last moment.  See Page_Frame_Bounds for more details.
+
+See Tutorial::TextForTeX for information about how to add packages and how (and how not) to enter text for TeX.
+
+=end
 
 class TeX_Text < Doc < FigureMaker
 
@@ -335,7 +362,7 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Framebox.jpg
 # :call-seq:
 #               default_text_scale                                     
 #
-# Default factor determining text size (relative to 12 point text).
+# Default factor determining text size (relative to the default font size).
 # Is initialized to 1.0 and changed by rescale_text.
    def default_text_scale
    end
@@ -345,7 +372,7 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Framebox.jpg
 #               default_font_size                                    
 #
 # Default font size in points (relative to the default_font_size).
-# Is initialized to 12.0 and changed by set_default_font_size.
+# Is initialized to 10.0 and changed by set_default_font_size.
 # The intention is that this gets set rarely and most font sizing is done
 # using rescale_text.
    def default_font_size

@@ -191,7 +191,7 @@ class FigureMaker
     def set_default_font_size(size, update_preview_size_string = true)
         private_set_default_font_size(size)
         return unless update_preview_size_string == true
-        self.tex_preview_fontsize = sprintf("%0.2fpt", size)
+        self.tex_preview_fontsize = sprintf("%0.2fbp", size)
     end
     
     def set_A4_landscape(fig_width = '!', fig_height = '184mm')
@@ -1055,23 +1055,6 @@ class FigureMaker
         extend_start = dict['extend_start']
         extend_end = dict['extend_end']
         private_axial_shading(x_start, y_start, x_end, y_end, colormap, extend_start, extend_end)
-    end
-    
-    @@keys_for_triangle_mesh_shading = FigureMaker.make_name_lookup_hash(['xs', 'ys',
-        'rs', 'gs', 'bs', 'flags'])
-    def triangle_mesh_shading(dict)
-        
-        # THIS STILL NEEDS DEBUGGING TO PRODUCE A WORKING PDF
-        # there is a bug lurking somewhere in c_triangle_mesh_shading in pdfcolor.c
-        # but i've failed so far to find it
-        
-        xs = get_dvec(dict, 'xs', 'triangle_mesh_shading')
-        ys = get_dvec(dict, 'ys', 'triangle_mesh_shading')
-        rs = get_dvec(dict, 'rs', 'triangle_mesh_shading')
-        gs = get_dvec(dict, 'gs', 'triangle_mesh_shading')
-        bs = get_dvec(dict, 'bs', 'triangle_mesh_shading')
-        fs = get_dvec(dict, 'flags', 'triangle_mesh_shading')
-        private_triangle_mesh_shading(xs, ys, rs, gs, bs, fs)
     end
     
     @@keys_for_radial_shading = FigureMaker.make_name_lookup_hash(['extend_start', 'extend_end',

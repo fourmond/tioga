@@ -41,9 +41,9 @@ The contents of a PDF file are typically compressed using a lossless scheme such
 (Images are often compressed using a lossy scheme such as JPEG.)
 
 The code for Flate is available as part of zlib[http://www.gzip.org/zlib/],
-and I've included it as a module in Tioga.  Methods for both compression and decompression are included.
+and I've included it as a module in tioga.  Methods for both compression and decompression are included.
 You may never have an occasion to call Flate yourself, but it's working for you every time you 
-call on Tioga to make a PDF file.
+call on tioga to make a PDF file.
 
 And if you're still wondering what's inside that PDF file, you might be able to use the Flate decompression method
 to find out!
