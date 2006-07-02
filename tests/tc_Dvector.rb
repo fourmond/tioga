@@ -254,6 +254,32 @@ class TestDvector < Test::Unit::TestCase
         assert_equal(nil, b.uniq!)
     end
     
+    def test_set
+        a = Dvector[33, 11, 22, 44, 17 ]
+        b = Dvector[2, 5, 1, -3, 9 ]
+        c = Dvector[2, 2, 2, 2, 2 ]
+        b.set(a)
+        assert_equal(a, b)
+        b.set(2)
+        assert_equal(c, b)
+    end
+    
+    def test_min_gt
+        a = Dvector[2, 5, 1, -3, 9 ]
+        b = a.min_gt(0)
+        assert_equal(1, b)
+        b = a.min_gt(10)
+        assert_equal(nil, b)
+    end
+    
+    def test_max_lt
+        a = Dvector[2, 5, 1, -3, 9 ]
+        b = a.max_lt(5)
+        assert_equal(2, b)
+        b = a.max_lt(-5)
+        assert_equal(nil, b)
+    end
+    
     def test_sort
         a = Dvector[33, 11, 22, 44, 17 ]
         assert_equal(Dvector[11, 17, 22, 33, 44], a.sort)

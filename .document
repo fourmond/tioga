@@ -1,5 +1,4 @@
 tutorial/tutorial*.rb
-split/Tioga/lib/Coordinate_Conversions.rb
 split/Tioga/lib/Figures_and_Plots.rb
 split/Tioga/lib/Page_Frame_Bounds.rb
 split/Tioga/lib/Executive.rb

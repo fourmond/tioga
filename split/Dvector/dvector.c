@@ -997,6 +997,104 @@ VALUE dvector_aset(int argc, VALUE *argv, VALUE ary) {
    return argv[1];
 }
 
+
+/* 
+ *  call-seq:
+ *     dvector.clear  ->  dvector
+ *
+ *  Removes all elements from _dvector_.
+ *
+ *     a = Dvector[ 1, 2, 3, 4, 5 ]
+ *     a.clear    -> Dvector[]
+ */
+
+VALUE dvector_clear(VALUE ary) {
+   Dvector *d = dvector_modify(ary);
+   d->len = 0;
+   if (DVEC_DEFAULT_SIZE * 2 < d->capa) {
+      REALLOC_N(d->ptr, double, DVEC_DEFAULT_SIZE * 2);
+      d->capa = DVEC_DEFAULT_SIZE * 2;
+   }
+   return ary;
+}
+
+/*
+ *  call-seq:
+ *     dvector.set(float)  -> dvector
+ *     dvector.set(a_dvector)  -> dvector
+ *  
+ *  Modifies the entries of _dvector_ array.  If the argument is a float, then all of the
+ *  entries are set to that value.  If the argument is another Dvector, then it must
+ *  be the same length as _dvector_, and its contents are copied to _dvector_.
+ */
+
+VALUE dvector_set(VALUE ary, VALUE val) {
+   Dvector *d = dvector_modify(ary);
+   int len = d->len, i;
+   double *data = d->ptr;
+   if (is_a_dvector(val)) {
+      Dvector *d2 = Get_Dvector(val);
+      double *data2 = d2->ptr;
+      if (d2->len != len)
+         rb_raise(rb_eArgError, "Vectors must be same length for Dvector set");
+      for (i = 0; i < len; i++) {
+         data[i] = data2[i];
+      }
+   } else {
+      double v = NUM2DBL(val);
+      for (i = 0; i < len; i++) {
+         data[i] = v;
+      }
+   }
+   return ary;
+}
+
+/*
+ *  call-seq:
+ *     dvector.min_gt(val)  -> float or nil
+ *  
+ *  Returns the minimum entry in _dvector_ which is greater than _val_, or <code>nil</code> if no such entry if found.
+ */
+
+VALUE dvector_min_gt(VALUE ary, VALUE val) {
+   Dvector *d = Get_Dvector(ary);
+   val = rb_Float(val);
+   double zmin, z = NUM2DBL(val), x;
+   double *data = d->ptr;
+   int len = d->len, i, imin;
+   imin = -1;
+   for (i = 0; i < len; i++) {
+       x = data[i];
+       if (x > z && (imin < 0 || x < zmin)) { imin = i; zmin = x; }
+   }
+   if (imin >= 0)
+      return rb_float_new(zmin);
+   return Qnil;
+}
+
+/*
+ *  call-seq:
+ *     dvector.max_lt(val)  -> float or nil
+ *  
+ *  Returns the maximum entry in _dvector_ which is less than _val_, or <code>nil</code> if no such entry if found.
+ */
+
+VALUE dvector_max_lt(VALUE ary, VALUE val) {
+   Dvector *d = Get_Dvector(ary);
+   val = rb_Float(val);
+   double zmax, z = NUM2DBL(val), x;
+   double *data = d->ptr;
+   int len = d->len, i, imax;
+   imax = -1;
+   for (i = 0; i < len; i++) {
+       x = data[i];
+       if (x < z && (imax < 0 || x > zmax)) { imax = i; zmax = x; }
+   }
+   if (imax >= 0)
+      return rb_float_new(zmax);
+   return Qnil;
+}
+
 /*
  *  call-seq:
  *     dvector.insert(int, number...)  -> dvector
@@ -2045,26 +2143,6 @@ VALUE dvector_replace(VALUE dest, VALUE orig) {
    d->len = org->len;
    d->shared = shared;
    return dest;
-}
-
-/* 
- *  call-seq:
- *     dvector.clear  ->  dvector
- *
- *  Removes all elements from _dvector_.
- *
- *     a = Dvector[ 1, 2, 3, 4, 5 ]
- *     a.clear    -> Dvector[]
- */
-
-VALUE dvector_clear(VALUE ary) {
-   Dvector *d = dvector_modify(ary);
-   d->len = 0;
-   if (DVEC_DEFAULT_SIZE * 2 < d->capa) {
-      REALLOC_N(d->ptr, double, DVEC_DEFAULT_SIZE * 2);
-      d->capa = DVEC_DEFAULT_SIZE * 2;
-   }
-   return ary;
 }
 
 /*
@@ -5011,7 +5089,6 @@ void Init_Dvector() {
    rb_define_method(cDvector, "reject", dvector_reject, 0);
    rb_define_method(cDvector, "reject!", dvector_reject_bang, 0);
    rb_define_method(cDvector, "replace", dvector_replace, 1);
-   rb_define_method(cDvector, "clear", dvector_clear, 0);
    rb_define_method(cDvector, "fill", dvector_fill, -1);
    rb_define_method(cDvector, "include?", dvector_includes, 1);
    rb_define_method(cDvector, "<=>", dvector_cmp, 1);
@@ -5060,6 +5137,10 @@ void Init_Dvector() {
    
    rb_define_method(cDvector, "max", dvector_max, -1);
    rb_define_method(cDvector, "min", dvector_min, -1);
+   rb_define_method(cDvector, "clear", dvector_clear, 0);
+   rb_define_method(cDvector, "set", dvector_set, 1);
+   rb_define_method(cDvector, "min_gt", dvector_min_gt, 1);
+   rb_define_method(cDvector, "max_lt", dvector_max_lt, 1);
    
    rb_define_method(cDvector, "sum", dvector_sum, 0);
    rb_define_method(cDvector, "dot", dvector_dot, 1);
@@ -5203,4 +5284,5 @@ void Init_Dvector() {
    RB_EXPORT_SYMBOL(cDvector, c_dvector_create_spline_interpolant);
    /* I guess that this should be all */
 }
+
 

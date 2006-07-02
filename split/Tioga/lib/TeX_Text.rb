@@ -389,6 +389,56 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Framebox.jpg
    end
 
 
+        
+=end 
+   def tex_preview_fontsize
+   end
+
+
+=begin rdoc
+:call-seq:
+               tex_preview_fontfamily                                     
+               tex_preview_fontfamily = a_string  # giving the font family 
+
+This string will be used as the basic font family specification in the preview TeX file.  Valid strings include
+'rmdefault', 'sfdefault', and 'ttdefault', for roman face, sans serif face, and typewriter face, respectively.
+        
+See also: tex_preview_fontsize, tex_preview_fontseries, and tex_preview_fontshape.
+        
+=end 
+   def tex_preview_fontfamily
+   end
+
+=begin rdoc
+:call-seq:
+               tex_preview_fontseries                                    
+               tex_preview_fontseries = a_string  # giving the font series 
+
+This string will be used as the basic font series specification in the preview TeX file.  Valid strings include
+'mddefault' and 'bfdefault', for medium and bold face, respectively.
+        
+See also: tex_preview_fontsize, tex_preview_fontfamily, and tex_preview_fontshape.
+        
+=end 
+   def tex_preview_fontseries
+   end
+
+
+=begin rdoc
+:call-seq:
+               tex_preview_fontshape                                   
+               tex_preview_fontshape = a_string  # giving the font shape 
+
+This string will be used as the basic font shape specification in the preview TeX file.  Valid strings include
+'updefault', 'itdefault', 'sldefault', and 'scdefault', for upright, italic, slant, and small caps, respectively.
+        
+See also: tex_preview_fontsize, tex_preview_fontfamily, and tex_preview_fontseries.
+        
+=end 
+   def tex_preview_fontshape
+   end
+
+
 
 end # class
 end # module Tioga
