@@ -361,6 +361,10 @@ extern double bbox_llx, bbox_lly, bbox_urx, bbox_ury;
 #define BIG_POINTS_PER_INCH 72.0
 #define INCHES_PER_MM 0.0393700787
 
+// 10 feet should be enough!
+#define MAX_DEV_COORD_ALLOWED (BIG_POINTS_PER_INCH*12*10.0)
+#define iMAX_DEV_COORD_ALLOWED (BIG_POINTS_PER_INCH*12*10)
+
 #define convert_inches_to_output(inches) ((ENLARGE*BIG_POINTS_PER_INCH)*(inches))
 #define convert_output_to_inches(output) ((output)/(ENLARGE*BIG_POINTS_PER_INCH))
 
