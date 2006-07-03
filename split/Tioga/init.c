@@ -272,6 +272,7 @@ void Initialize_Figure(VALUE fmkr) {
    p->legend_scale = 0.6;
    p->legend_alignment = ALIGNED_AT_BASELINE;
    p->legend_justification = LEFT_JUSTIFIED;
+   p->debug_verbosity_level = 0;
 }
 
 VALUE do_cmd(VALUE fmkr, VALUE cmd) { return rb_funcall(fmkr, do_cmd_ID, 1, cmd); }

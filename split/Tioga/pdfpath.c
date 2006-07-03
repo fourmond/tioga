@@ -193,9 +193,15 @@ VALUE FM_line_type_set(VALUE fmkr, VALUE line_type)
 
     /* all locations and vectors are in figure coordinates */
 
-int c_round_dev(double v) { // make sure that we don't get too far out or can overflow!
-    if (v > MAX_DEV_COORD_ALLOWED) return iMAX_DEV_COORD_ALLOWED;
-    if (v < -MAX_DEV_COORD_ALLOWED) return -iMAX_DEV_COORD_ALLOWED;
+long c_round_dev(FM *p, double v) { // make sure that we don't get too far out or can overflow!
+    if (v > MAX_DEV_COORD_ALLOWED) {
+        if (p->debug_verbosity_level > 0) printf("c_round_dev clipping %g\n", v);
+        return iMAX_DEV_COORD_ALLOWED;
+    }
+    if (v < -MAX_DEV_COORD_ALLOWED) {
+        if (p->debug_verbosity_level > 0) printf("c_round_dev clipping %g\n", v);
+        return -iMAX_DEV_COORD_ALLOWED;
+    }
     return ROUND(v);
 }
 
@@ -218,7 +224,7 @@ VALUE FM_update_bbox(VALUE fmkr, VALUE x, VALUE y)
 
 void c_moveto(FM *p, double x, double y)
 {
-   if (writing_file) fprintf(TF, "%d %d m\n", c_round_dev(x), c_round_dev(y));
+   if (writing_file) fprintf(TF, "%ld %ld m\n", c_round_dev(p,x), c_round_dev(p,y));
    update_bbox(p, x, y);
    have_current_point = constructing_path = true;
 }
@@ -236,7 +242,7 @@ VALUE FM_move_to_point(VALUE fmkr, VALUE x, VALUE y)
 void c_lineto(FM *p, double x, double y)
 {
    if (!constructing_path) rb_raise(rb_eArgError, "Sorry: must start path with moveto before call lineto");
-   if (writing_file) fprintf(TF, "%d %d l\n", c_round_dev(x), c_round_dev(y));
+   if (writing_file) fprintf(TF, "%ld %ld l\n", c_round_dev(p,x), c_round_dev(p,y));
    update_bbox(p, x, y);
 }
 
@@ -253,8 +259,8 @@ VALUE FM_append_point_to_path(VALUE fmkr, VALUE x, VALUE y)
 void c_curveto(FM *p, double x1, double y1, double x2, double y2, double x3, double y3)
 {
    if (!constructing_path) rb_raise(rb_eArgError, "Sorry: must start path with moveto before call curveto");
-   if (writing_file) fprintf(TF, "%d %d %d %d %d %d c\n", 
-            c_round_dev(x1), c_round_dev(y1), c_round_dev(x2), c_round_dev(y2), c_round_dev(x3), c_round_dev(y3));
+   if (writing_file) fprintf(TF, "%ld %ld %ld %ld %ld %ld c\n", 
+            c_round_dev(p,x1), c_round_dev(p,y1), c_round_dev(p,x2), c_round_dev(p,y2), c_round_dev(p,x3), c_round_dev(p,y3));
    update_bbox(p, x1, y1);
    update_bbox(p, x2, y2);
    update_bbox(p, x3, y3);

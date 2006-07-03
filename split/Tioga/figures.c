@@ -250,6 +250,9 @@ FM *Get_FM(VALUE fmkr) {
    DBL_ATTR(legend_scale)
    INT_ATTR(legend_alignment)
    INT_ATTR(legend_justification)
+   
+/* Debugging */
+   INT_ATTR(debug_verbosity_level)
 
 #define attr_reader(attr) rb_define_method(cFM, #attr , FM_##attr##_get, 0);
 #define attr_writer(attr) rb_define_method(cFM, #attr "=", FM_##attr##_set, 1);
@@ -609,6 +612,9 @@ void Init_FigureMaker(void) {
    attr_accessors(legend_scale)
    attr_accessors(legend_alignment)
    attr_accessors(legend_justification)
+   
+/* Debugging */
+   attr_accessors(debug_verbosity_level)
       
    rb_require("Tioga/FigMkr.rb");
    /* We now need to import the symbols */
