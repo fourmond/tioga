@@ -31,7 +31,6 @@ ID tex_preview_figure_width_ID, tex_preview_figure_height_ID;
 ID do_cmd_ID, initialized_ID, tex_xoffset_ID, tex_yoffset_ID;
 ID tex_preview_fontsize_ID, tex_preview_fontfamily_ID, tex_preview_fontseries_ID, tex_preview_fontshape_ID;
 
-
 void Init_IDs(void)
 {
    rb_Numeric_class = rb_define_class("Numeric", rb_cObject);
@@ -367,6 +366,15 @@ char *Get_tex_preview_fontshape(VALUE fmkr) {
    VALUE v = rb_ivar_get(fmkr, tex_preview_fontshape_ID);
    if (v == Qnil) return NULL;
    return StringValuePtr(v);
+}
+
+/* gets the generated preamble */
+char *Get_tex_preview_generated_preamble(VALUE fmkr) {
+  /* it is a class constant... */
+  VALUE v = rb_const_get(CLASS_OF(fmkr), 
+			 rb_intern("TEX_PREAMBLE"));
+  if (v == Qnil) return NULL;
+  return StringValuePtr(v);
 }
 
 

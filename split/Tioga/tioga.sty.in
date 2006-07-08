@@ -1,0 +1,80 @@
+% Here are some command to ease the use of pictures produced by Tioga
+% within a LaTeX document.
+
+
+% \tiogafigureshow  shows the figure and the accompanying text
+% at the size it was made
+\newcommand{\tiogafigureshow}[1]{
+  \rotatebox{0.0}{
+    \begin{picture}(0,0)(0,0)
+      \includegraphics[scale=1.0,clip]{#1_figure.pdf}
+    \end{picture}
+    \input{#1_figure.txt}}}
+
+% \tiogafigurescaled  shows a scaled version of the picture
+% The 1st arg is the base name for the pdf and txt files.
+% The 2nd arg determines the scale.
+\newcommand{\tiogafigurescaled}[2]{
+  \scalebox{#2}{\tiogafigureshow{#1}}}
+
+% \tiogafigurescaledxy shows a scaled version of the picture where you
+% can choose not to respect the original aspect ratio. Watch out for ugly
+% text !!!
+% The 1st arg is the base name for the pdf and txt files.
+% The 2nd arg determines the horizontal scale.
+% The 3rd arg determines the vertical scale.
+\newcommand{\tiogafigurescaledxy}[3]{
+  \scalebox{#2}[#3]{\tiogafigureshow{#1}}}
+
+% \tiogafiguresized shows a scaled version of the picture, where you
+% can specify the actual size it ought to take. Be careful however, as
+% during LaTeX processing, some rounding errors can occur: you might not
+% get exactly the size you asked for.
+% The 1st arg is the base name for the pdf and txt files.
+% The 2nd arg determines the figure width.
+% The 3rd arg determines the figure height.
+\newcommand{\tiogafiguresized}[3]{
+  \resizebox{#2}{#3}{\tiogafigureshow{#1}}}
+
+% \tiogafiguresized shows a version of the picture who takes as much
+% place as possible while keeping the aspect ratio. 
+\newcommand{\tiogafigure}[1]{
+  \tiogafiguresized{#1}{\columnwidth}{!}}
+
+% Commands for text properties:
+% Font size (two parameters)
+% {sz}{line_sp}, 1st is size of font in points,
+% 2nd is line spacing (not often used by Tioga, it is therefore optionnal)
+\newcommand\tiog@fontsize{{{10.0}{10pt}}}
+\newcommand\settiogafontsize[2][10pt]{\renewcommand\tiog@fontsize{{#2}{#1}}}
+
+% Font family
+% \rmdefault, \sfdefault, \ttdefault  -- roman, sans serif, typewriter
+\newcommand\tiog@fontfamily{\rmdefault}
+\newcommand\settiogafontfamily[1]{\renewcommand\tiog@fontfamily{#1}}
+
+% Font series
+% \mddefault, \bfdefault -- medium, bold 
+\newcommand\tiog@fontseries{\mddefault}
+\newcommand\settiogafontseries[1]{\renewcommand\tiog@fontseries{#1}}
+
+% Font shape
+% \updefault, \itdefault, \sldefault, \scdefault -- upright, italic, slant, small caps
+\newcommand\tiog@fontshape{\updefault}
+\newcommand\settiogafontshape[1]{\renewcommand\tiog@fontshape{#1}}
+
+% \SetTiogaFontInfo is called from within the figure.txt file with the TeX
+% for the text of the figure. Do not modify this function directly, it
+% is way better to use the previous settiogafont* commands.
+\newcommand\SetTiogaFontInfo{%
+\expandafter\fontsize\tiog@fontsize%
+\fontfamily{\tiog@fontfamily}% 
+\fontseries{\tiog@fontseries}%
+\fontshape{\tiog@fontshape}%
+}
+
+% This command is used inside the _figure.txt files. You can use it directly
+% as well, if you really want to make sure you get the same fonts. But I
+% personnaly doubt it would really come in useful ;-)...
+\newcommand\tiogasetfont{\reset@font\SetTiogaFontInfo%
+\selectfont}%

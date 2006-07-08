@@ -93,6 +93,9 @@ module Mkmf2
   # we are currently building.
   @@entities = []
 
+  # User-defined rules:
+  @@user_rules = []
+
 
   # we first start the module with a whole bunch of small subclasses
   # that will come in really useful later.
@@ -535,7 +538,13 @@ module Mkmf2
                        skip = /~$/, &b)
     source_files = []
     for glob in files
-      source_files += Dir[glob]
+      # If glob looks like a glob, we use Dir.glob, else we add it
+      # without modification
+      if glob =~ /\*|\[|\?/
+        source_files += Dir[glob]
+      else
+        source_files << glob
+      end
     end
     install_hash = {}
     for f in source_files
@@ -686,6 +695,10 @@ module Mkmf2
     return "$(#{str})"
   end
 
+
+  # A constant to get a configuration variable
+  MAKE_VARIABLE = /\$\((\w+)\)/
+
   # Returns a string containing all the configuration variables. We
   # use the MAKEFILE_CONFIG for more flexibility in the Makefile: the
   # variables can then be redefined on the make command-line.
@@ -700,7 +713,7 @@ module Mkmf2
       new_keys = []
       keys.each do |k|
         if MAKEFILE_CONFIG.key? k
-          MAKEFILE_CONFIG[k].gsub(/\$\((\w+)\)/) { |k|
+          MAKEFILE_CONFIG[k].gsub(MAKE_VARIABLE) { |k|
             # we add the key to the list only if it exists, else the
             # environment variable gets overridden by what is written
             # in the Makefile (for $HOME, for instance)
@@ -711,7 +724,11 @@ module Mkmf2
     end until (keys + new_keys).uniq.length == keys.length
     
     for var in keys.uniq.sort
-      str += "#{var}=#{MAKEFILE_CONFIG[var]}\n"
+      # We output the variable only if it is not empty: makes
+      # it a lot easier to modify them from outside...
+      if MAKEFILE_CONFIG[var] =~ /\S/
+        str += "#{var}=#{MAKEFILE_CONFIG[var]}\n"
+      end
     end
     return str
   end
@@ -1081,8 +1098,16 @@ module Mkmf2
                        [Mkmf2.rule('remove',"**/*~")], # remove archive files
                        # by default in the clean target.
                        clean["deps"]).to_s
+
+    # Add a distclean rule, to make debuild happy.
+    f.print <<"EOR"
+distclean: clean 
+\t@-$(RM) Makefile extconf.h conftest.* mkmf.log
+\t@-$(RM) core ruby$(EXEEXT) *~ $(DISTCLEANFILES) 
+EOR
+
     # Phony targets:
-    f.puts ".PHONY: clean build install uninstall"
+    f.puts ".PHONY: build install uninstall"
 
     f.puts "# Common rules:"
     common.each {|v|
@@ -1114,9 +1139,28 @@ module Mkmf2
       f.print rule.to_s
     end
 
+    if @@user_rules.length > 0
+      f.puts "\n# User-defined rules"
+      for rule in @@user_rules
+        f.puts rule.to_s
+      end
+    end
+
 
     f.close # not necessary, but good practice ;-) ?? 
 
+  end
+
+  # Adds a custom rule to the Makefile. If only the first argument
+  # is specified, it is written as is to the Makefile. If at least the
+  # second or the third is non-nil, a MfRule is created with the arguments
+  # and written to the Makefile.
+  def custom_rule(str, rule = nil, deps = nil)
+    if rule || deps 
+      @@user_rules  << MfRule.new(str, rule, deps)
+    else
+      @@user_rules << str
+    end
   end
 
   # *The* compatibility function with the mkmf.rb !

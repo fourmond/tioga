@@ -280,6 +280,7 @@ void Init_FigureMaker(void) {
    
    VALUE mTioga = rb_define_module("Tioga");
 
+
    /* and now, we need to import Dobjects and Flate modules*/
    VALUE mDobjects = rb_define_module("Dobjects");
    VALUE mFlate = rb_define_module("Flate");
@@ -287,14 +288,14 @@ void Init_FigureMaker(void) {
    rb_include_module(mTioga, mFlate);
 
    cFM = rb_define_class_under(mTioga, "FigureMaker", rb_cObject);
-   /* I don't like that much, but then, it works...
-      whereas with only the upper inclusions, it doesn't.
-      My knowledge of ruby internals is limited enough that
-      it doesn't surprise me so much... 
-   */
+
+   /* This is necessary to get the tex preamble for the previews*/
+   rb_require("Tioga/TexPreamble.rb");
+
+   /* Inclusion of the external objects to get them easily */
    rb_include_module(cFM, mDobjects);
    rb_include_module(cFM, mFlate);
-   /* end of thing which I don't like -- Vincent Fourmond */
+
    rb_define_alloc_func(cFM, FM_alloc);
    Init_IDs();
    Init_Font_Dictionary();

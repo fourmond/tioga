@@ -16,10 +16,21 @@ end
 setup_dir("Flate", "", "Flate", "") do |l,b,i|
   b.add_sources("symbols.c")
 end
-setup_dir("Tioga", "Tioga", 
-          "Tioga/FigureMaker", "") do |l,b,i|
-  b.add_sources("symbols.c")
-end
+
+# We declare Tioga by hand, as an automatic generation would not
+# take lib/TexPreamble.rb into accound (missing).
+declare_library("Tioga", "Tioga/lib/**/*.rb", 
+                "Tioga/lib/TexPreamble.rb")
+declare_binary_library("Tioga/FigureMaker", 
+                       "Tioga/**/*.c", "symbols.c")
+
+# The preamble stuff:
+custom_rule("Tioga/lib/TexPreamble.rb", 
+            [ "cd Tioga; " + Mkmf2.config_var("RUBY_INSTALL_NAME") + 
+              " mk_tioga_sty.rb"],
+            ["Tioga/lib/ColorConstants.rb",
+             "Tioga/tioga.sty.in"]
+            )
 
 # we check the presence of zlib library
 have_header("zlib.h")

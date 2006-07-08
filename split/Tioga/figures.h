@@ -773,6 +773,8 @@ extern char *Get_tex_preview_fontfamily(VALUE fmkr);
 extern char *Get_tex_preview_fontseries(VALUE fmkr);
 extern char *Get_tex_preview_fontshape(VALUE fmkr);
 
+extern char *Get_tex_preview_generated_preamble(VALUE fmkr);
+
 #ifndef USE_P
 #define USE_P p = NULL;
 #endif

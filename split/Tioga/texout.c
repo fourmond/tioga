@@ -240,6 +240,10 @@ void Close_tex(VALUE fmkr, bool quiet_mode)
 
 void Write_preview_header(VALUE fmkr, FILE *file) {
    fprintf(file, "\\documentclass{%s}\n\n", Get_tex_preview_documentclass(fmkr));
+   /* we print out the preamble generated from tioga.sty.in */
+   fprintf(file, "%% Tioga preamble generated from tioga.sty.in\n");
+   fprintf(file, "%s\n", Get_tex_preview_generated_preamble(fmkr));
+   fprintf(file, "%% User-specified preamble\n");
    fprintf(file, "%s\n\n", Get_tex_preview_preamble(fmkr));
    fprintf(file, "%% Set page margins.\n");
    fprintf(file, "\t\\setlength{\\topmargin}{0pt}\n");
@@ -257,41 +261,11 @@ void Write_preview_header(VALUE fmkr, FILE *file) {
 
    fprintf(file, "\n%% We need the graphicx package.\n");
    fprintf(file, "\t\\usepackage{graphicx}\n\n");
-   fprintf(file, "%% Here are some commands for doing Tioga figures.\n");
-   
-   
-   fprintf(file, "\\newcommand{\\TiogaFigureShow}[1]{\n\t\\rotatebox{0.0}{\n");
-   fprintf(file, "\t\\begin{picture}(0,0)(0,0)\n");
-   fprintf(file, "\t\\includegraphics[scale=1.0,clip]{#1_figure.pdf}\n");
-   fprintf(file, "\t\\end{picture}\n");
-   fprintf(file, "\t\\input{#1_figure.txt}}}\n\n");
-
-   fprintf(file, "\\newcommand{\\TiogaFigureScaled}[2]{\n");
-   fprintf(file, "\t\\scalebox{#2}{\\TiogaFigureShow{#1}}}\n");
-   fprintf(file, "\t%% The 1st arg is the base name for the pdf and txt files.\n");
-   fprintf(file, "\t%% The 2nd arg determines the scale.\n\n");
-
-   fprintf(file, "\\newcommand{\\TiogaFigureScaledXY}[3]{\n");
-   fprintf(file, "\t\\scalebox{#2}[#3]{\\TiogaFigureShow{#1}}}\n");
-   fprintf(file, "\t%% The 1st arg is the base name for the pdf and txt files.\n");
-   fprintf(file, "\t%% The 2nd arg determines the horizontal scale.\n");
-   fprintf(file, "\t%% The 3rd arg determines the vertical scale.\n\n");
-   
-   fprintf(file, "\\newcommand{\\TiogaFigureSized}[3]{\n\t\\resizebox{#2}{#3}{\\TiogaFigureShow{#1}}}\n");
-   fprintf(file, "\t%% The 1st arg is the base name for the pdf and txt files.\n");
-   fprintf(file, "\t%% The 2nd arg determines the figure width.\n");
-   fprintf(file, "\t%% The 3rd arg determines the figure height.\n\n");
-   
-   fprintf(file, "\\newcommand{\\TiogaFigure}[1]{\n\t\\TiogaFigureSized{#1}{\\columnwidth}{!}}\n\t%% The default is to resize to fit the column width.\n\n");
-      
-   fprintf(file, "\\def \\SetTiogaFontInfo\n");
-   fprintf(file, "%% this is called from within the figure.txt file with the TeX for the text of the figure\n");
-   fprintf(file, "{%% DO NOT PUT SPACES IN THE FOLLOWING FONT INFO -- they'll be added to the output text and mess up the alignment!\n");
-   fprintf(file, "\\fontsize{%s}{10pt}%% {sz}{line_sp}, 1st is size of font in points, 2nd is line spacing (not used by Tioga).\n", Get_tex_preview_fontsize(fmkr));
-   fprintf(file, "\\fontfamily{\\%s}%% \\rmdefault, \\sfdefault, \\ttdefault  -- roman, sans serif, typewriter \n", Get_tex_preview_fontfamily(fmkr));
-   fprintf(file, "\\fontseries{\\%s}%% \\mddefault, \\bfdefault -- medium, bold \n", Get_tex_preview_fontseries(fmkr));
-   fprintf(file, "\\fontshape{\\%s}%% \\updefault, \\itdefault, \\sldefault, \\scdefault -- upright, italic, slant, small caps\n", Get_tex_preview_fontshape(fmkr));
-   fprintf(file, "}\n\n");
+   /* now, the commands to customize the font used */
+   fprintf(file, "\\settiogafontsize[10pt]{%s}\n", Get_tex_preview_fontsize(fmkr));
+   fprintf(file, "\\settiogafontfamily{\\%s}\n", Get_tex_preview_fontfamily(fmkr));
+   fprintf(file, "\\settiogafontseries{\\%s}\n", Get_tex_preview_fontseries(fmkr));
+   fprintf(file, "\\settiogafontshape{\\%s}\n", Get_tex_preview_fontshape(fmkr));
 }
 
    
@@ -322,7 +296,7 @@ void Create_wrapper(VALUE fmkr, char *fname, bool quiet_mode)
    fprintf(file, "%% Here's the page with the figure.\n");
    fprintf(file, "\\begin{document}\n");
    fprintf(file, "\\pagestyle{%s}\n\n", Get_tex_preview_pagestyle(fmkr));   
-   fprintf(file, "\\TiogaFigureSized{%s}{%s}{%s}\n\n", simple_name, Get_tex_preview_figure_width(fmkr), Get_tex_preview_figure_height(fmkr));   
+   fprintf(file, "\\tiogafiguresized{%s}{%s}{%s}\n\n", simple_name, Get_tex_preview_figure_width(fmkr), Get_tex_preview_figure_height(fmkr));   
    fprintf(file, "\\end{document}\n");
    fclose(file);
 }
@@ -362,7 +336,7 @@ VALUE FM_private_make_portfolio(VALUE fmkr, VALUE name, VALUE filename, VALUE fi
     fig_height = Get_tex_preview_figure_height(fmkr);
     for (i=0; i < len; i++) {
         fig_str = Get_String(fignames, i);
-        fprintf(file, "\\begin{figure}\n\\TiogaFigureSized{%s}{%s}{%s}\n\\end{figure}\n\\clearpage\n\n", fig_str, fig_width, fig_height);
+        fprintf(file, "\\begin{figure}\n\\tiogafiguresized{%s}{%s}{%s}\n\\end{figure}\n\\clearpage\n\n", fig_str, fig_width, fig_height);
     }
     fprintf(file, "\\end{document}\n");
     fclose(file);
