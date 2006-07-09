@@ -254,8 +254,9 @@ void Write_preview_header(VALUE fmkr, FILE *file) {
    fprintf(file, "\t\\setlength{\\hoffset}{%s}\n", Get_tex_preview_hoffset(fmkr));
    fprintf(file, "\t\\setlength{\\voffset}{%s}\n", Get_tex_preview_voffset(fmkr));
 
-   fprintf(file, "\n%% We need the graphicx package.\n");
-   fprintf(file, "\t\\usepackage{graphicx}\n\n");
+   fprintf(file, "\n%% We need the graphicx package and the calc package.\n");
+   fprintf(file, "\t\\usepackage{graphicx}\n");
+   fprintf(file, "\t\\usepackage{calc}\n\n");
    /* now, the commands to customize the font used */
    fprintf(file, "\\settiogafontsize[10pt]{%s}\n", Get_tex_preview_fontsize(fmkr));
    fprintf(file, "\\settiogafontfamily{\\%s}\n", Get_tex_preview_fontfamily(fmkr));
@@ -290,8 +291,9 @@ void Create_wrapper(VALUE fmkr, char *fname, bool quiet_mode)
 
    fprintf(file, "%% Here's the page with the figure.\n");
    fprintf(file, "\\begin{document}\n");
-   fprintf(file, "\\pagestyle{%s}\n\n", Get_tex_preview_pagestyle(fmkr));   
-   fprintf(file, "\\tiogafiguresized{%s}{%s}{%s}\n\n", simple_name, Get_tex_preview_figure_width(fmkr), Get_tex_preview_figure_height(fmkr));   
+   fprintf(file, "\\pagestyle{%s}\n", Get_tex_preview_pagestyle(fmkr));
+   fprintf(file, "\\%s{%s}{%s}{%s}\n", Get_tex_preview_tiogafigure_command(fmkr), simple_name, 
+        Get_tex_preview_figure_width(fmkr), Get_tex_preview_figure_height(fmkr)); 
    fprintf(file, "\\end{document}\n");
    fclose(file);
 }
@@ -313,7 +315,7 @@ VALUE FM_private_make_portfolio(VALUE fmkr, VALUE name, VALUE filename, VALUE fi
     FM *p = Get_FM(fmkr);
     FILE *file;
     VALUE figname;
-    char *fname, *fig_str, *fig_width, *fig_height;
+    char *fname, *cmd_str, *fig_str, *fig_width, *fig_height;
     int i, len;
     name = rb_String(name);
     filename = rb_String(filename);
@@ -329,9 +331,11 @@ VALUE FM_private_make_portfolio(VALUE fmkr, VALUE name, VALUE filename, VALUE fi
     len = RARRAY(fignames)->len;
     fig_width = Get_tex_preview_figure_width(fmkr);
     fig_height = Get_tex_preview_figure_height(fmkr);
+    cmd_str = Get_tex_preview_tiogafigure_command(fmkr);
     for (i=0; i < len; i++) {
         fig_str = Get_String(fignames, i);
-        fprintf(file, "\\begin{figure}\n\\tiogafiguresized{%s}{%s}{%s}\n\\end{figure}\n\\clearpage\n\n", fig_str, fig_width, fig_height);
+        fprintf(file, "\\begin{figure}\n\\%s{%s}{%s}{%s}\n\\end{figure}\n\\clearpage\n\n", 
+            cmd_str, fig_str, fig_width, fig_height);
     }
     fprintf(file, "\\end{document}\n");
     fclose(file);

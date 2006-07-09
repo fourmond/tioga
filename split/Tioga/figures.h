@@ -768,6 +768,8 @@ extern char *Get_tex_preview_voffset(VALUE fmkr);
 extern char *Get_tex_preview_figure_width(VALUE fmkr);
 extern char *Get_tex_preview_figure_height(VALUE fmkr);
 
+extern char *Get_tex_preview_tiogafigure_command(VALUE fmkr);
+
 extern char *Get_tex_preview_fontsize(VALUE fmkr);
 extern char *Get_tex_preview_fontfamily(VALUE fmkr);
 extern char *Get_tex_preview_fontseries(VALUE fmkr);

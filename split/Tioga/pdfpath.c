@@ -195,11 +195,11 @@ VALUE FM_line_type_set(VALUE fmkr, VALUE line_type)
 
 long c_round_dev(FM *p, double v) { // make sure that we don't get too far out or can overflow!
     if (v > MAX_DEV_COORD_ALLOWED) {
-        if (p->debug_verbosity_level > 0) printf("c_round_dev clipping %g\n", v);
+        //if (p->debug_verbosity_level > 0) printf("c_round_dev clipping %g\n", v);
         return iMAX_DEV_COORD_ALLOWED;
     }
     if (v < -MAX_DEV_COORD_ALLOWED) {
-        if (p->debug_verbosity_level > 0) printf("c_round_dev clipping %g\n", v);
+        //if (p->debug_verbosity_level > 0) printf("c_round_dev clipping %g\n", v);
         return -iMAX_DEV_COORD_ALLOWED;
     }
     return ROUND(v);

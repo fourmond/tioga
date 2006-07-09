@@ -11,7 +11,7 @@ class MyFigures
 
     def initialize
         @figure_maker = FigureMaker.default
-        
+                
         t.save_dir = 'figures_out'
         t.def_eval_function { |str| eval(str) }
 
@@ -52,6 +52,8 @@ class MyFigures
         t.def_figure("Colors4") { colors4 }
         
         hues
+        
+        t.set_A4_portrait
         
         if false
             file = File.open('color_names.tex', 'w')

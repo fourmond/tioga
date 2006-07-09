@@ -96,6 +96,7 @@ class FigureMaker
     attr_accessor :tex_preview_fontshape
     
     attr_accessor :tex_preview_pagestyle
+    attr_accessor :tex_preview_tiogafigure_command
     
     attr_accessor :tex_xoffset
     attr_accessor :tex_yoffset
@@ -133,14 +134,17 @@ class FigureMaker
     \usepackage[pdftex]{geometry} % need this for setting page size for preview
 '
         @tex_preview_pagestyle = 'empty'
+        @tex_preview_tiogafigure_command = 'tiogafigurescaledtofit'
+        @tex_preview_figure_width = '\paperwidth - 2in'
+        @tex_preview_figure_height = '\paperheight - 2in'
         
         @num_error_lines = 6
 
         @tex_xoffset = -0.2
         @tex_yoffset = -3.55
         
-        @tex_preview_hoffset = '-0.5in'
-        @tex_preview_voffset = '-0.25in'
+        @tex_preview_hoffset = '0in'
+        @tex_preview_voffset = '0in'
         
         @tex_preview_fontsize = '10.0'  
         @tex_preview_fontfamily = 'rmdefault'
@@ -194,93 +198,69 @@ class FigureMaker
         self.tex_preview_fontsize = sprintf("%0.2fbp", size)
     end
     
-    def set_A4_landscape(fig_width = '!', fig_height = '184mm')
+    def set_A4_landscape
         self.tex_preview_paper_width = '297mm'
         self.tex_preview_paper_height = '210mm'
-        self.tex_preview_figure_width = fig_width
-        self.tex_preview_figure_height = fig_height
     end
      
-    def set_A4_portrait(fig_width = '184mm', fig_height = '!')
+    def set_A4_portrait
         self.tex_preview_paper_width = '210mm'
         self.tex_preview_paper_height = '297mm'
-        self.tex_preview_figure_width = fig_width
-        self.tex_preview_figure_height = fig_height
     end
 
     
-    def set_A5_landscape(fig_width = '!', fig_height = '122mm')
+    def set_A5_landscape
         self.tex_preview_paper_width = '210mm'
         self.tex_preview_paper_height = '148mm'
-        self.tex_preview_figure_width = fig_width
-        self.tex_preview_figure_height = fig_height
     end
 
-    def set_A5_portrait(fig_width = '122mm', fig_height = '!')
+    def set_A5_portrait
         self.tex_preview_paper_width = '148mm'
         self.tex_preview_paper_height = '210mm'
-        self.tex_preview_figure_width = fig_width
-        self.tex_preview_figure_height = fig_height
     end
 
     
-    def set_B5_landscape(fig_width = '!', fig_height = '150mm')
+    def set_B5_landscape
         self.tex_preview_paper_width = '250mm'
         self.tex_preview_paper_height = '176mm'
-        self.tex_preview_figure_width = fig_width
-        self.tex_preview_figure_height = fig_height
     end
 
-    def set_B5_portrait(fig_width = '150mm', fig_height = '!')
+    def set_B5_portrait
         self.tex_preview_paper_width = '176mm'
         self.tex_preview_paper_height = '250mm'
-        self.tex_preview_figure_width = fig_width
-        self.tex_preview_figure_height = fig_height
     end
 
     
-    def set_JB5_landscape(fig_width = '!', fig_height = '156mm')
+    def set_JB5_landscape
         self.tex_preview_paper_width = '256mm'
         self.tex_preview_paper_height = '182mm'
-        self.tex_preview_figure_width = fig_width
-        self.tex_preview_figure_height = fig_height
     end
 
-    def set_JB5_portrait(fig_width = '157mm', fig_height = '!')
+    def set_JB5_portrait
         self.tex_preview_paper_width = '182mm'
         self.tex_preview_paper_height = '257mm'
-        self.tex_preview_figure_width = fig_width
-        self.tex_preview_figure_height = fig_height
     end
 
     
-    def set_USLetter_landscape(fig_width = '!', fig_height = '7.5in')
+    def set_USLetter_landscape
         self.tex_preview_paper_width = '11in'
         self.tex_preview_paper_height = '8.5in'
-        self.tex_preview_figure_width = fig_width
-        self.tex_preview_figure_height = fig_height
     end
      
-    def set_USLetter_portrait(fig_width = '7.5in', fig_height = '!')
+    def set_USLetter_portrait
         self.tex_preview_paper_width = '8.5in'
         self.tex_preview_paper_height = '11in'
-        self.tex_preview_figure_width = fig_width
-        self.tex_preview_figure_height = fig_height
     end
    
      
-    def set_USLegal_portrait(fig_width = '7.5in', fig_height = '!')
+    def set_USLegal_portrait
         self.tex_preview_paper_width = '8.5in'
         self.tex_preview_paper_height = '14in'
-        self.tex_preview_figure_width = fig_width
-        self.tex_preview_figure_height = fig_height
     end
     
-    def set_USLegal_landscape(fig_width = '!', fig_height = '7.5in')
+    def set_USLegal_landscape
         self.tex_preview_paper_width = '14in'
         self.tex_preview_paper_height = '8.5in'
-        self.tex_preview_figure_width = fig_width
-        self.tex_preview_figure_height = fig_height
     end
 
     

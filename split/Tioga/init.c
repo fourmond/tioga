@@ -27,7 +27,7 @@ ID save_dir_ID, model_number_ID, add_model_number_ID, quiet_mode_ID;
 ID tex_preview_documentclass_ID, tex_preview_preamble_ID, tex_preview_pagestyle_ID;
 ID tex_preview_paper_width_ID, tex_preview_paper_height_ID;
 ID tex_preview_hoffset_ID, tex_preview_voffset_ID;
-ID tex_preview_figure_width_ID, tex_preview_figure_height_ID;
+ID tex_preview_figure_width_ID, tex_preview_figure_height_ID, tex_preview_tiogafigure_command_ID;
 ID do_cmd_ID, initialized_ID, tex_xoffset_ID, tex_yoffset_ID;
 ID tex_preview_fontsize_ID, tex_preview_fontfamily_ID, tex_preview_fontseries_ID, tex_preview_fontshape_ID;
 
@@ -55,6 +55,8 @@ void Init_IDs(void)
     tex_preview_voffset_ID = rb_intern("@tex_preview_voffset");
     tex_preview_figure_width_ID = rb_intern("@tex_preview_figure_width");
     tex_preview_figure_height_ID = rb_intern("@tex_preview_figure_height");
+
+    tex_preview_tiogafigure_command_ID = rb_intern("@tex_preview_tiogafigure_command");
     
     tex_preview_fontsize_ID = rb_intern("@tex_preview_fontsize");
     tex_preview_fontfamily_ID = rb_intern("@tex_preview_fontfamily");
@@ -401,6 +403,12 @@ char *Get_tex_preview_preamble(VALUE fmkr) {
 
 char *Get_tex_preview_pagestyle(VALUE fmkr) {
    VALUE v = rb_ivar_get(fmkr, tex_preview_pagestyle_ID);
+   if (v == Qnil) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_preview_tiogafigure_command(VALUE fmkr) {
+   VALUE v = rb_ivar_get(fmkr, tex_preview_tiogafigure_command_ID);
    if (v == Qnil) return NULL;
    return StringValuePtr(v);
 }
