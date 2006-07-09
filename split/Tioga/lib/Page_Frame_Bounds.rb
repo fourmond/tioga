@@ -54,33 +54,33 @@ tioga output page had when it was created, you can now rescale it to whatever si
 attributes tex_preview_figure_width and tex_preview_figure_height.  These sizes are also given as TeX strings.  I suggest opening
 a preview TeX file in your favorite TeX editor and taking a look.  In the heading of the file, you'll find various "setlength" commands for setting the
 paper size and the offsets.  Try changing these by hand in the TeX editor and retypesetting the page.  The values for the figure
-size will be found in the call on the TiogaFigureSized command from inside the document body at the bottom of the file.
+size will be found in the call on the tiogafiguresized command from inside the document body at the bottom of the file.
 It looks something like this:
 
         % Here's the page with the figure.
         \begin{document}
         \pagestyle{empty}
 
-        \TiogaFigureSized{MyPlot}{!}{184mm}
+        \tiogafiguresized{MyPlot}{!}{184mm}
 
         \end{document}
 
-The TiogaFigureSized routine is included in the preamble section -- it takes the name of the plot ("MyPlot" in this case),
+The tiogafiguresized routine is included in the preamble section -- it takes the name of the plot ("MyPlot" in this case),
 and specification strings for the width and height in the second and third arguments.  In the example, we're
 setting the height to 184mm; the "!" for the width means that the width will be scaled the same as the height to keep
 the aspect ratio of the figure unchanged.  As you did for the page size, try editing the figure size arguments
-in the TeX editor.  If you want to give a relative scale for the figure size, use the TiogaFigureScaled command;
-if you want different horizontal and vertical scales, use TiogaFigureScaledXY.
+in the TeX editor.  If you want to give a relative scale for the figure size, use the tiogafigurescaled command;
+if you want different horizontal and vertical scales, use tiogafigurescaledxy.
 
 Once you've finished creating a figure and have previewed it, you'll probably want to put it in a document.  One option
 is to use the PDF file created for previewing directly in the document with something like "includegraphics" -- you can see how this is done
-by looking at the TiogaFigureShow command in the preview TeX file.  However, if you are doing a set of figures
+by looking at the tiogafigureshow command in the preview TeX file.  However, if you are doing a set of figures
 that should have a coordinated appearance, such as sharing the same fonts, it is probably better to recreate the
 figure when the document is typeset in the same manner that the PDF preview is produced in the preview TeX file: include
-a copy of the TiogaFigure commands and use calls on them to place the figures in the document.  By doing this, you
+a copy of the tiogafigure commands and use calls on them to place the figures in the document.  By doing this, you
 "delay binding" of the selection of fonts for the figures until the last possible moment.  An entire set of figures
-can be redone with a different typeface simply by retypesetting the TeX after changing the SetTiogaFontInfo definitions
-in the preamble.
+can be redone with a different typeface simply by retypesetting the TeX  with the help of the various settiogafont... 
+LaTeX commands.
 
 For more information about font selection, see TeX_Text.
 

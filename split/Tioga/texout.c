@@ -74,10 +74,10 @@ void tex_show_rotated_text(FM *p, char *text, double x, double y, double scale, 
    bbox_urx = MAX(bbox_urx, x + sz);
    bbox_ury = MAX(bbox_ury, y + sz);
    if (angle != 0.0)
-      fprintf(fp,"\\put(%d,%d){\\rotatebox{%.1f}{\\scalebox{%.2f}{\\makebox(0,0)[%c%c]{\\FF",
+      fprintf(fp,"\\put(%d,%d){\\rotatebox{%.1f}{\\scalebox{%.2f}{\\makebox(0,0)[%c%c]{\\tiogasetfont",
             ROUND(x), ROUND(y), angle, scale, jst, ref);
    else
-      fprintf(fp,"\\put(%d,%d){\\scalebox{%.2f}{\\makebox(0,0)[%c%c]{\\FF",
+      fprintf(fp,"\\put(%d,%d){\\scalebox{%.2f}{\\makebox(0,0)[%c%c]{\\tiogasetfont",
             ROUND(x), ROUND(y), scale, jst, ref);
    fprintf(fp, (alignment == ALIGNED_AT_BASELINE)? "{%s\\BS" : "{%s", text);
    fprintf(fp, angle != 0? "}}}}}\n" : "}}}}\n");
@@ -211,11 +211,6 @@ void Open_tex(VALUE fmkr, char *filename, bool quiet_mode)
    Get_tex_name(ofile, filename, 300);
    fp = fopen(ofile, "w");
    fprintf(fp,"\\setlength{\\unitlength}{%fbp}%%\n", 1.0/ENLARGE);
-   fprintf(fp,"\\begingroup\\makeatletter\\ifx\\SetFigFont\\undefined%%\n");
-   fprintf(fp,"\\gdef\\FF{%%\n");
-   fprintf(fp,"\\reset@font\\SetTiogaFontInfo%%\n");
-   fprintf(fp,"\\selectfont}%%\n");
-   fprintf(fp,"\\fi\\endgroup%%\n"); 
    cur_pos = ftell(fp);
    fprintf(fp,"\\begin{picture}(xxxxxx,xxxxxx)            %% (width,height)(xoffset,yoffset) -- Adjust the 2nd pair for registration adjustments\n"); /* this line is rewritten at the end */
    fprintf(fp,"\\def\\BS{\\phantom{\\Huge\\scalebox{0}[2]{\\hbox{\\rotatebox{180}{O}O}}}}\n"); 
