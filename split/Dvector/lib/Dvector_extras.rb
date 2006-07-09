@@ -60,15 +60,6 @@ class Float
         end
     end
     
-    # a safe function that will return nil if the string is not a valid
-    # number
-    def Float.from_s(str)
-      if str =~ /^\s*[\d.]/
-        return str.to_s
-      else
-        return nil
-      end
-    end
 end
 
 class Fixnum
@@ -176,10 +167,9 @@ module Dobjects
         # now, the fun: the actual reading.
         # we first turn this elements into floats:
         numbers = elements.collect do |s| 
-          a = Float.from_s(s)
-          if a
-            a
-          else
+          begin 
+            a = Float(s)
+          rescue
             o["default"]
           end
         end

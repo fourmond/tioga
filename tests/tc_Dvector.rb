@@ -693,6 +693,15 @@ class TestDvector < Test::Unit::TestCase
 1.2
 EOT
 
+    FANCY_READ_TEXT_2 = <<"EOT"
+# some comments
+
+# and a blank line above
+-1.2  2.4
+-1.3 2.4\t3.5
+-1.2
+EOT
+
     def test_fancy_read 
       stream = StringIO.new(FANCY_READ_TEXT)
       cols = Dvector.fancy_read(stream, nil, 'default'=> 0.0)
@@ -706,6 +715,14 @@ EOT
       cols = Dvector.fancy_read(stream, [1,2], 'default'=> 0.0)
       assert_equal(cols[0], cols2[1])
       assert_equal(cols[1], cols2[2])
+
+      stream = StringIO.new(FANCY_READ_TEXT_2)
+      cols = Dvector.fancy_read(stream, nil, 'default'=> 0.0)
+      cols2 = [Dvector[-1.2, -1.3, -1.2], Dvector[2.4, 2.4, 0.0],
+               Dvector[0.0, 3.5, 0.0]]
+      3.times do |i|
+        assert_equal(cols[i], cols2[i])
+      end
 
     end
 
