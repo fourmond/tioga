@@ -106,6 +106,7 @@ class FigureMaker
     attr_accessor :tex_preview_paper_width, :tex_preview_paper_height
     attr_accessor :tex_preview_hoffset, :tex_preview_voffset
     attr_accessor :tex_preview_figure_width, :tex_preview_figure_height
+    attr_accessor :tex_preview_minwhitespace, :tex_preview_fullpage
 
     # Whether or not to create +save_dir+ if it doesn't exist
     attr_accessor :create_save_dir
@@ -134,6 +135,10 @@ class FigureMaker
     \usepackage[pdftex]{geometry} % need this for setting page size for preview
 '
         @tex_preview_pagestyle = 'empty'
+        
+        @tex_preview_fullpage = true
+        @tex_preview_minwhitespace = nil # use default
+        
         @tex_preview_tiogafigure_command = 'tiogafigurescaledtofit'
         @tex_preview_figure_width = '\paperwidth - 2in'
         @tex_preview_figure_height = '\paperheight - 2in'

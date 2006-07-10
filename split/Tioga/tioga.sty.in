@@ -2,8 +2,66 @@
 % within a LaTeX document.
 
 
-% \tiogafigureshow  shows the figure and the accompanying text
-% at the size it was made
+% \tiogafigurefullpage[minwhitespace]{figurename}
+%
+% \tiogafigurefullpage shows a version of the picture scaled to fit the 
+% paper size minus the minwhitespace.  The minwhitespace is the sum of 
+% the margins on both sides, top and bottom or left and right. 
+% The minwhitespace defaults to 2 inches.
+%
+\newcommand{\tiogafigurefullpage}[2][2in]{
+  \tiogafigurescaledtofit{#2}{\paperwidth - (#1)}{\paperheight - (#1)}}
+
+
+% \tiogafigurescaledtofit{figurename}{maxwidth}{maxheight}
+%
+% \tiogafigurescaledtofit shows a version of the picture scaled to fit the
+% given width and height while preserving the aspect ratio.
+% The 1st arg is the base name for the pdf and txt files.
+% The 2nd arg determines the maximum figure width.
+% The 3rd arg determines the maximum figure height.
+\newcommand{\tiogafigurescaledtofit}[3]{
+  \setkeys{Gin}{keepaspectratio=true}
+  \resizebox{#2}{#3}{\tiogafigureshow{#1}}}
+
+
+% \tiogafigurescaled{figurename}{scalefactor}
+%
+% \tiogafigurescaled shows a scaled version of the picture
+% The 1st arg is the base name for the pdf and txt files.
+% The 2nd arg determines the scale.
+\newcommand{\tiogafigurescaled}[2]{
+  \scalebox{#2}{\tiogafigureshow{#1}}}
+
+
+% \tiogafigurescaledxy{figurename}{xscalefactor}{yscalefactor}
+%
+% \tiogafigurescaledxy shows a scaled version of the picture where you
+% can use different scaling factors in the horizontal and vertical directions.
+% The 1st arg is the base name for the pdf and txt files.
+% The 2nd arg determines the horizontal scale.
+% The 3rd arg determines the vertical scale.
+\newcommand{\tiogafigurescaledxy}[3]{
+  \scalebox{#2}[#3]{\tiogafigureshow{#1}}}
+
+
+% \tiogafiguresized{figurename}{figurewidth}{figureheight}
+%
+% \tiogafiguresized shows a scaled version of the picture, where you
+% can specify the actual size you want.  If either length is
+% given as !, the one scale factor is used in both directions.
+% The 1st arg is the base name for the pdf and txt files.
+% The 2nd arg determines the figure width.
+% The 3rd arg determines the figure height.
+\newcommand{\tiogafiguresized}[3]{
+  \resizebox{#2}{#3}{\tiogafigureshow{#1}}}
+
+
+% \tiogafigureshow{figurename}
+%
+% \tiogafigureshow  shows the figure and the accompanying text.
+% Inside a box, it first creates a picture that includes the pdf
+% file with the graphics for the figure, then it includes the text.
 \newcommand{\tiogafigureshow}[1]{
   \rotatebox{0.0}{
     \begin{picture}(0,0)(0,0)
@@ -11,48 +69,12 @@
     \end{picture}
     \input{#1_figure.txt}}}
 
-% \tiogafigurescaled  shows a scaled version of the picture
-% The 1st arg is the base name for the pdf and txt files.
-% The 2nd arg determines the scale.
-\newcommand{\tiogafigurescaled}[2]{
-  \scalebox{#2}{\tiogafigureshow{#1}}}
 
-% \tiogafigurescaledxy shows a scaled version of the picture where you
-% can choose not to respect the original aspect ratio. Watch out for ugly
-% text !!!
-% The 1st arg is the base name for the pdf and txt files.
-% The 2nd arg determines the horizontal scale.
-% The 3rd arg determines the vertical scale.
-\newcommand{\tiogafigurescaledxy}[3]{
-  \scalebox{#2}[#3]{\tiogafigureshow{#1}}}
-
-% \tiogafiguresized shows a scaled version of the picture, where you
-% can specify the actual size it ought to take. Be careful however, as
-% during LaTeX processing, some rounding errors can occur: you might not
-% get exactly the size you asked for.
-% The 1st arg is the base name for the pdf and txt files.
-% The 2nd arg determines the figure width.
-% The 3rd arg determines the figure height.
-\newcommand{\tiogafiguresized}[3]{
-  \resizebox{#2}{#3}{\tiogafigureshow{#1}}}
-
-% \tiogafigurescaledtofit tries to have the figure take as much space
-% as given, while optionnally keeping the aspect ratio.
-\newcommand{\tiogafigurescaledtofit}[3]{
-  \setkeys{Gin}{keepaspectratio=true}
-  \resizebox{#2}{#3}{\tiogafigureshow{#1}}}
-
-
-
-% \tiogafiguresized shows a version of the picture who takes as much
-% place as possible while keeping the aspect ratio. 
-\newcommand{\tiogafigure}[1]{
-  \tiogafiguresized{#1}{\columnwidth}{!}}
 
 % Commands for text properties:
 % Font size (two parameters)
 % {sz}{line_sp}, 1st is size of font in points,
-% 2nd is line spacing (not often used by Tioga, it is therefore optionnal)
+% 2nd is line spacing (not used by Tioga)
 \newcommand\tiog@fontsize{{{10.0}{10pt}}}
 \newcommand\settiogafontsize[2][10pt]{\renewcommand\tiog@fontsize{{#2}{#1}}}
 

@@ -767,6 +767,8 @@ extern char *Get_tex_preview_hoffset(VALUE fmkr);
 extern char *Get_tex_preview_voffset(VALUE fmkr);
 extern char *Get_tex_preview_figure_width(VALUE fmkr);
 extern char *Get_tex_preview_figure_height(VALUE fmkr);
+extern char *Get_tex_preview_minwhitespace(VALUE fmkr);
+extern bool Get_tex_preview_fullpage(VALUE fmkr);
 
 extern char *Get_tex_preview_tiogafigure_command(VALUE fmkr);
 

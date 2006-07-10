@@ -264,6 +264,24 @@ void Write_preview_header(VALUE fmkr, FILE *file) {
    fprintf(file, "\\settiogafontshape{\\%s}\n", Get_tex_preview_fontshape(fmkr));
 }
 
+
+void Write_figure_command(VALUE fmkr, char *simple_name, FILE *file) {
+   char *minwhitespace;
+   
+   if (Get_tex_preview_fullpage(fmkr)) {
+        minwhitespace = Get_tex_preview_minwhitespace(fmkr);
+        if (minwhitespace == NULL) {
+            fprintf(file, "\\tiogafigurefullpage{%s}\n", simple_name); 
+        } else {
+            fprintf(file, "\\tiogafigurefullpage[%s]{%s}\n", minwhitespace, simple_name); 
+        }
+   } else {
+        fprintf(file, "\\%s{%s}{%s}{%s}\n", Get_tex_preview_tiogafigure_command(fmkr), simple_name, 
+            Get_tex_preview_figure_width(fmkr), Get_tex_preview_figure_height(fmkr)); 
+   }
+   
+}
+
    
 void Create_wrapper(VALUE fmkr, char *fname, bool quiet_mode)
 {  // create the wrapper TeX file to combine the text and graphics to make a figure
@@ -292,8 +310,7 @@ void Create_wrapper(VALUE fmkr, char *fname, bool quiet_mode)
    fprintf(file, "%% Here's the page with the figure.\n");
    fprintf(file, "\\begin{document}\n");
    fprintf(file, "\\pagestyle{%s}\n", Get_tex_preview_pagestyle(fmkr));
-   fprintf(file, "\\%s{%s}{%s}{%s}\n", Get_tex_preview_tiogafigure_command(fmkr), simple_name, 
-        Get_tex_preview_figure_width(fmkr), Get_tex_preview_figure_height(fmkr)); 
+   Write_figure_command(fmkr, simple_name, file);
    fprintf(file, "\\end{document}\n");
    fclose(file);
 }
@@ -315,7 +332,7 @@ VALUE FM_private_make_portfolio(VALUE fmkr, VALUE name, VALUE filename, VALUE fi
     FM *p = Get_FM(fmkr);
     FILE *file;
     VALUE figname;
-    char *fname, *cmd_str, *fig_str, *fig_width, *fig_height;
+    char *fname;
     int i, len;
     name = rb_String(name);
     filename = rb_String(filename);
@@ -329,13 +346,10 @@ VALUE FM_private_make_portfolio(VALUE fmkr, VALUE name, VALUE filename, VALUE fi
     fprintf(file, "%% Start of figures, one per page\n\n");
     fignames = rb_Array(fignames);
     len = RARRAY(fignames)->len;
-    fig_width = Get_tex_preview_figure_width(fmkr);
-    fig_height = Get_tex_preview_figure_height(fmkr);
-    cmd_str = Get_tex_preview_tiogafigure_command(fmkr);
     for (i=0; i < len; i++) {
-        fig_str = Get_String(fignames, i);
-        fprintf(file, "\\begin{figure}\n\\%s{%s}{%s}{%s}\n\\end{figure}\n\\clearpage\n\n", 
-            cmd_str, fig_str, fig_width, fig_height);
+        fprintf(file, "\\begin{figure}\n");
+        Write_figure_command(fmkr, Get_String(fignames, i), file);
+        fprintf(file, "\\end{figure}\n\\clearpage\n\n");
     }
     fprintf(file, "\\end{document}\n");
     fclose(file);

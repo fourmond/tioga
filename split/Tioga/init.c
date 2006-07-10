@@ -28,11 +28,13 @@ ID tex_preview_documentclass_ID, tex_preview_preamble_ID, tex_preview_pagestyle_
 ID tex_preview_paper_width_ID, tex_preview_paper_height_ID;
 ID tex_preview_hoffset_ID, tex_preview_voffset_ID;
 ID tex_preview_figure_width_ID, tex_preview_figure_height_ID, tex_preview_tiogafigure_command_ID;
+ID tex_preview_fullpage_ID, tex_preview_minwhitespace_ID;
 ID do_cmd_ID, initialized_ID, tex_xoffset_ID, tex_yoffset_ID;
 ID tex_preview_fontsize_ID, tex_preview_fontfamily_ID, tex_preview_fontseries_ID, tex_preview_fontshape_ID;
 
 void Init_IDs(void)
 {
+    
    rb_Numeric_class = rb_define_class("Numeric", rb_cObject);
    rb_Integer_class = rb_define_class("Integer", rb_Numeric_class);
 	do_cmd_ID = rb_intern("do_cmd");
@@ -56,12 +58,16 @@ void Init_IDs(void)
     tex_preview_figure_width_ID = rb_intern("@tex_preview_figure_width");
     tex_preview_figure_height_ID = rb_intern("@tex_preview_figure_height");
 
+    tex_preview_fullpage_ID = rb_intern("@tex_preview_fullpage");
+    tex_preview_minwhitespace_ID = rb_intern("@tex_preview_minwhitespace");
+
     tex_preview_tiogafigure_command_ID = rb_intern("@tex_preview_tiogafigure_command");
     
     tex_preview_fontsize_ID = rb_intern("@tex_preview_fontsize");
     tex_preview_fontfamily_ID = rb_intern("@tex_preview_fontfamily");
     tex_preview_fontseries_ID = rb_intern("@tex_preview_fontseries");
     tex_preview_fontshape_ID = rb_intern("@tex_preview_fontshape");
+
 }
 
 void c_set_device_pagesize(FM *p, double width, double height) { // sizes in units of 1/720 inch
@@ -368,6 +374,17 @@ char *Get_tex_preview_fontshape(VALUE fmkr) {
    VALUE v = rb_ivar_get(fmkr, tex_preview_fontshape_ID);
    if (v == Qnil) return NULL;
    return StringValuePtr(v);
+}
+
+char *Get_tex_preview_minwhitespace(VALUE fmkr) {
+   VALUE v = rb_ivar_get(fmkr, tex_preview_minwhitespace_ID);
+   if (v == Qnil) return NULL;
+   return StringValuePtr(v);
+}
+
+bool Get_tex_preview_fullpage(VALUE fmkr) {
+   VALUE v = rb_ivar_get(fmkr, tex_preview_fullpage_ID);
+   return v != Qfalse && v != Qnil;
 }
 
 /* gets the generated preamble */

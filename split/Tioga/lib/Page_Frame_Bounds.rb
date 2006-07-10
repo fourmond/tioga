@@ -865,6 +865,28 @@ adds the 'marvosym' package by inserting the following line into the 'initialize
    def tex_preview_preamble
    end
 
+# :call-seq:
+#               tex_preview_fullpage                                     
+#               tex_preview_fullpage = true or false
+#
+# Defaults to +true+.
+# If +true+, then preview tex file will use the tiogafigurefullpage command.
+# If the tex_preview_minwhitespace has been set, it will be used in the call.
+   def tex_preview_fullpage
+   end
+
+
+=begin rdoc
+:call-seq:
+               tex_preview_minwhitespace                                     
+               tex_preview_minwhitespace = a_string # giving the length
+
+This string will be used as the minwhitespace optional argument for the tiogafigurefullpage command.
+        
+See also: tex_preview_fullpage.
+=end
+   def tex_preview_minwhitespace
+   end
 
 =begin rdoc
 :call-seq:
@@ -878,6 +900,8 @@ the printer point which is defined to be 1/72.27 inch, so there are 1.00375 poin
         
 See also: tex_preview_fontfamily, tex_preview_fontseries, and tex_preview_fontshape.
 =end
+   def tex_preview_fontsize
+   end
 
 
 # :call-seq:

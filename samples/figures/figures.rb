@@ -53,8 +53,7 @@ class MyFigures
         
         hues
         
-        t.set_A4_portrait
-        
+                        
         if false
             file = File.open('color_names.tex', 'w')
             @color_list.each do |name|
