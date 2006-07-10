@@ -36,6 +36,14 @@
 \newcommand{\tiogafiguresized}[3]{
   \resizebox{#2}{#3}{\tiogafigureshow{#1}}}
 
+% \tiogafigurescaledtofit tries to have the figure take as much space
+% as given, while optionnally keeping the aspect ratio.
+\newcommand{\tiogafigurescaledtofit}[3]{
+  \setkeys{Gin}{keepaspectratio=true}
+  \resizebox{#2}{#3}{\tiogafigureshow{#1}}}
+
+
+
 % \tiogafiguresized shows a version of the picture who takes as much
 % place as possible while keeping the aspect ratio. 
 \newcommand{\tiogafigure}[1]{
