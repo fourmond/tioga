@@ -307,7 +307,7 @@ void Create_wrapper(VALUE fmkr, char *fname, bool quiet_mode)
 
    Write_preview_header(fmkr, file);
 
-   fprintf(file, "%% Here's the page with the figure.\n");
+   fprintf(file, "\n%% Here's the page with the figure.\n");
    fprintf(file, "\\begin{document}\n");
    fprintf(file, "\\pagestyle{%s}\n", Get_tex_preview_pagestyle(fmkr));
    Write_figure_command(fmkr, simple_name, file);

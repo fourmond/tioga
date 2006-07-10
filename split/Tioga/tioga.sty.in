@@ -57,17 +57,26 @@
   \resizebox{#2}{#3}{\tiogafigureshow{#1}}}
 
 
+% \tiogaprefix can be used to set a path for the figure pdf and txt files.
+%
+\newcommand{\tiogaprefix}{}
+% The prefix is initialized to an empty string.  
+% To change it, use \renewcommand as in the following example:
+% \renewcommand{\tiogaprefix}{plot_out/}
+
+
 % \tiogafigureshow{figurename}
 %
-% \tiogafigureshow  shows the figure and the accompanying text.
+% \tiogafigureshow shows the figure and the accompanying text.
 % Inside a box, it first creates a picture that includes the pdf
 % file with the graphics for the figure, then it includes the text.
+% The \tiogaprefix is added at the start of the file names for both.
 \newcommand{\tiogafigureshow}[1]{
   \rotatebox{0.0}{
     \begin{picture}(0,0)(0,0)
-      \includegraphics[scale=1.0,clip]{#1_figure.pdf}
+      \includegraphics[scale=1.0,clip]{\tiogaprefix#1_figure.pdf}
     \end{picture}
-    \input{#1_figure.txt}}}
+    \input{\tiogaprefix#1_figure.txt}}}
 
 
 
