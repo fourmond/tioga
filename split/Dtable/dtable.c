@@ -1619,7 +1619,7 @@ VALUE Read_Dtable(VALUE dest, char *filename, int skip_lines) {
    long num_cols, num_rows;
    int i, j, k;
    const int buff_len = 10000;
-   char c, buff[buff_len], *p;
+   char c, buff[buff_len], *p, *pend;
    double *data, **ptr = Dtable_Ptr(dest, &num_cols, &num_rows);
    if ((file=fopen(filename,"r")) == NULL)
       rb_raise(rb_eArgError, "failed to open %s", filename);
@@ -1631,7 +1631,7 @@ VALUE Read_Dtable(VALUE dest, char *filename, int skip_lines) {
       }
    }
    
-   // rewrite to use atof instead of fscanf since atof deals with things like 0.501-129 for 0.501E-129, but fscanf doesn't
+   // rewrite to use strtod instead of fscanf to deal with numbers from fortran like 0.501-129 for 0.501E-129
    
    for (i = 0; i < num_rows; i++) {
       data = ptr[i];
@@ -1647,8 +1647,14 @@ VALUE Read_Dtable(VALUE dest, char *filename, int skip_lines) {
             if (isspace(c) || k > 1000) break;
             *p++ = c;
          }
-         *p++ = ' ';
-         data[j] = atof(buff);
+         *p = ' ';
+         data[j] = strtod(buff,&pend);
+         if (pend != p) { // need to check to see if have a number like 0.501-129
+            if (pend[0] == '+' || pend[0] == '-') { // insert 'E' and try again
+                pend[5] = ' '; pend[4] = pend[3]; pend[3] = pend[2]; pend[2] = pend[1]; pend[1] = pend[0]; pend[0] = 'E';
+                data[j] = strtod(buff,&pend);
+            }
+         }
          if (!is_okay_number(data[j])) {
             fclose(file);
             rb_raise(rb_eArgError,

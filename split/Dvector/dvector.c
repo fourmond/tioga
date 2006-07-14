@@ -4357,7 +4357,7 @@ VALUE Read_Dvectors(char *filename, VALUE destinations, int first_row_of_file, i
    double v;
    int last_row_of_file;
    const int buff_len = 10000;
-   char buff[buff_len], *num_str;
+   char buff[buff_len], *num_str, *pend;
    int num_cols = 0, i, row, col, buff_loc, skip = first_row_of_file - 1;
    last_row_of_file = (number_of_rows == -1)? -1 : first_row_of_file + number_of_rows - 1;
    if ((last_row_of_file != -1 && last_row_of_file < first_row_of_file) || filename == NULL) return false;
@@ -4424,7 +4424,17 @@ VALUE Read_Dvectors(char *filename, VALUE destinations, int first_row_of_file, i
          col_obj = cols_ptr[col];
          if (col_obj == Qnil) continue;
          Data_Get_Struct(col_obj, Dvector, d);
-         v = atof(num_str);
+         
+         buff[buff_loc] = ' ';
+         // rewrite to use strtod instead of fscanf to deal with numbers from fortran like 0.501-129 for 0.501E-129
+         v = strtod(num_str,&pend);
+         if (pend != buff+buff_loc) {
+            if (pend[0] == '+' || pend[0] == '-') { // insert 'E' and try again
+                pend[5] = ' '; pend[4] = pend[3]; pend[3] = pend[2]; pend[2] = pend[1]; pend[1] = pend[0]; pend[0] = 'E';
+                v = strtod(num_str,&pend);
+            }
+         }
+         
          if (!is_okay_number(v)) {
             fclose(file);
             rb_raise(rb_eArgError, "ERROR: read found non-numeric value in line %i of %s -- %s", i, filename, num_str);
@@ -4477,7 +4487,7 @@ VALUE Read_Rows_of_Dvectors(char *filename, VALUE destinations, int first_row_of
    Dvector *d;
    double v, *row_data;
    const int buff_len = 10000;
-   char buff[buff_len], *num_str;
+   char buff[buff_len], *num_str, *pend;
    int num_rows = 0, i, row, col, buff_loc, skip = first_row_of_file - 1;
    rows_obj = rb_Array(destinations);
    num_rows = RARRAY(rows_obj)->len;
@@ -4520,7 +4530,17 @@ VALUE Read_Rows_of_Dvectors(char *filename, VALUE destinations, int first_row_of
          if (buff[buff_loc] == '\0') break;
          num_str = buff+buff_loc;
          while (isgraph(buff[buff_loc])) buff_loc++; /* include non-blanks */
-         v = atof(num_str);
+
+         buff[buff_loc] = ' ';
+         // use strtod instead of fscanf to deal with numbers from fortran like 0.501-129 for 0.501E-129
+         v = strtod(num_str,&pend);
+         if (pend != buff+buff_loc) {
+            if (pend[0] == '+' || pend[0] == '-') { // insert 'E' and try again
+                pend[5] = ' '; pend[4] = pend[3]; pend[3] = pend[2]; pend[2] = pend[1]; pend[1] = pend[0]; pend[0] = 'E';
+                v = strtod(num_str,&pend);
+            }
+         }
+
          if (!is_okay_number(v)) {
             fclose(file);
             rb_raise(rb_eArgError, "ERROR: non-finite value in file %s", filename);
@@ -4567,7 +4587,7 @@ VALUE dvector_read_rows(int argc, VALUE *argv, VALUE klass) {
 VALUE Read_Row(char *filename, int row, VALUE row_ary) {
    FILE *file = NULL;
    const int buff_len = 10000;
-   char buff[buff_len], *num_str;
+   char buff[buff_len], *num_str, *pend;
    int i, col, buff_loc;
    double v;
    if (row <= 0) {
@@ -4596,7 +4616,17 @@ VALUE Read_Row(char *filename, int row, VALUE row_ary) {
       num_str = buff+buff_loc;
       while (isgraph(buff[buff_loc])) buff_loc++; /* include non-blanks */
       if (buff[buff_loc] == '\0') break;
-      v = atof(num_str);
+
+      buff[buff_loc] = ' ';
+      // rewrite to use strtod instead of fscanf to deal with numbers from fortran like 0.501-129 for 0.501E-129
+      v = strtod(num_str,&pend);
+      if (pend != buff+buff_loc) {
+          if (pend[0] == '+' || pend[0] == '-') { // insert 'E' and try again
+            pend[5] = ' '; pend[4] = pend[3]; pend[3] = pend[2]; pend[2] = pend[1]; pend[1] = pend[0]; pend[0] = 'E';
+            v = strtod(num_str,&pend);
+          }
+      }
+
       if (!is_okay_number(v)) {
          fclose(file);
          rb_raise(rb_eArgError, "ERROR: non-finite value in file %s", filename);
