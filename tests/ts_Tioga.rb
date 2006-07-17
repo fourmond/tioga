@@ -12,6 +12,7 @@ require 'tc_Dtable.rb'
 
 require 'tc_Flate.rb'
 
+require 'tc_Function.rb'
 
 
 

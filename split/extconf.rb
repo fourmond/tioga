@@ -13,9 +13,17 @@ setup_dir("Dtable", "Dobjects",
           "Dobjects/Dtable", "") do |l,b,i|
   b.add_sources("symbols.c")
 end
+
 setup_dir("Flate", "", "Flate", "") do |l,b,i|
   b.add_sources("symbols.c")
 end
+
+
+setup_dir("Function", "Dobjects", 
+          "Dobjects/Function", "") do |l,b,i|
+  b.add_sources("symbols.c")
+end
+
 
 # We declare Tioga by hand, as an automatic generation would not
 # take lib/TexPreamble.rb into accound (missing).

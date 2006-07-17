@@ -17,8 +17,7 @@
 */
 
 
-/* Simple code for sharing C symbols across different
-   Ruby libraries */
+/* Simple code for sharing C symbols across different Ruby libraries */
 
 #include <ruby.h>
 #include <intern.h>
