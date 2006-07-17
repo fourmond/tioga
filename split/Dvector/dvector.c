@@ -4991,7 +4991,7 @@ VALUE dvector_max_of_many(VALUE klass, VALUE ary) {
 }
 
 /* 
- * Document-class: Tioga::Dvector
+ * Document-class: Dobjects::Dvector
  *
  * Dvectors are a specialized implementation of one-dimensional arrays of double precision floating point numbers. 
  * They are intended for use in applications needing efficient processing of large vectors of numeric data.

@@ -1733,7 +1733,7 @@ VALUE dtable_aset(VALUE ary, VALUE xloc, VALUE yloc, VALUE val) {
 }
 
 /* 
- * Document-class: Tioga::Dtable
+ * Document-class: Dobjects::Dtable
  *
  * Dtables are a specialized implementation of two-dimensional arrays of double precision floating point numbers. 
  * They are intended for use in applications needing efficient processing of large 2D tables of numeric data.
