@@ -4665,14 +4665,16 @@ VALUE dvector_read_row(int argc, VALUE *argv, VALUE klass) {
 
 double *Dvector_Data_for_Read(VALUE dvector, long *len_ptr) { /* returns pointer to the dvector's data (which may be shared) */
    Dvector *d = Get_Dvector(dvector);
-   *len_ptr = d->len;
+   if(len_ptr)
+     *len_ptr = d->len;
    return d->ptr;
    }
 
 double *Dvector_Data_Copy(VALUE dvector, long *len_ptr) { /* like Dvector_Data_for_Read, but returns pointer to a copy of the data */
    Dvector *d = Get_Dvector(dvector);
    double *data;
-   *len_ptr = d->len;
+   if(len_ptr)
+     *len_ptr = d->len;
    data = (double *)ALLOC_N(double, d->len);
    MEMCPY(data, d->ptr, double, d->len);
    return data;
@@ -4681,7 +4683,8 @@ double *Dvector_Data_Copy(VALUE dvector, long *len_ptr) { /* like Dvector_Data_f
 double *Dvector_Data_for_Write(VALUE dvector, long *len_ptr) {
    if (!is_a_dvector(dvector)) rb_raise(rb_eArgError, "arg must be a Dvector");
    Dvector *d = dvector_modify(dvector);
-   *len_ptr = d->len;
+   if(len_ptr)
+     *len_ptr = d->len;
    return d->ptr;
    }
 
