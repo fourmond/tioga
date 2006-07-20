@@ -23,6 +23,7 @@ split/Tioga/lib/Transparency.rb
 split/Tioga/lib/Colorbars.rb
 split/Dvector/dvector.c
 split/Dtable/dtable.c
+split/Function/function.c
 split/Flate/flate.c
 split/Tioga/lib/Doc.rb
 tutorial/tioga_doc.rb

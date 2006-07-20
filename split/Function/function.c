@@ -31,9 +31,12 @@
 static VALUE cFunction;
 static VALUE cDvector;
 
+/* ID used by different functions */
 static ID idSize;
 static ID idSetDirty;
 static ID idDirty;
+static ID idSort;
+static ID idNew;
 
 /* a few macros to work with Dvectors */
 #define IS_A_DVECTOR(x) RTEST(rb_obj_is_kind_of(x, cDvector))
@@ -43,7 +46,8 @@ static ID idDirty;
 
 #define DVECTOR_IS_DIRTY(x) (RTEST(rb_funcall(x, idDirty,0)))
 #define DVECTOR_CLEAR(x) (rb_funcall(x, idSetDirty,1, Qfalse))
-
+#define NUMERIC(x) (rb_type(x) == T_FIXNUM || \
+rb_type(x) == T_BIGNUM)
 
 #define X_VAL "@x_val"
 #define Y_VAL "@y_val"
@@ -51,6 +55,11 @@ static ID idDirty;
 
 
 /* basic functions for accessing the objects */
+
+
+/* 
+   The X vector.
+*/
 inline static VALUE get_x_vector(VALUE self) 
 {
   return rb_iv_get(self, X_VAL);
@@ -61,6 +70,9 @@ inline static void set_x_vector(VALUE self, VALUE vector)
   rb_iv_set(self, X_VAL, vector);
 }
 
+/* 
+   The Y vector.
+*/
 inline static VALUE get_y_vector(VALUE self) 
 {
   return rb_iv_get(self, Y_VAL);
@@ -80,6 +92,43 @@ inline static VALUE get_spline_vector(VALUE self)
 inline static void set_spline_vector(VALUE self, VALUE vector) 
 {
   rb_iv_set(self, SPLINE_CACHE, vector);
+}
+
+
+/*
+  Checks that self is a Function, that it has X and Y Dvectors and that
+  they both have the same size. In that case, the size is returned.
+*/
+static long function_sanity_check(VALUE self)
+{
+  if(RTEST(rb_obj_is_kind_of(self, cFunction)))
+  {
+    VALUE x = get_x_vector(self);
+    VALUE y = get_y_vector(self);
+    if(IS_A_DVECTOR(x)
+       && IS_A_DVECTOR(y))
+      {
+	long size = DVECTOR_SIZE(x);
+	if( size== DVECTOR_SIZE(y))
+	  return size;
+	else
+	  {
+	    rb_raise(rb_eRuntimeError, "X and Y vectors must have the"
+		     " same size");
+	    return -1;
+	  }
+      }
+    else 
+      {
+	rb_raise(rb_eRuntimeError, "X and Y must be vectors");
+	return -1;
+      }
+  }
+  else 
+    {
+      rb_raise(rb_eRuntimeError, "self is no Function");
+      return -1;
+    }
 }
 
 
@@ -105,24 +154,37 @@ static VALUE function_initialize(VALUE self, VALUE x, VALUE y)
     rb_raise(rb_eArgError,"both arguments must be Dvector");
   return self;
 }
+
+static int dvector_is_sorted(VALUE dvector)
+{
+  long size;
+  const double * x_data;
+  double prev;
+  if(! IS_A_DVECTOR(dvector))
+    rb_raise(rb_eArgError, "should take a Dvector as argument");
+  else 
+    {
+      x_data = Dvector_Data_for_Read(dvector, &size);
+      prev = x_data[0];
+      while((--size) && prev <= *(++x_data))
+	prev = *x_data;
+      return (size == 0);
+    }
+  return 0;
+}
   
 /*
   Checks if the +x+ values of the Function are sorted.
 */
 static VALUE function_is_sorted(VALUE self)
 {
-  long size;
-  const double * x_data;
-  double prev;
-  x_data = Dvector_Data_for_Read(get_x_vector(self), &size);
-  prev = x_data[0];
-  while((--size) && prev <= *(++x_data))
-    prev = *x_data;
-  if(size)
-    return Qfalse;
-  else
+  if(dvector_is_sorted(get_x_vector(self)))
     return Qtrue;
+  else
+    return Qfalse;
 }
+
+static VALUE function_sort(VALUE self);
 
 /* test if the number if finite */
 #define is_okay_number(x) ((x) - (x) == 0.0)
@@ -193,8 +255,10 @@ static void function_fill_second_derivatives(long nb_points,
    xfree(tmp);
 }
 
-/* Computes spline data and caches it inside the object. Both X and Y vectors
+/* 
+   Computes spline data and caches it inside the object. Both X and Y vectors
    are cleared (see Dvector#clear) to make sure the cache is kept up-to-date.
+   If the function is not sorted, sorts it.
 */
 static VALUE function_compute_spline_data(VALUE self)
 {
@@ -208,10 +272,14 @@ static VALUE function_compute_spline_data(VALUE self)
 	     "x and y should have the same size !");
   if(! IS_A_DVECTOR(cache))    /* create it -- and silently ignores
 				  its previous values */
-      cache = rb_funcall(cDvector, rb_intern("new"),
+      cache = rb_funcall(cDvector, idNew,
 			 1, LONG2NUM(size));
   if(DVECTOR_SIZE(y_vec) != size) /* switch to the required size */
     Dvector_Data_Resize(cache, size);
+
+  /* we make sure that the X values are sorted */
+  if(! RTEST(function_is_sorted(self)))
+     function_sort(self);
   
   double * x, *y, *spline;
   x = Dvector_Data_for_Read(x_vec, NULL);
@@ -259,8 +327,11 @@ static void function_compute_spline_interpolation(long dat_size,
   
   for(hi = 0; hi < dest_size; hi++)
     {
-      while(x_dat[low + 1] < x[hi])
+      while(x_dat[low + 1] < x[hi] && low < dat_size - 1)
 	low++; /* seek forward - shouldn't be too long ? */
+      if(hi && x[hi] < x[hi - 1])
+	rb_raise(rb_eArgError, 
+		 "X values should be sorted");
       h = x_dat[low + 1] - x_dat[low];
       /* should hopefully not be zero */
       if(h <= 0.0)
@@ -377,6 +448,66 @@ static VALUE function_each(VALUE self)
   
 }
 
+/* 
+   Makes sure the function is sorted.
+*/
+static VALUE function_ensure_sorted(VALUE self)
+{
+  if(!RTEST(function_is_sorted(self)))
+    function_sort(self);
+  return self;
+}
+
+
+
+/* 
+   :call-seq:
+     f.interpolate(x_values) -> a_function
+     f.interpolate(a_number) -> a_function
+
+   Computes interpolated values of the data contained in +f+ and 
+   returns a Function object holding both +x_values+ and the computed
+   Y values. +x_values+ will be sorted if necessary.
+
+   With the second form, specify only the number of points, and
+   the function will construct the appropriate vector with equally spaced
+   points within the function range.
+*/
+static VALUE function_interpolate(VALUE self, VALUE x_values)
+{
+  
+  if(NUMERIC(x_values))
+    {
+      /* we're in the second case, although I sincerely doubt it would
+	 come useful 
+      */
+      long size,i;
+      /* we make sure the function is sorted */
+      function_ensure_sorted(self);
+      double * data;
+      double x_min;
+      double x_max;
+      data = Dvector_Data_for_Read(get_x_vector(self), &size);
+      x_min = *data;
+      x_max = *(data + size -1);
+      x_values = rb_funcall(cDvector, idNew, 1, x_values);
+      data = Dvector_Data_for_Write(x_values, &size);
+      for(i = 0;i < size; i++)
+	data[i] = x_min + ((x_max - x_min)/((double) (size-1))) * i;
+    }
+  if(! IS_A_DVECTOR(x_values))
+    rb_raise(rb_eArgError, "x_values should be a Dvector or a number");
+  else 
+    {
+      /* sort x_values */
+      if(! dvector_is_sorted(x_values))
+	rb_funcall(x_values, idSort,0);
+      VALUE y_values = function_compute_spline(self, x_values);
+      return rb_funcall(cFunction, idNew, 2, x_values, y_values);
+    }
+  return Qnil;
+}
+
 /*
   Sorts the X values while keeping the matching Y values. 
 */
@@ -385,14 +516,53 @@ static VALUE function_sort(VALUE self)
   return function_joint_sort(self,get_x_vector(self), get_y_vector(self));
 }
 
+/*
+  Returns a Dvector with two elements: the X and Y values of the
+  point at the index given.
+*/
+static VALUE function_point(VALUE self, VALUE index)
+{
+  if(! NUMERIC(index))
+    rb_raise(rb_eArgError, "index has to be numeric");
+  else
+    {
+      long i = NUM2LONG(index);
+      long size = function_sanity_check(self);
+      if(size > 0 && i < size)
+	{
+	  VALUE point = rb_funcall(cDvector, idNew, 1, INT2NUM(2));
+	  double * dat = Dvector_Data_for_Write(point, NULL);
+	  double *x = Dvector_Data_for_Read(get_x_vector(self),NULL);
+	  double *y = Dvector_Data_for_Read(get_y_vector(self),NULL);
+	  dat[0] = x[i];
+	  dat[1] = y[i];
+	  return point;
+	}
+      else
+	return Qnil;
+    }
+  return Qnil;
+}
  
 static void init_IDs()
 {
   idSize  = rb_intern("size");
   idSetDirty = rb_intern("dirty=");
   idDirty = rb_intern("dirty?");
+  idSort = rb_intern("sort");
+  idNew = rb_intern("new");
 }
- 
+
+/*
+  Document-class: Dobjects::Function
+
+  Function is a class that embeds two Dvectors, one for X data and one for Y 
+  data. It provides 
+
+  - facilities for sorting the X while keeping the Y matching, with #sort
+  - interpolation, with #compute_spline, #compute_spline_data and #interpolate
+  - some functions for data access : #x, #y, #point
+ */ 
 void Init_Function() 
 {
   init_IDs();
@@ -416,6 +586,15 @@ void Init_Function()
 		   function_compute_spline_data, 0);
   rb_define_method(cFunction, "compute_spline", 
 		   function_compute_spline, 1);
+
+  rb_define_method(cFunction, "interpolate", 
+		   function_interpolate, 1);
+
+  /* access to data */
+  rb_define_method(cFunction, "x", get_x_vector,0);
+  rb_define_method(cFunction, "y", get_y_vector,0);
+  rb_define_method(cFunction, "point",function_point ,1);
+		   
 
   /* iterator */
   rb_define_method(cFunction, "each", 

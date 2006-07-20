@@ -31,4 +31,18 @@ class TestFunction < Test::Unit::TestCase
     assert(f.sorted?)
   end
 
+  def test_point
+    x = Dvector[1,3,2]
+    y = Dvector[2,3,4]
+    f = Function.new(x,y)
+    p = f.point(2)
+    assert_equal(p[0],2.0)
+    assert_equal(p[1],4.0)
+    f.sort
+    p = f.point(2)
+    assert_equal(p[0],3.0)
+    assert_equal(p[1],3.0)
+  end
+
+  # There is unfortunately no simple way to test the interpolations...
 end
