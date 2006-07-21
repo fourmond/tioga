@@ -57,28 +57,32 @@ rb_type(x) == T_BIGNUM)
 /* basic functions for accessing the objects */
 
 
+inline 
 /* 
    The X vector.
 */
-inline static VALUE get_x_vector(VALUE self) 
+static VALUE get_x_vector(VALUE self) 
 {
   return rb_iv_get(self, X_VAL);
 }
 
-inline static void set_x_vector(VALUE self, VALUE vector) 
+inline 
+static void set_x_vector(VALUE self, VALUE vector) 
 {
   rb_iv_set(self, X_VAL, vector);
 }
 
+inline 
 /* 
    The Y vector.
 */
-inline static VALUE get_y_vector(VALUE self) 
+static VALUE get_y_vector(VALUE self) 
 {
   return rb_iv_get(self, Y_VAL);
 }
 
-inline static void set_y_vector(VALUE self, VALUE vector) 
+inline 
+static void set_y_vector(VALUE self, VALUE vector) 
 {
   rb_iv_set(self, Y_VAL, vector);
 }
@@ -174,7 +178,7 @@ static int dvector_is_sorted(VALUE dvector)
 }
   
 /*
-  Checks if the +x+ values of the Function are sorted.
+  Checks if the X values of the Function are sorted.
 */
 static VALUE function_is_sorted(VALUE self)
 {
@@ -393,9 +397,12 @@ extern void joint_quicksort(double *const x_values, double * const y_values,
 /* Dvector's lock */
 #define DVEC_TMPLOCK  FL_USER1
 
-/* 
+/* call-seq:
+     Function.joint_sort(x,y)
+
    Sorts +x+, while ensuring that the corresponding +y+ values
-   keep matching. Should be pretty fast.
+   keep matching. Should be pretty fast, as it is derived from 
+   glibc's quicksort.
 */
 
 static VALUE function_joint_sort(VALUE self, VALUE x, VALUE y)
@@ -419,9 +426,13 @@ static VALUE function_joint_sort(VALUE self, VALUE x, VALUE y)
 }
 
 
-/* Yields X and Y */
-static VALUE function_each(VALUE self)
+/* 
+   Iterates over all the points in the Function, yielding X and Y for
+   each point.
+*/
+static VALUE function_each(VALUE self) /* :yields: x,y */
 {
+
   long x_len, y_len;
   VALUE x = get_x_vector(self);
   VALUE y = get_y_vector(self);
@@ -461,9 +472,9 @@ static VALUE function_ensure_sorted(VALUE self)
 
 
 /* 
-   :call-seq:
-     f.interpolate(x_values) -> a_function
-     f.interpolate(a_number) -> a_function
+   call-seq:
+     interpolate(x_values)
+     interpolate(a_number)
 
    Computes interpolated values of the data contained in +f+ and 
    returns a Function object holding both +x_values+ and the computed
@@ -518,7 +529,7 @@ static VALUE function_sort(VALUE self)
 
 /*
   Returns a Dvector with two elements: the X and Y values of the
-  point at the index given.
+  point at the given index.
 */
 static VALUE function_point(VALUE self, VALUE index)
 {
@@ -559,9 +570,11 @@ static void init_IDs()
   Function is a class that embeds two Dvectors, one for X data and one for Y 
   data. It provides 
 
-  - facilities for sorting the X while keeping the Y matching, with #sort
-  - interpolation, with #compute_spline, #compute_spline_data and #interpolate
-  - some functions for data access : #x, #y, #point
+  - facilities for sorting the X while keeping the Y matching, with #sort and
+    Function.joint_sort;
+  - to check if X data is sorted: #sorted?, #is_sorted;
+  - interpolation, with #compute_spline, #compute_spline_data and #interpolate;
+  - some functions for data access : #x, #y, #point;
  */ 
 void Init_Function() 
 {
@@ -591,9 +604,9 @@ void Init_Function()
 		   function_interpolate, 1);
 
   /* access to data */
-  rb_define_method(cFunction, "x", get_x_vector,0);
-  rb_define_method(cFunction, "y", get_y_vector,0);
-  rb_define_method(cFunction, "point",function_point ,1);
+  rb_define_method(cFunction, "point", function_point, 1);
+  rb_define_method(cFunction, "x", get_x_vector, 0);
+  rb_define_method(cFunction, "y", get_y_vector, 0);
 		   
 
   /* iterator */
