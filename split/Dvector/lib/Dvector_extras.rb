@@ -117,6 +117,7 @@ module Dobjects
     FANCY_READ_DEFAULTS = { 'sep' => /\s+/,
       'comments' => /^\s*\#/,
       'skip_first' => 0,
+      'index_col' => false,
       'headers' => nil, # not used for now.
       'default' => 0.0/0.0, # defaults to NaN
     }
@@ -133,6 +134,8 @@ module Dobjects
     # 'comments':: a regular expression matching comment lines
     # 'skip_first':: how many lines to skip at the beginning of the file,
     # 'default':: the value taken for missing elements
+    # 'index_col':: if set to true, the first column return contains the
+    #               indices of the corresponding lines (0 for first and so on)
     # ...
 
     def Dvector.fancy_read(stream, cols = nil, opts = {})
@@ -144,8 +147,7 @@ module Dobjects
         stream.respond_to? :gets
       
       # we take default options and override them with opts
-      o = FANCY_READ_DEFAULTS.dup
-      o.update(opts)
+      o = FANCY_READ_DEFAULTS.merge(opts)
       
       # strip off the first lines.
       while o["skip_first"] > 0
@@ -195,6 +197,10 @@ module Dobjects
 
         line_number += 1
       end
+      # Adding the index columns if necessary
+      if o["index_col"] 
+        columns.unshift(Dvector.new(columns[0].length) { |i| i})
+      end
 
       return columns unless cols
       return cols.collect { |i| 
@@ -205,9 +211,8 @@ module Dobjects
     # This function is a rudimentary formula computing stuff. Give it
     # a text _formula_ and an array of Dvectors (_a_), and it returns a
     # Dvector with the result. The formula should contain the following;
-    # column[n]:: represents the current element of the n-1th
+    # column[n]:: represents the current element of the n th
     #             Dvector of the array
-    # column[0]:: represents the index of the current element
     #
     # This is just a try, and should be implemented in C rather than in
     # Ruby. But if you're looking for simplicity, here you go ;-) !
@@ -257,7 +262,8 @@ module Dobjects
           end
         }
         # we add the index at the beginning:
-        args.unshift(i) 
+        #         args.unshift(i) 
+        # Commented out for simplicity
         
         # then we call the block:
         elem = block.call(args)
