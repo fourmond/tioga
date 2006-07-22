@@ -403,6 +403,10 @@ extern void joint_quicksort(double *const x_values, double * const y_values,
    Sorts +x+, while ensuring that the corresponding +y+ values
    keep matching. Should be pretty fast, as it is derived from 
    glibc's quicksort.
+
+    a = Dvector[3,2,1]
+    b = a * 2                 -> [6,4,2]
+    Function.joint_sort(a,b)  -> [[1,2,3], [2,4,6]]
 */
 
 static VALUE function_joint_sort(VALUE self, VALUE x, VALUE y)
@@ -422,11 +426,14 @@ static VALUE function_joint_sort(VALUE self, VALUE x, VALUE y)
       FL_UNSET(x, DVEC_TMPLOCK);
       FL_UNSET(y, DVEC_TMPLOCK);
     }
-  return self; /* nothing interesting */
+  /* we return the array of both Dvectors */
+  return rb_ary_new3(2,x,y); 
 }
 
 
-/* 
+/* call-seq:
+    f.each do |x,y| _code_ end
+    
    Iterates over all the points in the Function, yielding X and Y for
    each point.
 */
