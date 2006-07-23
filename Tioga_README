@@ -1,4 +1,4 @@
-This is the README for the Tioga kernel, version 1.1.2, June 29, 2006.
+This is the README for the Tioga kernel, version 1.1.3, July 23, 2006.
 
     Copyright (C) 2005, 2006  Bill Paxton
     
@@ -21,6 +21,25 @@ This is the README for the Tioga kernel, version 1.1.2, June 29, 2006.
 
 << What's new >>
 
+	Version 1.1.3 provides a better integration of output within LaTeX
+documents. A tioga.sty file is now available, with many macros for figure
+inclusion and color names like the ones provided by Tioga.
+
+	The Dobjects module is proud to announce the birth of the latest
+class, Function, which provides basic interpolation and sorting for sets of
+X,Y data. Not many features for now, but there's room for plenty more work.
+
+	Dvector provides a few more functions:
+		clear?, dirty?, dirty= (to check if a vector has been modified)
+		min_gt, max_lt (extrema with conditions)
+		set (mass modification of Dvector)
+
+	FigureMaker has now functions for coordinate conversions:
+		convert_inches_to_output, convert_output_to_inches,
+		convert_mm_to_output, convert_output_to_mm
+
+
+<< What's old >>
 
 	Version 1.1.2 provides more complete control over page layout and font
 selection.  Here's a list of new features:
@@ -48,10 +67,6 @@ selection.  Here's a list of new features:
 			tex_preview_fontfamily
 			tex_preview_fontseries
 			tex_preview_fontshape
-
-
-<< What's old >>
-
 
 	Version 1.1.1 is the first Tioga to be called a "beta" release.  You can
 interpret that anyway you'd like, but to me it means Tioga has been around long
