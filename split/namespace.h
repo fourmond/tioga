@@ -32,13 +32,13 @@
 #define PRIVATE __private_extern__
 #define PUBLIC 
 #else
-#if _GNU_C_ >= 4
+#if __GNUC__ >= 4
 #define PRIVATE __attribute__ ((visibility ("hidden"))) 
 #define PUBLIC __attribute__ ((visibility ("default"))) 
 #else /* not really good */
 #define PRIVATE 
 #define PUBLIC 
-#endif /* _GNU_C_ >= 4 */
-#endif /*__APPLE__*/
+#endif /* __GNU_C_ >= 4 */
+#endif /* __APPLE__ */
 
 #endif
