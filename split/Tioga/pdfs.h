@@ -22,6 +22,8 @@
 #ifndef __pdfs_H__
 #define __pdfs_H__
 
+#include <namespace.h>
+
 #include "flate.h"
 
 extern VALUE rb_Integer_class, rb_Numeric_class;
@@ -218,6 +220,8 @@ extern void End_Axis_Standard_State(void);
 
 extern void Write_gsave(void);
 extern void Write_grestore(void);
+
+PRIVATE void c_private_set_default_font_size(FM *p, double size);
 
 void Init_Font_Dictionary(void);
 

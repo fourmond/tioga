@@ -22,6 +22,8 @@
 #ifndef __figures_H__
 #define __figures_H__
 
+#include <namespace.h>
+
 #include <math.h>
 #include <stdbool.h>
 #include <ctype.h>
