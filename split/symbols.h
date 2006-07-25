@@ -22,10 +22,10 @@ PRIVATE void * rb_import_symbol_no_raise(VALUE module,
 		   
 #define DECLARE_SYMBOL(ret_type,name,args) \
   typedef ret_type (*rb_export_##name##_type) args;\
-  PRIVATE extern rb_export_##name##_type name
+  PRIVATE rb_export_##name##_type name
 
 #define IMPLEMENT_SYMBOL(name)\
-  PRIVATE rb_export_##name##_type name;
+  PRIVATE rb_export_##name##_type name = 0;
 
 #define RB_IMPORT_SYMBOL(module, name) \
   name = (rb_export_##name##_type) rb_import_symbol(module, #name)
