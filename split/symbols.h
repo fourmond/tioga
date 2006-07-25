@@ -8,10 +8,10 @@
 #include <namespace.h>
 
 
-PRIVATE extern void rb_export_symbol(VALUE module, const char * symbol_name,
+PRIVATE void rb_export_symbol(VALUE module, const char * symbol_name,
 		      void * symbol);
-PRIVATE extern void * rb_import_symbol(VALUE module, const char * symbol_name);
-PRIVATE extern void * rb_import_symbol_no_raise(VALUE module, 
+PRIVATE void * rb_import_symbol(VALUE module, const char * symbol_name);
+PRIVATE void * rb_import_symbol_no_raise(VALUE module, 
 						const char * symbol_name);
 
 /* a shortcut for exporting something with the same name */

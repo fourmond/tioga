@@ -26,19 +26,20 @@
    * PUBLIC, which has to be used to mark objects that will be used
    outside the module
    * PRIVATE, for symbols which are "extern" but intern to the module
+
+   Please don't add "extern" after the PRIVATE or PUBLIC declaration
+   as this would break compilation on Darwin.
 */
 
 #ifdef __APPLE__
-#define PRIVATE __private_extern__
-#define PUBLIC 
-#else
-#if __GNUC__ >= 4
-#define PRIVATE __attribute__ ((visibility ("hidden"))) 
-#define PUBLIC __attribute__ ((visibility ("default"))) 
+#  define PRIVATE __private_extern__
+#  define PUBLIC 
+#elif __GNUC__ >= 4 /* we have the visibility attribute */
+#  define PRIVATE __attribute__ ((visibility ("hidden"))) 
+#  define PUBLIC __attribute__ ((visibility ("default"))) 
 #else /* not really good */
-#define PRIVATE 
-#define PUBLIC 
-#endif /* __GNU_C_ >= 4 */
-#endif /* __APPLE__ */
+#  define PRIVATE 
+#  define PUBLIC 
+#endif /* __APPLE__  and __GNU_C_ >= 4*/
 
 #endif
