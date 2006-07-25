@@ -18,7 +18,8 @@
    along with Dtable; if not, write to the Free Software
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
-   
+
+#include <namespace.h>   
 #include "dtable_intern.h"
 #include <stdbool.h>
 #include <stdlib.h>
@@ -46,7 +47,8 @@ typedef struct {
 /* prototypes */
 static void dtable_free(Dtable *d);
 
-bool Is_Dtable(VALUE obj) { return is_a_dtable(obj); }
+
+PRIVATE bool Is_Dtable(VALUE obj) { return is_a_dtable(obj); }
 
 // data stored in row order
 // i.e., array arr of num_cols W and num_rows H is actually an array of H pointers
@@ -169,7 +171,7 @@ static VALUE dtable_init(VALUE ary, int num_cols, int num_rows) {
  *  first make a copy using dup and then do "bang" operations to modify the result without further copying.
  */
 
-VALUE dtable_dup(VALUE ary) {
+PRIVATE VALUE dtable_dup(VALUE ary) {
    Dtable *d = Get_Dtable(ary);
    int i, j, num_cols = d->num_cols, num_rows = d->num_rows;
    VALUE new = dtable_init(dtable_alloc(cDtable), num_cols, num_rows);
@@ -191,7 +193,7 @@ VALUE dtable_dup(VALUE ary) {
  *  Returns a copy of _dtable_ with the order of rows reversed.
  */
 
-VALUE dtable_reverse_rows(VALUE ary)
+PRIVATE VALUE dtable_reverse_rows(VALUE ary)
 {
    Dtable *d = Get_Dtable(ary);
    int i, j, num_cols = d->num_cols, num_rows = d->num_rows, last_row = num_rows - 1;
@@ -214,7 +216,7 @@ VALUE dtable_reverse_rows(VALUE ary)
  *  Returns a copy of _dtable_ with the order of columns reversed.
  */
 
-VALUE dtable_reverse_cols(VALUE ary)
+PRIVATE VALUE dtable_reverse_cols(VALUE ary)
 {
    Dtable *d = Get_Dtable(ary);
    int i, j, num_cols = d->num_cols, num_rows = d->num_rows, last_col = num_cols - 1;
@@ -238,7 +240,7 @@ VALUE dtable_reverse_cols(VALUE ary)
  *  Returns a copy of _dtable_ rotated 90 degrees clockwise.
  */
 
-VALUE dtable_rotate_cw90(VALUE ary)
+PRIVATE VALUE dtable_rotate_cw90(VALUE ary)
 {
    Dtable *d = Get_Dtable(ary);
    int i, j, num_cols = d->num_cols, num_rows = d->num_rows, last_row = num_rows - 1;
@@ -262,7 +264,7 @@ VALUE dtable_rotate_cw90(VALUE ary)
  *  Returns a copy of _dtable_ rotated 90 degrees counter-clockwise.
  */
 
-VALUE dtable_rotate_ccw90(VALUE ary)
+PRIVATE VALUE dtable_rotate_ccw90(VALUE ary)
 {
    Dtable *d = Get_Dtable(ary);
    int i, j, num_cols = d->num_cols, num_rows = d->num_rows, last_col = num_cols - 1;
@@ -285,7 +287,7 @@ VALUE dtable_rotate_ccw90(VALUE ary)
  *  Returns a transposed copy of _dtable_ (i.e., exchange rows and columns).
  */
 
-VALUE dtable_transpose(VALUE ary) {
+PRIVATE VALUE dtable_transpose(VALUE ary) {
    Dtable *d = Get_Dtable(ary);
    int i, j, num_cols = d->num_cols, num_rows = d->num_rows;
    VALUE new = dtable_init(dtable_alloc(cDtable), num_rows, num_cols);
@@ -307,7 +309,7 @@ VALUE dtable_transpose(VALUE ary) {
  *  Returns a new Dtable with the requested dimensions.
  */
 
-VALUE dtable_initialize(int argc, VALUE *argv, VALUE ary) {
+PRIVATE VALUE dtable_initialize(int argc, VALUE *argv, VALUE ary) {
    if (argc != 2) rb_raise(rb_eArgError, "need 2 args for Dtable.new(num_cols, num_rows)");
    int num_cols = NUM2INT(argv[0]), num_rows = NUM2INT(argv[1]);
    return dtable_init(ary, num_cols, num_rows);
@@ -320,7 +322,7 @@ VALUE dtable_initialize(int argc, VALUE *argv, VALUE ary) {
  *  Returns the number of entries in the x dimension of _dtable_.
  */
 
-VALUE dtable_num_cols(VALUE ary) {
+PRIVATE VALUE dtable_num_cols(VALUE ary) {
    Dtable *d = Get_Dtable(ary);
    return LONG2NUM(d->num_cols);
 }
@@ -332,7 +334,7 @@ VALUE dtable_num_cols(VALUE ary) {
  *  Returns the number of entries in the y dimension of _dtable_.
  */
 
-VALUE dtable_num_rows(VALUE ary) {
+PRIVATE VALUE dtable_num_rows(VALUE ary) {
    Dtable *d = Get_Dtable(ary);
    return LONG2NUM(d->num_rows);
 }
@@ -344,7 +346,7 @@ VALUE dtable_num_rows(VALUE ary) {
  *  Returns the minimum entry in _dtable_ which is greater than _val_, or <code>nil</code> if no such entry if found.
  */
 
-VALUE dtable_min_gt(VALUE ary, VALUE val) {
+PRIVATE VALUE dtable_min_gt(VALUE ary, VALUE val) {
    Dtable *d = Get_Dtable(ary);
    val = rb_Float(val);
    double zmin, z = NUM2DBL(val);
@@ -360,7 +362,7 @@ VALUE dtable_min_gt(VALUE ary, VALUE val) {
  *  Returns the maximum entry in _dtable_ which is less than _val_, or <code>nil</code> if no such entry if found.
  */
 
-VALUE dtable_max_lt(VALUE ary, VALUE val) {
+PRIVATE VALUE dtable_max_lt(VALUE ary, VALUE val) {
    Dtable *d = Get_Dtable(ary);
    val = rb_Float(val);
    double zmax, z = NUM2DBL(val);
@@ -376,7 +378,7 @@ VALUE dtable_max_lt(VALUE ary, VALUE val) {
  *  Returns the minimum entry in _dtable_.
  */
 
-VALUE dtable_min(VALUE ary) {
+PRIVATE VALUE dtable_min(VALUE ary) {
    Dtable *d = Get_Dtable(ary);
    double zmin = Min2dGrid(d->ptr, d->num_cols, d->num_rows);
    return rb_float_new(zmin);
@@ -389,7 +391,7 @@ VALUE dtable_min(VALUE ary) {
  *  Returns the maximum entry in _dtable_.
  */
 
-VALUE dtable_max(VALUE ary) {
+PRIVATE VALUE dtable_max(VALUE ary) {
    Dtable *d = Get_Dtable(ary);
    double zmax = Max2dGrid(d->ptr, d->num_cols, d->num_rows);
    return rb_float_new(zmax);
@@ -402,7 +404,7 @@ VALUE dtable_max(VALUE ary) {
  *  Creates a Dvector holding a copy of the contents of the requested row.
  */
 
-VALUE dtable_row(VALUE ary, VALUE row_num) {
+PRIVATE VALUE dtable_row(VALUE ary, VALUE row_num) {
    Dtable *d = Get_Dtable(ary);
    row_num = rb_Integer(row_num);
    int row = NUM2INT(row_num);
@@ -421,7 +423,7 @@ VALUE dtable_row(VALUE ary, VALUE row_num) {
  *  The length of the vector must equal the number of columns in the array.
  */
 
-VALUE dtable_set_row(VALUE ary, VALUE row_num, VALUE dvec) {
+PRIVATE VALUE dtable_set_row(VALUE ary, VALUE row_num, VALUE dvec) {
    Dtable *d = Get_Dtable(ary);
    long len, j;
    double *data = Dvector_Data_for_Read(dvec, &len);
@@ -444,7 +446,7 @@ VALUE dtable_set_row(VALUE ary, VALUE row_num, VALUE dvec) {
  *  The length of the vector must equal the number of rows in the array.
  */
 
-VALUE dtable_set_column(VALUE ary, VALUE col_num, VALUE dvec) {
+PRIVATE VALUE dtable_set_column(VALUE ary, VALUE col_num, VALUE dvec) {
    Dtable *d = Get_Dtable(ary);
    long len, i;
    double *data = Dvector_Data_for_Read(dvec, &len);
@@ -466,7 +468,7 @@ VALUE dtable_set_column(VALUE ary, VALUE col_num, VALUE dvec) {
  *  Creates a Dvector holding a copy of the contents of the requested column.
  */
 
-VALUE dtable_column(VALUE ary, VALUE column_num) {
+PRIVATE VALUE dtable_column(VALUE ary, VALUE column_num) {
    Dtable *d = Get_Dtable(ary);
    column_num = rb_Integer(column_num);
    int i, column = NUM2INT(column_num), len;
@@ -498,7 +500,7 @@ static void set_dtable_vals(VALUE ary, double v) {
  *  Sets the entries of _dtable_ array to zero.
  */
 
-VALUE dtable_clear(VALUE ary, VALUE val) {
+PRIVATE VALUE dtable_clear(VALUE ary, VALUE val) {
    set_dtable_vals(ary, 0.0);
    return ary;
 }
@@ -513,7 +515,7 @@ VALUE dtable_clear(VALUE ary, VALUE val) {
  *  be the size as _dtable_, and its contents are copied to _dtable_.
  */
 
-VALUE dtable_set(VALUE ary, VALUE val) {
+PRIVATE VALUE dtable_set(VALUE ary, VALUE val) {
    if (is_a_dtable(val)) {
       Dtable *d = Get_Dtable(ary);
       Dtable *d2 = Get_Dtable(val);
@@ -536,7 +538,7 @@ VALUE dtable_set(VALUE ary, VALUE val) {
 
 /*======================================================================*/
 
-VALUE dtable_apply_math_op_bang(VALUE ary, double (*op)(double)) {
+PRIVATE VALUE dtable_apply_math_op_bang(VALUE ary, double (*op)(double)) {
    Dtable *d = Get_Dtable(ary);
    double **p = d->ptr;
    int num_cols = d->num_cols, num_rows = d->num_rows, i, j;
@@ -548,7 +550,7 @@ VALUE dtable_apply_math_op_bang(VALUE ary, double (*op)(double)) {
    return ary;
 }
 
-VALUE dtable_apply_math_op(VALUE source, double (*op)(double)) {
+PRIVATE VALUE dtable_apply_math_op(VALUE source, double (*op)(double)) {
    return dtable_apply_math_op_bang(dtable_dup(source), op);
 }
 
@@ -561,7 +563,7 @@ static double do_neg(double arg) { return -arg; }
  *  Returns of copy of _dtable_ with each entry x replaced by -x.
  */
 
-VALUE dtable_neg(VALUE ary) {
+PRIVATE VALUE dtable_neg(VALUE ary) {
    return dtable_apply_math_op(ary, do_neg);
 }
 
@@ -572,7 +574,7 @@ VALUE dtable_neg(VALUE ary) {
  *  Returns of copy of _dtable_ with all entries replaced by their absolute values.
  */
 
-VALUE dtable_abs(VALUE ary) {
+PRIVATE VALUE dtable_abs(VALUE ary) {
    return dtable_apply_math_op(ary, fabs);
 }
 
@@ -583,7 +585,7 @@ VALUE dtable_abs(VALUE ary) {
  *  Returns of copy of _dtable_ with entry x replaced by sin(x).
  */
 
-VALUE dtable_sin(VALUE ary) {
+PRIVATE VALUE dtable_sin(VALUE ary) {
    return dtable_apply_math_op(ary, sin);
 }
 
@@ -594,7 +596,7 @@ VALUE dtable_sin(VALUE ary) {
  *  Returns of copy of _dtable_ with entry x replaced by cos(x).
  */
 
-VALUE dtable_cos(VALUE ary) {
+PRIVATE VALUE dtable_cos(VALUE ary) {
    return dtable_apply_math_op(ary, cos);
 }
 
@@ -605,7 +607,7 @@ VALUE dtable_cos(VALUE ary) {
  *  Returns of copy of _dtable_ with entry x replaced by tan(x).
  */
 
-VALUE dtable_tan(VALUE ary) {
+PRIVATE VALUE dtable_tan(VALUE ary) {
    return dtable_apply_math_op(ary, tan);
 }
 
@@ -616,7 +618,7 @@ VALUE dtable_tan(VALUE ary) {
  *  Returns of copy of _dtable_ with entry x replaced by asin(x).
  */
 
-VALUE dtable_asin(VALUE ary) {
+PRIVATE VALUE dtable_asin(VALUE ary) {
    return dtable_apply_math_op(ary, asin);
 }
 
@@ -627,7 +629,7 @@ VALUE dtable_asin(VALUE ary) {
  *  Returns of copy of _dtable_ with entry x replaced by acos(x).
  */
 
-VALUE dtable_acos(VALUE ary) {
+PRIVATE VALUE dtable_acos(VALUE ary) {
    return dtable_apply_math_op(ary, acos);
 }
 
@@ -638,7 +640,7 @@ VALUE dtable_acos(VALUE ary) {
  *  Returns of copy of _dtable_ with entry x replaced by atan(x).
  */
 
-VALUE dtable_atan(VALUE ary) {
+PRIVATE VALUE dtable_atan(VALUE ary) {
    return dtable_apply_math_op(ary, atan);
 }
 
@@ -649,7 +651,7 @@ VALUE dtable_atan(VALUE ary) {
  *  Returns of copy of _dtable_ with entry x replaced by sinh(x).
  */
 
-VALUE dtable_sinh(VALUE ary) {
+PRIVATE VALUE dtable_sinh(VALUE ary) {
    return dtable_apply_math_op(ary, sinh);
 }
 
@@ -660,7 +662,7 @@ VALUE dtable_sinh(VALUE ary) {
  *  Returns of copy of _dtable_ with entry x replaced by cosh(x).
  */
 
-VALUE dtable_cosh(VALUE ary) {
+PRIVATE VALUE dtable_cosh(VALUE ary) {
    return dtable_apply_math_op(ary, cosh);
 }
 
@@ -671,7 +673,7 @@ VALUE dtable_cosh(VALUE ary) {
  *  Returns of copy of _dtable_ with entry x replaced by tanh(x).
  */
 
-VALUE dtable_tanh(VALUE ary) {
+PRIVATE VALUE dtable_tanh(VALUE ary) {
    return dtable_apply_math_op(ary, tanh);
 }
 
@@ -684,7 +686,7 @@ static double do_asinh(double x) { return log(x + sqrt(x*x+1.0)); }
  *  Returns of copy of _dtable_ with entry x replaced by asinh(x).
  */
 
-VALUE dtable_asinh(VALUE ary) {
+PRIVATE VALUE dtable_asinh(VALUE ary) {
    return dtable_apply_math_op(ary, do_asinh);
 }
 
@@ -697,7 +699,7 @@ static double do_acosh(double x) { return log(x + sqrt(x*x-1.0)); }
  *  Returns of copy of _dtable_ with entry x replaced by acosh(x).
  */
 
-VALUE dtable_acosh(VALUE ary) {
+PRIVATE VALUE dtable_acosh(VALUE ary) {
    return dtable_apply_math_op(ary, do_acosh);
 }
 
@@ -710,7 +712,7 @@ static double do_atanh(double x) { return 0.5*log((1.0+x)/(1.0-x)); }
  *  Returns of copy of _dtable_ with entry x replaced by atanh(x).
  */
 
-VALUE dtable_atanh(VALUE ary) {
+PRIVATE VALUE dtable_atanh(VALUE ary) {
    return dtable_apply_math_op(ary, do_atanh);
 }
 
@@ -721,7 +723,7 @@ VALUE dtable_atanh(VALUE ary) {
  *  Returns of copy of _dtable_ with entry x replaced by smallest integer not less than x.
  */
 
-VALUE dtable_ceil(VALUE ary) {
+PRIVATE VALUE dtable_ceil(VALUE ary) {
    return dtable_apply_math_op(ary, ceil);
 }
 
@@ -732,7 +734,7 @@ VALUE dtable_ceil(VALUE ary) {
  *  Returns of copy of _dtable_ with each entry x replaced by largest integer not greater than x.
  */
 
-VALUE dtable_floor(VALUE ary) {
+PRIVATE VALUE dtable_floor(VALUE ary) {
    return dtable_apply_math_op(ary, floor);
 }
 
@@ -746,7 +748,7 @@ static double do_round(double x) { return (x == 0.0)? 0.0 : (x > 0.0)? floor(x+0
  *  (Numbers midway between integers round away from zero.)
  */
 
-VALUE dtable_round(VALUE ary) {
+PRIVATE VALUE dtable_round(VALUE ary) {
    return dtable_apply_math_op(ary, do_round);
 }
 
@@ -757,7 +759,7 @@ VALUE dtable_round(VALUE ary) {
  *  Returns of copy of _dtable_ with each entry x replaced by exp(x).
  */
 
-VALUE dtable_exp(VALUE ary) {
+PRIVATE VALUE dtable_exp(VALUE ary) {
    return dtable_apply_math_op(ary, exp);
 }
 
@@ -770,7 +772,7 @@ static double do_exp10(double arg) { return pow(10.0, arg); }
  *  Returns of copy of _dtable_ with each entry x replaced by 10**x.
  */
 
-VALUE dtable_exp10(VALUE ary) {
+PRIVATE VALUE dtable_exp10(VALUE ary) {
    return dtable_apply_math_op(ary, do_exp10);
 }
 
@@ -781,7 +783,7 @@ VALUE dtable_exp10(VALUE ary) {
  *  Returns of copy of _dtable_ with each entry x replaced by log(x).
  */
 
-VALUE dtable_log(VALUE ary) {
+PRIVATE VALUE dtable_log(VALUE ary) {
    return dtable_apply_math_op(ary, log);
 }
 
@@ -792,7 +794,7 @@ VALUE dtable_log(VALUE ary) {
  *  Returns of copy of _dtable_ with each entry x replaced by log10(x).
  */
 
-VALUE dtable_log10(VALUE ary) {
+PRIVATE VALUE dtable_log10(VALUE ary) {
    return dtable_apply_math_op(ary, log10);
 }
 
@@ -805,7 +807,7 @@ static double do_inv(double arg) { return 1.0/arg; }
  *  Returns of copy of _dtable_ with each entry x replaced by 1/x.
  */
 
-VALUE dtable_inv(VALUE ary) {
+PRIVATE VALUE dtable_inv(VALUE ary) {
    return dtable_apply_math_op(ary, do_inv);
 }
 
@@ -816,7 +818,7 @@ VALUE dtable_inv(VALUE ary) {
  *  Returns of copy of _dtable_ with each entry x replaced by sqrt(x).
  */
 
-VALUE dtable_sqrt(VALUE ary) {
+PRIVATE VALUE dtable_sqrt(VALUE ary) {
    return dtable_apply_math_op(ary, sqrt);
 }
 
@@ -827,7 +829,7 @@ VALUE dtable_sqrt(VALUE ary) {
  *  Replace each entry x of _dtable_ with -x.
  */
 
-VALUE dtable_neg_bang(VALUE ary) {
+PRIVATE VALUE dtable_neg_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, do_neg);
 }
 
@@ -838,7 +840,7 @@ VALUE dtable_neg_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with abs(x).
  */
 
-VALUE dtable_abs_bang(VALUE ary) {
+PRIVATE VALUE dtable_abs_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, fabs);
 }
 
@@ -849,7 +851,7 @@ VALUE dtable_abs_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with sin(x).
  */
 
-VALUE dtable_sin_bang(VALUE ary) {
+PRIVATE VALUE dtable_sin_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, sin);
 }
 
@@ -860,7 +862,7 @@ VALUE dtable_sin_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with cos(x).
  */
 
-VALUE dtable_cos_bang(VALUE ary) {
+PRIVATE VALUE dtable_cos_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, cos);
 }
 
@@ -871,7 +873,7 @@ VALUE dtable_cos_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with tan(x).
  */
 
-VALUE dtable_tan_bang(VALUE ary) {
+PRIVATE VALUE dtable_tan_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, tan);
 }
 
@@ -882,7 +884,7 @@ VALUE dtable_tan_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with asin(x).
  */
 
-VALUE dtable_asin_bang(VALUE ary) {
+PRIVATE VALUE dtable_asin_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, asin);
 }
 
@@ -893,7 +895,7 @@ VALUE dtable_asin_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with acos(x).
  */
 
-VALUE dtable_acos_bang(VALUE ary) {
+PRIVATE VALUE dtable_acos_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, acos);
 }
 
@@ -904,7 +906,7 @@ VALUE dtable_acos_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with atan(x).
  */
 
-VALUE dtable_atan_bang(VALUE ary) {
+PRIVATE VALUE dtable_atan_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, atan);
 }
 
@@ -915,7 +917,7 @@ VALUE dtable_atan_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with sinh(x).
  */
 
-VALUE dtable_sinh_bang(VALUE ary) {
+PRIVATE VALUE dtable_sinh_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, sinh);
 }
 
@@ -926,7 +928,7 @@ VALUE dtable_sinh_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with cosh(x).
  */
 
-VALUE dtable_cosh_bang(VALUE ary) {
+PRIVATE VALUE dtable_cosh_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, cosh);
 }
 
@@ -937,7 +939,7 @@ VALUE dtable_cosh_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with tanh(x).
  */
 
-VALUE dtable_tanh_bang(VALUE ary) {
+PRIVATE VALUE dtable_tanh_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, tanh);
 }
 
@@ -948,7 +950,7 @@ VALUE dtable_tanh_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with asinh(x).
  */
 
-VALUE dtable_asinh_bang(VALUE ary) {
+PRIVATE VALUE dtable_asinh_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, do_asinh);
 }
 
@@ -959,7 +961,7 @@ VALUE dtable_asinh_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with acosh(x).
  */
 
-VALUE dtable_acosh_bang(VALUE ary) {
+PRIVATE VALUE dtable_acosh_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, do_acosh);
 }
 
@@ -970,7 +972,7 @@ VALUE dtable_acosh_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with atanh(x).
  */
 
-VALUE dtable_atanh_bang(VALUE ary) {
+PRIVATE VALUE dtable_atanh_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, do_atanh);
 }
 
@@ -981,7 +983,7 @@ VALUE dtable_atanh_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with the smallest integer not less than x.
  */
 
-VALUE dtable_ceil_bang(VALUE ary) {
+PRIVATE VALUE dtable_ceil_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, ceil);
 }
 
@@ -992,7 +994,7 @@ VALUE dtable_ceil_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with the largest integer not greater than x.
  */
 
-VALUE dtable_floor_bang(VALUE ary) {
+PRIVATE VALUE dtable_floor_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, floor);
 }
 
@@ -1004,7 +1006,7 @@ VALUE dtable_floor_bang(VALUE ary) {
  *  (Numbers midway between integers round away from zero.)
  */
 
-VALUE dtable_round_bang(VALUE ary) {
+PRIVATE VALUE dtable_round_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, do_round);
 }
 
@@ -1015,7 +1017,7 @@ VALUE dtable_round_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with exp(x).
  */
 
-VALUE dtable_exp_bang(VALUE ary) {
+PRIVATE VALUE dtable_exp_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, exp);
 }
 
@@ -1026,7 +1028,7 @@ VALUE dtable_exp_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with 10**x.
  */
 
-VALUE dtable_exp10_bang(VALUE ary) {
+PRIVATE VALUE dtable_exp10_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, do_exp10);
 }
 
@@ -1037,7 +1039,7 @@ VALUE dtable_exp10_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with log(x).
  */
 
-VALUE dtable_log_bang(VALUE ary) {
+PRIVATE VALUE dtable_log_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, log);
 }
 
@@ -1048,7 +1050,7 @@ VALUE dtable_log_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with log10(x).
  */
 
-VALUE dtable_log10_bang(VALUE ary) {
+PRIVATE VALUE dtable_log10_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, log10);
 }
 
@@ -1059,7 +1061,7 @@ VALUE dtable_log10_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with 1/x.
  */
 
-VALUE dtable_inv_bang(VALUE ary) {
+PRIVATE VALUE dtable_inv_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, do_inv);
 }
 
@@ -1070,11 +1072,11 @@ VALUE dtable_inv_bang(VALUE ary) {
  *  Replace each entry x of _dtable_ with sqrt(x).
  */
 
-VALUE dtable_sqrt_bang(VALUE ary) {
+PRIVATE VALUE dtable_sqrt_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, sqrt);
 }
 
-VALUE dtable_apply_math_op1_bang(VALUE ary, VALUE arg, double (*op)(double, double)) {
+PRIVATE VALUE dtable_apply_math_op1_bang(VALUE ary, VALUE arg, double (*op)(double, double)) {
    Dtable *d = Get_Dtable(ary);
    arg = rb_Float(arg);
    double y = NUM2DBL(arg), **p = d->ptr;
@@ -1087,7 +1089,7 @@ VALUE dtable_apply_math_op1_bang(VALUE ary, VALUE arg, double (*op)(double, doub
    return ary;
 }
 
-VALUE dtable_apply_math_op1(VALUE source, VALUE arg, double (*op)(double, double)) {
+PRIVATE VALUE dtable_apply_math_op1(VALUE source, VALUE arg, double (*op)(double, double)) {
    return dtable_apply_math_op1_bang(dtable_dup(source), arg, op);
 }
 
@@ -1100,7 +1102,7 @@ static double do_trim(double x, double cutoff) { return (fabs(x) < cutoff)? 0.0 
  *  Returns a copy of _dtable_ with any entry with absolute value less than _cutoff_ replaced by 0.
  */
 
-VALUE dtable_trim(int argc, VALUE *argv, VALUE self) {
+PRIVATE VALUE dtable_trim(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
       rb_raise(rb_eArgError, "wrong # of arguments(%d for 0 or 1)",argc);
@@ -1117,7 +1119,7 @@ static double do_safe_log(double x, double y) { return log(MAX(x,y)); }
  *  Returns a copy of _dtable_ with each entry x replaced by log(max(x,_cutoff_)).
  */
 
-VALUE dtable_safe_log(int argc, VALUE *argv, VALUE self) {
+PRIVATE VALUE dtable_safe_log(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
       rb_raise(rb_eArgError, "wrong # of arguments(%d for 0 or 1)",argc);
@@ -1135,7 +1137,7 @@ static double do_safe_log10(double x, double y) { return log10(MAX(x,y)); }
  *     
  */
 
-VALUE dtable_safe_log10(int argc, VALUE *argv, VALUE self) {
+PRIVATE VALUE dtable_safe_log10(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
       rb_raise(rb_eArgError, "wrong # of arguments(%d for 0 or 1)",argc);
@@ -1154,7 +1156,7 @@ static double do_safe_inv(double x, double y) {
  *     
  */
 
-VALUE dtable_safe_inv(int argc, VALUE *argv, VALUE self) {
+PRIVATE VALUE dtable_safe_inv(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
       rb_raise(rb_eArgError, "wrong # of arguments(%d for 0 or 1)",argc);
@@ -1172,7 +1174,7 @@ static double do_safe_asin(double x) { return asin(MAX(-1.0,MIN(1.0,x))); }
  *     
  */
 
-VALUE dtable_safe_asin(VALUE ary) {
+PRIVATE VALUE dtable_safe_asin(VALUE ary) {
    return dtable_apply_math_op(ary, do_safe_asin);
 }
    
@@ -1186,7 +1188,7 @@ static double do_safe_acos(double x) { return acos(MAX(-1.0,MIN(1.0,x))); }
  *     
  */
 
-VALUE dtable_safe_acos(VALUE ary) {
+PRIVATE VALUE dtable_safe_acos(VALUE ary) {
    return dtable_apply_math_op(ary, do_safe_acos);
 }
    
@@ -1200,7 +1202,7 @@ static double do_safe_sqrt(double x) { return sqrt(MAX(x,0.0)); }
  *     
  */
 
-VALUE dtable_safe_sqrt(VALUE ary) {
+PRIVATE VALUE dtable_safe_sqrt(VALUE ary) {
    return dtable_apply_math_op(ary, do_safe_sqrt);
 }
 
@@ -1214,7 +1216,7 @@ VALUE dtable_safe_sqrt(VALUE ary) {
  *  by the corresponding entry in the _other_ data array.
  */
 
-VALUE dtable_atan2_bang(VALUE ary, VALUE arg) {
+PRIVATE VALUE dtable_atan2_bang(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2_bang(ary, arg, atan2);
 }
 
@@ -1231,7 +1233,7 @@ static double do_mod(double x, double y) { return x - y * floor(x/y); }
  *  by x % the corresponding entry in the _other_ data array.
  */
 
-VALUE dtable_modulo_bang(VALUE ary, VALUE arg) {
+PRIVATE VALUE dtable_modulo_bang(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2_bang(ary, arg, do_mod);
 }
 
@@ -1247,7 +1249,7 @@ static double do_remainder(double x, double y) { return (x*y > 0.0)? do_mod(x,y)
  *  by remainder of x divided by the corresponding entry in the _other_ data array.
  */
 
-VALUE dtable_remainder_bang(VALUE ary, VALUE arg) {
+PRIVATE VALUE dtable_remainder_bang(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2_bang(ary, arg, do_remainder);
 }
 
@@ -1258,7 +1260,7 @@ VALUE dtable_remainder_bang(VALUE ary, VALUE arg) {
  *  Each entry x in _dtable_ having absolute value less than _cutoff_ is replaced by 0.
  */
 
-VALUE dtable_trim_bang(int argc, VALUE *argv, VALUE self) {
+PRIVATE VALUE dtable_trim_bang(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
       rb_raise(rb_eArgError, "wrong # of arguments(%d for 0 or 1)",argc);
@@ -1278,7 +1280,7 @@ VALUE dtable_trim_bang(int argc, VALUE *argv, VALUE self) {
  *  by x ** the corresponding entry in the _other_ data array.
  */
 
-VALUE dtable_pow_bang(VALUE ary, VALUE arg) {
+PRIVATE VALUE dtable_pow_bang(VALUE ary, VALUE arg) {
    return dtable_apply_math_op1_bang(ary, arg, pow);
 }
 
@@ -1294,7 +1296,7 @@ static double do_as_exponent_of(double x, double y) { return pow(y,x); }
  *  by the corresponding entry in the _other_ data array raised to the power x.
  */
 
-VALUE dtable_as_exponent_of_bang(VALUE ary, VALUE arg) {
+PRIVATE VALUE dtable_as_exponent_of_bang(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2_bang(ary, arg, do_as_exponent_of);
 }
 
@@ -1306,7 +1308,7 @@ VALUE dtable_as_exponent_of_bang(VALUE ary, VALUE arg) {
  *     
  */
 
-VALUE dtable_safe_log_bang(int argc, VALUE *argv, VALUE self) {
+PRIVATE VALUE dtable_safe_log_bang(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
       rb_raise(rb_eArgError, "wrong # of arguments(%d for 0 or 1)",argc);
@@ -1322,7 +1324,7 @@ VALUE dtable_safe_log_bang(int argc, VALUE *argv, VALUE self) {
  *     
  */
 
-VALUE dtable_safe_log10_bang(int argc, VALUE *argv, VALUE self) {
+PRIVATE VALUE dtable_safe_log10_bang(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
       rb_raise(rb_eArgError, "wrong # of arguments(%d for 0 or 1)",argc);
@@ -1338,7 +1340,7 @@ VALUE dtable_safe_log10_bang(int argc, VALUE *argv, VALUE self) {
  *     
  */
 
-VALUE dtable_safe_inv_bang(int argc, VALUE *argv, VALUE self) {
+PRIVATE VALUE dtable_safe_inv_bang(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
       rb_raise(rb_eArgError, "wrong # of arguments(%d for 0 or 1)",argc);
@@ -1354,7 +1356,7 @@ VALUE dtable_safe_inv_bang(int argc, VALUE *argv, VALUE self) {
  *     
  */
 
-VALUE dtable_safe_sqrt_bang(VALUE ary) {
+PRIVATE VALUE dtable_safe_sqrt_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, do_safe_sqrt);
 }
    
@@ -1366,7 +1368,7 @@ VALUE dtable_safe_sqrt_bang(VALUE ary) {
  *     
  */
 
-VALUE dtable_safe_asin_bang(VALUE ary) {
+PRIVATE VALUE dtable_safe_asin_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, do_safe_asin);
 }
    
@@ -1378,11 +1380,11 @@ VALUE dtable_safe_asin_bang(VALUE ary) {
  *     
  */
 
-VALUE dtable_safe_acos_bang(VALUE ary) {
+PRIVATE VALUE dtable_safe_acos_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, do_safe_acos);
 }
    
-VALUE dtable_apply_math_op2_bang(VALUE ary1, VALUE ary2, double (*op)(double, double)) {
+PRIVATE VALUE dtable_apply_math_op2_bang(VALUE ary1, VALUE ary2, double (*op)(double, double)) {
    VALUE check = rb_obj_is_kind_of(ary2, rb_cNumeric);
    if (check != Qfalse) { return dtable_apply_math_op1_bang(ary1, ary2, op); }
    Dtable *d1 = Get_Dtable(ary1);
@@ -1400,7 +1402,7 @@ VALUE dtable_apply_math_op2_bang(VALUE ary1, VALUE ary2, double (*op)(double, do
    return ary1;
 }
 
-VALUE dtable_apply_math_op2(VALUE ary1, VALUE ary2, double (*op)(double, double)) {
+PRIVATE VALUE dtable_apply_math_op2(VALUE ary1, VALUE ary2, double (*op)(double, double)) {
    return dtable_apply_math_op2_bang(dtable_dup(ary1), ary2, op);
 }
 
@@ -1418,7 +1420,7 @@ static double do_add(double x, double y) { return x + y; }
  *  by x + the corresponding entry in the _other_ data array.
  */
 
-VALUE dtable_add(VALUE ary, VALUE arg) {
+PRIVATE VALUE dtable_add(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2(ary, arg, do_add);
 }
 
@@ -1436,7 +1438,7 @@ static double do_sub(double x, double y) { return x - y; }
  *  by x - the corresponding entry in the _other_ data array.
  */
 
-VALUE dtable_sub(VALUE ary, VALUE arg) {
+PRIVATE VALUE dtable_sub(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2(ary, arg, do_sub);
 }
 
@@ -1454,7 +1456,7 @@ static double do_mul(double x, double y) { return x * y; }
  *  by x * the corresponding entry in the _other_ data array.
  */
 
-VALUE dtable_mul(VALUE ary, VALUE arg) {
+PRIVATE VALUE dtable_mul(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2(ary, arg, do_mul);
 }
 
@@ -1472,7 +1474,7 @@ static double do_div(double x, double y) { return x / y; }
  *  by x / the corresponding entry in the _other_ data array.
  */
 
-VALUE dtable_div(VALUE ary, VALUE arg) {
+PRIVATE VALUE dtable_div(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2(ary, arg, do_div);
 }
 
@@ -1491,7 +1493,7 @@ VALUE dtable_div(VALUE ary, VALUE arg) {
  *     
  */
 
-VALUE dtable_mod(VALUE ary, VALUE arg) {
+PRIVATE VALUE dtable_mod(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2(ary, arg, do_mod);
 }
 
@@ -1505,7 +1507,7 @@ VALUE dtable_mod(VALUE ary, VALUE arg) {
  *  by the remainder of x divided by the corresponding entry in the _other_ data array.
  */
 
-VALUE dtable_remainder(VALUE ary, VALUE arg) {
+PRIVATE VALUE dtable_remainder(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2(ary, arg, do_remainder);
 }
 
@@ -1524,7 +1526,7 @@ VALUE dtable_remainder(VALUE ary, VALUE arg) {
  *     
  */
 
-VALUE dtable_pow(VALUE ary, VALUE arg) {
+PRIVATE VALUE dtable_pow(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2(ary, arg, pow);
 }
 
@@ -1538,7 +1540,7 @@ VALUE dtable_pow(VALUE ary, VALUE arg) {
  *  by the corresponding entry in the _other_ data array raised to the power x.
  */
 
-VALUE dtable_as_exponent_of(VALUE ary, VALUE arg) {
+PRIVATE VALUE dtable_as_exponent_of(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2(ary, arg, do_as_exponent_of);
 }
 
@@ -1552,7 +1554,7 @@ VALUE dtable_as_exponent_of(VALUE ary, VALUE arg) {
  *  by the angle whose tangent is x divided by the corresponding entry in the _other_ data array.
  */
 
-VALUE dtable_atan2(VALUE ary, VALUE arg) {
+PRIVATE VALUE dtable_atan2(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2(ary, arg, atan2);
 }
 
@@ -1566,7 +1568,7 @@ VALUE dtable_atan2(VALUE ary, VALUE arg) {
  *  the corresponding entry in the _other_ data array.
  */
 
-VALUE dtable_add_bang(VALUE ary, VALUE arg) {
+PRIVATE VALUE dtable_add_bang(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2_bang(ary, arg, do_add);
 }
 
@@ -1580,7 +1582,7 @@ VALUE dtable_add_bang(VALUE ary, VALUE arg) {
  *  the corresponding entry in the _other_ data array.
  */
 
-VALUE dtable_sub_bang(VALUE ary, VALUE arg) {
+PRIVATE VALUE dtable_sub_bang(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2_bang(ary, arg, do_sub);
 }
 
@@ -1594,7 +1596,7 @@ VALUE dtable_sub_bang(VALUE ary, VALUE arg) {
  *  the corresponding entry in the _other_ data array.
  */
 
-VALUE dtable_mul_bang(VALUE ary, VALUE arg) {
+PRIVATE VALUE dtable_mul_bang(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2_bang(ary, arg, do_mul);
 }
 
@@ -1608,13 +1610,13 @@ VALUE dtable_mul_bang(VALUE ary, VALUE arg) {
  *  the corresponding entry in the _other_ data array.
  */
 
-VALUE dtable_div_bang(VALUE ary, VALUE arg) {
+PRIVATE VALUE dtable_div_bang(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2_bang(ary, arg, do_div);
 }
 
 /*======================================================================*/
 
-VALUE Read_Dtable(VALUE dest, char *filename, int skip_lines) {
+PRIVATE VALUE Read_Dtable(VALUE dest, char *filename, int skip_lines) {
    FILE *file = NULL;
    long num_cols, num_rows;
    int i, j, k;
@@ -1677,7 +1679,7 @@ VALUE Read_Dtable(VALUE dest, char *filename, int skip_lines) {
  *  
  */
 
-VALUE dtable_read(int argc, VALUE *argv, VALUE self) {
+PRIVATE VALUE dtable_read(int argc, VALUE *argv, VALUE self) {
    if ((argc < 1) || (argc > 2))
       rb_raise(rb_eArgError, "wrong # of arguments(%d for 1 or 2)",argc);
    VALUE filename = argv[0];
@@ -1685,7 +1687,7 @@ VALUE dtable_read(int argc, VALUE *argv, VALUE self) {
    return Read_Dtable(self, StringValuePtr(filename), skip_lines);
 }
 
-VALUE dtable_entry(VALUE ary, long i, long j) {
+PRIVATE VALUE dtable_entry(VALUE ary, long i, long j) {
    Dtable *d = Get_Dtable(ary);
    if (d->num_cols <= 0 || d->num_rows <= 0) return Qnil;
    if (i < 0) i += d->num_rows;
@@ -1702,7 +1704,7 @@ VALUE dtable_entry(VALUE ary, long i, long j) {
  *  Returns the element at location _row_, _col_.  Returns +nil+
  *  if the location is out of range.
  */
-VALUE dtable_at(VALUE ary, VALUE xloc, VALUE yloc) {
+PRIVATE VALUE dtable_at(VALUE ary, VALUE xloc, VALUE yloc) {
    return dtable_entry(ary, NUM2LONG(xloc), NUM2LONG(yloc));
 }
 
@@ -1727,7 +1729,7 @@ void dtable_store(VALUE ary, long i, long j, double v) {
  *
  *  Replaces the element at location _row_, _col_ by the given _number_.
  */
-VALUE dtable_aset(VALUE ary, VALUE xloc, VALUE yloc, VALUE val) {
+PRIVATE VALUE dtable_aset(VALUE ary, VALUE xloc, VALUE yloc, VALUE val) {
    dtable_store(ary, NUM2LONG(xloc), NUM2LONG(yloc), NUM2DBL(val));
    return val;
 }
@@ -1742,7 +1744,7 @@ VALUE dtable_aset(VALUE ary, VALUE xloc, VALUE yloc, VALUE val) {
  */
 
 
-void Init_Dtable() {
+PUBLIC void Init_Dtable() {
    /* modified by Vincent Fourmond, for splitting out the libraries */
   
    rb_require("Dobjects/Dvector");
