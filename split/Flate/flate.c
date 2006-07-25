@@ -62,7 +62,7 @@
  *  Returns a compressed verion of _str_ in a new string.
  */
 
-VALUE do_compress(VALUE klass, VALUE str) {
+PRIVATE VALUE do_compress(VALUE klass, VALUE str) {
    str = rb_String(str);
    unsigned char *ptr = (unsigned char *)RSTRING(str)->ptr;
    long len = RSTRING(str)->len;
@@ -77,7 +77,7 @@ VALUE do_compress(VALUE klass, VALUE str) {
    return new_str;
 }
 
-int flate_compress(unsigned char *new_ptr, unsigned long *new_len_ptr, unsigned char *ptr, long len) {
+PRIVATE int flate_compress(unsigned char *new_ptr, unsigned long *new_len_ptr, unsigned char *ptr, long len) {
    return compress(new_ptr, new_len_ptr, ptr, len); // updates new_len to the actual length
 }
  
@@ -90,7 +90,7 @@ int flate_compress(unsigned char *new_ptr, unsigned long *new_len_ptr, unsigned 
  *  
  */
  
-VALUE do_expand(VALUE klass, VALUE str) {
+PRIVATE VALUE do_expand(VALUE klass, VALUE str) {
    str = rb_String(str);
    unsigned char *ptr = (unsigned char *)RSTRING(str)->ptr;
    long len = RSTRING(str)->len;
@@ -109,7 +109,7 @@ VALUE do_expand(VALUE klass, VALUE str) {
 // NOTE: the destination buffer will be reallocated if it isn't large enough.
 // So you MUST allocate a buffer rather than using a static one.
 // And you MUST be prepared for the buffer to change location and size.
-int flate_expand(unsigned char **new_ptr_ptr, unsigned long *new_len_ptr, unsigned char *ptr, long len) {
+PRIVATE int flate_expand(unsigned char **new_ptr_ptr, unsigned long *new_len_ptr, unsigned char *ptr, long len) {
    unsigned char *new_ptr = *new_ptr_ptr;
    int result = Z_MEM_ERROR;
    while (*new_len_ptr < 9999999) {
@@ -140,7 +140,7 @@ int flate_expand(unsigned char **new_ptr_ptr, unsigned long *new_len_ptr, unsign
  * 100 bytes or so, may actually 'compress' to a larger string due to the overhead of compression tables.
  */
  
-void Init_Flate() {
+PUBLIC void Init_Flate() {
    /* modified by Vincent Fourmond, for the splitting out */
    /*VALUE mTioga = rb_define_module("Tioga"); 
      VALUE mFlate = rb_define_module_under(mTioga, "Flate"); */

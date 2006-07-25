@@ -23,6 +23,7 @@
    
 **********************************************************************/
 
+#include <namespace.h>
 #include <ruby.h>
 
 #include "dvector.h"
@@ -391,8 +392,8 @@ static VALUE function_compute_spline(VALUE self, VALUE x_values)
 						     
 
 /* the function fort joint sorting...*/
-extern void joint_quicksort(double *const x_values, double * const y_values,
-			    size_t total_elems);
+PRIVATE void joint_quicksort(double *const x_values, double * const y_values,
+			     size_t total_elems);
 
 /* Dvector's lock */
 #define DVEC_TMPLOCK  FL_USER1

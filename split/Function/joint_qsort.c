@@ -23,7 +23,8 @@
    Engineering a sort function; Jon Bentley and M. Douglas McIlroy;
    Software - Practice and Experience; Vol. 23 (11), 1249-1265, 1993.  */
 
-#include <alloca.h>
+#include <namespace.h>
+
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
@@ -93,6 +94,7 @@ typedef struct
       smaller partition.  This *guarantees* no more than log (total_elems)
       stack size is needed (actually O(1) in this case)!  */
 
+PRIVATE
 void
 joint_quicksort (double *const x_values, double * const y_values,
 		 size_t total_elems)
