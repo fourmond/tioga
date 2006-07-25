@@ -22,6 +22,8 @@
 #include <ruby.h>
 #include <intern.h>
 
+#include <namespace.h>
+
 /* MV stands for Module Variable */
 #define MV_SYMBOLS "@_exported_C_symbols"
 /* modified to use instance variables instead of global class variables:
@@ -50,14 +52,15 @@ static VALUE get_symbol_hash(VALUE module)
 
 /* registers a symbol in the given module. This one is the internal
    function */
-void rb_export_symbol(VALUE module, const char * symbol_name,
+PRIVATE void rb_export_symbol(VALUE module, const char * symbol_name,
 			    void * symbol)
 {
   VALUE hash = get_symbol_hash(module);
   rb_hash_aset(hash, rb_str_new2(symbol_name),LONG2NUM((long) symbol));
 }
 
-void * rb_import_symbol_no_raise(VALUE module, const char * symbol_name)
+PRIVATE void * rb_import_symbol_no_raise(VALUE module, 
+					 const char * symbol_name)
 {
   VALUE hash = rb_iv_get(module, MV_SYMBOLS);
   if(TYPE(hash) != T_HASH) 
@@ -73,7 +76,7 @@ void * rb_import_symbol_no_raise(VALUE module, const char * symbol_name)
 
 /* same as before, but raises something is the return value is NULL,
    which is probably best as a default behavior*/
-void * rb_import_symbol(VALUE module, const char * symbol_name)
+PRIVATE void * rb_import_symbol(VALUE module, const char * symbol_name)
 {
   void * symbol = rb_import_symbol_no_raise(module, symbol_name);
   if(symbol)

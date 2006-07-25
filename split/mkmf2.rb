@@ -538,13 +538,7 @@ module Mkmf2
                        skip = /~$/, &b)
     source_files = []
     for glob in files
-      # If glob looks like a glob, we use Dir.glob, else we add it
-      # without modification
-      if glob =~ /\*|\[|\?/
-        source_files += Dir[glob]
-      else
-        source_files << glob
-      end
+      source_files += Dir[glob]
     end
     install_hash = {}
     for f in source_files
@@ -695,10 +689,6 @@ module Mkmf2
     return "$(#{str})"
   end
 
-
-  # A constant to get a configuration variable
-  MAKE_VARIABLE = /\$\((\w+)\)/
-
   # Returns a string containing all the configuration variables. We
   # use the MAKEFILE_CONFIG for more flexibility in the Makefile: the
   # variables can then be redefined on the make command-line.
@@ -713,7 +703,7 @@ module Mkmf2
       new_keys = []
       keys.each do |k|
         if MAKEFILE_CONFIG.key? k
-          MAKEFILE_CONFIG[k].gsub(MAKE_VARIABLE) { |k|
+          MAKEFILE_CONFIG[k].gsub(/\$\((\w+)\)/) { |k|
             # we add the key to the list only if it exists, else the
             # environment variable gets overridden by what is written
             # in the Makefile (for $HOME, for instance)
@@ -1397,6 +1387,12 @@ EOM
     return string.gsub(/\$\((\w+)\)/) { "$#$1" }
   end
 
+  # Add defines to the build
+  def add_define(d)
+        MAKEFILE_CONFIG["DEFINES"] += 
+          " -D_#{d}"
+  end
+
   # This is a compatibility function with the previous mkmf.rb. It does check
   # for the presence of a header in the current include directories. If found,
   # it returns true and sets the define HAVE_...
@@ -1406,8 +1402,7 @@ EOM
                 expand_vars("$(CPP) $(INCLUDEDIRS) " \
                             "$(CPPFLAGS) $(CFLAGS) $(DEFINES)"\
                             "#{CONFTEST_C} $(CPPOUTFILE)"),&b)
-        MAKEFILE_CONFIG["DEFINES"] += 
-          " -DHAVE_#{header.sanitize}"
+        add_define("HAVE_#{header.sanitize}")
         true
       else
         false
@@ -1471,7 +1466,7 @@ SRC
                             )
                 )
                 
-        MAKEFILE_CONFIG["DEFINES"] += " -DHAVE_#{lib.sanitize}"
+        add_define("HAVE_#{lib.sanitize}")
         MAKEFILE_CONFIG["LIBS_SUP"] += " #{libarg}"
         true
       else

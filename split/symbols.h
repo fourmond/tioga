@@ -5,10 +5,14 @@
 /* A small layer for exporting and importing symbols from
    a compiled module */
 
-void rb_export_symbol(VALUE module, const char * symbol_name,
+#include <namespace.h>
+
+
+PRIVATE extern void rb_export_symbol(VALUE module, const char * symbol_name,
 		      void * symbol);
-void * rb_import_symbol(VALUE module, const char * symbol_name);
-void * rb_import_symbol_no_raise(VALUE module, const char * symbol_name);
+PRIVATE extern void * rb_import_symbol(VALUE module, const char * symbol_name);
+PRIVATE extern void * rb_import_symbol_no_raise(VALUE module, 
+						const char * symbol_name);
 
 /* a shortcut for exporting something with the same name */
 #define RB_EXPORT_SYMBOL(module, name) \
@@ -18,10 +22,10 @@ void * rb_import_symbol_no_raise(VALUE module, const char * symbol_name);
 		   
 #define DECLARE_SYMBOL(ret_type,name,args) \
   typedef ret_type (*rb_export_##name##_type) args;\
-  extern rb_export_##name##_type name
+  PRIVATE extern rb_export_##name##_type name
 
 #define IMPLEMENT_SYMBOL(name)\
-  rb_export_##name##_type name;
+  PRIVATE rb_export_##name##_type name;
 
 #define RB_IMPORT_SYMBOL(module, name) \
   name = (rb_export_##name##_type) rb_import_symbol(module, #name)
