@@ -17,6 +17,7 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
+
 #ifndef _NAMESPACE_H
 #define _NAMESPACE_H
 
@@ -25,6 +26,7 @@
 
    * PUBLIC, which has to be used to mark objects that will be used
    outside the module
+
    * PRIVATE, for symbols which are "extern" but intern to the module
 
    Please don't add "extern" after the PRIVATE or PUBLIC declaration
@@ -32,14 +34,14 @@
 */
 
 #ifdef __APPLE__
-#  define PRIVATE __private_extern__
-#  define PUBLIC 
+# define PRIVATE __private_extern__
+# define PUBLIC 
 #elif __GNUC__ >= 4 /* we have the visibility attribute */
-#  define PRIVATE __attribute__ ((visibility ("hidden"))) 
-#  define PUBLIC __attribute__ ((visibility ("default"))) 
+# define PRIVATE __attribute__ ((visibility ("hidden"))) 
+# define PUBLIC __attribute__ ((visibility ("default"))) 
 #else /* not really good */
-#  define PRIVATE 
-#  define PUBLIC 
+# define PRIVATE 
+# define PUBLIC 
 #endif /* __APPLE__  and __GNU_C_ >= 4*/
 
 #endif
