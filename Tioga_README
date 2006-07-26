@@ -21,6 +21,12 @@ This is the README for the Tioga kernel, version 1.1.3, July 23, 2006.
 
 << What's new >>
 
+	Version 1.1.4 is a bug-fix release - a nasty symbol clash was preventing Tioga from running on 
+MacOS X.3. This should now be fixed. Moreover, the load time should improve a little bit on few 
+architectures.
+
+<< What's old >>
+
 	Version 1.1.3 provides a better integration of output within LaTeX
 documents. A tioga.sty file is now available, with many macros for figure
 inclusion and color names like the ones provided by Tioga.
@@ -37,9 +43,6 @@ X,Y data. Not many features for now, but there's room for plenty more work.
 	FigureMaker has now functions for coordinate conversions:
 		convert_inches_to_output, convert_output_to_inches,
 		convert_mm_to_output, convert_output_to_mm
-
-
-<< What's old >>
 
 	Version 1.1.2 provides more complete control over page layout and font
 selection.  Here's a list of new features:
