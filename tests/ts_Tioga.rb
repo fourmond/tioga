@@ -1,6 +1,10 @@
 #  ts_Tioga.rb
 
+
 require 'Tioga/tioga'
+
+puts "This is the test suite for Tioga #{Tioga::FigureMaker.version}"
+
 
 require 'test/unit'
 
