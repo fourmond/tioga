@@ -403,8 +403,14 @@ static VALUE function_compute_spline(VALUE self, VALUE x_values)
 
 /*
   Returns an interpolant that can be fed to 
-  FigureMake::Special_Paths#append_interpolant_to_path
-  to make nice splines.
+  Special_Paths#append_interpolant_to_path
+  to make nice splines. 
+
+  Can be used this way:
+
+   f = Function.new(x,y)
+   t.append_interpolant_to_path(f.make_interpolant)
+   t.stroke
 */
 static VALUE function_make_interpolant(VALUE self)
 {
@@ -561,7 +567,6 @@ static VALUE function_ensure_sorted(VALUE self)
 */
 static VALUE function_interpolate(VALUE self, VALUE x_values)
 {
-  
   if(NUMERIC(x_values))
     {
       /* we're in the second case, although I sincerely doubt it would

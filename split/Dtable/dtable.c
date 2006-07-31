@@ -163,15 +163,14 @@ static VALUE dtable_init(VALUE ary, int num_cols, int num_rows) {
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.dup  -> a_dtable
  *  
  *  Returns a copy of _dtable_.  For performance sensitive situations involving a series of operations,
  *  first make a copy using dup and then do "bang" operations to modify the result without further copying.
- */
-
-PRIVATE VALUE dtable_dup(VALUE ary) {
+ */ VALUE dtable_dup(VALUE ary) {
    Dtable *d = Get_Dtable(ary);
    int i, j, num_cols = d->num_cols, num_rows = d->num_rows;
    VALUE new = dtable_init(dtable_alloc(cDtable), num_cols, num_rows);
@@ -186,14 +185,13 @@ PRIVATE VALUE dtable_dup(VALUE ary) {
    return new;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.reverse_rows  -> a_dtable
  *  
  *  Returns a copy of _dtable_ with the order of rows reversed.
- */
-
-PRIVATE VALUE dtable_reverse_rows(VALUE ary)
+ */ VALUE dtable_reverse_rows(VALUE ary)
 {
    Dtable *d = Get_Dtable(ary);
    int i, j, num_cols = d->num_cols, num_rows = d->num_rows, last_row = num_rows - 1;
@@ -209,14 +207,13 @@ PRIVATE VALUE dtable_reverse_rows(VALUE ary)
    return new;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.reverse_cols  -> a_dtable
  *  
  *  Returns a copy of _dtable_ with the order of columns reversed.
- */
-
-PRIVATE VALUE dtable_reverse_cols(VALUE ary)
+ */ VALUE dtable_reverse_cols(VALUE ary)
 {
    Dtable *d = Get_Dtable(ary);
    int i, j, num_cols = d->num_cols, num_rows = d->num_rows, last_col = num_cols - 1;
@@ -233,14 +230,13 @@ PRIVATE VALUE dtable_reverse_cols(VALUE ary)
 }
 
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.rotate_cw90  -> a_dtable
  *  
  *  Returns a copy of _dtable_ rotated 90 degrees clockwise.
- */
-
-PRIVATE VALUE dtable_rotate_cw90(VALUE ary)
+ */ VALUE dtable_rotate_cw90(VALUE ary)
 {
    Dtable *d = Get_Dtable(ary);
    int i, j, num_cols = d->num_cols, num_rows = d->num_rows, last_row = num_rows - 1;
@@ -257,14 +253,13 @@ PRIVATE VALUE dtable_rotate_cw90(VALUE ary)
 }
 
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.rotate_ccw90  -> a_dtable
  *  
  *  Returns a copy of _dtable_ rotated 90 degrees counter-clockwise.
- */
-
-PRIVATE VALUE dtable_rotate_ccw90(VALUE ary)
+ */ VALUE dtable_rotate_ccw90(VALUE ary)
 {
    Dtable *d = Get_Dtable(ary);
    int i, j, num_cols = d->num_cols, num_rows = d->num_rows, last_col = num_cols - 1;
@@ -280,14 +275,13 @@ PRIVATE VALUE dtable_rotate_ccw90(VALUE ary)
    return new;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.transpose  -> a_dtable
  *  
  *  Returns a transposed copy of _dtable_ (i.e., exchange rows and columns).
- */
-
-PRIVATE VALUE dtable_transpose(VALUE ary) {
+ */ VALUE dtable_transpose(VALUE ary) {
    Dtable *d = Get_Dtable(ary);
    int i, j, num_cols = d->num_cols, num_rows = d->num_rows;
    VALUE new = dtable_init(dtable_alloc(cDtable), num_rows, num_cols);
@@ -302,51 +296,47 @@ PRIVATE VALUE dtable_transpose(VALUE ary) {
    return new;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     Dtable.new(num_cols, num_rows)      -> a_dtable
  *
  *  Returns a new Dtable with the requested dimensions.
- */
-
-PRIVATE VALUE dtable_initialize(int argc, VALUE *argv, VALUE ary) {
+ */ VALUE dtable_initialize(int argc, VALUE *argv, VALUE ary) {
    if (argc != 2) rb_raise(rb_eArgError, "need 2 args for Dtable.new(num_cols, num_rows)");
    int num_cols = NUM2INT(argv[0]), num_rows = NUM2INT(argv[1]);
    return dtable_init(ary, num_cols, num_rows);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.num_cols  -> integer
  *  
  *  Returns the number of entries in the x dimension of _dtable_.
- */
-
-PRIVATE VALUE dtable_num_cols(VALUE ary) {
+ */ VALUE dtable_num_cols(VALUE ary) {
    Dtable *d = Get_Dtable(ary);
    return LONG2NUM(d->num_cols);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.num_rows  -> integer
  *  
  *  Returns the number of entries in the y dimension of _dtable_.
- */
-
-PRIVATE VALUE dtable_num_rows(VALUE ary) {
+ */ VALUE dtable_num_rows(VALUE ary) {
    Dtable *d = Get_Dtable(ary);
    return LONG2NUM(d->num_rows);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.min_gt(val)  -> float or nil
  *  
  *  Returns the minimum entry in _dtable_ which is greater than _val_, or <code>nil</code> if no such entry if found.
- */
-
-PRIVATE VALUE dtable_min_gt(VALUE ary, VALUE val) {
+ */ VALUE dtable_min_gt(VALUE ary, VALUE val) {
    Dtable *d = Get_Dtable(ary);
    val = rb_Float(val);
    double zmin, z = NUM2DBL(val);
@@ -355,14 +345,13 @@ PRIVATE VALUE dtable_min_gt(VALUE ary, VALUE val) {
    return Qnil;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.max_lt(val)  -> float or nil
  *  
  *  Returns the maximum entry in _dtable_ which is less than _val_, or <code>nil</code> if no such entry if found.
- */
-
-PRIVATE VALUE dtable_max_lt(VALUE ary, VALUE val) {
+ */ VALUE dtable_max_lt(VALUE ary, VALUE val) {
    Dtable *d = Get_Dtable(ary);
    val = rb_Float(val);
    double zmax, z = NUM2DBL(val);
@@ -371,40 +360,37 @@ PRIVATE VALUE dtable_max_lt(VALUE ary, VALUE val) {
    return Qnil;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.min  -> float
  *  
  *  Returns the minimum entry in _dtable_.
- */
-
-PRIVATE VALUE dtable_min(VALUE ary) {
+ */ VALUE dtable_min(VALUE ary) {
    Dtable *d = Get_Dtable(ary);
    double zmin = Min2dGrid(d->ptr, d->num_cols, d->num_rows);
    return rb_float_new(zmin);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.max  -> float
  *  
  *  Returns the maximum entry in _dtable_.
- */
-
-PRIVATE VALUE dtable_max(VALUE ary) {
+ */ VALUE dtable_max(VALUE ary) {
    Dtable *d = Get_Dtable(ary);
    double zmax = Max2dGrid(d->ptr, d->num_cols, d->num_rows);
    return rb_float_new(zmax);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.row(int)  -> a_dvec
  *  
  *  Creates a Dvector holding a copy of the contents of the requested row.
- */
-
-PRIVATE VALUE dtable_row(VALUE ary, VALUE row_num) {
+ */ VALUE dtable_row(VALUE ary, VALUE row_num) {
    Dtable *d = Get_Dtable(ary);
    row_num = rb_Integer(row_num);
    int row = NUM2INT(row_num);
@@ -415,15 +401,14 @@ PRIVATE VALUE dtable_row(VALUE ary, VALUE row_num) {
    return dvec;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.set_row(int,a_dvec) -> a_dvec
  *  
  *  Stores the contents of _a_dec_ in the specified row of the array.
  *  The length of the vector must equal the number of columns in the array.
- */
-
-PRIVATE VALUE dtable_set_row(VALUE ary, VALUE row_num, VALUE dvec) {
+ */ VALUE dtable_set_row(VALUE ary, VALUE row_num, VALUE dvec) {
    Dtable *d = Get_Dtable(ary);
    long len, j;
    double *data = Dvector_Data_for_Read(dvec, &len);
@@ -438,15 +423,14 @@ PRIVATE VALUE dtable_set_row(VALUE ary, VALUE row_num, VALUE dvec) {
    return dvec;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.set_column(int,a_dvec) -> a_dvec
  *  
  *  Stores the contents of _a_dec_ in the specified column of the array.
  *  The length of the vector must equal the number of rows in the array.
- */
-
-PRIVATE VALUE dtable_set_column(VALUE ary, VALUE col_num, VALUE dvec) {
+ */ VALUE dtable_set_column(VALUE ary, VALUE col_num, VALUE dvec) {
    Dtable *d = Get_Dtable(ary);
    long len, i;
    double *data = Dvector_Data_for_Read(dvec, &len);
@@ -461,14 +445,13 @@ PRIVATE VALUE dtable_set_column(VALUE ary, VALUE col_num, VALUE dvec) {
    return dvec;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.column(int)  -> a_dvec
  *  
  *  Creates a Dvector holding a copy of the contents of the requested column.
- */
-
-PRIVATE VALUE dtable_column(VALUE ary, VALUE column_num) {
+ */ VALUE dtable_column(VALUE ary, VALUE column_num) {
    Dtable *d = Get_Dtable(ary);
    column_num = rb_Integer(column_num);
    int i, column = NUM2INT(column_num), len;
@@ -493,18 +476,18 @@ static void set_dtable_vals(VALUE ary, double v) {
    }
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.clear  -> dtable
  *  
  *  Sets the entries of _dtable_ array to zero.
- */
-
-PRIVATE VALUE dtable_clear(VALUE ary, VALUE val) {
+ */ VALUE dtable_clear(VALUE ary, VALUE val) {
    set_dtable_vals(ary, 0.0);
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.set(float)  -> dtable
@@ -513,9 +496,7 @@ PRIVATE VALUE dtable_clear(VALUE ary, VALUE val) {
  *  Modifies the entries of _dtable_ array.  If the argument is a float, then all of the
  *  entries are set to that value.  If the argument is another Dtable array, then it must
  *  be the size as _dtable_, and its contents are copied to _dtable_.
- */
-
-PRIVATE VALUE dtable_set(VALUE ary, VALUE val) {
+ */ VALUE dtable_set(VALUE ary, VALUE val) {
    if (is_a_dtable(val)) {
       Dtable *d = Get_Dtable(ary);
       Dtable *d2 = Get_Dtable(val);
@@ -536,9 +517,8 @@ PRIVATE VALUE dtable_set(VALUE ary, VALUE val) {
    return ary;
 }
 
-/*======================================================================*/
-
-PRIVATE VALUE dtable_apply_math_op_bang(VALUE ary, double (*op)(double)) {
+PRIVATE
+/*======================================================================*/ VALUE dtable_apply_math_op_bang(VALUE ary, double (*op)(double)) {
    Dtable *d = Get_Dtable(ary);
    double **p = d->ptr;
    int num_cols = d->num_cols, num_rows = d->num_rows, i, j;
@@ -556,523 +536,477 @@ PRIVATE VALUE dtable_apply_math_op(VALUE source, double (*op)(double)) {
 
 static double do_neg(double arg) { return -arg; }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.neg   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with each entry x replaced by -x.
- */
-
-PRIVATE VALUE dtable_neg(VALUE ary) {
+ */ VALUE dtable_neg(VALUE ary) {
    return dtable_apply_math_op(ary, do_neg);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.abs   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with all entries replaced by their absolute values.
- */
-
-PRIVATE VALUE dtable_abs(VALUE ary) {
+ */ VALUE dtable_abs(VALUE ary) {
    return dtable_apply_math_op(ary, fabs);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.sin   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with entry x replaced by sin(x).
- */
-
-PRIVATE VALUE dtable_sin(VALUE ary) {
+ */ VALUE dtable_sin(VALUE ary) {
    return dtable_apply_math_op(ary, sin);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.cos   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with entry x replaced by cos(x).
- */
-
-PRIVATE VALUE dtable_cos(VALUE ary) {
+ */ VALUE dtable_cos(VALUE ary) {
    return dtable_apply_math_op(ary, cos);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.tan   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with entry x replaced by tan(x).
- */
-
-PRIVATE VALUE dtable_tan(VALUE ary) {
+ */ VALUE dtable_tan(VALUE ary) {
    return dtable_apply_math_op(ary, tan);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.asin   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with entry x replaced by asin(x).
- */
-
-PRIVATE VALUE dtable_asin(VALUE ary) {
+ */ VALUE dtable_asin(VALUE ary) {
    return dtable_apply_math_op(ary, asin);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.acos   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with entry x replaced by acos(x).
- */
-
-PRIVATE VALUE dtable_acos(VALUE ary) {
+ */ VALUE dtable_acos(VALUE ary) {
    return dtable_apply_math_op(ary, acos);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.atan   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with entry x replaced by atan(x).
- */
-
-PRIVATE VALUE dtable_atan(VALUE ary) {
+ */ VALUE dtable_atan(VALUE ary) {
    return dtable_apply_math_op(ary, atan);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.sinh   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with entry x replaced by sinh(x).
- */
-
-PRIVATE VALUE dtable_sinh(VALUE ary) {
+ */ VALUE dtable_sinh(VALUE ary) {
    return dtable_apply_math_op(ary, sinh);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.cosh   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with entry x replaced by cosh(x).
- */
-
-PRIVATE VALUE dtable_cosh(VALUE ary) {
+ */ VALUE dtable_cosh(VALUE ary) {
    return dtable_apply_math_op(ary, cosh);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.tanh   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with entry x replaced by tanh(x).
- */
-
-PRIVATE VALUE dtable_tanh(VALUE ary) {
+ */ VALUE dtable_tanh(VALUE ary) {
    return dtable_apply_math_op(ary, tanh);
 }
 
 static double do_asinh(double x) { return log(x + sqrt(x*x+1.0)); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.asinh   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with entry x replaced by asinh(x).
- */
-
-PRIVATE VALUE dtable_asinh(VALUE ary) {
+ */ VALUE dtable_asinh(VALUE ary) {
    return dtable_apply_math_op(ary, do_asinh);
 }
 
 static double do_acosh(double x) { return log(x + sqrt(x*x-1.0)); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.acosh   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with entry x replaced by acosh(x).
- */
-
-PRIVATE VALUE dtable_acosh(VALUE ary) {
+ */ VALUE dtable_acosh(VALUE ary) {
    return dtable_apply_math_op(ary, do_acosh);
 }
 
 static double do_atanh(double x) { return 0.5*log((1.0+x)/(1.0-x)); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.atanh   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with entry x replaced by atanh(x).
- */
-
-PRIVATE VALUE dtable_atanh(VALUE ary) {
+ */ VALUE dtable_atanh(VALUE ary) {
    return dtable_apply_math_op(ary, do_atanh);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.ceil   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with entry x replaced by smallest integer not less than x.
- */
-
-PRIVATE VALUE dtable_ceil(VALUE ary) {
+ */ VALUE dtable_ceil(VALUE ary) {
    return dtable_apply_math_op(ary, ceil);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.floor   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with each entry x replaced by largest integer not greater than x.
- */
-
-PRIVATE VALUE dtable_floor(VALUE ary) {
+ */ VALUE dtable_floor(VALUE ary) {
    return dtable_apply_math_op(ary, floor);
 }
 
 static double do_round(double x) { return (x == 0.0)? 0.0 : (x > 0.0)? floor(x+0.5) : ceil(x-0.5); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.round   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with each entry x replaced by round(x).
  *  (Numbers midway between integers round away from zero.)
- */
-
-PRIVATE VALUE dtable_round(VALUE ary) {
+ */ VALUE dtable_round(VALUE ary) {
    return dtable_apply_math_op(ary, do_round);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.exp   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with each entry x replaced by exp(x).
- */
-
-PRIVATE VALUE dtable_exp(VALUE ary) {
+ */ VALUE dtable_exp(VALUE ary) {
    return dtable_apply_math_op(ary, exp);
 }
 
 static double do_exp10(double arg) { return pow(10.0, arg); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.exp10   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with each entry x replaced by 10**x.
- */
-
-PRIVATE VALUE dtable_exp10(VALUE ary) {
+ */ VALUE dtable_exp10(VALUE ary) {
    return dtable_apply_math_op(ary, do_exp10);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.log   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with each entry x replaced by log(x).
- */
-
-PRIVATE VALUE dtable_log(VALUE ary) {
+ */ VALUE dtable_log(VALUE ary) {
    return dtable_apply_math_op(ary, log);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.log10   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with each entry x replaced by log10(x).
- */
-
-PRIVATE VALUE dtable_log10(VALUE ary) {
+ */ VALUE dtable_log10(VALUE ary) {
    return dtable_apply_math_op(ary, log10);
 }
 
 static double do_inv(double arg) { return 1.0/arg; }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.inv   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with each entry x replaced by 1/x.
- */
-
-PRIVATE VALUE dtable_inv(VALUE ary) {
+ */ VALUE dtable_inv(VALUE ary) {
    return dtable_apply_math_op(ary, do_inv);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.sqrt   ->  a_dtable
  *  
  *  Returns of copy of _dtable_ with each entry x replaced by sqrt(x).
- */
-
-PRIVATE VALUE dtable_sqrt(VALUE ary) {
+ */ VALUE dtable_sqrt(VALUE ary) {
    return dtable_apply_math_op(ary, sqrt);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.neg!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with -x.
- */
-
-PRIVATE VALUE dtable_neg_bang(VALUE ary) {
+ */ VALUE dtable_neg_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, do_neg);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.abs!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with abs(x).
- */
-
-PRIVATE VALUE dtable_abs_bang(VALUE ary) {
+ */ VALUE dtable_abs_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, fabs);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.sin!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with sin(x).
- */
-
-PRIVATE VALUE dtable_sin_bang(VALUE ary) {
+ */ VALUE dtable_sin_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, sin);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.cos!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with cos(x).
- */
-
-PRIVATE VALUE dtable_cos_bang(VALUE ary) {
+ */ VALUE dtable_cos_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, cos);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.tan!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with tan(x).
- */
-
-PRIVATE VALUE dtable_tan_bang(VALUE ary) {
+ */ VALUE dtable_tan_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, tan);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.asin!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with asin(x).
- */
-
-PRIVATE VALUE dtable_asin_bang(VALUE ary) {
+ */ VALUE dtable_asin_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, asin);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.acos!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with acos(x).
- */
-
-PRIVATE VALUE dtable_acos_bang(VALUE ary) {
+ */ VALUE dtable_acos_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, acos);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.atan!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with atan(x).
- */
-
-PRIVATE VALUE dtable_atan_bang(VALUE ary) {
+ */ VALUE dtable_atan_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, atan);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.sinh!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with sinh(x).
- */
-
-PRIVATE VALUE dtable_sinh_bang(VALUE ary) {
+ */ VALUE dtable_sinh_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, sinh);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.cosh!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with cosh(x).
- */
-
-PRIVATE VALUE dtable_cosh_bang(VALUE ary) {
+ */ VALUE dtable_cosh_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, cosh);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.tanh!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with tanh(x).
- */
-
-PRIVATE VALUE dtable_tanh_bang(VALUE ary) {
+ */ VALUE dtable_tanh_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, tanh);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.asinh!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with asinh(x).
- */
-
-PRIVATE VALUE dtable_asinh_bang(VALUE ary) {
+ */ VALUE dtable_asinh_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, do_asinh);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.acosh!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with acosh(x).
- */
-
-PRIVATE VALUE dtable_acosh_bang(VALUE ary) {
+ */ VALUE dtable_acosh_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, do_acosh);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.atanh!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with atanh(x).
- */
-
-PRIVATE VALUE dtable_atanh_bang(VALUE ary) {
+ */ VALUE dtable_atanh_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, do_atanh);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.ceil!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with the smallest integer not less than x.
- */
-
-PRIVATE VALUE dtable_ceil_bang(VALUE ary) {
+ */ VALUE dtable_ceil_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, ceil);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.floor!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with the largest integer not greater than x.
- */
-
-PRIVATE VALUE dtable_floor_bang(VALUE ary) {
+ */ VALUE dtable_floor_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, floor);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.round!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with the integer closest to x.
  *  (Numbers midway between integers round away from zero.)
- */
-
-PRIVATE VALUE dtable_round_bang(VALUE ary) {
+ */ VALUE dtable_round_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, do_round);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.exp!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with exp(x).
- */
-
-PRIVATE VALUE dtable_exp_bang(VALUE ary) {
+ */ VALUE dtable_exp_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, exp);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.exp10!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with 10**x.
- */
-
-PRIVATE VALUE dtable_exp10_bang(VALUE ary) {
+ */ VALUE dtable_exp10_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, do_exp10);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.log!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with log(x).
- */
-
-PRIVATE VALUE dtable_log_bang(VALUE ary) {
+ */ VALUE dtable_log_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, log);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.log10!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with log10(x).
- */
-
-PRIVATE VALUE dtable_log10_bang(VALUE ary) {
+ */ VALUE dtable_log10_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, log10);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.inv!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with 1/x.
- */
-
-PRIVATE VALUE dtable_inv_bang(VALUE ary) {
+ */ VALUE dtable_inv_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, do_inv);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.sqrt!   ->  dtable
  *  
  *  Replace each entry x of _dtable_ with sqrt(x).
- */
-
-PRIVATE VALUE dtable_sqrt_bang(VALUE ary) {
+ */ VALUE dtable_sqrt_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, sqrt);
 }
 
@@ -1095,14 +1029,13 @@ PRIVATE VALUE dtable_apply_math_op1(VALUE source, VALUE arg, double (*op)(double
 
 static double do_trim(double x, double cutoff) { return (fabs(x) < cutoff)? 0.0 : x; }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.trim(cutoff=1e-6)   ->  a_dtable
  *  
  *  Returns a copy of _dtable_ with any entry with absolute value less than _cutoff_ replaced by 0.
- */
-
-PRIVATE VALUE dtable_trim(int argc, VALUE *argv, VALUE self) {
+ */ VALUE dtable_trim(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
       rb_raise(rb_eArgError, "wrong # of arguments(%d for 0 or 1)",argc);
@@ -1112,14 +1045,13 @@ PRIVATE VALUE dtable_trim(int argc, VALUE *argv, VALUE self) {
 
 static double do_safe_log(double x, double y) { return log(MAX(x,y)); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.safe_log(cutoff=1e-99)   ->  a_dtable
  *  
  *  Returns a copy of _dtable_ with each entry x replaced by log(max(x,_cutoff_)).
- */
-
-PRIVATE VALUE dtable_safe_log(int argc, VALUE *argv, VALUE self) {
+ */ VALUE dtable_safe_log(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
       rb_raise(rb_eArgError, "wrong # of arguments(%d for 0 or 1)",argc);
@@ -1129,15 +1061,14 @@ PRIVATE VALUE dtable_safe_log(int argc, VALUE *argv, VALUE self) {
 
 static double do_safe_log10(double x, double y) { return log10(MAX(x,y)); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.safe_log10(cutoff=1e-99)   ->  a_dtable
  *  
  *  Returns a copy of _dtable_ with each entry x replaced by log10(max(x,_cutoff_)).
  *     
- */
-
-PRIVATE VALUE dtable_safe_log10(int argc, VALUE *argv, VALUE self) {
+ */ VALUE dtable_safe_log10(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
       rb_raise(rb_eArgError, "wrong # of arguments(%d for 0 or 1)",argc);
@@ -1148,15 +1079,14 @@ PRIVATE VALUE dtable_safe_log10(int argc, VALUE *argv, VALUE self) {
 static double do_safe_inv(double x, double y) {
    return (fabs(x) >= y)? 1.0/x : (x > 0.0)? 1.0/y : -1.0/y; }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.safe_inv(cutoff=1e-99)   ->  a_dtable
  *  
  *  Returns a copy of _dtable_ with each entry x replaced by sign(x)/_cutoff_ if abs(x) < _cutoff_, 1/x otherwise.
  *     
- */
-
-PRIVATE VALUE dtable_safe_inv(int argc, VALUE *argv, VALUE self) {
+ */ VALUE dtable_safe_inv(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
       rb_raise(rb_eArgError, "wrong # of arguments(%d for 0 or 1)",argc);
@@ -1166,46 +1096,44 @@ PRIVATE VALUE dtable_safe_inv(int argc, VALUE *argv, VALUE self) {
 
 static double do_safe_asin(double x) { return asin(MAX(-1.0,MIN(1.0,x))); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.safe_asin   ->  a_dtable
  *  
  *  Returns a copy of _dtable_ with each entry x replaced by asin(max(-1,min(1,x))).
  *     
- */
-
-PRIVATE VALUE dtable_safe_asin(VALUE ary) {
+ */ VALUE dtable_safe_asin(VALUE ary) {
    return dtable_apply_math_op(ary, do_safe_asin);
 }
    
 static double do_safe_acos(double x) { return acos(MAX(-1.0,MIN(1.0,x))); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.safe_acos   ->  a_dtable
  *  
  *  Returns a copy of _dtable_ with each entry x replaced by acos(max(-1,min(1,x))).
  *     
- */
-
-PRIVATE VALUE dtable_safe_acos(VALUE ary) {
+ */ VALUE dtable_safe_acos(VALUE ary) {
    return dtable_apply_math_op(ary, do_safe_acos);
 }
    
 static double do_safe_sqrt(double x) { return sqrt(MAX(x,0.0)); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.safe_sqrt   ->  a_dtable
  *  
  *  Returns a copy of _dtable_ with each entry x replaced by sqrt(max(x,0)).
  *     
- */
-
-PRIVATE VALUE dtable_safe_sqrt(VALUE ary) {
+ */ VALUE dtable_safe_sqrt(VALUE ary) {
    return dtable_apply_math_op(ary, do_safe_sqrt);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.atan2!(number)       ->  dtable
@@ -1214,13 +1142,12 @@ PRIVATE VALUE dtable_safe_sqrt(VALUE ary) {
  *  When argument is a number, this operation replaces each entry x of _dtable_ by the angle whose tangent is x/_number_.
  *  When argument is a data array, this operation replaces each entry x of _dtable_ by the angle whose tangent is x divided
  *  by the corresponding entry in the _other_ data array.
- */
-
-PRIVATE VALUE dtable_atan2_bang(VALUE ary, VALUE arg) {
+ */ VALUE dtable_atan2_bang(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2_bang(ary, arg, atan2);
 }
 
 static double do_mod(double x, double y) { return x - y * floor(x/y); }
+PRIVATE
 /*
  *  call-seq:
  *     dtable.modulo!(number)       ->  dtable
@@ -1231,14 +1158,13 @@ static double do_mod(double x, double y) { return x - y * floor(x/y); }
  *  When argument is a number, this operation returns a copy of _dtable_ with each entry x replaced by x % _number_.
  *  When argument is a data array, this operation returns a copy of _dtable_ with each entry x replaced
  *  by x % the corresponding entry in the _other_ data array.
- */
-
-PRIVATE VALUE dtable_modulo_bang(VALUE ary, VALUE arg) {
+ */ VALUE dtable_modulo_bang(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2_bang(ary, arg, do_mod);
 }
 
 static double do_remainder(double x, double y) { return (x*y > 0.0)? do_mod(x,y) : do_mod(x,y)-y; }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.remainder!(number)          ->  dtable
@@ -1247,20 +1173,17 @@ static double do_remainder(double x, double y) { return (x*y > 0.0)? do_mod(x,y)
  *  When the argument is a number, this operation replaces with each entry x of _dtable_ by the remainder of x divided by _number_.
  *  When the argument is a data array, this operation replaces with each entry x of _dtable_
  *  by remainder of x divided by the corresponding entry in the _other_ data array.
- */
-
-PRIVATE VALUE dtable_remainder_bang(VALUE ary, VALUE arg) {
+ */ VALUE dtable_remainder_bang(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2_bang(ary, arg, do_remainder);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.trim!(cutoff=1e-6)   ->  dtable
  *  
  *  Each entry x in _dtable_ having absolute value less than _cutoff_ is replaced by 0.
- */
-
-PRIVATE VALUE dtable_trim_bang(int argc, VALUE *argv, VALUE self) {
+ */ VALUE dtable_trim_bang(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
       rb_raise(rb_eArgError, "wrong # of arguments(%d for 0 or 1)",argc);
@@ -1268,6 +1191,7 @@ PRIVATE VALUE dtable_trim_bang(int argc, VALUE *argv, VALUE self) {
    return dtable_apply_math_op1_bang(self, arg1, do_trim);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.pow!(number)                ->  dtable
@@ -1278,14 +1202,13 @@ PRIVATE VALUE dtable_trim_bang(int argc, VALUE *argv, VALUE self) {
  *  When argument is a number, this operation returns a copy of _dtable_ with each entry x replaced by x ** _number_.
  *  When argument is a data array, this operation returns a copy of _dtable_ with each entry x replaced
  *  by x ** the corresponding entry in the _other_ data array.
- */
-
-PRIVATE VALUE dtable_pow_bang(VALUE ary, VALUE arg) {
+ */ VALUE dtable_pow_bang(VALUE ary, VALUE arg) {
    return dtable_apply_math_op1_bang(ary, arg, pow);
 }
 
 static double do_as_exponent_of(double x, double y) { return pow(y,x); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.as_exponent_of!(number)                ->  dtable
@@ -1294,21 +1217,18 @@ static double do_as_exponent_of(double x, double y) { return pow(y,x); }
  *  When argument is a number, this operation replaces each entry x of _dtable_ by _number_ ** x.
  *  When argument is a data array, this operation replaces each entry x of _dtable_
  *  by the corresponding entry in the _other_ data array raised to the power x.
- */
-
-PRIVATE VALUE dtable_as_exponent_of_bang(VALUE ary, VALUE arg) {
+ */ VALUE dtable_as_exponent_of_bang(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2_bang(ary, arg, do_as_exponent_of);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.safe_log!(cutoff=1e-99)   ->  dtable
  *  
  *  Replaces each entry x in _dtable_ by log(max(x,_cutoff_)).
  *     
- */
-
-PRIVATE VALUE dtable_safe_log_bang(int argc, VALUE *argv, VALUE self) {
+ */ VALUE dtable_safe_log_bang(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
       rb_raise(rb_eArgError, "wrong # of arguments(%d for 0 or 1)",argc);
@@ -1316,15 +1236,14 @@ PRIVATE VALUE dtable_safe_log_bang(int argc, VALUE *argv, VALUE self) {
    return dtable_apply_math_op1_bang(self, arg1, do_safe_log);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.safe_log10!(cutoff)   ->  dtable
  *  
  *  Replaces each entry x in _dtable_ by log10(max(x,_cutoff_)).
  *     
- */
-
-PRIVATE VALUE dtable_safe_log10_bang(int argc, VALUE *argv, VALUE self) {
+ */ VALUE dtable_safe_log10_bang(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
       rb_raise(rb_eArgError, "wrong # of arguments(%d for 0 or 1)",argc);
@@ -1332,15 +1251,14 @@ PRIVATE VALUE dtable_safe_log10_bang(int argc, VALUE *argv, VALUE self) {
    return dtable_apply_math_op1_bang(self, arg1, do_safe_log10);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.safe_inv!(cutoff)   ->  dtable
  *  
  *  Replaces each entry x in _dtable_ by sign(x)/_cutoff_ if abs(x) < _cutoff_, 1/x otherwise.
  *     
- */
-
-PRIVATE VALUE dtable_safe_inv_bang(int argc, VALUE *argv, VALUE self) {
+ */ VALUE dtable_safe_inv_bang(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
       rb_raise(rb_eArgError, "wrong # of arguments(%d for 0 or 1)",argc);
@@ -1348,39 +1266,36 @@ PRIVATE VALUE dtable_safe_inv_bang(int argc, VALUE *argv, VALUE self) {
    return dtable_apply_math_op1_bang(self, arg1, do_safe_inv);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.safe_sqrt!   ->  dtable
  *  
  *  Replaces each entry x in _dtable_ by sqrt(max(x,0)).
  *     
- */
-
-PRIVATE VALUE dtable_safe_sqrt_bang(VALUE ary) {
+ */ VALUE dtable_safe_sqrt_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, do_safe_sqrt);
 }
    
+PRIVATE
 /*
  *  call-seq:
  *     dtable.safe_asin!   ->  dtable
  *  
  *  Replaces each entry x in _dtable_ by asin(max(-1,min(1,x)))..
  *     
- */
-
-PRIVATE VALUE dtable_safe_asin_bang(VALUE ary) {
+ */ VALUE dtable_safe_asin_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, do_safe_asin);
 }
    
+PRIVATE
 /*
  *  call-seq:
  *     dtable.safe_acos!   ->  dtable
  *  
  *  Replaces each entry x in _dtable_ by acos(max(-1,min(1,x)))..
  *     
- */
-
-PRIVATE VALUE dtable_safe_acos_bang(VALUE ary) {
+ */ VALUE dtable_safe_acos_bang(VALUE ary) {
    return dtable_apply_math_op_bang(ary, do_safe_acos);
 }
    
@@ -1407,6 +1322,7 @@ PRIVATE VALUE dtable_apply_math_op2(VALUE ary1, VALUE ary2, double (*op)(double,
 }
 
 static double do_add(double x, double y) { return x + y; }
+PRIVATE
 /*
  *  call-seq:
  *     dtable.add(number)       ->  a_dtable
@@ -1418,13 +1334,12 @@ static double do_add(double x, double y) { return x + y; }
  *  When argument is a number, this operation returns a copy of _dtable_ with each entry x replaced by x + _number_.
  *  When argument is a data array, this operation returns a copy of _dtable_ with each entry x replaced
  *  by x + the corresponding entry in the _other_ data array.
- */
-
-PRIVATE VALUE dtable_add(VALUE ary, VALUE arg) {
+ */ VALUE dtable_add(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2(ary, arg, do_add);
 }
 
 static double do_sub(double x, double y) { return x - y; }
+PRIVATE
 /*
  *  call-seq:
  *     dtable.sub(number)       ->  a_dtable
@@ -1436,13 +1351,12 @@ static double do_sub(double x, double y) { return x - y; }
  *  When argument is a number, this operation returns a copy of _dtable_ with each entry x replaced by x - _number_.
  *  When argument is a data array, this operation returns a copy of _dtable_ with each entry x replaced
  *  by x - the corresponding entry in the _other_ data array.
- */
-
-PRIVATE VALUE dtable_sub(VALUE ary, VALUE arg) {
+ */ VALUE dtable_sub(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2(ary, arg, do_sub);
 }
 
 static double do_mul(double x, double y) { return x * y; }
+PRIVATE
 /*
  *  call-seq:
  *     dtable.mul(number)       ->  a_dtable
@@ -1454,13 +1368,12 @@ static double do_mul(double x, double y) { return x * y; }
  *  When argument is a number, this operation returns a copy of _dtable_ with each entry x replaced by x * _number_.
  *  When argument is a data array, this operation returns a copy of _dtable_ with each entry x replaced
  *  by x * the corresponding entry in the _other_ data array.
- */
-
-PRIVATE VALUE dtable_mul(VALUE ary, VALUE arg) {
+ */ VALUE dtable_mul(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2(ary, arg, do_mul);
 }
 
 static double do_div(double x, double y) { return x / y; }
+PRIVATE
 /*
  *  call-seq:
  *     dtable.div(number)       ->  a_dtable
@@ -1472,12 +1385,11 @@ static double do_div(double x, double y) { return x / y; }
  *  When argument is a number, this operation returns a copy of _dtable_ with each entry x replaced by x / _number_.
  *  When argument is a data array, this operation returns a copy of _dtable_ with each entry x replaced
  *  by x / the corresponding entry in the _other_ data array.
- */
-
-PRIVATE VALUE dtable_div(VALUE ary, VALUE arg) {
+ */ VALUE dtable_div(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2(ary, arg, do_div);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.modulo(number)       ->  a_dtable
@@ -1491,12 +1403,11 @@ PRIVATE VALUE dtable_div(VALUE ary, VALUE arg) {
  *  When argument is a data array, this operation returns a copy of _dtable_ with each entry x replaced
  *  by x % the corresponding entry in the _other_ data array.
  *     
- */
-
-PRIVATE VALUE dtable_mod(VALUE ary, VALUE arg) {
+ */ VALUE dtable_mod(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2(ary, arg, do_mod);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.remainder(number)          ->  a_dtable
@@ -1505,12 +1416,11 @@ PRIVATE VALUE dtable_mod(VALUE ary, VALUE arg) {
  *  When the argument is a number, this operation returns a copy of _dtable_ with each entry x replaced by the remainder of x divided by _number_.
  *  When the argument is a data array, this operation returns a copy of _dtable_ with each entry x replaced
  *  by the remainder of x divided by the corresponding entry in the _other_ data array.
- */
-
-PRIVATE VALUE dtable_remainder(VALUE ary, VALUE arg) {
+ */ VALUE dtable_remainder(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2(ary, arg, do_remainder);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.pow(number)                ->  a_dtable
@@ -1524,12 +1434,11 @@ PRIVATE VALUE dtable_remainder(VALUE ary, VALUE arg) {
  *  When argument is a data array, this operation returns a copy of _dtable_ with each entry x replaced
  *  by x ** the corresponding entry in the _other_ data array.
  *     
- */
-
-PRIVATE VALUE dtable_pow(VALUE ary, VALUE arg) {
+ */ VALUE dtable_pow(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2(ary, arg, pow);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.as_exponent_of(number)                ->  a_dtable
@@ -1538,12 +1447,11 @@ PRIVATE VALUE dtable_pow(VALUE ary, VALUE arg) {
  *  When argument is a number, this operation returns a copy of _dtable_ with each entry x replaced by _number_ ** x.
  *  When argument is a data array, this operation returns a copy of _dtable_ with each entry x replaced
  *  by the corresponding entry in the _other_ data array raised to the power x.
- */
-
-PRIVATE VALUE dtable_as_exponent_of(VALUE ary, VALUE arg) {
+ */ VALUE dtable_as_exponent_of(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2(ary, arg, do_as_exponent_of);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.atan2(number)       ->  a_dtable
@@ -1552,12 +1460,11 @@ PRIVATE VALUE dtable_as_exponent_of(VALUE ary, VALUE arg) {
  *  When argument is a number, this operation returns a copy of _dtable_ with each entry x replaced by the angle whose tangent is x/_number_.
  *  When argument is a data array, this operation returns a copy of _dtable_ with each entry x replaced
  *  by the angle whose tangent is x divided by the corresponding entry in the _other_ data array.
- */
-
-PRIVATE VALUE dtable_atan2(VALUE ary, VALUE arg) {
+ */ VALUE dtable_atan2(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2(ary, arg, atan2);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.add!(number)       ->  dtable
@@ -1566,12 +1473,11 @@ PRIVATE VALUE dtable_atan2(VALUE ary, VALUE arg) {
  *  When argument is a number, each entry x in _dtable_ is replaced by x + _number_.
  *  When argument is a data array, each entry x in _dtable_ is replaced by x + 
  *  the corresponding entry in the _other_ data array.
- */
-
-PRIVATE VALUE dtable_add_bang(VALUE ary, VALUE arg) {
+ */ VALUE dtable_add_bang(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2_bang(ary, arg, do_add);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.sub!(number)       ->  dtable
@@ -1580,12 +1486,11 @@ PRIVATE VALUE dtable_add_bang(VALUE ary, VALUE arg) {
  *  When argument is a number, each entry x in _dtable_ is replaced by x - _number_.
  *  When argument is a data array, each entry x in _dtable_ is replaced by x - 
  *  the corresponding entry in the _other_ data array.
- */
-
-PRIVATE VALUE dtable_sub_bang(VALUE ary, VALUE arg) {
+ */ VALUE dtable_sub_bang(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2_bang(ary, arg, do_sub);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.mul!(number)       ->  dtable
@@ -1594,12 +1499,11 @@ PRIVATE VALUE dtable_sub_bang(VALUE ary, VALUE arg) {
  *  When argument is a number, each entry x in _dtable_ is replaced by x * _number_.
  *  When argument is a data array, each entry x in _dtable_ is replaced by x * 
  *  the corresponding entry in the _other_ data array.
- */
-
-PRIVATE VALUE dtable_mul_bang(VALUE ary, VALUE arg) {
+ */ VALUE dtable_mul_bang(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2_bang(ary, arg, do_mul);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.div!(number)       ->  dtable
@@ -1608,15 +1512,12 @@ PRIVATE VALUE dtable_mul_bang(VALUE ary, VALUE arg) {
  *  When argument is a number, each entry x in _dtable_ is replaced by x / _number_.
  *  When argument is a data array, each entry x in _dtable_ is replaced by x / 
  *  the corresponding entry in the _other_ data array.
- */
-
-PRIVATE VALUE dtable_div_bang(VALUE ary, VALUE arg) {
+ */ VALUE dtable_div_bang(VALUE ary, VALUE arg) {
    return dtable_apply_math_op2_bang(ary, arg, do_div);
 }
 
-/*======================================================================*/
-
-PRIVATE VALUE Read_Dtable(VALUE dest, char *filename, int skip_lines) {
+PRIVATE
+/*======================================================================*/ VALUE Read_Dtable(VALUE dest, char *filename, int skip_lines) {
    FILE *file = NULL;
    long num_cols, num_rows;
    int i, j, k;
@@ -1670,6 +1571,7 @@ PRIVATE VALUE Read_Dtable(VALUE dest, char *filename, int skip_lines) {
 }
 
 
+PRIVATE
 /*
  *  call-seq:
  *     dtable.read(filename, skip_lines=0) ->  dtable
@@ -1677,9 +1579,7 @@ PRIVATE VALUE Read_Dtable(VALUE dest, char *filename, int skip_lines) {
  *  The contents of _dtable_ are replaced by the contents of the file, starting after skipping
  *  the specified number of lines.  The values in the file are listed with row number 0 first.
  *  
- */
-
-PRIVATE VALUE dtable_read(int argc, VALUE *argv, VALUE self) {
+ */ VALUE dtable_read(int argc, VALUE *argv, VALUE self) {
    if ((argc < 1) || (argc > 2))
       rb_raise(rb_eArgError, "wrong # of arguments(%d for 1 or 2)",argc);
    VALUE filename = argv[0];
@@ -1696,6 +1596,7 @@ PRIVATE VALUE dtable_entry(VALUE ary, long i, long j) {
    return rb_float_new(d->ptr[i][j]);
 }
 
+PRIVATE
 /* 
  *  call-seq:
  *     dtable[row,col]  ->  number or nil
@@ -1703,8 +1604,7 @@ PRIVATE VALUE dtable_entry(VALUE ary, long i, long j) {
  *
  *  Returns the element at location _row_, _col_.  Returns +nil+
  *  if the location is out of range.
- */
-PRIVATE VALUE dtable_at(VALUE ary, VALUE xloc, VALUE yloc) {
+ */ VALUE dtable_at(VALUE ary, VALUE xloc, VALUE yloc) {
    return dtable_entry(ary, NUM2LONG(xloc), NUM2LONG(yloc));
 }
 
@@ -1723,13 +1623,13 @@ void dtable_store(VALUE ary, long i, long j, double v) {
    ptr[i][j] = v;
 }
 
+PRIVATE
 /* 
  *  call-seq:
  *     dtable[row,col] = number  ->  number
  *
  *  Replaces the element at location _row_, _col_ by the given _number_.
- */
-PRIVATE VALUE dtable_aset(VALUE ary, VALUE xloc, VALUE yloc, VALUE val) {
+ */ VALUE dtable_aset(VALUE ary, VALUE xloc, VALUE yloc, VALUE val) {
    dtable_store(ary, NUM2LONG(xloc), NUM2LONG(yloc), NUM2DBL(val));
    return val;
 }

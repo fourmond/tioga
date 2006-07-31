@@ -55,14 +55,14 @@
   (zlib format), rfc1951.txt (deflate format) and rfc1952.txt (gzip format).
 */
 
+PRIVATE
 /* 
  *  call-seq:
  *     Flate.compress(str)  ->  string
  *
  *  Returns a compressed verion of _str_ in a new string.
  */
-
-PRIVATE VALUE do_compress(VALUE klass, VALUE str) {
+VALUE do_compress(VALUE klass, VALUE str) {
    str = rb_String(str);
    unsigned char *ptr = (unsigned char *)RSTRING(str)->ptr;
    long len = RSTRING(str)->len;
@@ -80,7 +80,8 @@ PRIVATE VALUE do_compress(VALUE klass, VALUE str) {
 PRIVATE int flate_compress(unsigned char *new_ptr, unsigned long *new_len_ptr, unsigned char *ptr, long len) {
    return compress(new_ptr, new_len_ptr, ptr, len); // updates new_len to the actual length
 }
- 
+
+PRIVATE  
 /* 
  *  call-seq:
  *     Flate.expand(str)  ->  string
@@ -90,7 +91,7 @@ PRIVATE int flate_compress(unsigned char *new_ptr, unsigned long *new_len_ptr, u
  *  
  */
  
-PRIVATE VALUE do_expand(VALUE klass, VALUE str) {
+VALUE do_expand(VALUE klass, VALUE str) {
    str = rb_String(str);
    unsigned char *ptr = (unsigned char *)RSTRING(str)->ptr;
    long len = RSTRING(str)->len;

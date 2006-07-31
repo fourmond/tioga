@@ -207,6 +207,7 @@ static Dvector *dvector_modify(VALUE ary) {
    return d;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *    dvector.dirty? -> _true_ or _false_
@@ -215,8 +216,7 @@ static Dvector *dvector_modify(VALUE ary) {
  *  dirty was cleared. When a Dvector is created or copied, dirty is set
  *  to false. It is set to true whenever the vector is modified. You need
  *  to reset it manually using dirty=.
- */
-PRIVATE VALUE dvector_is_dirty(VALUE ary) {
+ */ VALUE dvector_is_dirty(VALUE ary) {
   Dvector *d;
   d = Get_Dvector(ary);
   if(d->dirty)
@@ -225,54 +225,51 @@ PRIVATE VALUE dvector_is_dirty(VALUE ary) {
     return Qfalse;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *    dvector.clean? -> _true_ or _false_
  *
  *  Returns _true_ if the vector hasn't been modified since the last time
  *  dirty was cleared. See dirty?.
- */
-PRIVATE VALUE dvector_is_clean(VALUE ary) {
+ */ VALUE dvector_is_clean(VALUE ary) {
   if(RTEST(dvector_is_dirty(ary)))
     return Qfalse;
   return Qtrue;
 }
 
 
+PRIVATE
 /*
  *  call-seq:
  *    dvector.dirty= _true_ or _false_ -> dvector
  *
  *  Sets (or unsets) the _dirty_ flag. Returns _dvector_.
- */
-
-PRIVATE VALUE dvector_set_dirty(VALUE ary, VALUE b) {
+ */ VALUE dvector_set_dirty(VALUE ary, VALUE b) {
   Dvector *d;
   d = Get_Dvector(ary);
   d->dirty = RTEST(b);
   return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.freeze  -> _dvector_
  *
  *  Prevents further modifications.  A TypeError will be raised if modification is attempted.
- */
-
-PRIVATE VALUE dvector_freeze(VALUE ary) {
+ */ VALUE dvector_freeze(VALUE ary) {
    return rb_obj_freeze(ary);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.frozen?  -> true or false
  *
  *  Return <code>true</code> if this vector is frozen (or temporarily frozen
  *  while being sorted).
- */
-
-PRIVATE VALUE dvector_frozen_p(VALUE ary) {
+ */ VALUE dvector_frozen_p(VALUE ary) {
    if (OBJ_FROZEN(ary)) return Qtrue;
    if (FL_TEST(ary, DVEC_TMPLOCK)) return Qtrue;
    return Qfalse;
@@ -329,6 +326,7 @@ PRIVATE VALUE dvector_check_array_type(VALUE ary) {
    return rb_check_convert_type(ary, T_ARRAY, "Array", "to_ary");
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     Dvector.new                          -> a_dvector
@@ -349,9 +347,7 @@ PRIVATE VALUE dvector_check_array_type(VALUE ary) {
  *     Dvector.new(3, -1)                -> Dvector[ -1, -1, -1 ]
  *     Dvector.new(3) {|i| i**2 + 1}     -> Dvector[ 1, 2, 5 ]
  * 
- */
-
-PRIVATE VALUE dvector_initialize(int argc, VALUE *argv, VALUE ary) {
+ */ VALUE dvector_initialize(int argc, VALUE *argv, VALUE ary) {
    long len;
    VALUE size, val;
    Dvector *d = dvector_modify(ary);
@@ -407,6 +403,7 @@ PRIVATE void Dvector_Push_Double(VALUE ary, double val) {
    Dvector_Store_Double(ary, d->len, val);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector << number  -> dvector
@@ -417,14 +414,13 @@ PRIVATE void Dvector_Push_Double(VALUE ary, double val) {
  *
  *     Dvector[ 1, 2 ] << -3.3 << 1e3    ->  Dvector[ 1, 2, 3.3, 1000.0 ]
  *
- */
-
-PRIVATE VALUE dvector_push(VALUE ary, VALUE item) {
+ */ VALUE dvector_push(VALUE ary, VALUE item) {
    item = rb_Float(item);
    Dvector_Push_Double(ary, NUM2DBL(item));
    return ary;
 }
 
+PRIVATE
 /* 
  *  call-seq:
  *     dvector.push(number, ... )  -> dvector
@@ -433,15 +429,14 @@ PRIVATE VALUE dvector_push(VALUE ary, VALUE item) {
  *
  *     a = Dvector[ 1, 2, 3 ]
  *     a.push(4, 5, 6)  -> Dvector[1, 2, 3, 4, 5, 6]
- */
-
-PRIVATE VALUE dvector_push_m(int argc, VALUE *argv, VALUE ary) {
+ */ VALUE dvector_push_m(int argc, VALUE *argv, VALUE ary) {
    while (argc--) {
       dvector_push(ary, *argv++);
    }
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.pop -> number or nil
@@ -452,9 +447,7 @@ PRIVATE VALUE dvector_push_m(int argc, VALUE *argv, VALUE ary) {
  *     a = Dvector[ 1, 2, 3 ]
  *     a.pop   -> 3
  *     a       -> Dvector[ 1, 2 ]
- */
-
-PRIVATE VALUE dvector_pop(VALUE ary) {
+ */ VALUE dvector_pop(VALUE ary) {
    Dvector *d = dvector_modify(ary);
    if (d->len == 0) return Qnil;
    if (d->shared == Qnil && d->len * 2 < d->capa && d->capa > DVEC_DEFAULT_SIZE) {
@@ -477,6 +470,7 @@ static VALUE dvector_make_shared(VALUE ary) {
    return shared;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.shift   ->   number or nil
@@ -488,9 +482,7 @@ static VALUE dvector_make_shared(VALUE ary) {
  *     args = Dvector[ 1, 2, 3 ]
  *     args.shift   -> 1
  *     args         -> Dvector[ 2, 3 ]
- */
-
-PRIVATE VALUE dvector_shift(VALUE ary) {
+ */ VALUE dvector_shift(VALUE ary) {
    double top;
    Dvector *d = dvector_modify(ary);
    if (d->len == 0) return Qnil;
@@ -501,6 +493,7 @@ PRIVATE VALUE dvector_shift(VALUE ary) {
    return rb_float_new(top);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.unshift(number, ...)  -> dvector
@@ -510,9 +503,7 @@ PRIVATE VALUE dvector_shift(VALUE ary) {
  *     a = [ 2, 3, 4 ]
  *     a.unshift(1)      -> Dvector[ 1, 2, 3, 4 ]
  *     a.unshift(-1, 0)  -> Dvector[ -1, 0, 1, 2, 3, 4 ]
- */
-
-PRIVATE VALUE dvector_unshift_m(int argc, VALUE *argv, VALUE ary) {
+ */ VALUE dvector_unshift_m(int argc, VALUE *argv, VALUE ary) {
    Dvector *d = Get_Dvector(ary);
    long len = d->len, i;
    if (argc < 0) {
@@ -564,6 +555,7 @@ PRIVATE VALUE dvector_subseq(VALUE ary, long beg, long len) {
    return ary2;
 }
 
+PRIVATE
 /* 
  *  call-seq:
  *     dvector[int]                  -> number or nil
@@ -596,9 +588,7 @@ PRIVATE VALUE dvector_subseq(VALUE ary, long beg, long len) {
  *     a[5, 1]                -> Dvector[]
  *     a[5..10]               -> Dvector[]
  *
- */
-
-PRIVATE VALUE dvector_aref(int argc, VALUE *argv, VALUE ary) {
+ */ VALUE dvector_aref(int argc, VALUE *argv, VALUE ary) {
    VALUE arg;
    long beg, len;
    Dvector *d = Get_Dvector(ary);
@@ -636,6 +626,7 @@ PRIVATE VALUE dvector_aref(int argc, VALUE *argv, VALUE ary) {
    return dvector_entry(ary, NUM2LONG(arg));
 }
 
+PRIVATE
 /* 
  *  call-seq:
  *     dvector.at(int)  ->  number or nil
@@ -647,12 +638,11 @@ PRIVATE VALUE dvector_aref(int argc, VALUE *argv, VALUE ary) {
  *     a = Dvector[ 1, 2, 3, 4, 5 ]
  *     a.at(0)     -> 1
  *     a.at(-1)    -> 5
- */
-
-PRIVATE VALUE dvector_at(VALUE ary, VALUE pos) {
+ */ VALUE dvector_at(VALUE ary, VALUE pos) {
    return dvector_entry(ary, NUM2LONG(pos));
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.first          ->  number or nil
@@ -665,9 +655,7 @@ PRIVATE VALUE dvector_at(VALUE ary, VALUE pos) {
  *     a.first   -> 1
  *     a.first(1)   -> Dvector[ 1 ]
  *     a.first(3)   -> Dvector[ 1, 2, 3 ]
- */
-
-PRIVATE VALUE dvector_first(int argc, VALUE *argv, VALUE ary) {
+ */ VALUE dvector_first(int argc, VALUE *argv, VALUE ary) {
    VALUE nv, result;
    long n, i;
    Dvector *d = Get_Dvector(ary);
@@ -685,6 +673,7 @@ PRIVATE VALUE dvector_first(int argc, VALUE *argv, VALUE ary) {
    return result;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.last     ->  number or nil
@@ -697,9 +686,7 @@ PRIVATE VALUE dvector_first(int argc, VALUE *argv, VALUE ary) {
  *     a.last   -> 5
  *     a.last(1)   -> Dvector[ 5 ]
  *     a.last(3)   -> Dvector[ 3, 4, 5 ]
-*/
-
-PRIVATE VALUE dvector_last(int argc, VALUE *argv, VALUE ary) {
+*/ VALUE dvector_last(int argc, VALUE *argv, VALUE ary) {
    VALUE nv, result;
    long n, i, beg;
    Dvector *d = Get_Dvector(ary);
@@ -718,6 +705,7 @@ PRIVATE VALUE dvector_last(int argc, VALUE *argv, VALUE ary) {
    return result;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.uniq! -> dvector
@@ -731,9 +719,7 @@ PRIVATE VALUE dvector_last(int argc, VALUE *argv, VALUE ary) {
  *     a.uniq!              ->   Dvector[1.1, 1.7, 3.8, 5]
  *     b = Dvector[ 1.1, 3.8, 1.7, 5 ]
  *     b.uniq!              ->   nil
- */
-
-PRIVATE VALUE dvector_uniq_bang(VALUE ary) {
+ */ VALUE dvector_uniq_bang(VALUE ary) {
    double v;
    Dvector *d = dvector_modify(ary);
    long i, j, k;
@@ -754,6 +740,7 @@ PRIVATE VALUE dvector_uniq_bang(VALUE ary) {
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.uniq -> a_dvector
@@ -763,15 +750,13 @@ PRIVATE VALUE dvector_uniq_bang(VALUE ary) {
  *     
  *     a = Dvector[ 1.1, 3.8, 1.7, 3.8, 5 ]
  *     a.uniq              ->   Dvector[1.1, 1.7, 3.8, 5]
- */
-
-
-PRIVATE VALUE dvector_uniq(VALUE ary) {
+ */ VALUE dvector_uniq(VALUE ary) {
    VALUE new = dvector_uniq_bang(dvector_dup(ary));
    if (new == Qnil) new = ary;
    return new;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.fetch(int)                    -> number
@@ -790,9 +775,7 @@ PRIVATE VALUE dvector_uniq(VALUE ary) {
  *     a.fetch(-1)              -> 44
  *     a.fetch(4, 0)            -> 0
  *     a.fetch(4) { |i| i*i }   -> 16
- */
-
-PRIVATE VALUE dvector_fetch(int argc, VALUE *argv, VALUE ary) {
+ */ VALUE dvector_fetch(int argc, VALUE *argv, VALUE ary) {
    VALUE pos, ifnone;
    long block_given;
    long idx;
@@ -816,6 +799,7 @@ PRIVATE VALUE dvector_fetch(int argc, VALUE *argv, VALUE ary) {
    return rb_float_new(d->ptr[idx]);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.index(number)   ->  int or nil
@@ -827,9 +811,7 @@ PRIVATE VALUE dvector_fetch(int argc, VALUE *argv, VALUE ary) {
  *     a = Dvector[ 1, 2, 3, 4, 5, 4, 3, 2 ]
  *     a.index(3)   -> 2
  *     a.index(0)   -> nil
- */
-
-PRIVATE VALUE dvector_index(VALUE ary, VALUE val) {
+ */ VALUE dvector_index(VALUE ary, VALUE val) {
    Dvector *d = Get_Dvector(ary);
    double v;
    long i = d->len;
@@ -842,6 +824,7 @@ PRIVATE VALUE dvector_index(VALUE ary, VALUE val) {
    return Qnil;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.rindex(number)    ->  int or nil
@@ -853,9 +836,7 @@ PRIVATE VALUE dvector_index(VALUE ary, VALUE val) {
  *     a = Dvector[ 1, 2, 3, 4, 5, 4, 3, 2 ]
  *     a.rindex(3)   -> 6
  *     a.rindex(0)   -> nil
- */
-
-PRIVATE VALUE dvector_rindex(VALUE ary, VALUE val) {
+ */ VALUE dvector_rindex(VALUE ary, VALUE val) {
    Dvector *d = Get_Dvector(ary);
    double v;
    long i = d->len;
@@ -929,6 +910,7 @@ static void dvector_splice(VALUE ary, long beg, long len, VALUE rpl) {
    }
 }
 
+PRIVATE
 /* 
  *  call-seq:
  *     dvector[int]           = number
@@ -957,9 +939,7 @@ static void dvector_splice(VALUE ary, long beg, long len, VALUE rpl) {
  *     a[0..2] = 1                    -> Dvector[ 1, 4 ]
  *     a[-1]   = 5                    -> Dvector[ 1, 5 ]
  *     a[1..-1] = nil                 -> Dvector[ 1 ]
- */
-
-PRIVATE VALUE dvector_aset(int argc, VALUE *argv, VALUE ary) {
+ */ VALUE dvector_aset(int argc, VALUE *argv, VALUE ary) {
    long offset, beg, len;
    Dvector *d = Get_Dvector(ary);
    VALUE arg1;
@@ -998,6 +978,7 @@ PRIVATE VALUE dvector_aset(int argc, VALUE *argv, VALUE ary) {
 }
 
 
+PRIVATE
 /* 
  *  call-seq:
  *     dvector.clear  ->  dvector
@@ -1006,9 +987,7 @@ PRIVATE VALUE dvector_aset(int argc, VALUE *argv, VALUE ary) {
  *
  *     a = Dvector[ 1, 2, 3, 4, 5 ]
  *     a.clear    -> Dvector[]
- */
-
-PRIVATE VALUE dvector_clear(VALUE ary) {
+ */ VALUE dvector_clear(VALUE ary) {
    Dvector *d = dvector_modify(ary);
    d->len = 0;
    if (DVEC_DEFAULT_SIZE * 2 < d->capa) {
@@ -1018,6 +997,7 @@ PRIVATE VALUE dvector_clear(VALUE ary) {
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.set(float)  -> dvector
@@ -1026,9 +1006,7 @@ PRIVATE VALUE dvector_clear(VALUE ary) {
  *  Modifies the entries of _dvector_ array.  If the argument is a float, then all of the
  *  entries are set to that value.  If the argument is another Dvector, then it must
  *  be the same length as _dvector_, and its contents are copied to _dvector_.
- */
-
-PRIVATE VALUE dvector_set(VALUE ary, VALUE val) {
+ */ VALUE dvector_set(VALUE ary, VALUE val) {
    Dvector *d = dvector_modify(ary);
    int len = d->len, i;
    double *data = d->ptr;
@@ -1049,14 +1027,13 @@ PRIVATE VALUE dvector_set(VALUE ary, VALUE val) {
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.min_gt(val)  -> float or nil
  *  
  *  Returns the minimum entry in _dvector_ which is greater than _val_, or <code>nil</code> if no such entry if found.
- */
-
-PRIVATE VALUE dvector_min_gt(VALUE ary, VALUE val) {
+ */ VALUE dvector_min_gt(VALUE ary, VALUE val) {
    Dvector *d = Get_Dvector(ary);
    val = rb_Float(val);
    double zmin = 0, z = NUM2DBL(val), x; /* it doesn't matter
@@ -1074,14 +1051,13 @@ PRIVATE VALUE dvector_min_gt(VALUE ary, VALUE val) {
    return Qnil;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.max_lt(val)  -> float or nil
  *  
  *  Returns the maximum entry in _dvector_ which is less than _val_, or <code>nil</code> if no such entry if found.
- */
-
-PRIVATE VALUE dvector_max_lt(VALUE ary, VALUE val) {
+ */ VALUE dvector_max_lt(VALUE ary, VALUE val) {
    Dvector *d = Get_Dvector(ary);
    val = rb_Float(val);
    double zmax = 0, z = NUM2DBL(val), x;
@@ -1097,6 +1073,7 @@ PRIVATE VALUE dvector_max_lt(VALUE ary, VALUE val) {
    return Qnil;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.insert(int, number...)  -> dvector
@@ -1110,9 +1087,7 @@ PRIVATE VALUE dvector_max_lt(VALUE ary, VALUE val) {
  *     a.insert(2, 99)         -> Dvector[ 1, 2, 99, 3 ]
  *     a.insert(-2, 1, 2, 3)   -> Dvector[ 1, 2, 99, 1, 2, 3, 3 ]
  *     a.insert(-1, 0)         -> Dvector[ 1, 2, 99, 1, 2, 3, 3, 0 ]
- */
-
-PRIVATE VALUE dvector_insert(int argc, VALUE *argv, VALUE ary) {
+ */ VALUE dvector_insert(int argc, VALUE *argv, VALUE ary) {
    long pos;
    if (argc < 1) {
       rb_raise(rb_eArgError, "wrong number of arguments (at least 1)");
@@ -1130,6 +1105,7 @@ PRIVATE VALUE dvector_insert(int argc, VALUE *argv, VALUE ary) {
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.each {|x| block }   ->   dvector
@@ -1143,9 +1119,7 @@ PRIVATE VALUE dvector_insert(int argc, VALUE *argv, VALUE ary) {
  *  produces:
  *     
  *      1 -- 0 -- -1 --
- */
-
-PRIVATE VALUE dvector_each(VALUE ary) {
+ */ VALUE dvector_each(VALUE ary) {
    Dvector *d = Get_Dvector(ary);
    long i;
    for (i=0; i < d->len; i++) {
@@ -1154,6 +1128,7 @@ PRIVATE VALUE dvector_each(VALUE ary) {
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.each2(other) {|x,y| block } 
@@ -1169,9 +1144,7 @@ PRIVATE VALUE dvector_each(VALUE ary) {
  *  produces:
  *     
  *     (1,3) (0,4) (-1,5) 
- */
-
-PRIVATE VALUE dvector_each2(VALUE ary, VALUE ary2) {
+ */ VALUE dvector_each2(VALUE ary, VALUE ary2) {
    Dvector *d = Get_Dvector(ary);
    Dvector *d2 = Get_Dvector(ary2);
    long i;
@@ -1184,6 +1157,7 @@ PRIVATE VALUE dvector_each2(VALUE ary, VALUE ary2) {
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.each_index {|index| block }  ->  dvector
@@ -1197,9 +1171,7 @@ PRIVATE VALUE dvector_each2(VALUE ary, VALUE ary2) {
  *  produces:
  *     
  *     0 -- 1 -- 2 --
- */
-
-PRIVATE VALUE dvector_each_index(VALUE ary) {
+ */ VALUE dvector_each_index(VALUE ary) {
    Dvector *d = Get_Dvector(ary);
    long i;
    for (i=0; i < d->len; i++) {
@@ -1208,6 +1180,7 @@ PRIVATE VALUE dvector_each_index(VALUE ary) {
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.each_with_index {|x,index| block }  ->  dvector
@@ -1215,9 +1188,7 @@ PRIVATE VALUE dvector_each_index(VALUE ary) {
  *  Same as <code>Dvector#each</code>, but passes the index of the element
  *  in addition to the element itself.
  *     
- */
-
-PRIVATE VALUE dvector_each_with_index(VALUE ary) {
+ */ VALUE dvector_each_with_index(VALUE ary) {
    Dvector *d = Get_Dvector(ary);
    long i;
    for (i=0; i < d->len; i++) {
@@ -1226,6 +1197,7 @@ PRIVATE VALUE dvector_each_with_index(VALUE ary) {
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.each2_with_index(other) {|x,y,index| block } 
@@ -1240,9 +1212,7 @@ PRIVATE VALUE dvector_each_with_index(VALUE ary) {
  *  produces:
  *     
  *     (1,3,0) (0,4,1) (-1,5,2) 
- */
-
-PRIVATE VALUE dvector_each2_with_index(VALUE ary, VALUE ary2) {
+ */ VALUE dvector_each2_with_index(VALUE ary, VALUE ary2) {
    Dvector *d = Get_Dvector(ary);
    Dvector *d2 = Get_Dvector(ary2);
    long i;
@@ -1255,6 +1225,7 @@ PRIVATE VALUE dvector_each2_with_index(VALUE ary, VALUE ary2) {
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.reverse_each {|x| block } 
@@ -1268,9 +1239,7 @@ PRIVATE VALUE dvector_each2_with_index(VALUE ary, VALUE ary2) {
  *  produces:
  *     
  *      -1 0 1
- */
-
-PRIVATE VALUE dvector_reverse_each(VALUE ary) {
+ */ VALUE dvector_reverse_each(VALUE ary) {
    Dvector *d = Get_Dvector(ary);
    long len = d->len;
    while (len--) {
@@ -1282,6 +1251,7 @@ PRIVATE VALUE dvector_reverse_each(VALUE ary) {
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.reverse_each2(other) {|x,y| block } 
@@ -1296,9 +1266,7 @@ PRIVATE VALUE dvector_reverse_each(VALUE ary) {
  *  produces:
  *     
  *      (-1,5) (0,4) (1,3)
- */
-
-PRIVATE VALUE dvector_reverse_each2(VALUE ary, VALUE ary2) {
+ */ VALUE dvector_reverse_each2(VALUE ary, VALUE ary2) {
    Dvector *d = Get_Dvector(ary);
    Dvector *d2 = Get_Dvector(ary2);
    long len = d->len;
@@ -1314,6 +1282,7 @@ PRIVATE VALUE dvector_reverse_each2(VALUE ary, VALUE ary2) {
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.reverse_each_index {|index| block }  ->  array
@@ -1327,9 +1296,7 @@ PRIVATE VALUE dvector_reverse_each2(VALUE ary, VALUE ary2) {
  *  produces:
  *     
  *     2 -- 1 -- 0 --
- */
-
-PRIVATE VALUE dvector_reverse_each_index(VALUE ary) {
+ */ VALUE dvector_reverse_each_index(VALUE ary) {
    Dvector *d = Get_Dvector(ary);
    long len = d->len;
    while (len--) {
@@ -1341,6 +1308,7 @@ PRIVATE VALUE dvector_reverse_each_index(VALUE ary) {
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.reverse_each_with_index {|x,index| block }  ->  array
@@ -1354,9 +1322,7 @@ PRIVATE VALUE dvector_reverse_each_index(VALUE ary) {
  *  produces:
  *     
  *     (-1,2) (0,1) (1,0) 
- */
-
-PRIVATE VALUE dvector_reverse_each_with_index(VALUE ary) {
+ */ VALUE dvector_reverse_each_with_index(VALUE ary) {
    Dvector *d = Get_Dvector(ary);
    long len = d->len;
    while (len--) {
@@ -1368,6 +1334,7 @@ PRIVATE VALUE dvector_reverse_each_with_index(VALUE ary) {
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.reverse_each2_with_index {|x,y,index| block }  ->  dvector
@@ -1382,9 +1349,7 @@ PRIVATE VALUE dvector_reverse_each_with_index(VALUE ary) {
  *  produces:
  *     
  *      (-1,5,2) (0,4,1) (1,3,0)
- */
-
-PRIVATE VALUE dvector_reverse_each2_with_index(VALUE ary, VALUE ary2) {
+ */ VALUE dvector_reverse_each2_with_index(VALUE ary, VALUE ary2) {
    Dvector *d = Get_Dvector(ary);
    Dvector *d2 = Get_Dvector(ary2);
    long len = d->len;
@@ -1400,6 +1365,7 @@ PRIVATE VALUE dvector_reverse_each2_with_index(VALUE ary, VALUE ary2) {
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.length -> int
@@ -1408,13 +1374,12 @@ PRIVATE VALUE dvector_reverse_each2_with_index(VALUE ary, VALUE ary2) {
  *     
  *     Dvector[ 0, -1, 2, -3, 4 ].length   -> 5
  *     Dvector[].length                    -> 0
- */
-
-PRIVATE VALUE dvector_length(VALUE ary) {
+ */ VALUE dvector_length(VALUE ary) {
    Dvector *d = Get_Dvector(ary);
    return LONG2NUM(d->len);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.empty?   -> true or false
@@ -1422,9 +1387,7 @@ PRIVATE VALUE dvector_length(VALUE ary) {
  *  Returns <code>true</code> if _dvector_ vector contains no elements.
  *     
  *     Dvector[].empty?   -> true
- */
-
-PRIVATE VALUE dvector_empty_p(VALUE ary) {
+ */ VALUE dvector_empty_p(VALUE ary) {
    Dvector *d = Get_Dvector(ary);
    if (d->len == 0)
       return Qtrue;
@@ -1457,6 +1420,7 @@ PRIVATE VALUE dvector_join(VALUE ary, VALUE sep) {
    return result;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.join(sep=" ")    -> a_string
@@ -1466,15 +1430,14 @@ PRIVATE VALUE dvector_join(VALUE ary, VALUE sep) {
  *     
  *     Dvector[ 1, 2, 3 ].join        -> "1 2 3"
  *     Dvector[ 1, 2, 3 ].join("-")   -> "1-2-3"
- */
-
-PRIVATE VALUE dvector_join_m(int argc, VALUE *argv, VALUE ary) {
+ */ VALUE dvector_join_m(int argc, VALUE *argv, VALUE ary) {
    VALUE sep;
    rb_scan_args(argc, argv, "01", &sep);
    if (NIL_P(sep)) sep = dvector_output_fs;
    return dvector_join(ary, sep);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.tridag(a,b,c,r) -> dvector
@@ -1494,9 +1457,7 @@ PRIVATE VALUE dvector_join_m(int argc, VALUE *argv, VALUE ary) {
  *     u[n-1] = (r[n-1] - a[n-1] * u[n-2]) / b[n-1].
  *
  *  See Numerical Recipes for more details.  
- */
-
-PRIVATE VALUE dvector_tridag(VALUE uVec, VALUE aVec, VALUE bVec, VALUE cVec, VALUE rVec) {
+ */ VALUE dvector_tridag(VALUE uVec, VALUE aVec, VALUE bVec, VALUE cVec, VALUE rVec) {
     double *u, *a, *b, *c, *r, *gam, bet;
     long j, n, u_len, a_len, b_len, c_len, r_len;
     u = Dvector_Data_for_Read(uVec, &u_len);
@@ -1529,6 +1490,7 @@ PRIVATE VALUE dvector_tridag(VALUE uVec, VALUE aVec, VALUE bVec, VALUE cVec, VAL
     return uVec;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.to_s -> a_string
@@ -1537,23 +1499,20 @@ PRIVATE VALUE dvector_tridag(VALUE uVec, VALUE aVec, VALUE bVec, VALUE cVec, VAL
  *     
  *     Dvector[ 1, 2, 3 ].to_s        -> "1 2 3"
  *
- */
-
-PRIVATE VALUE dvector_to_s(VALUE ary) {
+ */ VALUE dvector_to_s(VALUE ary) {
    Dvector *d = Get_Dvector(ary);
    if (d->len == 0) return rb_str_new(0, 0);
    return dvector_join(ary, dvector_output_fs);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.to_a     -> an_array
  *
  *     Returns an Array with the same contents as _dvector_.
  *  
- */
-
-PRIVATE VALUE dvector_to_a(VALUE dvector) {
+ */ VALUE dvector_to_a(VALUE dvector) {
    Dvector *d = Get_Dvector(dvector);
    long len = d->len, i;
    double *ptr = d->ptr;
@@ -1579,6 +1538,7 @@ PRIVATE VALUE dvector_reverse(VALUE ary) {
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.reverse!   -> dvector 
@@ -1588,12 +1548,11 @@ PRIVATE VALUE dvector_reverse(VALUE ary) {
  *     a = Dvector[ 1, 2, 3 ]
  *     a.reverse!       -> Dvector[ 3, 2, 1 ]
  *     a                -> Dvector[ 3, 2, 1 ]
- */
-
-PRIVATE VALUE dvector_reverse_bang(VALUE ary) {
+ */ VALUE dvector_reverse_bang(VALUE ary) {
    return dvector_reverse(ary);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.reverse -> a_dvector
@@ -1602,9 +1561,7 @@ PRIVATE VALUE dvector_reverse_bang(VALUE ary) {
  *     
  *     Dvector[ 1, 2, 3 ].reverse         -> Dvector[ 3, 2, 1 ]
  *     Dvector[ 1 ].reverse               -> Dvector[ 1 ]
- */
-
-PRIVATE VALUE dvector_reverse_m(VALUE ary) {
+ */ VALUE dvector_reverse_m(VALUE ary) {
    return dvector_reverse(dvector_dup(ary));
 }
 
@@ -1642,6 +1599,7 @@ static VALUE dvector_sort_unlock(VALUE ary) {
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.sort!                   -> dvector
@@ -1657,9 +1615,7 @@ static VALUE dvector_sort_unlock(VALUE ary) {
  *     a                          -> Dvector[ 1, 2, 3, 4, 5 ]
  *     a.sort! {|x,y| y <=> x }   -> Dvector[ 5, 4, 3, 2, 1 ]
  *     a                          -> Dvector[ 5, 4, 3, 2, 1 ]
- */
-
-PRIVATE VALUE dvector_sort_bang(VALUE ary) {
+ */ VALUE dvector_sort_bang(VALUE ary) {
    Dvector *d = dvector_modify(ary); /* force "unshared" before start the sort */
    if (d->len > 1) {
       FL_SET(ary, DVEC_TMPLOCK);	/* prohibit modification during sort */
@@ -1668,6 +1624,7 @@ PRIVATE VALUE dvector_sort_bang(VALUE ary) {
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.sort                   -> a_dvector 
@@ -1682,27 +1639,25 @@ PRIVATE VALUE dvector_sort_bang(VALUE ary) {
  *     a.sort                    -> Dvector[ 1, 2, 3, 4, 5 ]
  *     a                         -> Dvector[ 4, 1, 2, 5, 3 ]
  *     a.sort {|x,y| y <=> x }   -> Dvector[ 5, 4, 3, 2, 1 ]
- */
-
-PRIVATE VALUE dvector_sort(VALUE ary) {
+ */ VALUE dvector_sort(VALUE ary) {
     ary = dvector_dup(ary);
     dvector_sort_bang(ary);
     return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.dup  -> a_dvector
  *  
  *  Returns a copy of _dvector_.  For performance sensitive situations involving a series of vector operations,
  *  first make a copy using dup and then do "bang" operations to modify the result without further copying.
- */
-
-PRIVATE VALUE dvector_dup(VALUE ary) {
+ */ VALUE dvector_dup(VALUE ary) {
    Dvector *d = Get_Dvector(ary);
    return dvector_new4_dbl(d->len, d->ptr);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.collect {|x| block }  -> a_dvector
@@ -1717,9 +1672,7 @@ PRIVATE VALUE dvector_dup(VALUE ary) {
  *    A better way:
  *     a = Dvector[ 1, 2, 3, 4 ]
  *     a**2 + 1                   -> Dvector[ 2, 5, 10, 17 ]
- */
-
-PRIVATE VALUE dvector_collect(VALUE ary) {
+ */ VALUE dvector_collect(VALUE ary) {
    long i;
    VALUE collect;
    Dvector *d = Get_Dvector(ary);
@@ -1737,6 +1690,7 @@ PRIVATE VALUE dvector_collect(VALUE ary) {
    return collect;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.collect2(other) {|x,y| block }  -> dvector
@@ -1749,9 +1703,7 @@ PRIVATE VALUE dvector_collect(VALUE ary) {
  *     b = Dvector[ 3, 4, 5 ]
  *     a.map2(b) {|x,y| x**2 + y**2 }  -> Dvector[ 10, 16, 26 ]
  *
- */
-
-PRIVATE VALUE dvector_collect2(VALUE ary, VALUE ary2) {
+ */ VALUE dvector_collect2(VALUE ary, VALUE ary2) {
    long i;
    VALUE collect;
    Dvector *d = Get_Dvector(ary);
@@ -1769,6 +1721,7 @@ PRIVATE VALUE dvector_collect2(VALUE ary, VALUE ary2) {
    return collect;
 }
 
+PRIVATE
 /* 
  *  call-seq:
  *     dvector.collect! {|x| block }   ->   dvector
@@ -1785,9 +1738,7 @@ PRIVATE VALUE dvector_collect2(VALUE ary, VALUE ary2) {
  *  A better way:
  *     a.mul!(a).add!(1)           -> Dvector[ 5, 10, 50 ]
  *
-*/
-
-PRIVATE VALUE dvector_collect_bang(VALUE ary) {
+*/ VALUE dvector_collect_bang(VALUE ary) {
    long i;
    Dvector *d= dvector_modify(ary);
    for (i = 0; i < d->len; i++) {
@@ -1796,6 +1747,7 @@ PRIVATE VALUE dvector_collect_bang(VALUE ary) {
    return ary;
 }
 
+PRIVATE
 /* 
  *  call-seq:
  *     dvector.collect2! {|x,y| block }   ->   dvector
@@ -1809,8 +1761,7 @@ PRIVATE VALUE dvector_collect_bang(VALUE ary) {
  *     a.map2!(b) {|x,y| x**2 + y**2 }  -> Dvector[ 10, 16, 26 ]
  *     a                                -> Dvector[ 10, 16, 26 ]
  *
-*/
-PRIVATE 
+*/ 
 VALUE dvector_collect2_bang(VALUE ary, VALUE ary2) {
    long i;
    Dvector *d = dvector_modify(ary);
@@ -1824,6 +1775,7 @@ VALUE dvector_collect2_bang(VALUE ary, VALUE ary2) {
    return ary;
 }
 
+PRIVATE
 /* 
  *  call-seq:
  *     dvector.values_at(selector,... )   -> a_dvector
@@ -1837,8 +1789,7 @@ VALUE dvector_collect2_bang(VALUE ary, VALUE ary2) {
  *     a.values_at(1, 3, 5, 7)        -> Dvector[ 2, 4, 6 ]
  *     a.values_at(-1, -3, -5, -7)    -> Dvector[ 6, 4, 2 ]
  *     a.values_at(1..3, 2...5)       -> Dvector[ 2, 3, 4, 3, 4, 5 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_values_at(int argc, VALUE *argv, VALUE ary) {
    Dvector *d = Get_Dvector(ary);
    long olen = d->len;
@@ -1870,6 +1821,7 @@ VALUE dvector_values_at(int argc, VALUE *argv, VALUE ary) {
    return result;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.select {|x| block } -> dvector
@@ -1880,8 +1832,7 @@ VALUE dvector_values_at(int argc, VALUE *argv, VALUE ary) {
  *     
  *     a = Dvector[ 1, 2, 3, 4, 5, 6 ]
  *     a.select {|x| x.modulo(2) == 0 }   -> Dvector[2, 4, 6]
- */
-PRIVATE 
+ */ 
 VALUE dvector_select(VALUE ary) {
    VALUE result, el;
    long i;
@@ -1897,6 +1848,7 @@ VALUE dvector_select(VALUE ary) {
    return result;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.delete(number)            -> number or nil 
@@ -1912,8 +1864,7 @@ VALUE dvector_select(VALUE ary) {
  *     a                               -> Dvector[0, 3, 9, 12]
  *     a.delete(2)                     -> nil
  *     a.delete(2) { "not found" }     -> "not found"
- */
-PRIVATE 
+ */ 
 VALUE dvector_delete(VALUE ary, VALUE item) {
    long len, i1, i2;
    Dvector *d;
@@ -1966,6 +1917,7 @@ VALUE dvector_delete_at(VALUE ary, long pos) {
    return rb_float_new(del);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.delete_at(int)  -> number or nil
@@ -1977,12 +1929,12 @@ VALUE dvector_delete_at(VALUE ary, long pos) {
  *     a.delete_at(2)                   -> 6
  *     a                                -> Dvector[0, 3, 9, 12]
  *     a.delete_at(6)                   -> nil
- */
-PRIVATE 
+ */ 
 VALUE dvector_delete_at_m(VALUE ary, VALUE pos) {
     return dvector_delete_at(ary, NUM2LONG(pos));
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.slice!(int)         -> number or nil
@@ -2006,8 +1958,7 @@ VALUE dvector_delete_at_m(VALUE ary, VALUE pos) {
  *     a                         -> Dvector[0]
  *     a.slice!(0..2)            -> Dvector[0]
  *     a                         -> Dvector[]
-*/
-PRIVATE 
+*/ 
 VALUE dvector_slice_bang(int argc, VALUE *argv, VALUE ary) {
    VALUE arg1, arg2;
    long pos, len;
@@ -2029,6 +1980,7 @@ VALUE dvector_slice_bang(int argc, VALUE *argv, VALUE ary) {
    return dvector_delete_at(ary, NUM2LONG(arg1));
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.reject! {|x| block }  -> dvector or nil
@@ -2037,8 +1989,7 @@ VALUE dvector_slice_bang(int argc, VALUE *argv, VALUE ary) {
  *  _dvector_ for which the block evaluates to true, but returns
  *  <code>nil</code> if no changes were made. Also see
  *  <code>Enumerable#reject</code>.
- */
-PRIVATE 
+ */ 
 VALUE dvector_reject_bang(VALUE ary) {
    long i1, i2;
    Dvector *d;
@@ -2058,6 +2009,7 @@ VALUE dvector_reject_bang(VALUE ary) {
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.reject {|x| block }      -> a_dvector
@@ -2067,14 +2019,14 @@ VALUE dvector_reject_bang(VALUE ary) {
  *     
  *     a = Dvector[ 1, 2, 3, 4 ]
  *     a.reject {|x| x.modulo(2) == 0 }   -> Dvector[1, 3]
- */
-PRIVATE 
+ */ 
 VALUE dvector_reject(VALUE ary) {
    ary = dvector_dup(ary);
    dvector_reject_bang(ary);
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.delete_if {|x| block }  -> dvector
@@ -2085,8 +2037,7 @@ VALUE dvector_reject(VALUE ary) {
  *     a = Dvector[ 1, 2, 3, 4 ]
  *     a.delete_if {|x| x.modulo(2) == 0 }   -> Dvector[1, 3]
  *     a                                     -> Dvector[ 1, 3 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_delete_if(VALUE ary) {
    dvector_reject_bang(ary);
    return ary;
@@ -2111,6 +2062,7 @@ static double *dvector_replace_dbls(VALUE ary, long len, double *data) {
    return d->ptr;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.replace(other)  -> dvector
@@ -2121,8 +2073,7 @@ static double *dvector_replace_dbls(VALUE ary, long len, double *data) {
  *     a = Dvector[ 1, 2, 3, 4, 5 ]
  *     a.replace(Dvector[ -1, -2, -3 ])   -> Dvector[ -1, -2, -3 ]
  *     a                               -> Dvector[ -1, -2, -3 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_replace(VALUE dest, VALUE orig) {
    VALUE shared;
    Dvector *org, *d;
@@ -2147,6 +2098,7 @@ VALUE dvector_replace(VALUE dest, VALUE orig) {
    return dest;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.fill(number)                             -> dvector
@@ -2170,8 +2122,7 @@ VALUE dvector_replace(VALUE dest, VALUE orig) {
  *     a.fill {|i| i*i}         -> Dvector[ 0, 1, 4, 9, 16 ]
  *     a.fill(-2) {|i| i*i*i}   -> Dvector[ 0, 1, 4, 27, 64 ]
  *     a                        -> Dvector[ 0, 1, 4, 27, 64 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_fill(int argc, VALUE *argv, VALUE ary) {
    Dvector *d;
    VALUE item, arg1, arg2;
@@ -2250,6 +2201,7 @@ static VALUE c_Resize(VALUE ary, long new_len) {
    return ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.resize(new_size)  -> dvector
@@ -2261,14 +2213,14 @@ static VALUE c_Resize(VALUE ary, long new_len) {
  *  a                      -> Dvector[ 1, 5, -3, 0, 0 ]  
  *  a.resize(2)            -> Dvector[ 1, 5 ]  
  *  a                      -> Dvector[ 1, 5 ]  
- */
-PRIVATE 
+ */ 
 VALUE dvector_resize(VALUE ary, VALUE len) {
    len = rb_Integer(len);
    long new_size = NUM2INT(len);
    return c_Resize(ary, new_size);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.concat(other)  -> dvector
@@ -2278,8 +2230,7 @@ VALUE dvector_resize(VALUE ary, VALUE len) {
  *  a = Dvector[1, 5, -3]
  *  a.concat([6, 7])       -> Dvector[ 1, 5, -3, 6, 7 ]  
  *  a                      -> Dvector[ 1, 5, -3, 6, 7 ]  
- */
-PRIVATE 
+ */ 
 VALUE dvector_concat(VALUE x, VALUE y) {
    Dvector *c, *d;
    y = dvector_to_dvector(y);
@@ -2291,13 +2242,13 @@ VALUE dvector_concat(VALUE x, VALUE y) {
    return x;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.eql?(other)  -> true or false
  *
  *  Returns <code>true</code> if _dvector_ and _other_ have the same content.  _other_  can either be a Dvector or a 1D Array of numbers.
- */
-PRIVATE 
+ */ 
 VALUE dvector_eql(VALUE ary1, VALUE ary2) {
    long i, len;
    Dvector *d1, *d2;
@@ -2315,6 +2266,7 @@ VALUE dvector_eql(VALUE ary1, VALUE ary2) {
    return Qtrue;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *  dvector.include?(number)   -> true or false
@@ -2325,8 +2277,7 @@ VALUE dvector_eql(VALUE ary1, VALUE ary2) {
  *     a = Dvector[ 1, 2, 3 ]
  *     a.include?(2)   -> true
  *     a.include?(0)   -> false
- */
-PRIVATE 
+ */ 
 VALUE dvector_includes(VALUE ary, VALUE item) {
    Dvector *d = Get_Dvector(ary);
    long i, len = d->len;
@@ -2339,6 +2290,7 @@ VALUE dvector_includes(VALUE ary, VALUE item) {
    return Qfalse;
 }
 
+PRIVATE
 /* 
  *  call-seq:
  *     dvector <=> other   ->  -1, 0, +1
@@ -2355,8 +2307,7 @@ VALUE dvector_includes(VALUE ary, VALUE item) {
  *     Dvector[ 1, 1, 2 ] <=> Dvector[ 1, 1, 2, 3 ]     -> -1
  *     Dvector[ 1, 2, 3, 4, 5, 6 ] <=> Dvector[ 1, 2 ]  -> +1
  *
- */
-PRIVATE 
+ */ 
 VALUE dvector_cmp(VALUE ary1, VALUE ary2) {
    long i, len;
    Dvector *d1, *d2;
@@ -2379,6 +2330,7 @@ VALUE dvector_cmp(VALUE ary1, VALUE ary2) {
    return INT2FIX(-1);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.where_max         ->  int or nil
@@ -2390,8 +2342,7 @@ VALUE dvector_cmp(VALUE ary1, VALUE ary2) {
  *     a = Dvector[ 1, 2, 3, 4, 5, 4, 3, 5, 2 ]
  *     a.where_max        -> 4
  *     Dvector[].where_max   -> nil
- */
-PRIVATE 
+ */ 
 VALUE dvector_where_max(VALUE ary) {
    Dvector *d = Get_Dvector(ary);
    double *p = d->ptr, bst;
@@ -2405,6 +2356,7 @@ VALUE dvector_where_max(VALUE ary) {
    return INT2FIX(bst_i);   
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.where_last_max   ->  int or nil
@@ -2415,8 +2367,7 @@ VALUE dvector_where_max(VALUE ary) {
  *     a = Dvector[ 1, 2, 3, 4, 5, 4, 3, 5, 2 ]
  *     a.where_last_max        -> 7
  *     Dvector[].where_last_max   -> nil
- */
-PRIVATE 
+ */ 
 VALUE dvector_where_last_max(VALUE ary) {
    Dvector *d = Get_Dvector(ary);
    double *p = d->ptr, bst;
@@ -2442,6 +2393,7 @@ static double c_dvector_max(Dvector *d)
    return bst;   
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.max   ->  number or nil
@@ -2455,8 +2407,7 @@ static double c_dvector_max(Dvector *d)
  *     Dvector[].max          -> nil
  *     b = Dvector[ 8, 3, 0, 7 ]
  *     a.max(b)            -> 8
- */
-PRIVATE 
+ */ 
 VALUE dvector_max(int argc, VALUE *argv, VALUE self) {
    VALUE ary, index;
    int i, got_one = false;
@@ -2474,6 +2425,7 @@ VALUE dvector_max(int argc, VALUE *argv, VALUE self) {
    return rb_float_new(mx);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.where_min         ->  int or nil
@@ -2485,8 +2437,7 @@ VALUE dvector_max(int argc, VALUE *argv, VALUE self) {
  *     a = Dvector[ 1, 2, -3, 4, -5, 4, 3, -5, 2 ]
  *     a.where_min        -> 4
  *     Dvector[].where_min   -> nil
- */
-PRIVATE 
+ */ 
 VALUE dvector_where_min(VALUE ary) {
    Dvector *d = Get_Dvector(ary);
    double bst, *p = d->ptr;
@@ -2512,6 +2463,7 @@ static double c_dvector_min(Dvector *d)
    return bst;   
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.min   ->  number or nil
@@ -2525,8 +2477,7 @@ static double c_dvector_min(Dvector *d)
  *     Dvector[].min          -> nil
  *     b = Dvector[ 8, 3, 0, 7 ]
  *     a.min(b)            -> 0
- */
-PRIVATE 
+ */ 
 VALUE dvector_min(int argc, VALUE *argv, VALUE self) {
    VALUE ary, index;
    int i, got_one = false;
@@ -2544,6 +2495,7 @@ VALUE dvector_min(int argc, VALUE *argv, VALUE self) {
    return rb_float_new(mn);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.where_last_min   ->  int or nil
@@ -2554,8 +2506,7 @@ VALUE dvector_min(int argc, VALUE *argv, VALUE self) {
  *     a = Dvector[ 1, 2, -3, 4, -5, 4, 3, -5, 2 ]
  *     a.where_last_min         -> 7
  *     Dvector[].where_last_min    -> nil
- */
-PRIVATE 
+ */ 
 VALUE dvector_where_last_min(VALUE ary) {
    Dvector *d = Get_Dvector(ary);
    double *p = d->ptr, bst;
@@ -2569,6 +2520,7 @@ VALUE dvector_where_last_min(VALUE ary) {
    return INT2FIX(bst_i);   
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.where_closest(number)         ->  int or nil
@@ -2580,8 +2532,7 @@ VALUE dvector_where_last_min(VALUE ary) {
  *     a = Dvector[ 1, 2, -3, 4, -5, 4, 3, -5, 2 ]
  *     a.where_closest(3.9)        -> 3
  *     Dvector[].where_closest(3.9)   -> nil
- */
-PRIVATE 
+ */ 
 VALUE dvector_where_closest(VALUE ary, VALUE item) {
    Dvector *d = Get_Dvector(ary);
    item = rb_Float(item);
@@ -2600,6 +2551,7 @@ VALUE dvector_where_closest(VALUE ary, VALUE item) {
    return INT2FIX(bst_i);   
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.where_last_closest(number)   ->  int or nil
@@ -2610,8 +2562,7 @@ VALUE dvector_where_closest(VALUE ary, VALUE item) {
  *     a = Dvector[ 1, 2, -3, 4, -5, 4, 3, -5, 2 ]
  *     a.where_last_closest(3.9)         -> 5
  *     Dvector[].where_last_closest(3.9)    -> nil
- */
-PRIVATE 
+ */ 
 VALUE dvector_where_last_closest(VALUE ary, VALUE item) {
    Dvector *d = Get_Dvector(ary);
    item = rb_Float(item);
@@ -2630,6 +2581,7 @@ VALUE dvector_where_last_closest(VALUE ary, VALUE item) {
    return INT2FIX(bst_i);   
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.where_eq(number)         ->  int or nil
@@ -2642,8 +2594,7 @@ VALUE dvector_where_last_closest(VALUE ary, VALUE item) {
  *     a.where_eq(4)        -> 3
  *     a.where_eq(6)        -> nil
  *     Dvector[].where_eq(4)   -> nil
- */
-PRIVATE 
+ */ 
 VALUE dvector_where_first_eq(VALUE ary, VALUE item) {
    Dvector *d = Get_Dvector(ary);
    item = rb_Float(item);
@@ -2656,6 +2607,7 @@ VALUE dvector_where_first_eq(VALUE ary, VALUE item) {
    return Qnil;   
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.where_ne(number)         ->  int or nil
@@ -2667,8 +2619,7 @@ VALUE dvector_where_first_eq(VALUE ary, VALUE item) {
  *     a = Dvector[ 1, 2, -3, 4, -5, 4, 3, -5, 2 ]
  *     a.where_ne(1)        -> 1
  *     Dvector[].where_ne(4)   -> nil
- */
-PRIVATE 
+ */ 
 VALUE dvector_where_first_ne(VALUE ary, VALUE item) {
    Dvector *d = Get_Dvector(ary);
    item = rb_Float(item);
@@ -2681,6 +2632,7 @@ VALUE dvector_where_first_ne(VALUE ary, VALUE item) {
    return Qnil;   
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.where_lt(number)          ->  int or nil
@@ -2693,8 +2645,7 @@ VALUE dvector_where_first_ne(VALUE ary, VALUE item) {
  *     a.where_lt(1)        -> 2
  *     a.where_lt(-5)       -> nil
  *     Dvector[].where_lt(4)   -> nil
- */
-PRIVATE 
+ */ 
 VALUE dvector_where_first_lt(VALUE ary, VALUE item) {
    Dvector *d = Get_Dvector(ary);
    item = rb_Float(item);
@@ -2707,6 +2658,7 @@ VALUE dvector_where_first_lt(VALUE ary, VALUE item) {
    return Qnil;   
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.where_le(number)         ->  int or nil
@@ -2719,8 +2671,7 @@ VALUE dvector_where_first_lt(VALUE ary, VALUE item) {
  *     a.where_le(0)        -> 2
  *     a.where_le(-5.5)     -> nil
  *     Dvector[].where_le(4)   -> nil
- */
-PRIVATE 
+ */ 
 VALUE dvector_where_first_le(VALUE ary, VALUE item) {
    Dvector *d = Get_Dvector(ary);
    item = rb_Float(item);
@@ -2733,6 +2684,7 @@ VALUE dvector_where_first_le(VALUE ary, VALUE item) {
    return Qnil;   
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.where_gt(number)         ->  int or nil
@@ -2745,8 +2697,7 @@ VALUE dvector_where_first_le(VALUE ary, VALUE item) {
  *     a.where_gt(3)        -> 3
  *     a.where_gt(4)        -> nil
  *     Dvector[].where_gt(0)   -> nil
- */
-PRIVATE 
+ */ 
 VALUE dvector_where_first_gt(VALUE ary, VALUE item) {
    Dvector *d = Get_Dvector(ary);
    item = rb_Float(item);
@@ -2759,6 +2710,7 @@ VALUE dvector_where_first_gt(VALUE ary, VALUE item) {
    return Qnil;   
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.where_ge(number)         ->  int or nil
@@ -2771,8 +2723,7 @@ VALUE dvector_where_first_gt(VALUE ary, VALUE item) {
  *     a.where_ge(3)        -> 3
  *     a.where_ge(5)        -> nil
  *     Dvector[].where_ge(0)   -> nil
- */
-PRIVATE 
+ */ 
 VALUE dvector_where_first_ge(VALUE ary, VALUE item) {
    Dvector *d = Get_Dvector(ary);
    item = rb_Float(item);
@@ -2785,6 +2736,7 @@ VALUE dvector_where_first_ge(VALUE ary, VALUE item) {
    return Qnil;   
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.where_last_eq(number)   ->  int or nil
@@ -2796,8 +2748,7 @@ VALUE dvector_where_first_ge(VALUE ary, VALUE item) {
  *     a.where_last_eq(2)         -> 8
  *     a.where_last_eq(5)         -> nil
  *     Dvector[].where_last_eq(0)    -> nil
- */
-PRIVATE 
+ */ 
 VALUE dvector_where_last_eq(VALUE ary, VALUE item) {
    Dvector *d = Get_Dvector(ary);
    item = rb_Float(item);
@@ -2810,6 +2761,7 @@ VALUE dvector_where_last_eq(VALUE ary, VALUE item) {
    return Qnil;   
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.where_last_ne(number)   ->  int or nil
@@ -2821,8 +2773,7 @@ VALUE dvector_where_last_eq(VALUE ary, VALUE item) {
  *     a.where_last_ne(2)        -> 7
  *     Dvector[0].where_last_ne(0)  -> nil
  *     Dvector[].where_last_ne(0)   -> nil
- */
-PRIVATE 
+ */ 
 VALUE dvector_where_last_ne(VALUE ary, VALUE item) {
    Dvector *d = Get_Dvector(ary);
    item = rb_Float(item);
@@ -2835,6 +2786,7 @@ VALUE dvector_where_last_ne(VALUE ary, VALUE item) {
    return Qnil;   
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.where_last_lt(number)   ->  int or nil
@@ -2846,8 +2798,7 @@ VALUE dvector_where_last_ne(VALUE ary, VALUE item) {
  *     a.where_last_lt(2)        -> 7
  *     a.where_last_lt(-5)       -> nil
  *     Dvector[].where_last_lt(0)   -> nil
- */
-PRIVATE 
+ */ 
 VALUE dvector_where_last_lt(VALUE ary, VALUE item) {
    Dvector *d = Get_Dvector(ary);
    item = rb_Float(item);
@@ -2860,6 +2811,7 @@ VALUE dvector_where_last_lt(VALUE ary, VALUE item) {
    return Qnil;   
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.where_last_le(number)   ->  int or nil
@@ -2871,8 +2823,7 @@ VALUE dvector_where_last_lt(VALUE ary, VALUE item) {
  *     a.where_last_le(1)        -> 7
  *     a.where_last_le(-6)       -> nil
  *     Dvector[].where_last_le(0)   -> nil
- */
-PRIVATE 
+ */ 
 VALUE dvector_where_last_le(VALUE ary, VALUE item) {
    Dvector *d = Get_Dvector(ary);
    item = rb_Float(item);
@@ -2885,6 +2836,7 @@ VALUE dvector_where_last_le(VALUE ary, VALUE item) {
    return Qnil;   
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.where_last_gt(number)   ->  int or nil
@@ -2896,8 +2848,7 @@ VALUE dvector_where_last_le(VALUE ary, VALUE item) {
  *     a.where_last_gt(2)        -> 6
  *     a.where_last_gt(4)        -> nil
  *     Dvector[].where_last_gt(0)   -> nil
- */
-PRIVATE 
+ */ 
 VALUE dvector_where_last_gt(VALUE ary, VALUE item) {
    Dvector *d = Get_Dvector(ary);
    item = rb_Float(item);
@@ -2910,6 +2861,7 @@ VALUE dvector_where_last_gt(VALUE ary, VALUE item) {
    return Qnil;   
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.where_last_ge(number)   ->  int or nil
@@ -2921,8 +2873,7 @@ VALUE dvector_where_last_gt(VALUE ary, VALUE item) {
  *     a.where_last_ge(4)        -> 5
  *     a.where_last_ge(5)        -> nil
  *     Dvector[].where_last_ge(0)   -> nil
- */
-PRIVATE 
+ */ 
 VALUE dvector_where_last_ge(VALUE ary, VALUE item) {
    Dvector *d = Get_Dvector(ary);
    item = rb_Float(item);
@@ -2935,6 +2886,7 @@ VALUE dvector_where_last_ge(VALUE ary, VALUE item) {
    return Qnil;   
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.sum   ->  number
@@ -2945,8 +2897,7 @@ VALUE dvector_where_last_ge(VALUE ary, VALUE item) {
  *     a = Dvector[ 1, 2, 3, 4 ]
  *     a.sum        -> 10
  *     Dvector[].sum   -> 0
- */
-PRIVATE 
+ */ 
 VALUE dvector_sum(VALUE ary) {
    Dvector *d = Get_Dvector(ary);
    double *p = d->ptr, sum = 0.0;
@@ -2955,6 +2906,7 @@ VALUE dvector_sum(VALUE ary) {
    return rb_float_new(sum);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.dot(other)   ->  number
@@ -2966,8 +2918,7 @@ VALUE dvector_sum(VALUE ary) {
  *     b = Dvector[ 1, -3, 3, 0 ]
  *     a.dot(b)        -> 4
  *     Dvector[].dot(b)   -> 0
- */
-PRIVATE 
+ */ 
 VALUE dvector_dot(VALUE ary1, VALUE ary2) {
    Dvector *d1 = Get_Dvector(ary1), *d2 = Get_Dvector(ary2);
    double *p1 = d1->ptr, *p2 = d2->ptr, sum = 0.0;
@@ -2979,6 +2930,7 @@ VALUE dvector_dot(VALUE ary1, VALUE ary2) {
    return rb_float_new(sum);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.vector_length   ->  number
@@ -2987,8 +2939,7 @@ VALUE dvector_dot(VALUE ary1, VALUE ary2) {
  *     
  *     a = Dvector[ 3, 5 ]
  *     a.vector_length -> 5.0
- */
-PRIVATE 
+ */ 
 VALUE dvector_vector_length(VALUE ary) {
    Dvector *d = Get_Dvector(ary);
    double *p = d->ptr, sum = 0.0;
@@ -3011,6 +2962,7 @@ VALUE dvector_apply_math_op(VALUE source, double (*op)(double)) {
 
 static double do_neg(double arg) { return -arg; }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.neg   ->  a_dvector
@@ -3019,12 +2971,12 @@ static double do_neg(double arg) { return -arg; }
  *     
  *     a = Dvector[ 1, 2, 3, 4 ]
  *     a.neg   -> Dvector[ -1, -2, -3, -4 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_neg(VALUE ary) {
    return dvector_apply_math_op(ary, do_neg);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.abs   ->  a_dvector
@@ -3033,12 +2985,12 @@ VALUE dvector_neg(VALUE ary) {
  *     
  *     a = Dvector[ 1, -2, -3, 4 ]
  *     a.abs   -> Dvector[ 1, 2, 3, 4 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_abs(VALUE ary) {
    return dvector_apply_math_op(ary, fabs);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.sin   ->  a_dvector
@@ -3047,12 +2999,12 @@ VALUE dvector_abs(VALUE ary) {
  *     
  *     a = Dvector[ 1, -2, -3, 4 ]
  *     a.sin   -> Dvector[ sin(1), sin(-2), sin(-3), sin(4) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_sin(VALUE ary) {
    return dvector_apply_math_op(ary, sin);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.cos   ->  a_dvector
@@ -3061,12 +3013,12 @@ VALUE dvector_sin(VALUE ary) {
  *     
  *     a = Dvector[ 1, -2, -3, 4 ]
  *     a.cos   -> Dvector[ cos(1), cos(-2), cos(-3), cos(4) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_cos(VALUE ary) {
    return dvector_apply_math_op(ary, cos);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.tan   ->  a_dvector
@@ -3075,12 +3027,12 @@ VALUE dvector_cos(VALUE ary) {
  *     
  *     a = Dvector[ 1, -2, -3, 4 ]
  *     a.tan   -> Dvector[ tan(1), tan(-2), tan(-3), tan(4) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_tan(VALUE ary) {
    return dvector_apply_math_op(ary, tan);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.asin   ->  a_dvector
@@ -3089,12 +3041,12 @@ VALUE dvector_tan(VALUE ary) {
  *     
  *     a = Dvector[ 0.1, -0.2, -0.3, 0.4 ]
  *     a.asin   -> Dvector[ asin(0.1), asin(-0.2), asin(-0.3), asin(0.4) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_asin(VALUE ary) {
    return dvector_apply_math_op(ary, asin);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.acos   ->  a_dvector
@@ -3103,12 +3055,12 @@ VALUE dvector_asin(VALUE ary) {
  *     
  *     a = Dvector[ 0.1, -0.2, -0.3, 0.4 ]
  *     a.acos   -> Dvector[ acos(0.1), acos(-0.2), acos(-0.3), acos(0.4) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_acos(VALUE ary) {
    return dvector_apply_math_op(ary, acos);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.atan   ->  a_dvector
@@ -3117,12 +3069,12 @@ VALUE dvector_acos(VALUE ary) {
  *     
  *     a = Dvector[ 0.1, -0.2, -0.3, 0.4 ]
  *     a.atan   -> Dvector[ atan(0.1), atan(-0.2), atan(-0.3), atan(0.4) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_atan(VALUE ary) {
    return dvector_apply_math_op(ary, atan);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.sinh   ->  a_dvector
@@ -3131,12 +3083,12 @@ VALUE dvector_atan(VALUE ary) {
  *     
  *     a = Dvector[ 0.1, -0.2, 0.3 ]
  *     a.sinh   -> Dvector[ sinh(0.1), sinh(-0.2), sinh(0.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_sinh(VALUE ary) {
    return dvector_apply_math_op(ary, sinh);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.cosh   ->  a_dvector
@@ -3145,12 +3097,12 @@ VALUE dvector_sinh(VALUE ary) {
  *     
  *     a = Dvector[ 0.1, -0.2, 0.3 ]
  *     a.cosh   -> Dvector[ cosh(0.1), cosh(-0.2), cosh(0.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_cosh(VALUE ary) {
    return dvector_apply_math_op(ary, cosh);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.tanh   ->  a_dvector
@@ -3159,14 +3111,14 @@ VALUE dvector_cosh(VALUE ary) {
  *     
  *     a = Dvector[ 0.1, -0.2, 0.3 ]
  *     a.tanh   -> Dvector[ tanh(0.1), tanh(-0.2), tanh(0.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_tanh(VALUE ary) {
    return dvector_apply_math_op(ary, tanh);
 }
 
 static double do_asinh(double x) { return log(x + sqrt(x*x+1.0)); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.asinh   ->  a_dvector
@@ -3175,14 +3127,14 @@ static double do_asinh(double x) { return log(x + sqrt(x*x+1.0)); }
  *     
  *     a = Dvector[ 0.1, -0.2, 0.3 ]
  *     a.asinh   -> Dvector[ asinh(0.1), asinh(-0.2), asinh(0.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_asinh(VALUE ary) {
    return dvector_apply_math_op(ary, do_asinh);
 }
 
 static double do_acosh(double x) { return log(x + sqrt(x*x-1.0)); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.acosh   ->  a_dvector
@@ -3191,14 +3143,14 @@ static double do_acosh(double x) { return log(x + sqrt(x*x-1.0)); }
  *     
  *     a = Dvector[ 5.1, 2.2, 1.3 ]
  *     a.acosh   -> Dvector[ acosh(5.1), acosh(2.2), acosh(1.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_acosh(VALUE ary) {
    return dvector_apply_math_op(ary, do_acosh);
 }
 
 static double do_atanh(double x) { return 0.5*log((1.0+x)/(1.0-x)); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.atanh   ->  a_dvector
@@ -3207,12 +3159,12 @@ static double do_atanh(double x) { return 0.5*log((1.0+x)/(1.0-x)); }
  *     
  *     a = Dvector[ 0.1, -0.2, 0.3 ]
  *     a.atanh   -> Dvector[ atanh(0.1), atanh(-0.2), atanh(0.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_atanh(VALUE ary) {
    return dvector_apply_math_op(ary, do_atanh);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.ceil   ->  a_dvector
@@ -3221,12 +3173,12 @@ VALUE dvector_atanh(VALUE ary) {
  *     
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.ceil   -> Dvector[ 2, -2, 6 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_ceil(VALUE ary) {
    return dvector_apply_math_op(ary, ceil);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.floor   ->  a_dvector
@@ -3235,14 +3187,14 @@ VALUE dvector_ceil(VALUE ary) {
  *     
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.floor   -> Dvector[ 1, -3, 5 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_floor(VALUE ary) {
    return dvector_apply_math_op(ary, floor);
 }
 
 static double do_round(double x) { return (x == 0.0)? 0.0 : (x > 0.0)? floor(x+0.5) : ceil(x-0.5); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.round   ->  a_dvector
@@ -3252,12 +3204,12 @@ static double do_round(double x) { return (x == 0.0)? 0.0 : (x > 0.0)? floor(x+0
  *     
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.round   -> Dvector[ 1, -2, 5 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_round(VALUE ary) {
    return dvector_apply_math_op(ary, do_round);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.exp   ->  a_dvector
@@ -3266,14 +3218,14 @@ VALUE dvector_round(VALUE ary) {
  *     
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.exp   -> Dvector[ exp(1.1), exp(-2.2), exp(5.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_exp(VALUE ary) {
    return dvector_apply_math_op(ary, exp);
 }
 
 static double do_exp10(double arg) { return pow(10.0, arg); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.exp10   ->  a_dvector
@@ -3282,12 +3234,12 @@ static double do_exp10(double arg) { return pow(10.0, arg); }
  *     
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.exp10   -> Dvector[ 10**(1.1), 10**(-2.2), 10**(5.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_exp10(VALUE ary) {
    return dvector_apply_math_op(ary, do_exp10);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.log   ->  a_dvector
@@ -3296,12 +3248,12 @@ VALUE dvector_exp10(VALUE ary) {
  *     
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.log   -> Dvector[ log(1.1), log(-2.2), log(5.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_log(VALUE ary) {
    return dvector_apply_math_op(ary, log);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.log10   ->  a_dvector
@@ -3310,14 +3262,14 @@ VALUE dvector_log(VALUE ary) {
  *     
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.log10   -> Dvector[ log10(1.1), log10(-2.2), log10(5.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_log10(VALUE ary) {
    return dvector_apply_math_op(ary, log10);
 }
 
 static double do_inv(double arg) { return 1.0/arg; }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.inv   ->  a_dvector
@@ -3326,12 +3278,12 @@ static double do_inv(double arg) { return 1.0/arg; }
  *     
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.inv   -> Dvector[ 1 / 1.1, -1 / 2.2, 1 / 5.3 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_inv(VALUE ary) {
    return dvector_apply_math_op(ary, do_inv);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.sqrt   ->  a_dvector
@@ -3340,12 +3292,12 @@ VALUE dvector_inv(VALUE ary) {
  *     
  *     a = Dvector[ 1.1, 2.2, 5.3 ]
  *     a.sqrt   -> Dvector[ sqrt(1.1), sqrt(2.2), sqrt(5.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_sqrt(VALUE ary) {
    return dvector_apply_math_op(ary, sqrt);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.neg!   ->  dvector
@@ -3355,12 +3307,12 @@ VALUE dvector_sqrt(VALUE ary) {
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.neg!   -> Dvector[ -1.1, 2.2, -5.3 ]
  *     a        -> Dvector[ -1.1, 2.2, -5.3 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_neg_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, do_neg);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.abs!   ->  dvector
@@ -3370,12 +3322,12 @@ VALUE dvector_neg_bang(VALUE ary) {
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.abs!   -> Dvector[ 1.1, 2.2, 5.3 ]
  *     a        -> Dvector[ 1.1, 2.2, 5.3 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_abs_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, fabs);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.sin!   ->  dvector
@@ -3385,12 +3337,12 @@ VALUE dvector_abs_bang(VALUE ary) {
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.sin!   -> Dvector[ sin(1.1), sin(-2.2), sin(5.3) ]
  *     a        -> Dvector[ sin(1.1), sin(-2.2), sin(5.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_sin_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, sin);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.cos!   ->  dvector
@@ -3400,12 +3352,12 @@ VALUE dvector_sin_bang(VALUE ary) {
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.cos!   -> Dvector[ cos(1.1), cos(-2.2), cos(5.3) ]
  *     a        -> Dvector[ cos(1.1), cos(-2.2), cos(5.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_cos_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, cos);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.tan!   ->  dvector
@@ -3415,12 +3367,12 @@ VALUE dvector_cos_bang(VALUE ary) {
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.tan!   -> Dvector[ tan(1.1), tan(-2.2), tan(5.3) ]
  *     a        -> Dvector[ tan(1.1), tan(-2.2), tan(5.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_tan_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, tan);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.asin!   ->  dvector
@@ -3430,12 +3382,12 @@ VALUE dvector_tan_bang(VALUE ary) {
  *     a = Dvector[ 0.1, -0.2, 0.3 ]
  *     a.asin!   -> Dvector[ asin(0.1), asin(-0.2), asin(0.3) ]
  *     a         -> Dvector[ asin(0.1), asin(-0.2), asin(0.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_asin_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, asin);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.acos!   ->  dvector
@@ -3445,12 +3397,12 @@ VALUE dvector_asin_bang(VALUE ary) {
  *     a = Dvector[ 0.1, -0.2, 0.3 ]
  *     a.acos!   -> Dvector[ acos(0.1), acos(-0.2), acos(0.3) ]
  *     a         -> Dvector[ acos(0.1), acos(-0.2), acos(0.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_acos_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, acos);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.atan!   ->  dvector
@@ -3460,12 +3412,12 @@ VALUE dvector_acos_bang(VALUE ary) {
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.atan!   -> Dvector[ atan(1.1), atan(-2.2), atan(5.3) ]
  *     a         -> Dvector[ atan(1.1), atan(-2.2), atan(5.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_atan_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, atan);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.sinh!   ->  dvector
@@ -3475,12 +3427,12 @@ VALUE dvector_atan_bang(VALUE ary) {
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.sinh!   -> Dvector[ sinh(1.1), sinh(-2.2), sinh(5.3) ]
  *     a         -> Dvector[ sinh(1.1), sinh(-2.2), sinh(5.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_sinh_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, sinh);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.cosh!   ->  dvector
@@ -3490,12 +3442,12 @@ VALUE dvector_sinh_bang(VALUE ary) {
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.cosh!   -> Dvector[ cosh(1.1), cosh(-2.2), cosh(5.3) ]
  *     a         -> Dvector[ cosh(1.1), cosh(-2.2), cosh(5.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_cosh_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, cosh);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.tanh!   ->  dvector
@@ -3505,12 +3457,12 @@ VALUE dvector_cosh_bang(VALUE ary) {
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.tanh!   -> Dvector[ tanh(1.1), tanh(-2.2), tanh(5.3) ]
  *     a         -> Dvector[ tanh(1.1), tanh(-2.2), tanh(5.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_tanh_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, tanh);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.asinh!   ->  dvector
@@ -3520,12 +3472,12 @@ VALUE dvector_tanh_bang(VALUE ary) {
  *     a = Dvector[ 1.1, 2.2, 5.3 ]
  *     a.asinh!   -> Dvector[ asinh(1.1), asinh(2.2), asinh(5.3) ]
  *     a          -> Dvector[ asinh(1.1), asinh(2.2), asinh(5.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_asinh_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, do_asinh);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.acosh!   ->  dvector
@@ -3535,12 +3487,12 @@ VALUE dvector_asinh_bang(VALUE ary) {
  *     a = Dvector[ 1.1, 2.2, 5.3 ]
  *     a.acosh!   -> Dvector[ acosh(1.1), acosh(2.2), acosh(5.3) ]
  *     a          -> Dvector[ acosh(1.1), acosh(2.2), acosh(5.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_acosh_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, do_acosh);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.atanh!   ->  dvector
@@ -3550,12 +3502,12 @@ VALUE dvector_acosh_bang(VALUE ary) {
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.atanh!   -> Dvector[ atanh(1.1), atanh(-2.2), atanh(5.3) ]
  *     a          -> Dvector[ atanh(1.1), atanh(-2.2), atanh(5.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_atanh_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, do_atanh);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.ceil!   ->  dvector
@@ -3565,12 +3517,12 @@ VALUE dvector_atanh_bang(VALUE ary) {
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.ceil!   -> Dvector[ 2, -2, 6 ]
  *     a         -> Dvector[ 2, -2, 6 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_ceil_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, ceil);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.floor!   ->  dvector
@@ -3580,12 +3532,12 @@ VALUE dvector_ceil_bang(VALUE ary) {
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.floor!   -> Dvector[ 1, -3, 5 ]
  *     a          -> Dvector[ 1, -3, 5 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_floor_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, floor);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.round!   ->  dvector
@@ -3596,12 +3548,12 @@ VALUE dvector_floor_bang(VALUE ary) {
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.round!   -> Dvector[ 1, -2, 5 ]
  *     a          -> Dvector[ 1, -2, 5 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_round_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, do_round);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.exp!   ->  dvector
@@ -3611,12 +3563,12 @@ VALUE dvector_round_bang(VALUE ary) {
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.exp!   -> Dvector[ exp(1.1), exp(-2.2), exp(5.3) ]
  *     a        -> Dvector[ exp(1.1), exp(-2.2), exp(5.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_exp_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, exp);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.exp10!   ->  dvector
@@ -3626,12 +3578,12 @@ VALUE dvector_exp_bang(VALUE ary) {
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.exp10!   -> Dvector[ 10**(1.1), 10**(-2.2), 10**(5.3) ]
  *     a          -> Dvector[ 10**(1.1), 10**(-2.2), 10**(5.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_exp10_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, do_exp10);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.log!   ->  dvector
@@ -3641,12 +3593,12 @@ VALUE dvector_exp10_bang(VALUE ary) {
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.log!   -> Dvector[ log(1.1), log(-2.2), log(5.3) ]
  *     a        -> Dvector[ log(1.1), log(-2.2), log(5.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_log_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, log);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.log10!   ->  dvector
@@ -3656,12 +3608,12 @@ VALUE dvector_log_bang(VALUE ary) {
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.log10!   -> Dvector[ log10(1.1), log10(-2.2), log10(5.3) ]
  *     a          -> Dvector[ log10(1.1), log10(-2.2), log10(5.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_log10_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, log10);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.inv!   ->  dvector
@@ -3671,12 +3623,12 @@ VALUE dvector_log10_bang(VALUE ary) {
  *     a = Dvector[ 1.1, -2.2, 5.3 ]
  *     a.inv!   -> Dvector[ 1 / 1.1, -1 / 2.2, 1 / 5.3 ]
  *     a        -> Dvector[ 1 / 1.1, -1 / 2.2, 1 / 5.3 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_inv_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, do_inv);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.sqrt!   ->  dvector
@@ -3686,8 +3638,7 @@ VALUE dvector_inv_bang(VALUE ary) {
  *     a = Dvector[ 1.1, 2.2, 5.3 ]
  *     a.sqrt!   -> Dvector[ sqrt(1.1), sqrt(2.2), sqrt(5.3) ]
  *     a         -> Dvector[ sqrt(1.1), sqrt(2.2), sqrt(5.3) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_sqrt_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, sqrt);
 }
@@ -3707,6 +3658,7 @@ static VALUE dvector_apply_math_op1(VALUE source, VALUE arg, double (*op)(double
 
 static double do_trim(double x, double cutoff) { return (fabs(x) < cutoff)? 0.0 : x; }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.trim(cutoff=1e-6)   ->  a_dvector
@@ -3715,8 +3667,7 @@ static double do_trim(double x, double cutoff) { return (fabs(x) < cutoff)? 0.0 
  *     
  *     a = Dvector[ 1.1, 1e-20, -5.3 ]
  *     a.trim  -> Dvector[ 1.1, 0, -5.3 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_trim(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
@@ -3727,14 +3678,14 @@ VALUE dvector_trim(int argc, VALUE *argv, VALUE self) {
 
 static double do_safe_log(double x, double y) { return log(MAX(x,y)); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.safe_log(cutoff=1e-99)   ->  a_dvector
  *  
  *  Returns a copy of _dvector_ with each entry x replaced by log(max(x,_cutoff_)).
  *     
- */
-PRIVATE 
+ */ 
 VALUE dvector_safe_log(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
@@ -3745,14 +3696,14 @@ VALUE dvector_safe_log(int argc, VALUE *argv, VALUE self) {
 
 static double do_safe_log10(double x, double y) { return log10(MAX(x,y)); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.safe_log10(cutoff=1e-99)   ->  a_dvector
  *  
  *  Returns a copy of _dvector_ with each entry x replaced by log10(max(x,_cutoff_)).
  *     
- */
-PRIVATE 
+ */ 
 VALUE dvector_safe_log10(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
@@ -3764,60 +3715,61 @@ VALUE dvector_safe_log10(int argc, VALUE *argv, VALUE self) {
 static double do_safe_inv(double x, double y) {
    return (fabs(x) >= y)? 1.0/x : (x > 0.0)? 1.0/y : -1.0/y; }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.safe_inv(cutoff)   ->  a_dvector
  *  
  *  Returns a copy of _dvector_ with each entry x replaced by sign(x)/_cutoff_ if abs(x) < _cutoff_, 1/x otherwise.
  *     
- */
-PRIVATE 
+ */ 
 VALUE dvector_safe_inv(VALUE ary, VALUE arg) {
    return dvector_apply_math_op1(ary, arg, do_safe_inv);
 }
 
 static double do_safe_asin(double x) { return asin(MAX(-1.0,MIN(1.0,x))); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.safe_asin   ->  a_dvector
  *  
  *  Returns a copy of _dvector_ with each entry x replaced by asin(max(-1,min(1,x))).
  *     
- */
-PRIVATE 
+ */ 
 VALUE dvector_safe_asin(VALUE ary) {
    return dvector_apply_math_op(ary, do_safe_asin);
 }
    
 static double do_safe_acos(double x) { return acos(MAX(-1.0,MIN(1.0,x))); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.safe_acos   ->  a_dvector
  *  
  *  Returns a copy of _dvector_ with each entry x replaced by acos(max(-1,min(1,x))).
  *     
- */
-PRIVATE 
+ */ 
 VALUE dvector_safe_acos(VALUE ary) {
    return dvector_apply_math_op(ary, do_safe_acos);
 }
    
 static double do_safe_sqrt(double x) { return sqrt(MAX(x,0.0)); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.safe_sqrt   ->  a_dvector
  *  
  *  Returns a copy of _dvector_ with each entry x replaced by sqrt(max(x,0)).
  *     
- */
-PRIVATE 
+ */ 
 VALUE dvector_safe_sqrt(VALUE ary) {
    return dvector_apply_math_op(ary, do_safe_sqrt);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.atan2!(number)       ->  dvector
@@ -3832,13 +3784,13 @@ VALUE dvector_safe_sqrt(VALUE ary) {
  *     a = Dvector[ 1.1, -5.7, 12.7 ]
  *     b = Dvector[ 7.1, 4.9, -10.1 ]
  *     a.atan2!(b)                -> Dvector[ atan2(1.1,7.1), atan2(-5.7,4.9), atan2(12.7,-10.1) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_atan2_bang(VALUE ary, VALUE arg) {
    return dvector_apply_math_op2_bang(ary, arg, atan2);
 }
 
 static double do_mod(double x, double y) { return x - y * floor(x/y); }
+PRIVATE
 /*
  *  call-seq:
  *     dvector.modulo!(number)       ->  dvector
@@ -3856,14 +3808,14 @@ static double do_mod(double x, double y) { return x - y * floor(x/y); }
  *     b = Dvector[ 7.1, 4.9, -10.1 ]
  *     a.mod!(b)                -> Dvector[ 1.1, 4.1, -7.5 ]
  *     a                        -> Dvector[ 1.1, 4.1, -7.5 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_modulo_bang(VALUE ary, VALUE arg) {
    return dvector_apply_math_op2_bang(ary, arg, do_mod);
 }
 
 static double do_remainder(double x, double y) { return (x*y > 0.0)? do_mod(x,y) : do_mod(x,y)-y; }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.remainder!(number)          ->  dvector
@@ -3880,12 +3832,12 @@ static double do_remainder(double x, double y) { return (x*y > 0.0)? do_mod(x,y)
  *     b = Dvector[ 2, 3, 5 ]
  *     a.remainder!(b)                -> Dvector[ 1, -2, 2 ]
  *     a                              -> Dvector[ 1, -2, 2 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_remainder_bang(VALUE ary, VALUE arg) {
    return dvector_apply_math_op2_bang(ary, arg, do_remainder);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.trim!(cutoff=1e-6)   ->  dvector
@@ -3894,8 +3846,7 @@ VALUE dvector_remainder_bang(VALUE ary, VALUE arg) {
  *     
  *     a = Dvector[ 1.1, 1e-20, -5.3 ]
  *     a.trim!  -> Dvector[ 1.1, 0, -5.3 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_trim_bang(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
@@ -3904,6 +3855,7 @@ VALUE dvector_trim_bang(int argc, VALUE *argv, VALUE self) {
    return dvector_apply_math_op1_bang(self, arg1, do_trim);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.pow!(number)                ->  dvector
@@ -3921,14 +3873,14 @@ VALUE dvector_trim_bang(int argc, VALUE *argv, VALUE self) {
  *     b = Dvector[ 7, 4, -2 ]
  *     a.raised_to!(b)                -> Dvector[ 1.1 ** 7, (-5.7) ** 4, 12.7 ** (-2) ]
  *     a                              -> Dvector[ 1.1 ** 7, (-5.7) ** 4, 12.7 ** (-2) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_pow_bang(VALUE ary, VALUE arg) {
    return dvector_apply_math_op1_bang(ary, arg, pow);
 }
 
 static double do_as_exponent_of(double x, double y) { return pow(y,x); }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.as_exponent_of!(number)                ->  dvector
@@ -3944,20 +3896,19 @@ static double do_as_exponent_of(double x, double y) { return pow(y,x); }
  *     b = Dvector[ 7.1, 4.9, -10 ]
  *     a.as_exponent_of!(b)                -> Dvector[ 7.1 ** 2, 4.9 ** (-5), (-10) ** 12 ]
  *     a                                   -> Dvector[ 7.1 ** 2, 4.9 ** (-5), (-10) ** 12 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_as_exponent_of_bang(VALUE ary, VALUE arg) {
    return dvector_apply_math_op2_bang(ary, arg, do_as_exponent_of);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.safe_log!(cutoff=1e-99)   ->  dvector
  *  
  *  Replaces each entry x in _dvector_ by log(max(x,_cutoff_)).
  *     
- */
-PRIVATE 
+ */ 
 VALUE dvector_safe_log_bang(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
@@ -3966,14 +3917,14 @@ VALUE dvector_safe_log_bang(int argc, VALUE *argv, VALUE self) {
    return dvector_apply_math_op1_bang(self, arg1, do_safe_log);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.safe_log10!(cutoff=1e-99)   ->  dvector
  *  
  *  Replaces each entry x in _dvector_ by log10(max(x,_cutoff_)).
  *     
- */
-PRIVATE 
+ */ 
 VALUE dvector_safe_log10_bang(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
@@ -3982,14 +3933,14 @@ VALUE dvector_safe_log10_bang(int argc, VALUE *argv, VALUE self) {
    return dvector_apply_math_op1_bang(self, arg1, do_safe_log10);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.safe_inv!(cutoff=1e-99)   ->  dvector
  *  
  *  Replaces each entry x in _dvector_ by sign(x)/_cutoff_ if abs(x) < _cutoff_, 1/x otherwise.
  *     
- */
-PRIVATE 
+ */ 
 VALUE dvector_safe_inv_bang(int argc, VALUE *argv, VALUE self) {
    VALUE arg1;
    if ((argc < 0) || (argc > 1))
@@ -3998,38 +3949,38 @@ VALUE dvector_safe_inv_bang(int argc, VALUE *argv, VALUE self) {
    return dvector_apply_math_op1_bang(self, arg1, do_safe_inv);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.safe_sqrt!   ->  dvector
  *  
  *  Replaces each entry x in _dvector_ by sqrt(max(x,0)).
  *     
- */
-PRIVATE 
+ */ 
 VALUE dvector_safe_sqrt_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, do_safe_sqrt);
 }
    
+PRIVATE
 /*
  *  call-seq:
  *     dvector.safe_asin!   ->  dvector
  *  
  *  Replaces each entry x in _dvector_ by asin(max(-1,min(1,x))).
  *     
- */
-PRIVATE 
+ */ 
 VALUE dvector_safe_asin_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, do_safe_asin);
 }
    
+PRIVATE
 /*
  *  call-seq:
  *     dvector.safe_acos!   ->  dvector
  *  
  *  Replaces each entry x in _dvector_ by acos(max(-1,min(1,x))).
  *     
- */
-PRIVATE 
+ */ 
 VALUE dvector_safe_acos_bang(VALUE ary) {
    return dvector_apply_math_op_bang(ary, do_safe_acos);
 }
@@ -4052,6 +4003,7 @@ VALUE dvector_apply_math_op2(VALUE ary1, VALUE ary2, double (*op)(double, double
 }
 
 static double do_add(double x, double y) { return x + y; }
+PRIVATE
 /*
  *  call-seq:
  *     dvector.add(number)       ->  a_dvector
@@ -4071,13 +4023,13 @@ static double do_add(double x, double y) { return x + y; }
  *     b = Dvector[ 7, 4, -10 ]
  *     a.add(b)              -> Dvector[ 18, -1, -8 ]
  *     a + b                 -> Dvector[ 18, -1, -8 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_add(VALUE ary, VALUE arg) {
    return dvector_apply_math_op2(ary, arg, do_add);
 }
 
 static double do_sub(double x, double y) { return x - y; }
+PRIVATE
 /*
  *  call-seq:
  *     dvector.sub(number)       ->  a_dvector
@@ -4097,13 +4049,13 @@ static double do_sub(double x, double y) { return x - y; }
  *     b = Dvector[ 7, 4, -10 ]
  *     a.sub(b)               -> Dvector[ 4, -9, 12 ]
  *     a - b                  -> Dvector[ 4, -9, 12 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_sub(VALUE ary, VALUE arg) {
    return dvector_apply_math_op2(ary, arg, do_sub);
 }
 
 static double do_mul(double x, double y) { return x * y; }
+PRIVATE
 /*
  *  call-seq:
  *     dvector.mul(number)       ->  a_dvector
@@ -4123,13 +4075,13 @@ static double do_mul(double x, double y) { return x * y; }
  *     b = Dvector[ 7, 4, -10 ]
  *     a.mul(b)               -> Dvector[ 77, -20, -20 ]
  *     a * b                  -> Dvector[ 77, -20, -20 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_mul(VALUE ary, VALUE arg) {
    return dvector_apply_math_op2(ary, arg, do_mul);
 }
 
 static double do_div(double x, double y) { return x / y; }
+PRIVATE
 /*
  *  call-seq:
  *     dvector.div(number)       ->  a_dvector
@@ -4149,12 +4101,12 @@ static double do_div(double x, double y) { return x / y; }
  *     b = Dvector[ 7.1, 4.9, -10.1 ]
  *     a.div(b)                -> Dvector[ 1.1/7.1, -5.7/4.9, 2.5/10.1 ]
  *     a / b                   -> Dvector[ 1.1/7.1, -5.7/4.9, 2.5/10.1 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_div(VALUE ary, VALUE arg) {
    return dvector_apply_math_op2(ary, arg, do_div);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.modulo(number)       ->  a_dvector
@@ -4174,12 +4126,12 @@ VALUE dvector_div(VALUE ary, VALUE arg) {
  *     b = Dvector[ 7.1, 4.9, -10.1 ]
  *     a.mod(b)                -> Dvector[ 1.1, 4.1, -7.5 ]
  *     a % b                   -> Dvector[ 1.1, 4.1, -7.5 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_mod(VALUE ary, VALUE arg) {
    return dvector_apply_math_op2(ary, arg, do_mod);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.remainder(number)          ->  a_dvector
@@ -4193,12 +4145,12 @@ VALUE dvector_mod(VALUE ary, VALUE arg) {
  *     a.remainder(3)  -> Dvector[ 2, -2, 2 ]
  *     b = Dvector[ 2, 3, 5 ]
  *     a.remainder(b)                -> Dvector[ 1, -2, 2 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_remainder(VALUE ary, VALUE arg) {
    return dvector_apply_math_op2(ary, arg, do_remainder);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.pow(number)                ->  a_dvector
@@ -4218,12 +4170,12 @@ VALUE dvector_remainder(VALUE ary, VALUE arg) {
  *     b = Dvector[ 7, 4, -2 ]
  *     a.raised_to(b)                -> Dvector[ 1.1 ** 7, (-5.7) ** 4, 12.7 ** (-2) ]
  *     a ** b                        -> Dvector[ 1.1 ** 7, (-5.7) ** 4, 12.7 ** (-2) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_pow(VALUE ary, VALUE arg) {
    return dvector_apply_math_op2(ary, arg, pow);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.as_exponent_of(number)                ->  a_dvector
@@ -4237,12 +4189,12 @@ VALUE dvector_pow(VALUE ary, VALUE arg) {
  *     a.as_exponent_of(3.8)              -> Dvector[ 3.8 ** 2, 3.8 ** (-5), 3.8 ** 12 ]
  *     b = Dvector[ 7.1, 4.9, -10 ]
  *     a.as_exponent_of(b)                -> Dvector[ 7.1 ** 2, 4.9 ** (-5), (-10) ** 12 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_as_exponent_of(VALUE ary, VALUE arg) {
    return dvector_apply_math_op2(ary, arg, do_as_exponent_of);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.atan2(number)       ->  a_dvector
@@ -4256,12 +4208,12 @@ VALUE dvector_as_exponent_of(VALUE ary, VALUE arg) {
  *     a.atan2(3.8)              -> Dvector[ atan2(1.1, 3.8), atan2(-5.7,3.8), atan2(12.7,3.8) ]
  *     b = Dvector[ 7.1, 4.9, -10.1 ]
  *     a.atan2(b)                -> Dvector[ atan2(1.1,7.1), atan2(-5.7,4.9), atan2(12.7,-10.1) ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_atan2(VALUE ary, VALUE arg) {
    return dvector_apply_math_op2(ary, arg, atan2);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.add!(number)       ->  dvector
@@ -4278,12 +4230,12 @@ VALUE dvector_atan2(VALUE ary, VALUE arg) {
  *     b = Dvector[ 7, 4, -10 ]
  *     a.add!(b)              -> Dvector[ 18, -1, -8 ]
  *     a                      -> Dvector[ 18, -1, -8 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_add_bang(VALUE ary, VALUE arg) {
    return dvector_apply_math_op2_bang(ary, arg, do_add);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.sub!(number)       ->  dvector
@@ -4300,12 +4252,12 @@ VALUE dvector_add_bang(VALUE ary, VALUE arg) {
  *     a = Dvector[ 11, -5, 2 ]
  *     a.sub!(b)               -> Dvector[ 4, -9, 12 ]
  *     a                       -> Dvector[ 4, -9, 12 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_sub_bang(VALUE ary, VALUE arg) {
    return dvector_apply_math_op2_bang(ary, arg, do_sub);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.mul!(number)       ->  dvector
@@ -4322,12 +4274,12 @@ VALUE dvector_sub_bang(VALUE ary, VALUE arg) {
  *     b = Dvector[ 7, 4, -10 ]
  *     a.mul!(b)               -> Dvector[ 77, -20, -20 ]
  *     a                       -> Dvector[ 77, -20, -20 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_mul_bang(VALUE ary, VALUE arg) {
    return dvector_apply_math_op2_bang(ary, arg, do_mul);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     dvector.div!(number)       ->  dvector
@@ -4344,14 +4296,13 @@ VALUE dvector_mul_bang(VALUE ary, VALUE arg) {
  *     b = Dvector[ 7.1, 4.9, -10.1 ]
  *     a.div!(b)               -> Dvector[ 1.1/7.1, -5.7/4.9, 2.5/10.1 ]
  *     a                       -> Dvector[ 1.1/7.1, -5.7/4.9, 2.5/10.1 ]
- */
-PRIVATE 
+ */ 
 VALUE dvector_div_bang(VALUE ary, VALUE arg) {
    return dvector_apply_math_op2_bang(ary, arg, do_div);
 }
 
-/*======================================================================*/
-PRIVATE 
+PRIVATE
+/*======================================================================*/ 
 VALUE Read_Dvectors(char *filename, VALUE destinations, int first_row_of_file, int number_of_rows) {
    FILE *file = NULL;
    VALUE col_obj, cols_obj, *cols_ptr = NULL;
@@ -4454,6 +4405,7 @@ VALUE Read_Dvectors(char *filename, VALUE destinations, int first_row_of_file, i
    return destinations;
 }
 
+PRIVATE 
 /*
  *  call-seq:
  *     Dvector.read(filename, dest=nil, start=1, length=-1)  ->  array of dvectors
@@ -4467,7 +4419,6 @@ VALUE Read_Dvectors(char *filename, VALUE destinations, int first_row_of_file, i
  * contents of the vector are replaced by the column of data from the file.  If the entry is <code>nil</code>, that column of the file is skipped.
  *
  */
-PRIVATE 
 VALUE dvector_read(int argc, VALUE *argv, VALUE klass) {
    char *arg1 ;
    VALUE arg2 = Qnil;
@@ -4564,6 +4515,7 @@ VALUE Read_Rows_of_Dvectors(char *filename, VALUE destinations, int first_row_of
 }
 
 
+PRIVATE
 /*
  *  call-seq:
  *     Dvector.read_rows(filename, dest, start=1)  ->  array of dvectors
@@ -4575,8 +4527,7 @@ VALUE Read_Rows_of_Dvectors(char *filename, VALUE destinations, int first_row_of
  * contents of the vector are replaced by the row of data from the file.  The _start_ row is placed in the
  * first entry in _dest_, the second row in the next, and so on.  If the entry in _dest_ is <code>nil</code>, that row of the file is skipped.
  *
- */
-PRIVATE 
+ */ 
 VALUE dvector_read_rows(int argc, VALUE *argv, VALUE klass) {
    int arg3 = (int) 1 ;
    if ((argc < 2) || (argc > 3))
@@ -4639,6 +4590,7 @@ VALUE Read_Row(char *filename, int row, VALUE row_ary) {
    return row_ary;
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     Dvector.read_row(filename, row=1, dvector=nil)  ->  dvector
@@ -4648,8 +4600,7 @@ VALUE Read_Row(char *filename, int row, VALUE row_ary) {
  *  If the _dvector_ argument is <code>nil</code>, a new Dvector is allocated to hold the row of numbers.
  *  Otherwise, the contents of _dvector_ are replaced by the numbers from the line in the file.
  *  
- */
-PRIVATE 
+ */ 
 VALUE dvector_read_row(int argc, VALUE *argv, VALUE klass) {
    char *arg1 ;
    int arg2 = (int) 1 ;
@@ -4744,6 +4695,7 @@ VALUE c_make_bezier_control_points_for_cubic_in_x(VALUE dest, double x0, double 
    return dest;
 }
    
+PRIVATE
 /*
  *  call-seq:
  *     dvector.make_bezier_control_points_for_cubic_in_x(x0, y0, delta_x, a, b, c)
@@ -4753,8 +4705,7 @@ VALUE c_make_bezier_control_points_for_cubic_in_x(VALUE dest, double x0, double 
  *  At location x = x0 + dx, with dx between 0 and delta_x, define y = a*dx^3 + b*dx^2 + c*dx + y0.
  *  This routine replaces the contents of _dest_ by [x1, y1, x2, y2, x3, y3], the Bezier control points to match this cubic.
  *     
- */
-PRIVATE 
+ */ 
 VALUE dvector_make_bezier_control_points_for_cubic_in_x(VALUE dest, VALUE x0, VALUE y0, VALUE delta_x, VALUE a, VALUE b, VALUE c)
 {
    x0 = rb_Float(x0);
@@ -4803,6 +4754,7 @@ void c_dvector_create_spline_interpolant(int n_pts_data, double *Xs, double *Ys,
    free(Zs); free(mu_s); free(Ls); free(alphas); free(Hs);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     Dvector.create_spline_interpolant(xs, ys, start_clamped, start_slope, end_clamped, end_slope) ->  interpolant
@@ -4816,8 +4768,7 @@ void c_dvector_create_spline_interpolant(int n_pts_data, double *Xs, double *Ys,
  *  y = As[j]*dx^3 + Bs[j]*dx^2 + Cs[j]*dx + Ys[j].
  *  (Spline algorithms derived from Burden & Faires, Numerical Analysis, 4th edition, pp 131 and following.)
  *  
- */
-PRIVATE 
+ */ 
 VALUE dvector_create_spline_interpolant(int argc, VALUE *argv, VALUE klass) {
    if (argc != 6)
       rb_raise(rb_eArgError, "wrong # of arguments(%d) for create_spline_interpolant", argc);
@@ -4862,6 +4813,7 @@ double c_dvector_spline_interpolate(double x, int n_pts_data,
    return Ys[j] + dx*(Cs[j] + dx*(Bs[j] + dx*As[j]));
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     Dvector.spline_interpolate(x, interpolant)  ->  y
@@ -4869,8 +4821,7 @@ double c_dvector_spline_interpolate(double x, int n_pts_data,
  *  Returns the _y_ corresponding to _x_ by spline interpolation using the _interpolant_
  *  which was previously created by calling _create_spline_interpolant_.
  *  
- */
-PRIVATE 
+ */ 
 VALUE dvector_spline_interpolate(int argc, VALUE *argv, VALUE klass) {
    if (argc != 2)
       rb_raise(rb_eArgError, "wrong # of arguments(%d) for spline_interpolate", argc);
@@ -4904,14 +4855,14 @@ double c_dvector_linear_interpolate(int num_pts, double *xs, double *ys, double 
    return ys[num_pts-1];
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     Dvector.linear_interpolate(x, xs, ys)  ->  y
  *
  *  Returns the _y_ corresponding to _x_ by linear interpolation using the Dvectors _xs_ and _ys_.
  *  
- */
-PRIVATE 
+ */ 
 VALUE dvector_linear_interpolate(int argc, VALUE *argv, VALUE klass) {
    if (argc != 3)
       rb_raise(rb_eArgError, "wrong # of arguments(%d) for linear_interpolate", argc);
@@ -4929,6 +4880,7 @@ VALUE dvector_linear_interpolate(int argc, VALUE *argv, VALUE klass) {
    return rb_float_new(y);
 }
 
+PRIVATE
 /*
  *  call-seq:
  *     Dvector.min_of_many(ary)  ->  number or nil
@@ -4936,8 +4888,7 @@ VALUE dvector_linear_interpolate(int argc, VALUE *argv, VALUE klass) {
  *  Returns the minimum value held in the array of Dvectors (or <code>nil</code> if _ary_ is empty).
  *  Any +nil+ entries in _ary_ are ignored.
  *  
- */
-PRIVATE 
+ */ 
 VALUE dvector_min_of_many(VALUE klass, VALUE ary) {
    VALUE *ary_ptr;
    long ary_len, i;
@@ -4963,6 +4914,7 @@ VALUE dvector_min_of_many(VALUE klass, VALUE ary) {
 }
 
 
+PRIVATE
 /*
  *  call-seq:
  *     Dvector.max_of_many(ary)  ->  number or nil
@@ -4970,8 +4922,7 @@ VALUE dvector_min_of_many(VALUE klass, VALUE ary) {
  *  Returns the maximum value held in the array of Dvectors (or <code>nil</code> if _ary_ is empty).
  *  Any +nil+ entries in _ary_ are ignored.
  *  
- */
-PRIVATE 
+ */ 
 VALUE dvector_max_of_many(VALUE klass, VALUE ary) {
    VALUE *ary_ptr;
    long ary_len, i;
