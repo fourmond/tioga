@@ -341,7 +341,7 @@ static void function_compute_spline_interpolation(long dat_size,
       /* should hopefully not be zero */
       if(h <= 0.0)
 	rb_raise(rb_eRuntimeError, 
-		 "x_dat must be striclty growing");
+		 "x_dat must be strictly growing");
       a = (x_dat[low + 1] - x[hi])/h;
       b = - (x_dat[low] - x[hi])/h;
       /* spline evaluation */
@@ -362,15 +362,22 @@ static VALUE function_compute_spline(VALUE self, VALUE x_values)
   VALUE y_vec = get_y_vector(self);
   VALUE cache = get_spline_vector(self);
   VALUE ret_val;
-  long dat_size = DVECTOR_SIZE(x_vec);
+  long dat_size = function_sanity_check(self);
   long size = DVECTOR_SIZE(x_values);
   
 
   /* check that the cache is here and up-to-date */
   if(! IS_A_DVECTOR(cache) || 
      DVECTOR_IS_DIRTY(x_vec) || 
-     DVECTOR_IS_DIRTY(y_vec))
-    function_compute_spline_data(self);
+     DVECTOR_IS_DIRTY(y_vec) || 
+     DVECTOR_SIZE(cache) == dat_size
+     )
+    {
+      function_compute_spline_data(self);
+      cache = get_spline_vector(self); /* and we update what this function
+					  think is the cache
+				       */
+    }
 
   ret_val = rb_funcall(cDvector, rb_intern("new"),
 		       1, LONG2NUM(size));
@@ -380,13 +387,9 @@ static VALUE function_compute_spline(VALUE self, VALUE x_values)
   double * x = Dvector_Data_for_Read(x_values,NULL);
   double * y = Dvector_Data_for_Write(ret_val,NULL);
   
-  function_compute_spline_interpolation(dat_size,
-					x_dat,
-					y_dat,
-					spline,
-					size,
-					x,
-					y);
+  function_compute_spline_interpolation(dat_size, x_dat,
+					y_dat, spline,
+					size, x, y);
   return ret_val;
 }
 						     
