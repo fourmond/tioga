@@ -353,6 +353,24 @@ static void function_compute_spline_interpolation(long dat_size,
     }
 }
 
+/* makes sure that the spline data is present and up-to-date, refreshing
+   it if necessary 
+*/
+static void function_ensure_spline_data_present(VALUE self)
+{
+  VALUE x_vec = get_x_vector(self);
+  VALUE y_vec = get_y_vector(self);
+  VALUE cache = get_spline_vector(self);
+  long dat_size = function_sanity_check(self);
+
+  if(! IS_A_DVECTOR(cache) || 
+     DVECTOR_IS_DIRTY(x_vec) || 
+     DVECTOR_IS_DIRTY(y_vec) || 
+     DVECTOR_SIZE(cache) == dat_size
+     )
+    function_compute_spline_data(self);
+}
+
 /* Interpolates the value of the function at the points given.
    Returns a brand new Dvector. The X values must be sorted ! 
  */
@@ -360,24 +378,14 @@ static VALUE function_compute_spline(VALUE self, VALUE x_values)
 {
   VALUE x_vec = get_x_vector(self);
   VALUE y_vec = get_y_vector(self);
-  VALUE cache = get_spline_vector(self);
+  VALUE cache;
   VALUE ret_val;
   long dat_size = function_sanity_check(self);
   long size = DVECTOR_SIZE(x_values);
   
+  function_ensure_spline_data_present(self);
 
-  /* check that the cache is here and up-to-date */
-  if(! IS_A_DVECTOR(cache) || 
-     DVECTOR_IS_DIRTY(x_vec) || 
-     DVECTOR_IS_DIRTY(y_vec) || 
-     DVECTOR_SIZE(cache) == dat_size
-     )
-    {
-      function_compute_spline_data(self);
-      cache = get_spline_vector(self); /* and we update what this function
-					  think is the cache
-				       */
-    }
+  cache = get_spline_vector(self);
 
   ret_val = rb_funcall(cDvector, rb_intern("new"),
 		       1, LONG2NUM(size));
@@ -390,6 +398,62 @@ static VALUE function_compute_spline(VALUE self, VALUE x_values)
   function_compute_spline_interpolation(dat_size, x_dat,
 					y_dat, spline,
 					size, x, y);
+  return ret_val;
+}
+
+/*
+  Returns an interpolant that can be fed to 
+  FigureMake::Special_Paths#append_interpolant_to_path
+  to make nice splines.
+*/
+static VALUE function_make_interpolant(VALUE self)
+{
+  VALUE x_vec = get_x_vector(self);
+  VALUE y_vec = get_y_vector(self);
+  VALUE cache;
+  VALUE a_vec,b_vec,c_vec;
+  VALUE ret_val;
+  double *x, *y, *a, *b, *c, *y2;
+  double delta_x;
+  long size = function_sanity_check(self);
+  long i;
+  
+  function_ensure_spline_data_present(self);
+
+  cache = get_spline_vector(self);
+  x = Dvector_Data_for_Read(x_vec,NULL);
+  y = Dvector_Data_for_Read(y_vec,NULL);
+  y2 = Dvector_Data_for_Read(cache,NULL);
+
+  a_vec  = rb_funcall(cDvector, idNew, 1, LONG2NUM(size));
+  a = Dvector_Data_for_Write(a_vec, NULL);
+  b_vec  = rb_funcall(cDvector, idNew, 1, LONG2NUM(size));
+  b = Dvector_Data_for_Write(b_vec, NULL);
+  c_vec  = rb_funcall(cDvector, idNew, 1, LONG2NUM(size));
+  c = Dvector_Data_for_Write(c_vec, NULL);
+
+  /* from my computations, the formula is the following:
+     A = (y_2n+1 - y_2n)/(6 * delta_x)
+     B = 0.5 * y_2n
+     C = (y_n+1 - y_n)/delta_x - (2 * y_2n + y_2n+1) * delta_x/6
+  */
+
+  for(i = 0; i < size - 1; i++)
+    {
+      delta_x = x[i+1] - x[i];
+      a[i] = (y2[i+1] - y2[i]) / (6.0 * delta_x);
+      b[i] = 0.5 * y2[i];
+      c[i] = (y[i+1] - y[i])/delta_x - 
+	(2 * y2[i] + y2[i+1]) * (delta_x / 6.0);
+    }
+  a[i] = b[i] = c[i] = 0.0;
+  ret_val = rb_ary_new();
+  rb_ary_push(ret_val, x_vec);
+  rb_ary_push(ret_val, y_vec);
+  rb_ary_push(ret_val, a_vec);
+  rb_ary_push(ret_val, b_vec);
+  rb_ary_push(ret_val, c_vec);
+
   return ret_val;
 }
 						     
@@ -613,6 +677,8 @@ void Init_Function()
 
   rb_define_method(cFunction, "interpolate", 
 		   function_interpolate, 1);
+  rb_define_method(cFunction, "make_interpolant", 
+		   function_make_interpolant, 0);
 
   /* access to data */
   rb_define_method(cFunction, "point", function_point, 1);
