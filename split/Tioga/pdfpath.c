@@ -25,6 +25,22 @@
 bool have_current_point, constructing_path, writing_file;
 double bbox_llx, bbox_lly, bbox_urx, bbox_ury;
 
+/* emits a warning on nonok numbers if croak_on_nonok_numbers is true */
+static void croak_on_nonok(FM *p, const char * function)
+{
+  if(p->croak_on_nonok_numbers)
+    rb_warn("Illegal coordinates in function %s, element suppressed", 
+	    function);
+}
+
+/* small macro to check if a number is ok to be output */
+#define is_okay_number(x) ((x) - (x) == 0.0)
+
+#define CROAK_ON_NONOK(p) croak_on_nonok(p, __FUNCTION__)
+#define ARE_OK_NUMBERS(x,y) if(! is_okay_number(x) || ! is_okay_number(y)) {\
+CROAK_ON_NONOK(p); return;}
+
+
 /* PDF graphics */
    
 /* graphics attributes */
@@ -224,6 +240,7 @@ VALUE FM_update_bbox(VALUE fmkr, VALUE x, VALUE y)
 
 void c_moveto(FM *p, double x, double y)
 {
+   ARE_OK_NUMBERS(x,y);
    if (writing_file) fprintf(TF, "%ld %ld m\n", c_round_dev(p,x), c_round_dev(p,y));
    update_bbox(p, x, y);
    have_current_point = constructing_path = true;
@@ -241,6 +258,7 @@ VALUE FM_move_to_point(VALUE fmkr, VALUE x, VALUE y)
 
 void c_lineto(FM *p, double x, double y)
 {
+   ARE_OK_NUMBERS(x,y);
    if (!constructing_path) rb_raise(rb_eArgError, "Sorry: must start path with moveto before call lineto");
    if (writing_file) fprintf(TF, "%ld %ld l\n", c_round_dev(p,x), c_round_dev(p,y));
    update_bbox(p, x, y);
@@ -258,6 +276,9 @@ VALUE FM_append_point_to_path(VALUE fmkr, VALUE x, VALUE y)
 
 void c_curveto(FM *p, double x1, double y1, double x2, double y2, double x3, double y3)
 {
+   ARE_OK_NUMBERS(x1,y1);
+   ARE_OK_NUMBERS(x2,y2);
+   ARE_OK_NUMBERS(x3,y3);
    if (!constructing_path) rb_raise(rb_eArgError, "Sorry: must start path with moveto before call curveto");
    if (writing_file) fprintf(TF, "%ld %ld %ld %ld %ld %ld c\n", 
             c_round_dev(p,x1), c_round_dev(p,y1), c_round_dev(p,x2), c_round_dev(p,y2), c_round_dev(p,x3), c_round_dev(p,y3));
@@ -299,6 +320,10 @@ VALUE FM_close_path(VALUE fmkr)
 void c_append_arc(FM *p, double x_start, double y_start, double x_corner, double y_corner,
    double x_end, double y_end, double radius)
 {
+   ARE_OK_NUMBERS(x_start,y_start);
+   ARE_OK_NUMBERS(x_corner,y_corner);
+   ARE_OK_NUMBERS(x_end,y_end);
+
    double x0, y0, x1, y1, x2, y2, x3, y3, udx, udy, vdx, vdy, wdx, wdy, len, x_center, y_center, tmp;
    double psi, sin_psi, cos_psi, theta, cos_alpha, sin_alpha;
    udx = x_start - x_corner; udy = y_start - y_corner;

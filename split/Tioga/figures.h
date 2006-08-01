@@ -289,6 +289,9 @@ typedef struct {
     
     /* Debugging */
     int debug_verbosity_level; // 0 turns off the trace info
+
+    /* Whether to complain about out non ok numbers in paths */
+    int croak_on_nonok_numbers;
     
 /* PRIVATE -- not to be included in the Ruby interface */
     double clip_left, clip_right, clip_top, clip_bottom; // in output coords

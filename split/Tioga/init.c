@@ -67,7 +67,6 @@ void Init_IDs(void)
     tex_preview_fontfamily_ID = rb_intern("@tex_preview_fontfamily");
     tex_preview_fontseries_ID = rb_intern("@tex_preview_fontseries");
     tex_preview_fontshape_ID = rb_intern("@tex_preview_fontshape");
-
 }
 
 void c_set_device_pagesize(FM *p, double width, double height) { // sizes in units of 1/720 inch
@@ -280,6 +279,9 @@ void Initialize_Figure(VALUE fmkr) {
    p->legend_alignment = ALIGNED_AT_BASELINE;
    p->legend_justification = LEFT_JUSTIFIED;
    p->debug_verbosity_level = 0;
+
+   /* emit a warning by default */
+   p->croak_on_nonok_numbers = 1;
 }
 
 VALUE do_cmd(VALUE fmkr, VALUE cmd) { return rb_funcall(fmkr, do_cmd_ID, 1, cmd); }

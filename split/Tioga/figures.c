@@ -254,6 +254,9 @@ FM *Get_FM(VALUE fmkr) {
 /* Debugging */
    INT_ATTR(debug_verbosity_level)
 
+/* Warning on non-ok numbers */
+   BOOL_ATTR(croak_on_nonok_numbers)
+
 #define attr_reader(attr) rb_define_method(cFM, #attr , FM_##attr##_get, 0);
 #define attr_writer(attr) rb_define_method(cFM, #attr "=", FM_##attr##_set, 1);
 #define attr_accessors(attr) attr_reader(attr) attr_writer(attr)
@@ -360,6 +363,9 @@ void Init_FigureMaker(void) {
    attr_accessors(stroke_opacity)
    attr_accessors(fill_opacity)
    attr_accessors(line_type)
+/* croak on non ok */
+   attr_accessors(croak_on_nonok_numbers)
+
 /* methods */
    rb_define_method(cFM, "private_context", FM_private_context, 1);
    rb_define_method(cFM, "private_set_bounds", FM_private_set_bounds, 4);
