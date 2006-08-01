@@ -78,5 +78,17 @@ class Creating_Paths < Doc < FigureMaker
    end
 
 
+   # If #croak_on_nonok_numbers is set, the kernel will emit a warning when
+   # it encounters a weird point (such as with infinite or NaN coordinates)
+   # in a primitive path operation. In any case, the faulty element in the
+   # path will be discarded.
+   def croak_on_nonok_numbers
+   end
+
+   # Sets the #croak_on_nonok_numbers warning. On by default.
+   def croak_on_nonok_numbers=(bool)
+   end
+
+
 end # class
 end # module Tioga
