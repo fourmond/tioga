@@ -1,111 +1,6 @@
 #  Tioga::Dvector_extras.rb
 
-class Numeric
-
-    def mod(y)
-        self.modulo(y)
-    end
-
-end
-
-# Modified by Vincent Fourmond to have a nice Dvector module
-# instead of the Tioga module.
-# add arithmetic operators for Float and Fixnum with Dvec
-
-class Array
-    def to_dvector
-        Dobjects::Dvector[*self]
-    end
-end
-
-class Float
-    alias :pre_dvec_add :+
-    def +(a)
-        if a.class == Dobjects::Dvector
-            a+self
-        else
-            pre_dvec_add(a)
-        end
-    end
-    alias :pre_dvec_sub :-
-    def -(a)
-        if a.class == Dobjects::Dvector
-            a.neg+self
-        else
-            pre_dvec_sub(a)
-        end
-    end
-    alias :pre_dvec_mult :*
-    def *(a)
-        if a.class == Dobjects::Dvector
-            a*self
-        else
-            pre_dvec_mult(a)
-        end
-    end
-    alias :pre_dvec_div :/
-    def /(a)
-        if a.class == Dobjects::Dvector
-            a.inv*self
-        else
-            pre_dvec_div(a)
-        end
-    end
-    alias :pre_dvec_pow :**
-    def **(a)
-        if a.class == Dobjects::Dvector
-            a.as_exponent_of(self)
-        else
-            pre_dvec_pow(a)
-        end
-    end
-    
-end
-
-class Fixnum
-    alias :pre_dvec_add :+
-    def +(a)
-        if a.class == Dobjects::Dvector
-            a+self
-        else
-            pre_dvec_add(a)
-        end
-    end
-    alias :pre_dvec_sub :-
-    def -(a)
-        if a.class == Dobjects::Dvector
-            a.neg+self
-        else
-            pre_dvec_sub(a)
-        end
-    end
-    alias :pre_dvec_mult :*
-    def *(a)
-        if a.class == Dobjects::Dvector
-            a*self
-        else
-            pre_dvec_mult(a)
-        end
-    end
-    alias :pre_dvec_div :/
-    def /(a)
-        if a.class == Dobjects::Dvector
-            a.inv*self
-        else
-            pre_dvec_div(a)
-        end
-    end
-    alias :pre_dvec_pow :**
-    def **(a)
-        if a.class == Dobjects::Dvector
-            a.as_exponent_of(self)
-        else
-            pre_dvec_pow(a)
-        end
-    end
-end
-
-module Dobjects
+module Dobjects 
   class Dvector
       
     def to_dvector
@@ -122,6 +17,7 @@ module Dobjects
       'default' => 0.0/0.0, # defaults to NaN
     }
 
+
     # This function reads in +stream+ (can an IO object or a String,
     # in which case it represents the name of a file to be opened)
     # the columns specified by +cols+ and returns them. column 0 is the
@@ -134,11 +30,10 @@ module Dobjects
     # 'comments':: a regular expression matching comment lines
     # 'skip_first':: how many lines to skip at the beginning of the file,
     # 'default':: the value taken for missing elements
-    # 'index_col':: if set to true, the first column return contains the
+    # 'index_col':: if set to true, the first column contains the
     #               indices of the corresponding lines (0 for first and so on)
-    # ...
 
-    def Dvector.fancy_read(stream, cols = nil, opts = {})
+    def Dvector.fancy_read(stream, cols = nil, opts = {}) # :doc:
       # first, we turn the stream into a real IO stream
       if stream.is_a?(String)
         stream = File.open(stream)
@@ -217,7 +112,7 @@ module Dobjects
     # This is just a try, and should be implemented in C rather than in
     # Ruby. But if you're looking for simplicity, here you go ;-) !
 
-    def Dvector.compute_formula(formula, a)
+    def Dvector.compute_formula(formula, a) # :doc:
       # we first compile the formula:
       begin
         block = eval "proc { |column| #{formula} }"
@@ -275,3 +170,109 @@ module Dobjects
     
   end
 end
+
+class Numeric # :nodoc: all
+
+    def mod(y)
+        self.modulo(y)
+    end
+
+end
+
+# Modified by Vincent Fourmond to have a nice Dvector module
+# instead of the Tioga module.
+# add arithmetic operators for Float and Fixnum with Dvec
+
+class Array # :nodoc: all
+    def to_dvector
+        Dobjects::Dvector[*self]
+    end
+end
+
+class Float # :nodoc: all
+    alias :pre_dvec_add :+
+    def +(a)
+        if a.class == Dobjects::Dvector
+            a+self
+        else
+            pre_dvec_add(a)
+        end
+    end
+    alias :pre_dvec_sub :-
+    def -(a)
+        if a.class == Dobjects::Dvector
+            a.neg+self
+        else
+            pre_dvec_sub(a)
+        end
+    end
+    alias :pre_dvec_mult :*
+    def *(a)
+        if a.class == Dobjects::Dvector
+            a*self
+        else
+            pre_dvec_mult(a)
+        end
+    end
+    alias :pre_dvec_div :/
+    def /(a)
+        if a.class == Dobjects::Dvector
+            a.inv*self
+        else
+            pre_dvec_div(a)
+        end
+    end
+    alias :pre_dvec_pow :**
+    def **(a)
+        if a.class == Dobjects::Dvector
+            a.as_exponent_of(self)
+        else
+            pre_dvec_pow(a)
+        end
+    end
+    
+end
+
+class Fixnum # :nodoc: all
+    alias :pre_dvec_add :+
+    def +(a)
+        if a.class == Dobjects::Dvector
+            a+self
+        else
+            pre_dvec_add(a)
+        end
+    end
+    alias :pre_dvec_sub :-
+    def -(a)
+        if a.class == Dobjects::Dvector
+            a.neg+self
+        else
+            pre_dvec_sub(a)
+        end
+    end
+    alias :pre_dvec_mult :*
+    def *(a)
+        if a.class == Dobjects::Dvector
+            a*self
+        else
+            pre_dvec_mult(a)
+        end
+    end
+    alias :pre_dvec_div :/
+    def /(a)
+        if a.class == Dobjects::Dvector
+            a.inv*self
+        else
+            pre_dvec_div(a)
+        end
+    end
+    alias :pre_dvec_pow :**
+    def **(a)
+        if a.class == Dobjects::Dvector
+            a.as_exponent_of(self)
+        else
+            pre_dvec_pow(a)
+        end
+    end
+end
+
