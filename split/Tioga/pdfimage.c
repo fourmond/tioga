@@ -400,6 +400,7 @@ int c_private_show_image(FM *p, int image_type, double *dest, bool interpolate, 
    xo->xobj_subtype = SAMPLED_SUBTYPE;
    double llx = dest[0], lly = dest[1], lrx = dest[2], lry = dest[3], ulx = dest[4],  uly = dest[5];
    double a, b, c, d, e, f; // the transform to position the image
+   int ir, ic, id;
    xo->next = xobj_list;
    xobj_list = (XObject_Info *)xo;
    xo->xo_num = next_available_xo_number++;
@@ -422,6 +423,29 @@ int c_private_show_image(FM *p, int image_type, double *dest, bool interpolate, 
    }
    xo->width = w;
    xo->height = h;
+   
+   if (0) {
+    printf("len=%i  w=%i  h=%i\ndata\n\n", len, w, h);
+   for (ir=0; ir<h; ir++) {
+    for (ic=0; ic<w; ic++) {
+        id = (int)data[ir*h+ic];
+        printf("%3i ",id);
+    }
+    printf("\n");
+   }
+   
+   
+    printf("\n\nxo->image_data\n");
+   for (ir=0; ir<h; ir++) {
+    for (ic=0; ic<w; ic++) {
+        id = (int)xo->image_data[ir*h+ic];
+        printf("%3i ",id);
+    }
+    printf("\n\n");
+   }
+   }
+   
+   
    xo->value_mask_min = value_mask_min;
    xo->value_mask_max = value_mask_max;
    xo->mask_obj_num = mask_obj_num;

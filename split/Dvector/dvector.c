@@ -1443,8 +1443,8 @@ PRIVATE
  *     dvector.tridag(a,b,c,r) -> dvector
  *  
  *  Sets contents of _dvector_ to solution vector _u_ of the following tri-diagonal matrix problem.
- *
- *	   |  b[0]  c[0]    0    ...                         |   |  u[0]  |   |  r[0]  |
+ *     
+ *     |  b[0]  c[0]    0    ...                         |   |  u[0]  |   |  r[0]  |
  *     |  a[1]  b[1]  c[1]   ...                         |   |  u[1]  |   |  r[1]  |
  *     |                     ...                         | * |  ...   | = |  ...   |
  *     |                     ... a[n-2]  b[n-2]  c[n-2]  |   | u[n-2] |   | r[n-2] |
@@ -2399,8 +2399,8 @@ PRIVATE
  *     dvector.max   ->  number or nil
  *     dvector.max(dvector2, ...)   ->  number or nil
  *  
- *  First form returns the entry with the minimum value in _dvector_, <code>nil</code> if
- *  _dvector_ is empty.  Second form returns minimum of all the vectors (or <code>nil</code> if all are empty).
+ *  First form returns the entry with the maximum value in _dvector_, <code>nil</code> if
+ *  _dvector_ is empty.  Second form returns maximum of all the vectors (or <code>nil</code> if all are empty).
  *     
  *     a = Dvector[ 1, 2, 3, 4, 5, 4, 3, 5, 2 ]
  *     a.max               -> 5
@@ -2469,8 +2469,8 @@ PRIVATE
  *     dvector.min   ->  number or nil
  *     dvector.min(dvector2, ...)   ->  number or nil
  *  
- *  First form returns the entry with the maximum value in _dvector_, <code>nil</code> if
- *  _dvector_ is empty.  Second form returns maximum of all the vectors (or <code>nil</code> if all are empty).
+ *  First form returns the entry with the minimum value in _dvector_, <code>nil</code> if
+ *  _dvector_ is empty.  Second form returns minimum of all the vectors (or <code>nil</code> if all are empty).
  *     
  *     a = Dvector[ 1, 2, 3, 4, 5, 4, 3, 5, 2 ]
  *     a.min               -> 1
