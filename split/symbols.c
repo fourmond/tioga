@@ -25,8 +25,6 @@
 #include <namespace.h>
 
 
-#include <stdio.h>
-
 /* MV stands for Module Variable */
 #define MV_SYMBOLS "@_exported_C_symbols"
 /* modified to use instance variables instead of global class variables:
