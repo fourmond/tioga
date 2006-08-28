@@ -24,6 +24,9 @@
 
 #include <namespace.h>
 
+
+#include <stdio.h>
+
 /* MV stands for Module Variable */
 #define MV_SYMBOLS "@_exported_C_symbols"
 /* modified to use instance variables instead of global class variables:
@@ -35,17 +38,19 @@
    module and returns it */
 static VALUE get_symbol_hash(VALUE module)
 {
-  VALUE hash = rb_iv_get(module, MV_SYMBOLS);
-  if(NIL_P(hash))
+  VALUE hash;
+  ID mv_id = rb_intern(MV_SYMBOLS);
+  if(RTEST(rb_ivar_defined(module, mv_id)))
     {
-      /* Then, we create it */
-      hash = rb_hash_new();
-      rb_iv_set(module, MV_SYMBOLS, hash);
+      hash = rb_ivar_get(module, mv_id);
+      Check_Type(hash, T_HASH);
       return hash;
     }
-  else 
+  else
     {
-      Check_Type(hash, T_HASH);
+      /* module variable uninitialized, we need to make sure it's here */
+      hash = rb_hash_new();
+      rb_ivar_set(module, mv_id, hash);
       return hash;
     }
 }

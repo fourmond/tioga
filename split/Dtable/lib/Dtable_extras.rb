@@ -1,13 +1,5 @@
 #  pre_ddata_extras.rb
 
-class Numeric
-
-    def mod(y)
-        self.modulo(y)
-    end
-
-end
-
 # add arithmetic operators for Float and Fixnum with Dtable
 
 class Float

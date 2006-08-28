@@ -46,14 +46,6 @@ class Numeric
         Math.exp(self)
     end
     
-    def exp
-        Math.exp(self)
-    end
-    
-    def exp
-        Math.exp(self)
-    end
-    
     def log
         Math.log(self)
     end
@@ -133,5 +125,10 @@ class Numeric
     def safe_acos
         ((self > 1.0)? 1.0 : (self < -1.0)? -1.0 : self).acos
     end
+
+    def mod(y)
+        self.modulo(y)
+    end
+
     
 end

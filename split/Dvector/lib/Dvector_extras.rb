@@ -171,14 +171,6 @@ module Dobjects
   end
 end
 
-class Numeric # :nodoc: all
-
-    def mod(y)
-        self.modulo(y)
-    end
-
-end
-
 # Modified by Vincent Fourmond to have a nice Dvector module
 # instead of the Tioga module.
 # add arithmetic operators for Float and Fixnum with Dvec

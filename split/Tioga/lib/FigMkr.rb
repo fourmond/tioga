@@ -1548,20 +1548,23 @@ class FigureMaker
     end
     
     private
+
+    # This function is de facto overwritten by the one after, I comment it
+    # out.
     
-    def report_error(er, msg)
-        puts msg
-        puts ""
-        puts "    " + "#{er.message}"
-        line_count = 0
-        er.backtrace.each do |line|
-            if line_count < @num_error_lines
-                puts "    " + line
-            end
-            line_count = line_count + 1
-        end
-        puts "ERROR"  # GUI uses this
-    end
+#     def report_error(er, msg)
+#         puts msg
+#         puts ""
+#         puts "    " + "#{er.message}"
+#         line_count = 0
+#         er.backtrace.each do |line|
+#             if line_count < @num_error_lines
+#                 puts "    " + line
+#             end
+#             line_count = line_count + 1
+#         end
+#         puts "ERROR"  # GUI uses this
+#     end
 
     def internal_show_image(dict, is_mask)
         check_dict(dict, @@keys_for_show_image, 'show_image')
