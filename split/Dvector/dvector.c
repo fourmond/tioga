@@ -32,6 +32,9 @@
 
 #include <symbols.h>
 
+/* safe storing of doubles */
+#include <safe_double.h>
+
 #define is_a_dvector(d) ( TYPE(d) == T_DATA && RDATA(d)->dfree == (RUBY_DATA_FUNC)dvector_free )
 
 #ifndef MAX
@@ -4947,6 +4950,85 @@ VALUE dvector_max_of_many(VALUE klass, VALUE ary) {
    return rb_float_new(m);
 }
 
+#define DVECTOR_DUMP_VERSION 1
+
+PRIVATE
+/*
+  Called by the marshalling mechanism to store a permanent copy of a 
+  Dvector. _limit_ is simply ignored.
+ */
+VALUE dvector_dump(VALUE ary, VALUE limit)
+{
+  int i; /* for STORE_UNSIGNED */
+  long len;
+  double * data = Dvector_Data_for_Read(ary, &len);
+  long target_len = 1 /* first signature byte */
+    + 4 /* length */
+    + len * 8 ;
+  unsigned u_len = (unsigned) len; /* this is bad, I know, but it
+				      won't hurt before it is common
+				      that computers have 64 GB of RAM...
+				   */
+  VALUE str = rb_str_buf_new(target_len);
+  /* \begin{playing with ruby's internals} */
+  unsigned char * ptr = (unsigned char *) RSTRING(str)->ptr;
+  /* signature byte */
+  (*ptr++) = DVECTOR_DUMP_VERSION;
+  STORE_UNSIGNED(u_len, ptr); /* destroys u_len */
+  while(len-- > 0)
+    {
+      store_double(*(data++), ptr);
+      ptr += 8;
+    }
+  RSTRING(str)->len = target_len;
+  return str;
+  /* \end{playing with ruby's internals} */
+}
+
+PRIVATE
+/*
+  Called by the marshalling mechanism to retrieve a permanent copy of a 
+  Dvector. 
+ */
+VALUE dvector_load(VALUE klass, VALUE str)
+{
+  VALUE ret = Qnil;
+  VALUE s = StringValue(str);
+  unsigned char * buf = (unsigned char *) StringValuePtr(s);
+  unsigned char * dest = buf + RSTRING(s)->len;
+  unsigned i; /* for GET_UNSIGNED */
+  unsigned tmp = 0;
+  double * data;
+  /*  depending on the first byte, the decoding will be different */
+  switch(*(buf++)) 
+    {
+    case 1:
+      GET_UNSIGNED(tmp, buf);
+      /* create a new Dvector with the right size */
+      ret = rb_funcall(cDvector, rb_intern("new"), 1, UINT2NUM(tmp));
+      data = Dvector_Data_for_Write(ret, NULL);
+      for(i = 0; i< tmp; i++)
+	{
+	  if(buf + 8 > dest)
+	    {
+	      rb_raise(rb_eRuntimeError, 
+		       "corrupted data given to Dvector._load");
+	      break;
+	    }	
+	  else 
+	    {
+	      data[i] = get_double(buf);
+	      buf += 8;
+	    }
+	}
+      break;
+    default:
+      rb_raise(rb_eRuntimeError, "corrupted data given to Dvector._load");
+    }
+  return ret;
+}
+
+
 /* 
  * Document-class: Dobjects::Dvector
  *
@@ -4992,6 +5074,9 @@ VALUE dvector_max_of_many(VALUE klass, VALUE ary) {
  * [Note: for N-dimensional arrays or arrays of complex numbers or integers as well as doubles,
  * along with a variety of matrix operations,
  * check out the NArray[http://www.ir.isas.ac.jp/~masa/ruby/index-e.html] extension.]
+ *
+ * Dvector now also prides itselfs with a _dump and a _load function, which
+ * means you can Marshal them.
  */
 
 
@@ -5245,6 +5330,10 @@ void Init_Dvector() {
    rb_define_method(cDvector, "clean?", dvector_is_clean, 0);
    rb_define_alias(cDvector,  "dirty", "dirty?");
    rb_define_method(cDvector, "dirty=", dvector_set_dirty, 1);
+
+   /* dvector marshalling */
+   rb_define_method(cDvector, "_dump", dvector_dump, 1);
+   rb_define_singleton_method(cDvector, "_load", dvector_load, 1);
 
    dvector_output_fs = Qnil;
    rb_global_variable(&dvector_output_fs);

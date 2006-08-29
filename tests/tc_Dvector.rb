@@ -720,9 +720,7 @@ EOT
       cols = Dvector.fancy_read(stream, nil, 'default'=> 0.0)
       cols2 = [Dvector[-1.2, -1.3, -1.2], Dvector[2.4, 2.4, 0.0],
                Dvector[0.0, 3.5, 0.0]]
-      3.times do |i|
-        assert_equal(cols[i], cols2[i])
-      end
+      assert_equal(cols, cols2)
 
     end
 
@@ -734,6 +732,13 @@ EOT
       assert(v.dirty?)
       v.dirty = false
       assert(! v.dirty?)
+    end
+
+    def test_marshall
+      v = Dvector[1, 2, 3]
+      s = Marshal.dump(v)
+      v_bis = Marshal.restore(s)
+      assert_equal(v, v_bis)
     end
     
 end

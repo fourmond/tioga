@@ -44,6 +44,11 @@ custom_rule("Tioga/lib/TexPreamble.rb",
 have_header("zlib.h")
 have_library("z", "compress", "zlib.h")
 
+unless have_header("ieee754.h")
+  puts "You lack the ieee754.h header file, which might mean lower "
+  + "reliability when Marshalling Dvectors and Dtables"
+end
+
 write_makefile
 
 

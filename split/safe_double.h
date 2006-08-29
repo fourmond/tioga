@@ -34,8 +34,8 @@
 *(p++) = (a) & 0xFF; (a) >>= 8; }\
 while(0)
 #define STORE_UNSIGNED(a,p)   for(i = 0; i < 4; i++) STORE_LOWER_BYTE(a,p);
-#define GET_UNSIGNED(a,p) for(i = 0; i < 4; i++) \
-(a) |= *(p++) << (i * 8);
+#define GET_UNSIGNED(a,p) do { a = 0; for(i = 0; i < 4; i++) \
+(a) |= *(p++) << (i * 8); } while (0)
 
 #ifdef HAVE_IEEE754_H
 #include <ieee754.h>

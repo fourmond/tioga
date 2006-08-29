@@ -1,3 +1,9 @@
+tioga (1.1.6)
+
+  * Added marshalling for Dvector
+
+ -- Vincent Fourmond <vincent.fourmond@9online.fr>, Wed Aug 30 00:26:07 CEST 2006
+
 tioga (1.1.5)
 
   * Fix a bug with mkmf2 that prevented good installation.
