@@ -1041,6 +1041,8 @@ module Mkmf2
 
   # Writes the Makefile using @@entities -- and others...
   def write_makefile(file_name = "Makefile")
+    puts "Writing #{file_name}"
+    
     install = {}
     uninstall = {}
     build = {}
@@ -1397,6 +1399,12 @@ EOM
     return string.gsub(/\$\((\w+)\)/) { "$#$1" }
   end
 
+  # Add defines to the build
+  def add_define(d)
+        MAKEFILE_CONFIG["DEFINES"] += 
+          " -D_#{d}"
+  end
+
   # This is a compatibility function with the previous mkmf.rb. It does check
   # for the presence of a header in the current include directories. If found,
   # it returns true and sets the define HAVE_...
@@ -1404,10 +1412,9 @@ EOM
     checking_for header do
       if try_do("#include <#{header}>",
                 expand_vars("$(CPP) $(INCLUDEDIRS) " \
-                            "$(CPPFLAGS) $(CFLAGS) $(DEFINES)"\
+                            "$(CPPFLAGS) $(CFLAGS) $(DEFINES) "\
                             "#{CONFTEST_C} $(CPPOUTFILE)"),&b)
-        MAKEFILE_CONFIG["DEFINES"] += 
-          " -DHAVE_#{header.sanitize}"
+        add_define("HAVE_#{header.sanitize}")
         true
       else
         false
@@ -1471,7 +1478,7 @@ SRC
                             )
                 )
                 
-        MAKEFILE_CONFIG["DEFINES"] += " -DHAVE_#{lib.sanitize}"
+        add_define("HAVE_#{lib.sanitize}")
         MAKEFILE_CONFIG["LIBS_SUP"] += " #{libarg}"
         true
       else
