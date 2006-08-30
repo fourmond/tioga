@@ -5088,6 +5088,7 @@ void Init_Dvector() {
    VALUE mDobjects = rb_define_module("Dobjects");
    cDvector = rb_define_class_under(mDobjects, "Dvector", rb_cObject);
    rb_include_module(cDvector, rb_mEnumerable);
+   rb_require("dl");
    
    rb_define_alloc_func(cDvector, dvector_alloc);
    rb_define_singleton_method(cDvector, "[]", dvector_s_create, -1);
