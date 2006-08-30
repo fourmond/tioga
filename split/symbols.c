@@ -23,8 +23,6 @@
 #include <intern.h>
 
 #include <namespace.h>
-/* for dynamic loading */
-#include <dl.h>
 
 
 /* MV stands for Module Variable */
@@ -61,9 +59,7 @@ PRIVATE void rb_export_symbol(VALUE module, const char * symbol_name,
 			    void * symbol)
 {
   VALUE hash = get_symbol_hash(module);
-  rb_hash_aset(hash, rb_str_new2(symbol_name),
-	       rb_dlsym_new(symbol, symbol_name, "0")
-	       );
+  rb_hash_aset(hash, rb_str_new2(symbol_name),LONG2NUM((long) symbol));
 }
 
 PRIVATE void * rb_import_symbol_no_raise(VALUE module, 
@@ -76,8 +72,8 @@ PRIVATE void * rb_import_symbol_no_raise(VALUE module,
 		    of segfaults ! */
   VALUE symbol = rb_hash_aref(hash, rb_str_new2(symbol_name));
   
-  if(RTEST(symbol))
-    return (void *) rb_dlsym2csym(symbol);
+  if(TYPE(symbol) == T_FIXNUM || TYPE(symbol) == T_BIGNUM)
+    return (void *) NUM2LONG(symbol);
   return NULL;
 }
 
@@ -94,4 +90,3 @@ PRIVATE void * rb_import_symbol(VALUE module, const char * symbol_name)
 	   "module %s", symbol_name, 
 	   rb_string_value_cstr(&module_name));
 }
-
