@@ -4429,7 +4429,7 @@ VALUE dvector_read(int argc, VALUE *argv, VALUE klass) {
    int arg4 = (int) -1 ;
    if ((argc < 1) || (argc > 4))
       rb_raise(rb_eArgError, "wrong # of arguments(%d) for read", argc);
-   arg1 = StringValuePtr(argv[0]);
+   arg1 = StringValueCStr(argv[0]);
    if (argc > 1) arg2 = argv[1];
    if (argc > 2) arg3 = NUM2INT(argv[2]);
    if (argc > 3) arg4 = NUM2INT(argv[3]);
@@ -4536,7 +4536,7 @@ VALUE dvector_read_rows(int argc, VALUE *argv, VALUE klass) {
    if ((argc < 2) || (argc > 3))
       rb_raise(rb_eArgError, "wrong # of arguments(%d) for read_rows", argc);
    if (argc > 2) arg3 = NUM2INT(argv[2]);
-   return Read_Rows_of_Dvectors(StringValuePtr(argv[0]),argv[1],arg3);
+   return Read_Rows_of_Dvectors(StringValueCStr(argv[0]),argv[1],arg3);
    klass = Qnil;
 }
 PRIVATE 
@@ -4610,7 +4610,7 @@ VALUE dvector_read_row(int argc, VALUE *argv, VALUE klass) {
    VALUE arg3 = Qnil;
    if ((argc < 1) || (argc > 3))
       rb_raise(rb_eArgError, "wrong # of arguments(%d) for read_row", argc);
-   arg1 = StringValuePtr(argv[0]);
+   arg1 = StringValueCStr(argv[0]);
    if (argc > 1) arg2 = NUM2INT(argv[1]);
    if (argc > 2) arg3 = argv[2];
    return Read_Row(arg1,arg2,arg3);
