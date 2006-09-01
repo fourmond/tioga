@@ -3,17 +3,49 @@
 # This file provides a way to extract links to images from ruby files
 # converting the files and getting the images into static links.
 
-target_dir = $*.shift           # The dir where to put images
-link= $*.shift                  # How to reference them from the doc
-files= $*                  # The files to be processed
+require 'optparse'
+require 'ostruct'
+
+options = OpenStruct.new
+
+opts = OptionParser.new do |opts|
+  opts.banner = "$0 [options] [files]"
+  
+  opts.on("-l","--link LINK", 
+          "How to link the images from the files") do |l|
+    options.link = l
+  end
+
+  opts.on("-d","--dir DIR", 
+          "Where to save images") do |w|
+    options.dir = w
+  end
+end
+
+opts.parse!
+
+files= ARGV.dup                  # The files to be processed
+
+if files.empty?
+  open '.document' do |f|
+    for line in f
+      files += Dir.glob(line)
+    end
+  end
+end
+
+p files
+return nil
+  
 
 for file in files 
   puts file
+  next if File.directory?(file)
   open(file) do |f|
     o = file + ".new"
     output = open(o, "w")
     for line in f
-      if line =~/(http:.*(jpg|gif|jpeg))/
+      if line =~ /(http:.*(jpg|gif|jpeg|png))/
         puts line
         image = $1
         puts image
