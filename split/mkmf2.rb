@@ -695,16 +695,87 @@ module Mkmf2
     return "$(#{str})"
   end
 
+  # This hash says which of the "CONFIG" variables we should make available
+  # as a global variable -- and use it back to output the variables. If non
+  # nil, the second part says which name it should have as global variable.
+  MKMF_GLOBAL_VARIABLES =   {
+    "CFLAGS" => nil, 
+    "LDFLAGS" => nil, 
+    "DLDFLAGS" => nil,
+    "CPPFLAGS" => nil,
+    "LIBS" => nil,
+    "LOCAL_LIBS" => nil,
+    "libs" => nil,
+  }
+                           
+
+  # Takes the config variables, turn them into global variables.
+  def config_to_global
+    for var,name in MKMF_GLOBAL_VARIABLES 
+      name = var if name.nil?
+      value = MAKEFILE_CONFIG[var].to_s # make sure its a string
+      # in case it doesn't exist there...
+      # Nice trick to get around quoting...
+      block = eval "proc {|x| $#{name} = x}"
+      block.call(value)
+    end
+  end
+
+  # Takes the global variables taken from the config, and put them back into
+  # the config hash.
+  def global_to_config
+    for var,name in MKMF_GLOBAL_VARIABLES 
+      name = var if name.nil?
+      value = eval "$#{name}"
+      MAKEFILE_CONFIG[var] = value
+    end
+  end
+
+
 
   # A constant to get a configuration variable
   MAKE_VARIABLE = /\$\((\w+)\)/
 
+  # List config variables referenced to by the string _str_. If
+  # hash is specified, only config variables that are keys of this hash
+  # will be listed.
+  def subvars(str, hash = nil)
+    vars = []
+    str.gsub(MAKE_VARIABLE) { |k|
+      # we add the key to the list only if it exists, else the
+      # environment variable gets overridden by what is written
+      # in the Makefile (for $HOME, for instance)
+      vars << $1 if ( hash.nil? || hash.key?($1) )
+    }
+    return vars
+  end
+
+  # A way to deal with compound make variables (that is,
+  # make variables that get more than just themselves on the output)
+
+  COMPOUND_MAKE_VARIABLES = {
+    "CFLAGS" => "$(CFLAGS) $(ARCH_FLAG)", 
+    "DLDFLAGS" => "$(LDFLAGS) $(DLDFLAGS) $(ARCH_FLAG)",
+    "LIBS" => "$(LIBRUBYARG) $(libs) $(LIBS)",
+  }
+
+
+  # Returns the contents of a "compound" variable.
+  def compound_var_expand(var, value = nil, hash = MAKEFILE_CONFIG)
+    if value.nil?
+      value = MAKEFILE_CONFIG[var]
+    end
+    COMPOUND_MAKE_VARIABLES[var].gsub("$(#{var})",value)
+  end
+
+
   # Returns a string containing all the configuration variables. We
   # use the MAKEFILE_CONFIG for more flexibility in the Makefile: the
   # variables can then be redefined on the make command-line.
-  def Mkmf2.output_config_variables
+  def output_config_variables
     str = ""
     keys = @@config_variables_used.uniq
+    global_to_config
     new_keys = []
     begin 
       # we merge the new keys with the old
@@ -713,12 +784,10 @@ module Mkmf2
       new_keys = []
       keys.each do |k|
         if MAKEFILE_CONFIG.key? k
-          MAKEFILE_CONFIG[k].gsub(MAKE_VARIABLE) { |k|
-            # we add the key to the list only if it exists, else the
-            # environment variable gets overridden by what is written
-            # in the Makefile (for $HOME, for instance)
-            new_keys << $1 if MAKEFILE_CONFIG.key? $1
-          }
+          new_keys += subvars(MAKEFILE_CONFIG[k], MAKEFILE_CONFIG)
+        end
+        if COMPOUND_MAKE_VARIABLES.key? k
+          new_keys += subvars(COMPOUND_MAKE_VARIABLES[k], MAKEFILE_CONFIG)
         end
       end
     end until (keys + new_keys).uniq.length == keys.length
@@ -726,7 +795,9 @@ module Mkmf2
     for var in keys.uniq.sort
       # We output the variable only if it is not empty: makes
       # it a lot easier to modify them from outside...
-      if MAKEFILE_CONFIG[var] =~ /\S/
+      if COMPOUND_MAKE_VARIABLES.key?(var)
+        str += "#{var}=#{compound_var_expand(var)}\n"
+      elsif MAKEFILE_CONFIG[var] =~ /\S/
         str += "#{var}=#{MAKEFILE_CONFIG[var]}\n"
       end
     end
@@ -866,6 +937,7 @@ module Mkmf2
   # I know this is bad design, but that's the best I think of for now.
   # This function better be called before using MAKEFILE_CONFIG directly.
   def update_makefile_config
+    global_to_config
     setup_paths_variables
   end
 
@@ -1082,7 +1154,7 @@ module Mkmf2
 
 
     # First, the variables in use:
-    f.puts Mkmf2.output_config_variables
+    f.puts output_config_variables
 
     # build has to be the first target so that simply
     # invoking make does the building, but not the installing.
@@ -1104,7 +1176,7 @@ module Mkmf2
     # Add a distclean rule, to make debuild happy.
     f.print <<"EOR"
 distclean: clean 
-\t@-$(RM) Makefile extconf.h conftest.* mkmf.log
+\t@-$(RM) Makefile extconf.h conftest.* mkmf2.log
 \t@-$(RM) core ruby$(EXEEXT) *~ $(DISTCLEANFILES) 
 EOR
 
@@ -1280,7 +1352,7 @@ EOR
 
   module Logging
     @log = nil
-    @logfile = 'mkmf.log'
+    @logfile = 'mkmf2.log'
     @orgerr = $stderr.dup
     @orgout = $stdout.dup
     @postpone = 0
@@ -1437,6 +1509,7 @@ EOM
   def mkmf2_init
     check_missing_features
     parse_cmdline
+    config_to_global
   end
 
   # Compatibility function from mkmf.rb. Checks if the compiler
