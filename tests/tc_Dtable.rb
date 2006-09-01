@@ -178,6 +178,21 @@ class TestDtable < Test::Unit::TestCase
         end
     end
 
+    def test_marshal
+      t = Dtable.new(3,4)
+      t[1,1] = 1.2
+      t[3,2] = 2.5
+      
+      str = Marshal.dump(t)
+      tbis = Marshal.restore(str)
+      assert_equal(t.num_rows, tbis.num_rows)
+      i = 0
+      while i < t.num_rows
+        assert_equal(t.row(i), tbis.row(i))
+        i += 1
+      end
+    end
+
 end
 
 

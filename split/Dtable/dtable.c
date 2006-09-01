@@ -27,6 +27,9 @@
 #include <math.h>
 #include "intern.h"
 
+/* safe storing of doubles */
+#include <safe_double.h>
+
 // should use isfinite instead of is_okay_number, but some C's don't support it yet.
 #define is_okay_number(x) ((x) - (x) == 0.0)
 
@@ -130,8 +133,10 @@ static Dtable *Get_Dtable(VALUE obj) {
 double **Dtable_Ptr(VALUE dtable, long *num_cols, long *num_rows) {
    Dtable *d;
    Data_Get_Struct(dtable, Dtable, d);
-   *num_cols = d->num_cols;
-   *num_rows = d->num_rows;
+   if(num_cols)
+     *num_cols = d->num_cols;
+   if(num_rows)
+     *num_rows = d->num_rows;
    return d->ptr;
    }
 
@@ -170,7 +175,8 @@ PRIVATE
  *  
  *  Returns a copy of _dtable_.  For performance sensitive situations involving a series of operations,
  *  first make a copy using dup and then do "bang" operations to modify the result without further copying.
- */ VALUE dtable_dup(VALUE ary) {
+ */ 
+VALUE dtable_dup(VALUE ary) {
    Dtable *d = Get_Dtable(ary);
    int i, j, num_cols = d->num_cols, num_rows = d->num_rows;
    VALUE new = dtable_init(dtable_alloc(cDtable), num_cols, num_rows);
@@ -302,7 +308,8 @@ PRIVATE
  *     Dtable.new(num_cols, num_rows)      -> a_dtable
  *
  *  Returns a new Dtable with the requested dimensions.
- */ VALUE dtable_initialize(int argc, VALUE *argv, VALUE ary) {
+ */ 
+VALUE dtable_initialize(int argc, VALUE *argv, VALUE ary) {
    if (argc != 2) rb_raise(rb_eArgError, "need 2 args for Dtable.new(num_cols, num_rows)");
    int num_cols = NUM2INT(argv[0]), num_rows = NUM2INT(argv[1]);
    return dtable_init(ary, num_cols, num_rows);
@@ -314,7 +321,8 @@ PRIVATE
  *     dtable.num_cols  -> integer
  *  
  *  Returns the number of entries in the x dimension of _dtable_.
- */ VALUE dtable_num_cols(VALUE ary) {
+ */ 
+VALUE dtable_num_cols(VALUE ary) {
    Dtable *d = Get_Dtable(ary);
    return LONG2NUM(d->num_cols);
 }
@@ -1629,9 +1637,104 @@ PRIVATE
  *     dtable[row,col] = number  ->  number
  *
  *  Replaces the element at location _row_, _col_ by the given _number_.
- */ VALUE dtable_aset(VALUE ary, VALUE xloc, VALUE yloc, VALUE val) {
+ */ 
+VALUE dtable_aset(VALUE ary, VALUE xloc, VALUE yloc, VALUE val) {
    dtable_store(ary, NUM2LONG(xloc), NUM2LONG(yloc), NUM2DBL(val));
    return val;
+}
+
+#define DTABLE_DUMP_VERSION 1
+
+PRIVATE
+/*
+  Called by the marshalling mechanism to store a permanent copy of a 
+  Dtable. _limit_ is simply ignored.
+ */
+VALUE dtable_dump(VALUE ary, VALUE limit)
+{
+  int i; /* for STORE_UNSIGNED */
+  long rows, cols;
+  long x, y;
+  double ** data = Dtable_Ptr(ary, &cols, &rows);
+  double * col;
+  long target_len = 1 /* first signature byte */
+    + 8 /* 2 * length */
+    + cols * rows * 8 ;
+  unsigned u_len;
+  VALUE str = rb_str_buf_new(target_len);
+  /* \begin{playing with ruby's internals} */
+  unsigned char * ptr = (unsigned char *) RSTRING(str)->ptr;
+  /* signature byte */
+  (*ptr++) = DTABLE_DUMP_VERSION;
+  u_len = (unsigned) rows; /* limits to 4 billions rows */
+  STORE_UNSIGNED(u_len, ptr); /* destroys u_len */
+  u_len = (unsigned) cols; /* limits to 4 billions columns */
+  STORE_UNSIGNED(u_len, ptr); /* destroys u_len */
+  for(x = 0; x < rows; x++)
+    {
+      col = data[x];
+      for(y = 0; y < cols; y++)
+	{
+	  store_double(*(col++), ptr);
+	  ptr += 8;
+	}
+    }
+  RSTRING(str)->len = target_len;
+  return str;
+  /* \end{playing with ruby's internals} */
+}
+
+PRIVATE
+/*
+  Called by the marshalling mechanism to retrieve a permanent copy of a 
+  Dtable. 
+ */
+VALUE dtable_load(VALUE klass, VALUE str)
+{
+  VALUE ret = Qnil;
+  VALUE s = StringValue(str);
+  unsigned char * buf = (unsigned char *) StringValuePtr(s);
+  unsigned char * dest = buf + RSTRING(s)->len;
+  unsigned i; /* for GET_UNSIGNED */
+  unsigned tmp = 0;
+  long rows, cols;
+  long x,y;
+  double ** data;
+  double * col;
+  /*  depending on the first byte, the decoding will be different */
+  switch(*(buf++)) 
+    {
+    case 1:
+      GET_UNSIGNED(tmp, buf);
+      rows = tmp;
+      GET_UNSIGNED(tmp, buf);
+      cols = tmp;
+      /* create a new Dtable with the right size */
+      ret = dtable_init(dtable_alloc(cDtable), cols, rows);
+      data = Dtable_Ptr(ret, NULL, NULL);
+      for(x = 0; x < rows; x++) 
+	{
+	  col = data[x];
+	  for(y = 0; y< cols; y++)
+	    {
+	      if(buf + 8 > dest)
+		{
+		  rb_raise(rb_eRuntimeError, 
+			   "corrupted data given to Dtable._load");
+		  break;
+		}	
+	      else 
+		{
+		  col[y] = get_double(buf);
+		  buf += 8;
+		}
+	    }
+	}
+      break;
+    default:
+      rb_raise(rb_eRuntimeError, "corrupted data given to Dtable._load");
+    }
+  return ret;
 }
 
 /* 
@@ -1789,6 +1892,9 @@ PUBLIC void Init_Dtable() {
    rb_define_method(cDtable, "safe_asin!", dtable_safe_asin_bang, 0);
    rb_define_method(cDtable, "safe_acos!", dtable_safe_acos_bang, 0);
 
+   /* Marshal : */
+   rb_define_method(cDtable, "_dump", dtable_dump, 1);
+   rb_define_singleton_method(cDtable, "_load", dtable_load, 1);
    /* modified by Vincent Fourmond, for splitting out the libraries */
    rb_require("Dobjects/Dtable_extras.rb");
    /* end of modification */
