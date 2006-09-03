@@ -49,6 +49,9 @@ unless have_header("ieee754.h")
     "reliability when Marshalling Dvectors and Dtables"
 end
 
+# Looking for the presence of the is_nan (implies the rest -- isfinite)
+have_func("isnan","math.h")
+
 write_makefile
 
 

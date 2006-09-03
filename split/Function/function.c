@@ -28,6 +28,10 @@
 
 #include "dvector.h"
 
+#include <math.h>
+/* compiler-dependent definitions, such as is_okay_number */
+#include <defs.h>
+
 /* the class we're defining */
 static VALUE cFunction;
 static VALUE cDvector;
@@ -53,6 +57,7 @@ rb_type(x) == T_BIGNUM)
 #define X_VAL "@x_val"
 #define Y_VAL "@y_val"
 #define SPLINE_CACHE "@spline_cache"
+
 
 
 /* basic functions for accessing the objects */
@@ -190,9 +195,6 @@ static VALUE function_is_sorted(VALUE self)
 }
 
 static VALUE function_sort(VALUE self);
-
-/* test if the number if finite */
-#define is_okay_number(x) ((x) - (x) == 0.0)
 
 /* small macros to make the code a little more clear */
 #define FIXED_BOUNDARY(n, slope) (3.0/(x_vals[n+1] - x_vals[n])) *\
@@ -634,7 +636,7 @@ static VALUE function_point(VALUE self, VALUE index)
     }
   return Qnil;
 }
- 
+
 static void init_IDs()
 {
   idSize  = rb_intern("size");
@@ -695,6 +697,7 @@ void Init_Function()
   rb_define_method(cFunction, "each", 
 		   function_each, 0);
 
+  rb_require("Dobjects/Function_extras.rb");
 
   /* now, we import the necessary symbols from Dvector */
   RB_IMPORT_SYMBOL(cDvector, Dvector_Data_for_Read);

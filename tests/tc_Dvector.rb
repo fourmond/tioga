@@ -740,5 +740,10 @@ EOT
       v_bis = Marshal.restore(s)
       assert_equal(v, v_bis)
     end
+
+    def test_bounds
+      v = Dvector[0.0/0.0, 0.0/0.0, 1,2,4,5,9,0.0/0.0,0.1]
+      assert_equal(v.bounds, [0.1, 9])
+    end
     
 end

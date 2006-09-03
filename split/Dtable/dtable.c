@@ -27,11 +27,11 @@
 #include <math.h>
 #include "intern.h"
 
+#include <defs.h>
+
 /* safe storing of doubles */
 #include <safe_double.h>
 
-// should use isfinite instead of is_okay_number, but some C's don't support it yet.
-#define is_okay_number(x) ((x) - (x) == 0.0)
 
 #define is_a_dtable(d) ( TYPE(d) == T_DATA && RDATA(d)->dfree == (RUBY_DATA_FUNC)dtable_free )
 

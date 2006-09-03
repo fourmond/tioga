@@ -32,9 +32,14 @@
 
 #include <symbols.h>
 
+/* compiler-dependent definitions, such as is_okay_number */
+#include <defs.h>
+
 /* safe storing of doubles */
 #include <safe_double.h>
 
+/* temp */
+/* #include <stdio.h> */
 #define is_a_dvector(d) ( TYPE(d) == T_DATA && RDATA(d)->dfree == (RUBY_DATA_FUNC)dvector_free )
 
 #ifndef MAX
@@ -44,8 +49,6 @@
 #define MIN(a,b)    (((a) < (b)) ? (a) : (b))
 #endif
 
-// should use isfinite instead of is_okay_number, but some C's don't support it yet.
-#define is_okay_number(x) ((x) - (x) == 0.0)
 
 
 typedef struct {
@@ -5028,6 +5031,47 @@ VALUE dvector_load(VALUE klass, VALUE str)
   return ret;
 }
 
+/* Returns the boundaries of a Dvector, that is [min, max]. It deals
+   correctly with NaN but will complain if the Dvector contains only NaN.
+   
+    v = Dvector[0.0/0.0, 0.0/0.0, 1,2,4,5,9,0.0/0.0,0.1]
+    v.bounds -> [0.1, 9]
+
+*/
+static VALUE dvector_bounds(VALUE self)
+{
+  double min, max;
+  VALUE ret;
+  long len;
+  double * data = Dvector_Data_for_Read(self, &len);
+  /* skip all NaNs at the beginning */
+  while(len-- > 0)
+    if(!isnan(*data++))
+       break;
+  if(len>=0)
+    {
+      min = max = *(data-1);
+      while(len-- > 0)
+	{
+	  if(! isnan(*data))
+	    {
+	      if(*data < min)
+		min = *data;
+	      if(*data > max)
+		max = *data;
+	    }
+	  data++;
+	}
+      ret = rb_ary_new2(2);
+      rb_ary_store(ret, 0, rb_float_new(min));
+      rb_ary_store(ret, 1, rb_float_new(max));
+      return ret;
+    }
+  else
+    rb_raise(rb_eRuntimeError, 
+	     "bounds called on an array containing only NaN");
+  return Qnil;
+}
 
 /* 
  * Document-class: Dobjects::Dvector
@@ -5213,6 +5257,8 @@ void Init_Dvector() {
    rb_define_method(cDvector, "set", dvector_set, 1);
    rb_define_method(cDvector, "min_gt", dvector_min_gt, 1);
    rb_define_method(cDvector, "max_lt", dvector_max_lt, 1);
+   rb_define_method(cDvector, "bounds", dvector_bounds, 0);
+
    
    rb_define_method(cDvector, "sum", dvector_sum, 0);
    rb_define_method(cDvector, "dot", dvector_dot, 1);

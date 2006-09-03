@@ -44,5 +44,12 @@ class TestFunction < Test::Unit::TestCase
     assert_equal(p[1],3.0)
   end
 
+  def test_bounds
+    x_1 = Dvector[1,2,3,4]
+    x_2 = Dvector[1,9,2,0.1]
+    f = Function.new(x_1, x_2)
+    assert_equal(f.bounds, [1,0.1,4,9])
+  end
+
   # There is unfortunately no simple way to test the interpolations...
 end
