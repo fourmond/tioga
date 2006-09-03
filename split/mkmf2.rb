@@ -59,12 +59,6 @@ But before, please, check out the latest cvs version at
 http://rubyforge.org/scm/?group_id=1391
 and make sure the bug is still there...
 
-==Unimplemented features
-
-* It is currently impossible to remove directories with make uninstall.
-  This is due to the fact that +rbconfig.rb+ doesn't provide an entry
-  for removing directories.
-
 ==Note to anyone who wishes to contribute
 
 Please, document any code you add, and keep the
@@ -1512,6 +1506,51 @@ EOM
     config_to_global
   end
 
+  def headers(header)
+    headers = ""
+    if header
+      if header.is_a?(Array) 
+        header.each {|h|
+          headers += "#include <#{h.to_s}>\n"
+        }
+      else
+        headers += "#include <#{header.to_s}>\n"
+      end
+    end
+    return headers
+  end
+
+  # Tries to link the given code with the extra flags given
+  def try_link(code, extras = "")
+    return try_do(code,
+                expand_vars("$(CC) $(OUTFLAG)conftest $(INCFLAGS) " +
+                            "#{CONFTEST_C} " + 
+                            " -I$(hdrdir) $(CPPFLAGS) $(CFLAGS) $(src)" + 
+                            " $(LIBPATH) $(LDFLAGS) $(ARCH_FLAG) " +
+                            " $(LOCAL_LIBS) $(LIBS) $(LIBS_SUP) #{extras}"
+                            )
+                )
+  ensure
+    rm_f("conftest*")
+  end
+
+  def try_func(func, extra, h)
+    headers = headers(h)
+
+    try_link(<<"SRC", extra) or try_link(<<"SRC", extra)
+#{headers}
+/*top*/
+int main() { return 0; }
+int t() { #{func}(); return 0; }
+SRC
+#{headers}
+/*top*/
+int main() { return 0; }
+int t() { void ((*volatile p)()); p = (void ((*)()))#{func}; return 0; }
+SRC
+end
+
+
   # Compatibility function from mkmf.rb. Checks if the compiler
   # can find the given function in the given library. If the function
   # is not given, we look for main but it's definitely not a good idea.
@@ -1519,47 +1558,32 @@ EOM
   # this function. It can possibly be an array, in which case it is
   # interpreted as a list of headers that should be included.
 
-  # code still needs to be done...
   def have_library(lib, func = nil, header=nil, &b)
     if func.nil?
       func = "main"
     end
-    headers = ""
-    if header
-      if header.is_a?(Array) 
-        header.each {|h|
-          headers += "#include <#{h}>\n"
-        }
-      else
-        headers += "#include <#{header.to_s}>\n"
-      end
-    end
     libarg = "#{MAKEFILE_CONFIG["LIBARG"]%lib}"
     checking_for "#{func}() in #{libarg}" do
-      code = <<"SRC"
-#{headers}
-/*top*/
-int main() { return 0; }
-int t() { void ((*volatile p)()); p = (void ((*)()))#{func}; return 0; }
-SRC
-      if try_do(code,
-                expand_vars("$(CC) $(OUTFLAG)conftest $(INCFLAGS) " +
-                            "#{CONFTEST_C} " + 
-                            " -I$(hdrdir) $(CPPFLAGS) $(CFLAGS) $(src)" + 
-                            " $(LIBPATH) $(LDFLAGS) $(ARCH_FLAG) " +
-                            " $(LOCAL_LIBS) $(LIBS) $(LIBS_SUP) #{libarg}"
-                            )
-                )
-                
+      if try_func(func, libarg, header)
         add_define("HAVE_#{lib.sanitize}")
-        MAKEFILE_CONFIG["LIBS_SUP"] += " #{libarg}"
+        MAKEFILE_CONFIG["LIBS_SUP"] += " #{libarg}" 
         true
       else
         false
       end
     end
-  ensure
-    rm_f("conftest*")
+  end
+  
+  # Returns true if a function could be found
+  def have_func(func, header = nil)
+    checking_for "#{func}() " do
+      if try_func(func, "", header)
+        add_define("HAVE_#{func.sanitize}")
+        true
+      else
+        false
+      end
+    end
   end
 end
 
