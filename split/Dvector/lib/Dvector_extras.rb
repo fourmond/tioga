@@ -1,6 +1,43 @@
 #  Tioga::Dvector_extras.rb
 
 module Dobjects 
+
+  # MathEvaluator enables one to evaluate a simple mathematical expression
+  # such as "x[0] + cos(x[1])", where the array x is given at each call to
+  # compute, or "x + y**z", or...
+  # 
+  # This class acts as a backend for Dvector.compute_formula, to make sure
+  # that the Math module is included, without the drawback of cluttering
+  # all Math functions in Dvector, which would admittedly be quite stupid.
+
+  class MathEvaluator
+    include Math
+
+    # Creates an evaluator for a formula. +formula+ is the formula. It is
+    # transformed into a block that takes +argname+ as an argument --
+    # +argname+ can be whatever you want. +mods+ are the modules you would
+    # like the formula to include. Math is included by default, but you
+    # can include other ones to make other kinds of functions available.
+    #
+    #  MathEvaluator.new("col[0] + col[1]", "col")
+    #  MathEvaluator.new("x*cos(y)", "x,y")
+    def initialize(formula, argname, mods = [])
+      for mod in mods
+        self.extend mod
+      end
+      @block = eval "proc { |#{argname}| #{formula} }"
+    end
+
+    # This function does the actual evaluation with the blocks
+    # given.
+    #
+    #  e = MathEvaluator.new("x*y", "x,y")
+    #  e.compute(1,2)         -> 2
+    def compute(*args)
+      return @block.call(*args)
+    end
+  end
+
   class Dvector
       
     def to_dvector
@@ -111,15 +148,13 @@ module Dobjects
     #
     # This is just a try, and should be implemented in C rather than in
     # Ruby. But if you're looking for simplicity, here you go ;-) !
+    #
+    # _modules_ are the modules you would wish the evaluator to +include+. 
+    # This feature enables one to make sure custom functions are included
 
-    def Dvector.compute_formula(formula, a) # :doc:
-      # we first compile the formula:
-      begin
-        block = eval "proc { |column| #{formula} }"
-      rescue
-        raise "Compiling the formula did fail"
-      end
+    def Dvector.compute_formula(formula, a, modules = []) # :doc:
 
+      evaluator = MathEvaluator.new(formula, "column", modules)
       # if we reach this place, it means that there a no big syntax errors ;-)
       
       # we now need to inspect the array given, and make sure that there is
@@ -161,7 +196,7 @@ module Dobjects
         # Commented out for simplicity
         
         # then we call the block:
-        elem = block.call(args)
+        elem = evaluator.compute(args)
         res << elem
       }
       
