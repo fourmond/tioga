@@ -1,3 +1,9 @@
+tioga (1.1.7)
+
+  * Fixed a runtime failure on MacOS X.
+
+ -- Vincent Fourmond <vincent.fourmond@9online.fr>, Tue Sep  5 00:55:41 CEST 2006
+
 tioga (1.1.6)
 
   * Added marshalling for Dvector
