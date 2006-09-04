@@ -41,7 +41,7 @@ while(0)
 #include <ieee754.h>
 
 
-inline void store_double(double a, unsigned char * p)
+static inline void store_double(double a, unsigned char * p)
 {
   unsigned int tmp;
   int i;
@@ -57,7 +57,7 @@ inline void store_double(double a, unsigned char * p)
 }
 
 
-inline double get_double(const unsigned char * p)
+static inline double get_double(const unsigned char * p)
 {
   unsigned int tmp;
   int i;
@@ -81,7 +81,7 @@ union basic_double{
   } i;
 };
 
-inline void store_double(double a, unsigned char * p)
+static inline void store_double(double a, unsigned char * p)
 {
   union basic_double d;
   int i;
@@ -90,7 +90,7 @@ inline void store_double(double a, unsigned char * p)
   STORE_UNSIGNED(d.i.b, p);
 }
 
-inline double get_double(const unsigned char * p)
+static inline double get_double(const unsigned char * p)
 {
   union basic_double d;
   int i;

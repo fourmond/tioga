@@ -698,6 +698,7 @@ module Mkmf2
     "DLDFLAGS" => nil,
     "CPPFLAGS" => nil,
     "LIBS" => nil,
+    "LIBRUBYARG" => nil,
     "LOCAL_LIBS" => nil,
     "libs" => nil,
   }
@@ -713,6 +714,7 @@ module Mkmf2
       block = eval "proc {|x| $#{name} = x}"
       block.call(value)
     end
+    $LIBRUBYARG = "" # seems the default in mkmf.rb
   end
 
   # Takes the global variables taken from the config, and put them back into
@@ -749,7 +751,7 @@ module Mkmf2
 
   COMPOUND_MAKE_VARIABLES = {
     "CFLAGS" => "$(CFLAGS) $(ARCH_FLAG)", 
-    "DLDFLAGS" => "$(LDFLAGS) $(DLDFLAGS) $(ARCH_FLAG)",
+    "DLDFLAGS" => "$(DLDFLAGS) $(ARCH_FLAG)",
     "LIBS" => "$(LIBRUBYARG) $(libs) $(LIBS)",
   }
 
