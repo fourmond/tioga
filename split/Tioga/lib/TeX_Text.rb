@@ -59,7 +59,7 @@ string rather than double quotes.  With single quotes, backslashes are treated a
 for the two special cases of \' and \\), so TeX commands using backslashes don't cause trouble.  
 With double quotes, Ruby uses backslash for a variety of escape characters such as newline (\n) and tab (\t),
 so the backslashes for TeX need to be entered as \\ pairs to be safe.
-Compare '$\nu\sim\tau$' to the equivalent form "$\\nu\\sim\\tau$" and the incorrect form "$\nu\sim\tau$".
+Compare '$\nu\sim\tau$' to the equivalent form "$\\\\nu\\\\sim\\\\tau$" and the incorrect form "$\nu\sim\tau$".
 
 Dictionary Entries
     'text'            => a_string        # to be processed by TeX
