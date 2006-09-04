@@ -21,11 +21,18 @@ This is the README for the Tioga kernel, version 1.1.3, July 23, 2006.
 
 << What's new >>
 
+	Version 1.1.6 provides marshalling for Dtable and Dvector. You can now use Marshal.dump and
+Marshal.load with Dvectors. Dvectors and Function now have a bounds function, which return both the
+minima and the maxima. Ruby is no longer complaining about Tioga when used with the -w switch.
+
+<< What's old >>
+
+	Version 1.1.5 is a bug-fix release - updated to the latest mkmf2.rb to make sure all
+necessary files are generated during make
+
 	Version 1.1.4 is a bug-fix release - a nasty symbol clash was preventing Tioga from running on 
 MacOS X.3. This should now be fixed. Moreover, the load time should improve a little bit on few 
 architectures.
-
-<< What's old >>
 
 	Version 1.1.3 provides a better integration of output within LaTeX
 documents. A tioga.sty file is now available, with many macros for figure

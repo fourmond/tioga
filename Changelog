@@ -1,8 +1,11 @@
 tioga (1.1.6)
 
   * Added marshalling for Dvector
+  * Added bounds for Dvector and Function (min,max) and (xmin, ymin, xmax, ymax)
+  * Modified Dvector.compute_formula to cope better with external modules included
+  * better alternatives for is_okay_number
 
- -- Vincent Fourmond <vincent.fourmond@9online.fr>, Wed Aug 30 00:26:07 CEST 2006
+ -- Vincent Fourmond <vincent.fourmond@9online.fr>, Mon Sep  4 21:41:31 CEST 2006
 
 tioga (1.1.5)
 

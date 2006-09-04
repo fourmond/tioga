@@ -724,6 +724,19 @@ EOT
 
     end
 
+    def test_compute_formula
+      v = Dvector[1,2,3]
+      w = Dvector[3,2,1]
+      cal = Dvector.compute_formula("column[0] + column[1]", [v,w])
+      assert_equal(cal, Dvector[4,4,4])
+      cal = Dvector.compute_formula("sin(column[0]) " +
+                                    "** 2 + cos(column[0]) ** 2", [v,w])
+      cal.sub!(1)
+      cal.abs!
+      assert(cal.max < 1e-10)   # We need this trick as computations are
+      # not perfectly precise.
+    end
+
     def test_dirtyness
       v = Dvector.new(10)
       assert(! v.dirty?)
