@@ -84,7 +84,7 @@
 % Font size (two parameters)
 % {sz}{line_sp}, 1st is size of font in points,
 % 2nd is line spacing (not used by Tioga)
-\newcommand\tiog@fontsize{{{10.0}{10pt}}}
+\newcommand\tiog@fontsize{{10.0}{10pt}}
 \newcommand\settiogafontsize[2][10pt]{\renewcommand\tiog@fontsize{{#2}{#1}}}
 
 % Font family
