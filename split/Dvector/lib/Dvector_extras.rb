@@ -46,12 +46,14 @@ module Dobjects
 
     # Dvector.fancy_read's defaults options. See that function for
     # more details
-    FANCY_READ_DEFAULTS = { 'sep' => /\s+/,
+    FANCY_READ_DEFAULTS = { 
+      'sep' => /\s+/,
       'comments' => /^\s*\#/,
       'skip_first' => 0,
       'index_col' => false,
       'headers' => nil, # not used for now.
       'default' => 0.0/0.0, # defaults to NaN
+      'remove_space' => true ,# removes spaces at the beginning of the lines
     }
 
 
@@ -97,6 +99,10 @@ module Dobjects
       while line = stream.gets
         next if line =~ o["comments"]
         next if line =~ /^\s*$/ # skip empty lines
+        if o["remove_space"]
+          line.gsub!(/^\s+/,'')
+        end
+  
         elements = line.split(o["sep"])
         # now, the fun: the actual reading.
         # we first turn this elements into floats:
