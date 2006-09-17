@@ -276,10 +276,14 @@ void Write_figure_command(VALUE fmkr, char *simple_name, FILE *file) {
             fprintf(file, "\\tiogafigurefullpage[%s]{%s}\n", minwhitespace, simple_name); 
         }
    } else {
+       const char * command = Get_tex_preview_tiogafigure_command(fmkr);
+       if(strcmp(command, "tiogafigureshow")) {
         fprintf(file, "\\%s{%s}{%s}{%s}\n", Get_tex_preview_tiogafigure_command(fmkr), simple_name, 
             Get_tex_preview_figure_width(fmkr), Get_tex_preview_figure_height(fmkr)); 
+       } else { /* no need for extra arguments for tiogafigureshow */
+        fprintf(file, "\\%s{%s}\n", Get_tex_preview_tiogafigure_command(fmkr), simple_name); 
+       }
    }
-   
 }
 
    
@@ -310,6 +314,8 @@ void Create_wrapper(VALUE fmkr, char *fname, bool quiet_mode)
    fprintf(file, "\n%% Here's the page with the figure.\n");
    fprintf(file, "\\begin{document}\n");
    fprintf(file, "\\pagestyle{%s}\n", Get_tex_preview_pagestyle(fmkr));
+   /* necessary to get the position right */
+   fprintf(file, "\\noindent");
    Write_figure_command(fmkr, simple_name, file);
    fprintf(file, "\\end{document}\n");
    fclose(file);
@@ -329,9 +335,13 @@ void Rename_tex(char *oldname, char *newname)
 
 VALUE FM_private_make_portfolio(VALUE fmkr, VALUE name, VALUE filename, VALUE fignames)
 {
-    FM *p = Get_FM(fmkr);
+    /*
+    FM *p = Get_FM(fmkr); // not in use
+    */
     FILE *file;
-    VALUE figname;
+    /*
+    VALUE figname; // not in use
+    */
     char *fname;
     int i, len;
     name = rb_String(name);
