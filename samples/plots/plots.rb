@@ -16,6 +16,10 @@ class MyPlots
         
         t.def_eval_function { |str| eval(str) }
         
+        t.def_enter_context_function { puts "enter context" }
+        
+        t.def_exit_context_function { puts "exit context" }
+        
         t.def_enter_show_plot_function { |bounds| 
             puts "enter show_plot #{bounds[0]} #{bounds[1]} #{bounds[2]} #{bounds[3]}" }
         

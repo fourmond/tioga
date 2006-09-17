@@ -181,12 +181,18 @@ class FigureMaker
             'ascent_angle' => 0.0 }
                 
         @eval_command = nil
+
         @enter_show_plot_function = nil
-        @enter_subfigure_function = nil
-        @enter_subplot_function = nil
         @exit_show_plot_function = nil
+
+        @enter_subfigure_function = nil
         @exit_subfigure_function = nil
+
+        @enter_subplot_function = nil
         @exit_subplot_function = nil
+
+        @enter_context_function = nil
+        @exit_context_function = nil
                 
         # default TeX preview page size info
         set_A4_landscape
@@ -621,11 +627,11 @@ class FigureMaker
     end
     
     
-    def trace_cmd(entry_function, exit_function, args, &cmd)
+    def trace_cmd_no_arg(entry_function, exit_function, &cmd)
         
         unless entry_function == nil 
             begin
-                result = entry_function.call(args)
+                result = entry_function.call
             rescue Exception => er
                 report_error(er, nil)
             end
@@ -635,7 +641,30 @@ class FigureMaker
         
         unless exit_function == nil 
             begin
-                result = exit_function.call(args)
+                result = exit_function.call
+            rescue Exception => er
+                report_error(er, nil)
+            end
+        end
+        
+    end
+    
+    
+    def trace_cmd_one_arg(entry_function, exit_function, arg, &cmd)
+        
+        unless entry_function == nil 
+            begin
+                result = entry_function.call(arg)
+            rescue Exception => er
+                report_error(er, nil)
+            end
+        end
+        
+        cmd.call
+        
+        unless exit_function == nil 
+            begin
+                result = exit_function.call(arg)
             rescue Exception => er
                 report_error(er, nil)
             end
@@ -645,7 +674,7 @@ class FigureMaker
     
     
     def show_plot(bounds=nil,&cmd)       
-        trace_cmd(@enter_show_plot_function, @exit_show_plot_function, bounds) {        
+        trace_cmd_one_arg(@enter_show_plot_function, @exit_show_plot_function, bounds) {        
             set_bounds(bounds)
             context { clip_to_frame; cmd.call }
             show_plot_box
@@ -653,13 +682,13 @@ class FigureMaker
     end
     
     def subfigure(margins=nil,&cmd)
-        trace_cmd(@enter_subfigure_function, @exit_subfigure_function, margins) {        
+        trace_cmd_one_arg(@enter_subfigure_function, @exit_subfigure_function, margins) {        
             context { doing_subfigure; set_subframe(margins); cmd.call }
         }      
     end
 
     def subplot(margins=nil,&cmd)
-        trace_cmd(@enter_subplot_function, @exit_subplot_function, margins) {        
+        trace_cmd_one_arg(@enter_subplot_function, @exit_subplot_function, margins) {        
             reset_legend_info
             context { doing_subplot; set_subframe(margins); cmd.call }
         }      
@@ -721,10 +750,13 @@ class FigureMaker
         bottom_margin = bottom_margin + rows_below * (row_width + row_margin)
         return { 'top_margin' => top_margin, 'bottom_margin' => bottom_margin }
     end
-    
-    def context (&cmd)
-        private_context(cmd)
+
+
+    def context(&cmd)
+        trace_cmd_no_arg(@enter_context_function, @exit_context_function) {        
+            private_context(cmd) }      
     end
+
     
     def rescale(factor)
         rescale_text(factor)
@@ -1432,7 +1464,19 @@ class FigureMaker
     
     def reset_enter_show_plot_function
         @enter_show_plot_function = nil
+    end   
+    
+    def def_exit_show_plot_function(&cmd)
+        if cmd == nil
+            raise "Sorry: must provide a command block for def_exit_show_plot_function"
+        end
+        @exit_show_plot_function = cmd
     end
+    
+    def reset_exit_show_plot_function
+        @exit_show_plot_function = nil
+    end
+
     
     
     def def_enter_subfigure_function(&cmd)
@@ -1445,32 +1489,7 @@ class FigureMaker
     def reset_enter_subfigure_function
         @enter_subfigure_function = nil
     end
-    
-    
-    def def_enter_subplot_function(&cmd)
-        if cmd == nil
-            raise "Sorry: must provide a command block for def_enter_subplot_function"
-        end
-        @enter_subplot_function = cmd
-    end
-    
-    def reset_enter_subplot_function
-        @enter_subplot_function = nil
-    end
-    
-    
-    def def_exit_show_plot_function(&cmd)
-        if cmd == nil
-            raise "Sorry: must provide a command block for def_exit_show_plot_function"
-        end
-        @exit_show_plot_function = cmd
-    end
-    
-    def reset_exit_show_plot_function
-        @exit_show_plot_function = nil
-    end
-    
-    
+     
     def def_exit_subfigure_function(&cmd)
         if cmd == nil
             raise "Sorry: must provide a command block for def_exit_subfigure_function"
@@ -1483,6 +1502,17 @@ class FigureMaker
     end
     
     
+    def def_enter_subplot_function(&cmd)
+        if cmd == nil
+            raise "Sorry: must provide a command block for def_enter_subplot_function"
+        end
+        @enter_subplot_function = cmd
+    end
+    
+    def reset_enter_subplot_function
+        @enter_subplot_function = nil
+    end     
+    
     def def_exit_subplot_function(&cmd)
         if cmd == nil
             raise "Sorry: must provide a command block for def_exit_subplot_function"
@@ -1492,6 +1522,29 @@ class FigureMaker
     
     def reset_exit_subplot_function
         @exit_subplot_function = nil
+    end
+    
+    
+    def def_enter_context_function(&cmd)
+        if cmd == nil
+            raise "Sorry: must provide a command block for def_enter_context_function"
+        end
+        @enter_context_function = cmd
+    end
+    
+    def reset_enter_context_function
+        @enter_subplot_context = nil
+    end
+    
+    def def_exit_context_function(&cmd)
+        if cmd == nil
+            raise "Sorry: must provide a command block for def_exit_context_function"
+        end
+        @exit_context_function = cmd
+    end
+    
+    def reset_exit_context_function
+        @exit_subplot_context = nil
     end
     
     
