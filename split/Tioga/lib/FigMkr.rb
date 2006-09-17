@@ -181,6 +181,12 @@ class FigureMaker
             'ascent_angle' => 0.0 }
                 
         @eval_command = nil
+        @enter_show_plot_function = nil
+        @enter_subfigure_function = nil
+        @enter_subplot_function = nil
+        @exit_show_plot_function = nil
+        @exit_subfigure_function = nil
+        @exit_subplot_function = nil
                 
         # default TeX preview page size info
         set_A4_landscape
@@ -614,20 +620,51 @@ class FigureMaker
         private_set_bounds(left, right, top, bottom)
     end
     
-    def show_plot(bounds=nil,&cmd)
-        set_bounds(bounds)
-        context { clip_to_frame; cmd.call }
-        show_plot_box
+    
+    def trace_cmd(entry_function, exit_function, args, &cmd)
+        
+        unless entry_function == nil 
+            begin
+                result = entry_function.call(args)
+            rescue Exception => er
+                report_error(er, nil)
+            end
+        end
+        
+        cmd.call
+        
+        unless exit_function == nil 
+            begin
+                result = exit_function.call(args)
+            rescue Exception => er
+                report_error(er, nil)
+            end
+        end
+        
     end
-
+    
+    
+    def show_plot(bounds=nil,&cmd)       
+        trace_cmd(@enter_show_plot_function, @exit_show_plot_function, bounds) {        
+            set_bounds(bounds)
+            context { clip_to_frame; cmd.call }
+            show_plot_box
+        }      
+    end
+    
     def subfigure(margins=nil,&cmd)
-        context { doing_subfigure; set_subframe(margins); cmd.call }
+        trace_cmd(@enter_subfigure_function, @exit_subfigure_function, margins) {        
+            context { doing_subfigure; set_subframe(margins); cmd.call }
+        }      
     end
 
     def subplot(margins=nil,&cmd)
-        reset_legend_info
-        context { doing_subplot; set_subframe(margins); cmd.call }
+        trace_cmd(@enter_subplot_function, @exit_subplot_function, margins) {        
+            reset_legend_info
+            context { doing_subplot; set_subframe(margins); cmd.call }
+        }      
     end
+    
     
     @@keys_for_column_margins = FigureMaker.make_name_lookup_hash([
         'left_margin', 'right_margin', 'column_margin', 'column',
@@ -1383,6 +1420,80 @@ class FigureMaker
         end
         @eval_command = cmd
     end
+    
+    
+    
+    def def_enter_show_plot_function(&cmd)
+        if cmd == nil
+            raise "Sorry: must provide a command block for def_enter_show_plot_function"
+        end
+        @enter_show_plot_function = cmd
+    end
+    
+    def reset_enter_show_plot_function
+        @enter_show_plot_function = nil
+    end
+    
+    
+    def def_enter_subfigure_function(&cmd)
+        if cmd == nil
+            raise "Sorry: must provide a command block for def_enter_subfigure_function"
+        end
+        @enter_subfigure_function = cmd
+    end
+    
+    def reset_enter_subfigure_function
+        @enter_subfigure_function = nil
+    end
+    
+    
+    def def_enter_subplot_function(&cmd)
+        if cmd == nil
+            raise "Sorry: must provide a command block for def_enter_subplot_function"
+        end
+        @enter_subplot_function = cmd
+    end
+    
+    def reset_enter_subplot_function
+        @enter_subplot_function = nil
+    end
+    
+    
+    def def_exit_show_plot_function(&cmd)
+        if cmd == nil
+            raise "Sorry: must provide a command block for def_exit_show_plot_function"
+        end
+        @exit_show_plot_function = cmd
+    end
+    
+    def reset_exit_show_plot_function
+        @exit_show_plot_function = nil
+    end
+    
+    
+    def def_exit_subfigure_function(&cmd)
+        if cmd == nil
+            raise "Sorry: must provide a command block for def_exit_subfigure_function"
+        end
+        @exit_subfigure_function = cmd
+    end
+    
+    def reset_exit_subfigure_function
+        @exit_subfigure_function = nil
+    end
+    
+    
+    def def_exit_subplot_function(&cmd)
+        if cmd == nil
+            raise "Sorry: must provide a command block for def_exit_subplot_function"
+        end
+        @exit_subplot_function = cmd
+    end
+    
+    def reset_exit_subplot_function
+        @exit_subplot_function = nil
+    end
+    
     
     def eval_function(string)
         result = string
