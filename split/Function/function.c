@@ -165,6 +165,11 @@ static VALUE function_initialize(VALUE self, VALUE x, VALUE y)
   return self;
 }
 
+static VALUE Function_Create(VALUE x, VALUE y)
+{
+  return rb_funcall(cFunction, idNew, 2, x, y);
+}
+
 static int dvector_is_sorted(VALUE dvector)
 {
   long size;
@@ -632,6 +637,69 @@ static VALUE function_strip_nan(VALUE self)
 }
 
 /*
+  Splits the function into monotonic sub-functions.
+  Returns the array of the subfunctions. The returned values are
+  necessarily new values.
+*/
+
+static VALUE function_split_monotonic(VALUE self)
+{
+  VALUE ret = rb_ary_new();
+  VALUE cur_x = Dvector_Create();
+  VALUE cur_y = Dvector_Create();
+
+  long size = function_sanity_check(self);
+  long i;
+  if(size < 2)
+    rb_raise(rb_eRuntimeError, "Function needs to have at least 2 points");
+
+  double *x = Dvector_Data_for_Read(get_x_vector(self),NULL);
+  double *y = Dvector_Data_for_Read(get_y_vector(self),NULL);
+
+  double last_x;
+  double direction; /* -1 if down, +1 if up, so that the product of 
+		       (x - last_x) with direction should always be positive
+		    */
+  VALUE f;
+		     
+		       
+  /* bootstrap */
+  if(x[1] > x[0])
+    direction = 1;
+  else
+    direction = -1;
+  last_x = x[1];
+  for(i = 0; i < 2; i++)
+    {
+      Dvector_Push_Double(cur_x, x[i]);
+      Dvector_Push_Double(cur_y, y[i]);
+    }
+
+  for(i = 2; i < size; i++) 
+    {
+      if(direction * (x[i] - last_x) < 0) 
+	{
+	  /* we need to add a new set of Dvectors */
+	  f = Function_Create(cur_x, cur_y);
+	  rb_ary_push(ret, f);
+	  cur_x = Dvector_Create();
+	  cur_y = Dvector_Create();
+	  Dvector_Push_Double(cur_x, x[i-1]);
+	  Dvector_Push_Double(cur_y, y[i-1]);
+	  direction *= -1;
+	}
+      /* store the current point */
+      Dvector_Push_Double(cur_x, x[i]);
+      Dvector_Push_Double(cur_y, y[i]);
+      last_x = x[i];
+    }
+  f = Function_Create(cur_x, cur_y);
+  rb_ary_push(ret, f);
+  return ret;
+}
+
+
+/*
   Sorts the X values while keeping the matching Y values. 
 */
 static VALUE function_sort(VALUE self)
@@ -730,6 +798,9 @@ void Init_Function()
   /* stripping of NaNs */
   rb_define_method(cFunction, "strip_nan", function_strip_nan, 0);
 
+  /* split into monotonic subfunctions */
+  rb_define_method(cFunction, "split_monotonic", function_split_monotonic, 0);
+
 
 
   rb_require("Dobjects/Function_extras.rb");
@@ -738,8 +809,12 @@ void Init_Function()
   RB_IMPORT_SYMBOL(cDvector, Dvector_Data_for_Read);
   RB_IMPORT_SYMBOL(cDvector, Dvector_Data_for_Write);
   RB_IMPORT_SYMBOL(cDvector, Dvector_Data_Resize);
+  RB_IMPORT_SYMBOL(cDvector, Dvector_Create);
+  RB_IMPORT_SYMBOL(cDvector, Dvector_Push_Double);
 }
 
 IMPLEMENT_SYMBOL(Dvector_Data_for_Read);
 IMPLEMENT_SYMBOL(Dvector_Data_for_Write);
 IMPLEMENT_SYMBOL(Dvector_Data_Resize);
+IMPLEMENT_SYMBOL(Dvector_Create);
+IMPLEMENT_SYMBOL(Dvector_Push_Double);

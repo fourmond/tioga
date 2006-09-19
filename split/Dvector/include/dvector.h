@@ -43,6 +43,8 @@ DECLARE_SYMBOL(double *, Dvector_Data_Replace,
 /* copies the data into the dvector */
 DECLARE_SYMBOL(VALUE, Dvector_Create, (void));
 DECLARE_SYMBOL(void, Dvector_Store_Double, (VALUE ary, long idx, double val));
+/* pushes one element onto the vector */
+DECLARE_SYMBOL(void, Dvector_Push_Double, (VALUE ary, double val));
 
 /* functions for interpolation */
 DECLARE_SYMBOL(double, c_dvector_spline_interpolate,

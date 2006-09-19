@@ -62,6 +62,19 @@ class TestFunction < Test::Unit::TestCase
     assert_equal(f.y, Dvector[2,5])
   end
 
+  def test_monotonic
+    x = Dvector[1,3,2,4,5,6]
+    y = x.dup
+    f = Function.new(x,y)
+    ary = f.split_monotonic
+    assert_equal(ary.size, 3)
+    x = Dvector[1,3]
+    assert_equal(ary[0].x, x)
+    x = Dvector[3,2]
+    assert_equal(ary[1].x, x)
+    x = Dvector[2,4,5,6]
+    assert_equal(ary[2].x, x)
+  end
 
   # There is unfortunately no simple way to test the interpolations...
 end

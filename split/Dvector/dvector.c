@@ -5401,6 +5401,7 @@ void Init_Dvector() {
    RB_EXPORT_SYMBOL(cDvector, Dvector_Data_Replace);
    RB_EXPORT_SYMBOL(cDvector, Dvector_Create);
    RB_EXPORT_SYMBOL(cDvector, Dvector_Store_Double);
+   RB_EXPORT_SYMBOL(cDvector, Dvector_Push_Double);
    RB_EXPORT_SYMBOL(cDvector, c_dvector_spline_interpolate);
    RB_EXPORT_SYMBOL(cDvector, c_dvector_linear_interpolate);
    RB_EXPORT_SYMBOL(cDvector, c_dvector_create_spline_interpolant);
