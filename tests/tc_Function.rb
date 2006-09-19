@@ -51,5 +51,17 @@ class TestFunction < Test::Unit::TestCase
     assert_equal(f.bounds, [1,0.1,4,9])
   end
 
+  def test_strip
+    x = Dvector[1,3,2,4]
+    y = Dvector[2,3,4,5]
+    x[1] = 0.0/0.0
+    y[2] = 0.0/0.0
+    f = Function.new(x,y)
+    assert_equal(f.strip_nan, 2)
+    assert_equal(f.x, Dvector[1,4])
+    assert_equal(f.y, Dvector[2,5])
+  end
+
+
   # There is unfortunately no simple way to test the interpolations...
 end

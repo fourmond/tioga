@@ -281,7 +281,7 @@ static VALUE function_compute_spline_data(VALUE self)
 				  its previous values */
       cache = rb_funcall(cDvector, idNew,
 			 1, LONG2NUM(size));
-  if(DVECTOR_SIZE(y_vec) != size) /* switch to the required size */
+  if(DVECTOR_SIZE(cache) != size) /* switch to the required size for cache */
     Dvector_Data_Resize(cache, size);
 
   /* we make sure that the X values are sorted */
@@ -602,6 +602,36 @@ static VALUE function_interpolate(VALUE self, VALUE x_values)
 }
 
 /*
+  Strips all the points containing NaN values from the function, and
+  returns the number of points stripped.
+*/
+static VALUE function_strip_nan(VALUE self)
+{
+  long size = function_sanity_check(self);
+  long nb_stripped = 0;
+  long i;
+
+  double *x = Dvector_Data_for_Write(get_x_vector(self),NULL);
+  double *y = Dvector_Data_for_Write(get_y_vector(self),NULL);
+  for( i = 0; i < size; i++)
+    {
+      if(isnan(x[i]) || isnan(y[i]))
+	nb_stripped ++;
+      else
+	{
+	  x[i - nb_stripped] = x[i];
+	  y[i - nb_stripped] = y[i];
+	}
+    }
+  if(nb_stripped)
+    {
+      Dvector_Data_Resize(get_x_vector(self), size - nb_stripped);
+      Dvector_Data_Resize(get_y_vector(self), size - nb_stripped);
+    }
+  return INT2NUM(nb_stripped);
+}
+
+/*
   Sorts the X values while keeping the matching Y values. 
 */
 static VALUE function_sort(VALUE self)
@@ -696,6 +726,11 @@ void Init_Function()
   /* iterator */
   rb_define_method(cFunction, "each", 
 		   function_each, 0);
+
+  /* stripping of NaNs */
+  rb_define_method(cFunction, "strip_nan", function_strip_nan, 0);
+
+
 
   rb_require("Dobjects/Function_extras.rb");
 
