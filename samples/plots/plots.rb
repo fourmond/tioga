@@ -13,28 +13,12 @@ class MyPlots
     def initialize
         @figure_maker = FigureMaker.default
         t.save_dir = 'plots_out'
-        
         t.def_eval_function { |str| eval(str) }
         
-        t.def_enter_context_function { puts "enter context" }
-        
-        t.def_exit_context_function { puts "exit context" }
-        
-        t.def_enter_show_plot_function { |bounds| 
-            puts "enter show_plot #{bounds[0]} #{bounds[1]} #{bounds[2]} #{bounds[3]}" }
-        
-        t.def_exit_show_plot_function { |bounds| 
-            puts "exit show_plot #{bounds[0]} #{bounds[1]} #{bounds[2]} #{bounds[3]}" }
-        
-        t.def_enter_subfigure_function { |margins| 
-            puts "enter subfigure #{margins[0]} #{margins[1]} #{margins[2]} #{margins[3]}" }
-        
-        t.def_enter_subplot_function { |margins| 
-            puts "enter subplot #{margins[0]} #{margins[1]} #{margins[2]} #{margins[3]}" }
-
         @data_filename = "data/datalog.data"
         t.auto_refresh_filename = @data_filename
         t.add_model_number = true
+        t.tex_preview_preamble += "\n\\include{color_names}\n"
         
         @image_right_margin = 0.07
         @margin = 0.1

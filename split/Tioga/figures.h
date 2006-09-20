@@ -549,6 +549,11 @@ extern VALUE FM_append_frame_to_path(VALUE fmkr);
 
 extern VALUE FM_update_bbox(VALUE fmkr, VALUE x, VALUE y);
 
+extern VALUE FM_bbox_left(VALUE fmkr);
+extern VALUE FM_bbox_right(VALUE fmkr);
+extern VALUE FM_bbox_top(VALUE fmkr);
+extern VALUE FM_bbox_bottom(VALUE fmkr);
+
 /* Path Consumers */
 
 extern VALUE FM_stroke(VALUE fmkr);  // S

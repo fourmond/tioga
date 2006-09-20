@@ -115,7 +115,7 @@ Aaron Hillegass for his book, {Cocoa Programming for Mac OS X}[http://www.bigner
 
 {Alan Irwin}[http://astrowww.phys.uvic.ca/rsocs/irwin/] and the rest of the PLPLOT[http://plplot.sourceforge.net/] team for support and code.
 
-Joao Cardoso whose pstex driver for PLPLOT gave me the idea for PDF and TeX.
+{Joao Cardoso}[http://paginas.fe.up.pt/~jcard/] whose pstex driver for PLPLOT gave me the idea for PDF and TeX.
 
 Jean-loup Gailly and Mark Adler for zlib[http://www.gzip.org/zlib/] and Flate.
 
@@ -123,7 +123,7 @@ The TeXShop[http://www.uoregon.edu/~koch/texshop/texshop.html] implementors for 
 
 KITP[http://www.itp.ucsb.edu/] and UCSB[http://www.ucsb.edu/] for giving me a place to play.
 
-Kathlyn for being patient as I ranted and raved my way to completion.
+My wife, Kathlyn, for being patient as I ranted and raved my way to completion.
 
 ---
 

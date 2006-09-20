@@ -238,6 +238,29 @@ VALUE FM_update_bbox(VALUE fmkr, VALUE x, VALUE y)
    return fmkr;
 }
 
+
+VALUE FM_bbox_left(VALUE fmkr)
+{
+   return rb_float_new(bbox_llx); 
+}
+
+VALUE FM_bbox_right(VALUE fmkr)
+{
+   return rb_float_new(bbox_urx); 
+}
+
+VALUE FM_bbox_top(VALUE fmkr)
+{
+   return rb_float_new(bbox_ury); 
+}
+
+VALUE FM_bbox_bottom(VALUE fmkr)
+{
+   return rb_float_new(bbox_lly); 
+}
+
+
+
 void c_moveto(FM *p, double x, double y)
 {
    ARE_OK_NUMBERS(x,y);

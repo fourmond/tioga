@@ -432,6 +432,10 @@ void Init_FigureMaker(void) {
    rb_define_method(cFM, "append_oval_to_path", FM_append_oval_to_path, 5);
    rb_define_method(cFM, "append_frame_to_path", FM_append_frame_to_path, 0);
    rb_define_method(cFM, "update_bbox", FM_update_bbox, 2);
+   rb_define_method(cFM, "bbox_left", FM_bbox_left, 0);
+   rb_define_method(cFM, "bbox_right", FM_bbox_right, 0);
+   rb_define_method(cFM, "bbox_top", FM_bbox_top, 0);
+   rb_define_method(cFM, "bbox_bottom", FM_bbox_bottom, 0);
 /* path painting */
    rb_define_method(cFM, "rescale_lines", FM_rescale_lines, 1);
    rb_define_method(cFM, "discard_path", FM_discard_path, 0);
