@@ -65,6 +65,34 @@
 % \renewcommand{\tiogaprefix}{plot_out/}
 
 
+% \tiogafigurecentered{figurename}{targetwidth}{targetheight}
+%
+% \tiogafigurecentered displays an unscaled figure centered within
+% a box of height targetheight. The width is not taken into accound,
+% but is here to help compatibility with other macros. The width will
+% be the line width.
+\newcommand{\tiogafigurecentered}[3]{
+\vbox to #3{%
+\vspace*{\fill}%
+\hbox{%
+\hspace*{\fill}\tiogafigureshow{#1}\hspace*{\fill}}%
+\vspace*{\fill}%
+}}
+
+% \tiogafigurecentereddebug{figurename}{targetwidth}{targetheight}
+%
+% \tiogafigurecentereddebug has the same effect as \tiogafigurecentered
+% except that the figure is included in a \fbox, which makes it easier
+% to track problems.
+\newcommand{\tiogafigurecentereddebug}[3]{
+\vbox to #3{%
+\vspace*{\fill}%
+\hbox{%
+\hspace*{\fill}\fbox{\tiogafigureshow{#1}}\hspace*{\fill}}%
+\vspace*{\fill}%
+}}
+
+
 % \tiogafigureshow{figurename}
 %
 % \tiogafigureshow shows the figure and the accompanying text.

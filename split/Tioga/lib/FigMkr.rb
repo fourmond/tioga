@@ -132,8 +132,10 @@ class FigureMaker
         @tex_preview_documentclass = 'article'
         @tex_preview_preamble = '% start of preview preamble.  
     \usepackage[dvipsnames,usenames]{color} % need this for text colors
-    \usepackage[pdftex]{geometry} % need this for setting page size for preview
 '
+        #     \usepackage[pdftex]{geometry} % need this for setting page size for preview
+        # This has been commented out as it's place lie in the texout.c, for
+        # it's parameters to be set properly...
         @tex_preview_pagestyle = 'empty'
         
         @tex_preview_fullpage = true

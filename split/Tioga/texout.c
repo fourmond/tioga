@@ -240,19 +240,16 @@ void Write_preview_header(VALUE fmkr, FILE *file) {
    fprintf(file, "%s\n", Get_tex_preview_generated_preamble(fmkr));
    fprintf(file, "%% User-specified preamble\n");
    fprintf(file, "%s\n\n", Get_tex_preview_preamble(fmkr));
-   fprintf(file, "%% Set page margins.\n");
-   fprintf(file, "\t\\setlength{\\topmargin}{0pt}\n");
-   fprintf(file, "\t\\setlength{\\headsep}{0pt}\n");
-   fprintf(file, "\t\\setlength{\\topskip}{0pt}\n");
-   fprintf(file, "\t\\setlength{\\headheight}{0pt}\n");
-   fprintf(file, "\t\\setlength{\\oddsidemargin}{0pt}\n");
-   fprintf(file, "\t\\setlength{\\evensidemargin}{0pt}\n");
-   fprintf(file, "\n");
-   fprintf(file, "%% Set page size and orientation.\n");
-   fprintf(file, "\t\\setlength{\\paperwidth}{%s}\n", Get_tex_preview_paper_width(fmkr));
-   fprintf(file, "\t\\setlength{\\paperheight}{%s}\n", Get_tex_preview_paper_height(fmkr));
-   fprintf(file, "\t\\setlength{\\hoffset}{%s}\n", Get_tex_preview_hoffset(fmkr));
-   fprintf(file, "\t\\setlength{\\voffset}{%s}\n", Get_tex_preview_voffset(fmkr));
+   fprintf(file, "%% Set page margins, page size and orientation.\n");
+   fprintf(file, "\t\\usepackage[pdftex,tmargin=0pt,lmargin=0pt,"
+	   "rmargin=0pt,bmargin=0pt,\n");
+   fprintf(file, "\tpaperwidth=%s,paperheight=%s,\n", 
+	   Get_tex_preview_paper_width(fmkr),
+	   Get_tex_preview_paper_height(fmkr));
+   fprintf(file, "\thoffset=%s,voffset=%s\n", 
+	   Get_tex_preview_hoffset(fmkr),
+	   Get_tex_preview_voffset(fmkr));
+   fprintf(file, "\t]{geometry}\n");
 
    fprintf(file, "\n%% We need the graphicx package and the calc package.\n");
    fprintf(file, "\t\\usepackage{graphicx}\n");
