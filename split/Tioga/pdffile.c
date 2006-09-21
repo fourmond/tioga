@@ -261,7 +261,8 @@ void Close_pdf(VALUE fmkr, bool quiet_mode)
    if (bbox_lly < p->page_bottom) bbox_lly = p->page_bottom;
    if (bbox_urx > p->page_left + p->page_width) bbox_urx = p->page_left + p->page_width;
    if (bbox_ury > p->page_bottom + p->page_height) bbox_ury = p->page_bottom + p->page_height;
-#define MARGIN 3
+//#define MARGIN 3
+#define MARGIN 0
    xoff = Get_pdf_xoffset();
    yoff = Get_pdf_yoffset();
    llx = bbox_llx / ENLARGE + xoff - MARGIN;  // convert back to points
