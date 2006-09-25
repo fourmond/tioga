@@ -128,7 +128,7 @@ void Initialize_Figure(VALUE fmkr) {
    c_private_set_default_font_size(p, 12.0);
    c_set_device_pagesize(p, 5 * 72.0 * ENLARGE, 5 * 72.0 * ENLARGE);
    /* default frame */
-   c_set_frame_sides(p, 0.2, 0.8, 0.8, 0.2);
+   c_set_frame_sides(p, 0.15, 0.85, 0.85, 0.15);
    /* default bounds */
    p->bounds_left = p->bounds_bottom = p->bounds_xmin = p->bounds_ymin = 0;
    p->bounds_right = p->bounds_top = p->bounds_xmax = p->bounds_ymax = 1;

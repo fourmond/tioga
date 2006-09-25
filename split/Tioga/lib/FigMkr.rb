@@ -146,12 +146,12 @@ class FigureMaker
         @tex_preview_figure_height = '\paperheight - 2in'
         
         @num_error_lines = 6
-
-        @tex_xoffset = -0.2
-        @tex_yoffset = -3.55
         
-        @tex_preview_hoffset = '0in'
-        @tex_preview_voffset = '0in'
+        @tex_xoffset = 0
+        @tex_yoffset = 0
+        
+        @tex_preview_hoffset = '1in'
+        @tex_preview_voffset = '1in'
         
         @tex_preview_fontsize = '10.0'  
         @tex_preview_fontfamily = 'rmdefault'
@@ -200,7 +200,7 @@ class FigureMaker
         set_A4_landscape
 
         @plot_box_command = lambda { show_plot_box }
-
+        
     end
 
     def initialize        
@@ -215,6 +215,28 @@ class FigureMaker
         private_set_default_font_size(size)
         return unless update_preview_size_string == true
         self.tex_preview_fontsize = sprintf("%0.2fbp", size)
+    end
+
+    def page_setup(width,height) # in big-points (1/72 inch)
+        set_device_pagesize(width*10-1, height*10-1)
+        self.tex_preview_figure_width = width.to_s + 'bp'
+        self.tex_preview_figure_height = height.to_s + 'bp'
+        self.tex_preview_paper_height = "#{height}bp"
+        self.tex_preview_paper_width = "#{width}bp"
+        self.tex_preview_tiogafigure_command = 'tiogafigureshow'
+        self.tex_preview_fullpage = false
+        self.tex_xoffset = 0
+        self.tex_yoffset = 0
+        self.tex_preview_hoffset = '0in'
+        self.tex_preview_voffset = '0in'
+        set_frame_sides(0,1,1,0)
+        set_bounds(
+            'left_boundary' => 0, 'right_boundary' => 1, 
+            'top_boundary' => 1, 'bottom_boundary' => 0)
+        self.update_bbox(0,0)
+        self.update_bbox(0,1)
+        self.update_bbox(1,0)
+        self.update_bbox(1,1)
     end
     
     def set_A4_landscape
