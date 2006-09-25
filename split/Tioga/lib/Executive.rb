@@ -44,6 +44,17 @@ class Executive < Doc < FigureMaker
     def make_preview_pdf(num)
     end
 
+
+# :call-seq:
+#   figure_index(name)
+#
+# Returns the index of the given figure; useful to pass on to
+# make_preview_pdf
+
+
+    def figure_index(name)
+    end
+
 # :call-seq:
 #   reset_state
 #

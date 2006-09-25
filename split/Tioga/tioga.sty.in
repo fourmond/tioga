@@ -68,14 +68,13 @@
 % \tiogafigurecentered{figurename}{targetwidth}{targetheight}
 %
 % \tiogafigurecentered displays an unscaled figure centered within
-% a box of height targetheight. The width is not taken into accound,
-% but is here to help compatibility with other macros. The width will
-% be the line width.
+% a box of targetwidth *targetheight.
 \newcommand{\tiogafigurecentered}[3]{
 \vbox to #3{%
 \vspace*{\fill}%
-\hbox{%
-\hspace*{\fill}\tiogafigureshow{#1}\hspace*{\fill}}%
+\hbox to #2{\hfill%
+\tiogafigureshow{#1}%
+\hspace*{\fill}}%
 \vspace*{\fill}%
 }}
 
@@ -87,8 +86,9 @@
 \newcommand{\tiogafigurecentereddebug}[3]{
 \vbox to #3{%
 \vspace*{\fill}%
-\hbox{%
-\hspace*{\fill}\fbox{\tiogafigureshow{#1}}\hspace*{\fill}}%
+\hbox to #2{\hfill%
+\fbox{\tiogafigureshow{#1}}
+\hspace*{\fill}}%
 \vspace*{\fill}%
 }}
 

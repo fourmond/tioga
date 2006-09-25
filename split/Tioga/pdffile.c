@@ -269,6 +269,8 @@ void Close_pdf(VALUE fmkr, bool quiet_mode)
    lly = bbox_lly / ENLARGE + yoff - MARGIN;
    urx = bbox_urx / ENLARGE + xoff + MARGIN;
    ury = bbox_ury / ENLARGE + yoff + MARGIN;
+   fprintf(stderr, "writing PDF media box %lf %lf\n",
+	   Get_tex_xoffset(fmkr), Get_tex_yoffset(fmkr));
    if (urx < llx || ury < lly) rb_raise(rb_eArgError, "Sorry: Empty plot!");
    fprintf(OF, "%d %d %d %d", ROUND(llx), ROUND(lly), ROUND(urx), ROUND(ury));
    fprintf(OF, " ]\n/Contents %i 0 R\n/Resources << /ProcSet [/PDF /Text /ImageB /ImageC /ImageI]\n", STREAM_OBJ);

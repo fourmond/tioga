@@ -1631,6 +1631,10 @@ class FigureMaker
         end
         return true
     end
+
+    def figure_index(name)
+        return @figure_names.index(name)
+    end
     
     def make_preview_pdf(num)
         ensure_safe_save_dir
