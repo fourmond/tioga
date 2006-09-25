@@ -99,14 +99,11 @@
 % Inside a box, it first creates a picture that includes the pdf
 % file with the graphics for the figure, then it includes the text.
 % The \tiogaprefix is added at the start of the file names for both.
-\newcommand{\tiogafigureshow}[1]{
-  \rotatebox{0.0}{
-    \begin{picture}(0,0)(0,0)
-      \includegraphics[scale=1.0,clip]{\tiogaprefix#1_figure.pdf}
-    \end{picture}
+\newcommand{\tiogafigureshow}[1]{%
+  \mbox{\begin{picture}(0,0)(0,0)%
+      \put(0,0){\includegraphics{\tiogaprefix#1_figure.pdf}}%
+    \end{picture}%
     \input{\tiogaprefix#1_figure.txt}}}
-
-
 
 % Commands for text properties:
 % Font size (two parameters)

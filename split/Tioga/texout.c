@@ -254,6 +254,9 @@ void Write_preview_header(VALUE fmkr, FILE *file) {
    fprintf(file, "\n%% We need the graphicx package and the calc package.\n");
    fprintf(file, "\t\\usepackage{graphicx}\n");
    fprintf(file, "\t\\usepackage{calc}\n\n");
+   fprintf(file, "\t%% This is necessary to avoid getting the picture on the second page\n");
+   fprintf(file, "\t\\topskip=0pt\n\n");
+
    /* now, the commands to customize the font used */
    fprintf(file, "\\settiogafontsize[10pt]{%s}\n", Get_tex_preview_fontsize(fmkr));
    fprintf(file, "\\settiogafontfamily{\\%s}\n", Get_tex_preview_fontfamily(fmkr));
