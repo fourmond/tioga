@@ -617,16 +617,21 @@ module Mkmf2
       MAKEFILE_CONFIG["RUBYARCHLIB_INSTALL_DIR"] = 
         "$(sitearchdir)"
 
-      # For the include directory, the strategy to use is far less clear.
-      # I propose to strip the last two directories
-      # from MAKEFILE_CONFIG["sitelibdir"] and append 
-      # 'include' then. Whether this is a good idea, I don't know.
+      # To make the base directory for installation, I propose
+      # to strip all the directories containing ruby from the
+      # $(sitedir) directory and strip one more directory.
 
-      basedir = File.dirname(File.dirname(MAKEFILE_CONFIG["sitedir"]))
+      basedir = MAKEFILE_CONFIG["sitedir"]
+      while File.basename(basedir) =~ /ruby/
+        basedir = File.dirname(basedir)
+      end
+      # Strip one more:
+      basedir = File.dirname(basedir)
+      MAKEFILE_CONFIG["basedir"] = basedir
       MAKEFILE_CONFIG["INCLUDE_INSTALL_DIR"] = 
-        File.join(basedir,"include")
+        "$(basedir)/include"
       MAKEFILE_CONFIG["EXEC_INSTALL_DIR"] = 
-        File.join(basedir,"bin")
+        "$(basedir)/bin"
     end
 
   end
@@ -1117,7 +1122,6 @@ module Mkmf2
     clean = {}
     vars = []
 
-    setup_model
 
 
     for entity in @@entities
@@ -1505,6 +1509,7 @@ EOM
   def mkmf2_init
     check_missing_features
     parse_cmdline
+    setup_model
     config_to_global
   end
 
