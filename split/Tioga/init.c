@@ -29,7 +29,7 @@ ID tex_preview_paper_width_ID, tex_preview_paper_height_ID;
 ID tex_preview_hoffset_ID, tex_preview_voffset_ID;
 ID tex_preview_figure_width_ID, tex_preview_figure_height_ID, tex_preview_tiogafigure_command_ID;
 ID tex_preview_fullpage_ID, tex_preview_minwhitespace_ID;
-ID do_cmd_ID, initialized_ID, tex_xoffset_ID, tex_yoffset_ID;
+ID do_cmd_ID, make_page_ID, initialized_ID, tex_xoffset_ID, tex_yoffset_ID;
 ID tex_preview_fontsize_ID, tex_preview_fontfamily_ID, tex_preview_fontseries_ID, tex_preview_fontshape_ID;
 
 void Init_IDs(void)
@@ -38,6 +38,7 @@ void Init_IDs(void)
    rb_Numeric_class = rb_define_class("Numeric", rb_cObject);
    rb_Integer_class = rb_define_class("Integer", rb_Numeric_class);
 	do_cmd_ID = rb_intern("do_cmd");
+	make_page_ID = rb_intern("make_page");
    // class variables
 	initialized_ID = rb_intern("@@initialized");
 	// instance variables
@@ -522,7 +523,8 @@ VALUE FM_private_make(VALUE fmkr, VALUE name, VALUE cmd) {
    Write_gsave();
    p->root_figure = true;
    p->in_subplot = false;
-   result = rb_funcall(fmkr, do_cmd_ID, 1, cmd);
+   result = rb_funcall(fmkr, make_page_ID, 1, cmd);
+//   result = rb_funcall(fmkr, do_cmd_ID, 1, cmd);
    Write_grestore();
    if (result == Qfalse) quiet = true;
    Close_pdf(fmkr, quiet);

@@ -195,6 +195,9 @@ class FigureMaker
 
         @enter_context_function = nil
         @exit_context_function = nil
+
+        @enter_page_function = nil
+        @exit_page_function = nil
                 
         # default TeX preview page size info
         set_A4_landscape
@@ -655,21 +658,23 @@ class FigureMaker
         
         unless entry_function == nil 
             begin
-                result = entry_function.call
+                entry_function.call
             rescue Exception => er
                 report_error(er, nil)
             end
         end
         
-        cmd.call
+        result = cmd.call
         
         unless exit_function == nil 
             begin
-                result = exit_function.call
+                exit_function.call
             rescue Exception => er
                 report_error(er, nil)
             end
         end
+        
+        return result
         
     end
     
@@ -678,21 +683,23 @@ class FigureMaker
         
         unless entry_function == nil 
             begin
-                result = entry_function.call(arg)
+                entry_function.call(arg)
             rescue Exception => er
                 report_error(er, nil)
             end
         end
         
-        cmd.call
+        result = cmd.call
         
         unless exit_function == nil 
             begin
-                result = exit_function.call(arg)
+                exit_function.call(arg)
             rescue Exception => er
                 report_error(er, nil)
             end
         end
+        
+        return result
         
     end
     
@@ -1466,6 +1473,7 @@ class FigureMaker
         show_rotated_text(text, loc, shift, position, scale, angle, just, align)
     end
     
+    
     def reset_eval_function
         @eval_command = nil
     end
@@ -1475,6 +1483,30 @@ class FigureMaker
             raise "Sorry: must provide a command block for def_eval"
         end
         @eval_command = cmd
+    end
+    
+    
+    
+    def def_enter_page_function(&cmd)
+        if cmd == nil
+            raise "Sorry: must provide a command block for def_enter_page_function"
+        end
+        @enter_page_function = cmd
+    end
+    
+    def reset_enter_page_function
+        @enter_page_function = nil
+    end   
+    
+    def def_exit_page_function(&cmd)
+        if cmd == nil
+            raise "Sorry: must provide a command block for def_exit_page_function"
+        end
+        @exit_page_function = cmd
+    end
+    
+    def reset_exit_page_function
+        @exit_page_function = nil
     end
     
     
@@ -1839,6 +1871,29 @@ class FigureMaker
         end
     end
     
+
+    def make_page(cmd)  # the C implementation uses this to call figure command
+        entry_function = @enter_page_function
+        exit_function = @exit_page_function
+        unless entry_function == nil 
+            begin
+                entry_result = entry_function.call
+            rescue Exception => er
+                report_error(er, nil)
+            end
+        end       
+        result = do_cmd(cmd)       
+        unless result == false or exit_function == nil 
+            begin
+                exit_result = exit_function.call
+            rescue Exception => er
+                report_error(er, nil)
+            end
+        end       
+        return result
+    end
+
+
     def do_cmd(cmd)  # the C implementation uses this to call Ruby commands
         begin
             cmd.call
