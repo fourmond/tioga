@@ -5031,8 +5031,8 @@ VALUE dvector_load(VALUE klass, VALUE str)
   return ret;
 }
 
-/* Returns the boundaries of a Dvector, that is [min, max]. It deals
-   correctly with NaN but will complain if the Dvector contains only NaN.
+/* Returns the boundaries of a Dvector, that is [min, max]. It ignores
+   NaN and will complain if the Dvector contains only NaN.
    
     v = Dvector[0.0/0.0, 0.0/0.0, 1,2,4,5,9,0.0/0.0,0.1]
     v.bounds -> [0.1, 9]
@@ -5071,6 +5071,57 @@ static VALUE dvector_bounds(VALUE self)
     rb_raise(rb_eRuntimeError, 
 	     "bounds called on an array containing only NaN");
   return Qnil;
+}
+
+/*
+  :call-seq:
+    vector.convolve(kernel, middle)
+
+  convolve applies a simple convolution to the vector using kernel centered
+  at the point middle. 
+*/
+
+static VALUE dvector_convolve(VALUE self, VALUE kernel, VALUE middle)
+{
+  long len;
+  const double * values = Dvector_Data_for_Read(self, &len);
+  VALUE retval = dvector_new2(len,len);
+  double * ret = Dvector_Data_for_Write(retval,NULL);
+  long kernel_len;
+  const double * ker = Dvector_Data_for_Read(kernel, &kernel_len);
+  long mid = NUM2LONG(middle);
+  if(mid > kernel_len)
+    rb_raise(rb_eArgError, "middle should be within kernel's range");
+  else
+    {
+      long i,j,k;
+      for(i = 0; i < len; i++) 
+	{
+	  double sum = 0, k_sum = 0;
+	  for(j = 0; j < kernel_len; j++) 
+	    {
+	      /* check that we are within the vector */
+	      k = i - mid + j; 	/* The current index inside the vector */
+	      /* This code is equivalent to saying that the vector is
+		 prolongated until infinity with values at the boundaries
+		 -> no, obnoxious, I think. Simply don't take care
+		 of these points
+		 -> yes, finally ?
+	      */
+	      if( k < 0)
+/* 		continue; */
+		k = 0;
+	      if( k >= len)
+/* 		continue; */
+		k = len - 1;
+	      sum += ker[j] * values[k];
+	      k_sum += ker[j];
+	    }
+	  sum/= k_sum;
+	  ret[i] = sum;
+	}
+    }
+  return retval;
 }
 
 /* 
@@ -5380,6 +5431,9 @@ void Init_Dvector() {
    /* dvector marshalling */
    rb_define_method(cDvector, "_dump", dvector_dump, 1);
    rb_define_singleton_method(cDvector, "_load", dvector_load, 1);
+
+   /* simple convolution */
+   rb_define_method(cDvector,"convolve", dvector_convolve, 2);
 
    dvector_output_fs = Qnil;
    rb_global_variable(&dvector_output_fs);
