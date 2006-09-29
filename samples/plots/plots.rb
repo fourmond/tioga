@@ -59,7 +59,14 @@ class MyPlots
         @sampled_data_plot = t.def_figure("Sampled_Data") { sampled_data }
         @samples_with_contours_plot = t.def_figure("Contours") { samples_with_contours }
         t.model_number = -1
+        
+        t.def_enter_page_function { enter_page }
             
+    end
+    
+    def enter_page
+        t.page_setup(11*72/2,8.5*72/2)
+        t.set_frame_sides(0.15,0.85,0.85,0.15) # left, right, top, bottom in page coords        
     end
     
     def read_data
@@ -127,7 +134,6 @@ class MyPlots
         ys = @reds
         t.xaxis_log_values = true
         t.yaxis_log_values = true
-        t.xaxis_number_of_minor_intervals = 1
         t.show_plot(plot_boundaries(xs,ys,@margin,-1,1)) { t.show_polyline(xs,ys,Red) }
     end
     
@@ -353,8 +359,8 @@ class MyPlots
         read_data
         show_model_number
         t.rescale(0.6)
-        t.subplot('bottom_margin' => 0.55, 'left_margin' => 0.15, 'right_margin' => 0.15) { rows }
-        t.subplot('top_margin' => 0.55) { side_by_side }
+        t.subplot('bottom_margin' => 0.6, 'left_margin' => 0.15, 'right_margin' => 0.15) { rows }
+        t.subplot('top_margin' => 0.60) { side_by_side }
     end
     
     def collage
@@ -383,7 +389,7 @@ class MyPlots
     def special_y
         read_data
         show_model_number
-        t.ylabel_shift += 2
+        t.ylabel_shift += 1.2
         t.do_box_labels('Special Y Axis', 'Position', "Y Values")
         t.yaxis_numeric_label_angle = -90
         t.yaxis_locations_for_major_ticks = [ -10.0, -6.0, -PI, 0.0, PI, 6.0, 10.0 ]
