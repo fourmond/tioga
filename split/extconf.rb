@@ -27,8 +27,14 @@ end
 
 # We declare Tioga by hand, as an automatic generation would not
 # take lib/TexPreamble.rb into accound (missing).
-declare_library("Tioga", "Tioga/lib/**/*.rb", 
+declare_library("Tioga", 
+                "Tioga/lib/ColorConstants.rb",
+                "Tioga/lib/FigMkr.rb",
+                "Tioga/lib/FigureConstants.rb",
+                "Tioga/lib/MarkerConstants.rb",
+                "Tioga/lib/Utils.rb",
                 "Tioga/lib/TexPreamble.rb")
+
 declare_binary_library("Tioga/FigureMaker", 
                        "Tioga/**/*.c", "symbols.c")
 

@@ -291,7 +291,7 @@ module Mkmf2
         file = File.join(install_path,f)
         install << file
         source << k
-        dirs << File.dirname(file)
+        dirs << File.dirname(file) + "/"
       end
       dirs.uniq! 
       ret["#{@name.upcase}_INSTALL_FILES"] = 
@@ -669,6 +669,9 @@ module Mkmf2
   def Mkmf2.register_name(name)
     # first, transform all that is not letter into underscore
     name.gsub!(/[^a-zA-Z]/,'_')
+    # pretty-print a bit
+    name.gsub!(/^_|_$/,'')
+    name.gsub!(/_+/, '_')
     name.downcase!
     # then, increment the number
     if @@registered_names[name]
@@ -899,6 +902,9 @@ module Mkmf2
                           " -c $< #{CONFIG["OUTFLAG"]} $@" 
                           ) 
     end 
+    # A simple rule for making directories:
+    rules << MfRule.new("%/",
+                        Mkmf2.config_join("MAKEDIRS") + " $@")
     return rules
   end 
 
@@ -1154,12 +1160,13 @@ module Mkmf2
 
 
     # First, the variables in use:
+    f.puts "# Configurations variables, from rbconfig.rb"
     f.puts output_config_variables
 
     # build has to be the first target so that simply
     # invoking make does the building, but not the installing.
     # now, the main rules
-    f.puts "# main rules"
+    f.puts "\n\n# main rules"
     # we force the dependence on build for install so that
     # ruby library files don't get installed before the c code is
     # compiled...
@@ -1183,29 +1190,28 @@ EOR
     # Phony targets:
     f.puts ".PHONY: build install uninstall"
 
-    f.puts "# Common rules:"
+    f.puts "\n\n# Common rules:"
     common.each {|v|
       f.print v.to_s
     }
 
-    f.puts ""
     
     # We write the variables:
-    f.puts "# entities-dependent variables"
+    f.puts "\n\n# entities-dependent variables"
     for v in vars 
       v.each do |k,v|
         f.print "#{k}=#{v}\n"
       end
     end
 
-    f.puts "# Rules to make directories"
+    f.puts "\n\n# Rules to make directories"
 
     # directory rules
     for rule in dir_rules
       f.print rule.to_s
     end
 
-    f.puts "# entities-dependent rules"
+    f.puts "\n\n# entities-dependent rules"
     # We write the rules
     for rule in (install['rules'] + 
                  uninstall['rules'] +
@@ -1214,7 +1220,7 @@ EOR
     end
 
     if @@user_rules.length > 0
-      f.puts "\n# User-defined rules"
+      f.puts "\n\n# User-defined rules"
       for rule in @@user_rules
         f.puts rule.to_s
       end
