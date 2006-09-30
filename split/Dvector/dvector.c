@@ -5078,7 +5078,7 @@ static VALUE dvector_bounds(VALUE self)
     vector.convolve(kernel, middle)
 
   convolve applies a simple convolution to the vector using kernel centered
-  at the point middle. 
+  at the point middle. (0 is the leftmost point of the kernel).
 */
 
 static VALUE dvector_convolve(VALUE self, VALUE kernel, VALUE middle)
@@ -5089,6 +5089,7 @@ static VALUE dvector_convolve(VALUE self, VALUE kernel, VALUE middle)
   double * ret = Dvector_Data_for_Write(retval,NULL);
   long kernel_len;
   const double * ker = Dvector_Data_for_Read(kernel, &kernel_len);
+  /* I guess */
   long mid = NUM2LONG(middle);
   if(mid > kernel_len)
     rb_raise(rb_eArgError, "middle should be within kernel's range");

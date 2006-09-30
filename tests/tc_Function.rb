@@ -76,5 +76,15 @@ class TestFunction < Test::Unit::TestCase
     assert_equal(ary[2].x, x)
   end
 
+  def test_integrate
+    x = Dvector[1,2,4]
+    y = Dvector[0,1,2]
+    f = Function.new(x,y)
+    # integral should be 0.5 + 1.5 * 2
+    assert_equal(f.integrate, 3.5)
+    assert_equal(f.integrate(0,1), 0.5)
+    assert_equal(f.integrate(1,2), 3)
+  end
+
   # There is unfortunately no simple way to test the interpolations...
 end

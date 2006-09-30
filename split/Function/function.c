@@ -744,6 +744,89 @@ static void init_IDs()
   idNew = rb_intern("new");
 }
 
+
+/* a smaller helper for the following function */
+#define DISTANCE(x,y) (((x) - xpoint) * ((x) - xpoint) /xscale/xscale \
++ ((y) - ypoint) * ((y) - ypoint) /yscale/yscale)
+
+/*
+  Returns the distance of a point to the function, computed by the minimum
+  of ((x - xpoint)/xscale)**2 + ((y - ypoint)/yscale)**2. If index
+  is not NULL, it receives the index of the point of minimum distance.
+*/
+static double private_function_distance(VALUE self, 
+					double xpoint, double ypoint,
+					double xscale, double yscale,
+					long * dest_index)
+{
+  long size = function_sanity_check(self);
+  const double *x = Dvector_Data_for_Read(get_x_vector(self),NULL);
+  const double *y = Dvector_Data_for_Read(get_y_vector(self),NULL);
+  double min = DISTANCE(x[0],y[0]);
+  double cur;
+  long index = 0;
+  long i;
+  for(i = 1; i < size; i++)
+    {
+      cur = DISTANCE(x[i], y[i]);
+      if(cur < min)
+	{
+	  index = i;
+	  min = cur;
+	}
+    }
+  if(dest_index)
+    *dest_index = index;
+  return min;
+}
+
+
+/*
+  Code for integration.
+*/
+static double private_function_integrate(VALUE self, long start, long end)
+{
+  long size = function_sanity_check(self);
+  const double *x = Dvector_Data_for_Read(get_x_vector(self),NULL);
+  const double *y = Dvector_Data_for_Read(get_y_vector(self),NULL);
+  long i = start;
+  double val = 0;
+  while(i < (end))
+    {
+      val += (y[i] + y[i+1]) * (x[i+1] - x[i]) * 0.5;
+      i++;
+    }
+  return val;
+}
+
+/*
+  :call-seq:
+    f.integrate()  -> value
+    f.integrate(start_index, end_index) -> value
+
+  Returns the value of the integral of the function between the
+  two indexes given, or over the whole function if no indexes are
+  specified.
+*/
+static VALUE function_integrate(int argc, VALUE *argv, VALUE self)
+{
+  long start,end;
+  switch(argc) 
+    {
+    case 0:
+      start = 0;
+      end = function_sanity_check(self) - 1; 
+      break;
+    case 2:
+      start = NUM2LONG(argv[0]);
+      end = NUM2LONG(argv[1]);
+      break;
+    default:
+      rb_raise(rb_eArgError, "integrate should have 0 or 2 parameters");
+    }
+  return rb_float_new(private_function_integrate(self,start,end));
+}
+
 /*
   Document-class: Dobjects::Function
 
@@ -755,6 +838,11 @@ static void init_IDs()
   - to check if X data is sorted: #sorted?, #is_sorted;
   - interpolation, with #compute_spline, #compute_spline_data and #interpolate;
   - some functions for data access : #x, #y, #point;
+  - some utiliy functions: #split_monotonic, #strip_nan;
+  - data inspection: #min, #max;
+  - some computationnal functions: #integrate.
+
+  And getting bigger everyday...
  */ 
 void Init_Function() 
 {
@@ -801,8 +889,11 @@ void Init_Function()
   /* split into monotonic subfunctions */
   rb_define_method(cFunction, "split_monotonic", function_split_monotonic, 0);
 
+  /* integration between two integer boundaries */
+  rb_define_method(cFunction, "integrate", function_integrate, -1);
 
 
+  /* a few more methods better written in pure Ruby */
   rb_require("Dobjects/Function_extras.rb");
 
   /* now, we import the necessary symbols from Dvector */

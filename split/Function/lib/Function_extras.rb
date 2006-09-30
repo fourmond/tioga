@@ -29,5 +29,16 @@ module Dobjects
       ymin,ymax = y.bounds
       return [xmin, ymin, xmax, ymax]
     end
+
+    # Returns the point where Y is the minimum
+    def min
+      return point(y.where_min)
+    end
+
+    # Returns the point where Y is the maximum
+    def max
+      return point(y.where_max)
+    end
+
   end
 end
