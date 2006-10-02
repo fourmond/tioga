@@ -25,6 +25,7 @@ split/Dvector/dvector.c
 split/Dvector/lib/Dvector_extras.rb
 split/Dtable/dtable.c
 split/Function/function.c
+split/Function/lib/Function_extras.rb
 split/Flate/flate.c
 split/Tioga/lib/Doc.rb
 tutorial/tioga_doc.rb

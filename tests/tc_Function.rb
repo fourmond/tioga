@@ -86,5 +86,23 @@ class TestFunction < Test::Unit::TestCase
     assert_equal(f.integrate(1,2), 3)
   end
 
+  def test_length
+    x = Dvector[1,2,4]
+    y = Dvector[0,1,2]
+    f = Function.new(x,y)
+    assert_equal(f.size, 3)
+    assert_equal(f.length, 3)
+  end
+
+  def test_distance
+    f = Function.new(Dvector[0],Dvector[0])
+    assert_equal(f.distance(3,4), 5.0)
+    f = Function.new(Dvector[0,1],Dvector[0,1])
+    assert_equal(f.distance(1,1), 0.0)
+    assert_equal(f.distance(0,1), 1.0)
+    assert_equal(f.distance(1,0), 1.0)
+    assert_equal(f.distance(1,0), 1.0)
+  end
+
   # There is unfortunately no simple way to test the interpolations...
 end

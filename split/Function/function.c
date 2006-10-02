@@ -777,7 +777,40 @@ static double private_function_distance(VALUE self,
     }
   if(dest_index)
     *dest_index = index;
-  return min;
+  return sqrt(min);
+}
+
+/*
+  call-seq:
+    f.distance(x,y) -> a_number
+    f.distance(x,y, xscale, yscale) -> a_number
+  
+  Returns the distance of the function to the given point. Optionnal
+  xscale and yscale says by how much we should divide the x and y
+  coordinates before computing the distance. Use it if the distance is not
+  homogeneous.
+*/
+
+static VALUE function_distance(int argc, VALUE *argv, VALUE self)
+{
+  switch(argc)
+    {
+    case 2:
+      return rb_float_new(private_function_distance(self, 
+						    NUM2DBL(argv[0]),
+						    NUM2DBL(argv[1]),
+						    1.0,1.0,NULL));
+    case 4:
+      return rb_float_new(private_function_distance(self, 
+						    NUM2DBL(argv[0]),
+						    NUM2DBL(argv[1]),
+						    NUM2DBL(argv[2]),
+						    NUM2DBL(argv[3]),
+						    NULL));
+    default:
+      rb_raise(rb_eArgError, "distance should have 2 or 4 parameters");
+    }
+  return Qnil;
 }
 
 
@@ -791,6 +824,10 @@ static double private_function_integrate(VALUE self, long start, long end)
   const double *y = Dvector_Data_for_Read(get_y_vector(self),NULL);
   long i = start;
   double val = 0;
+  if(end >= size)
+    end = size - 1;
+  if(start < 0)
+    start = 0;
   while(i < (end))
     {
       val += (y[i] + y[i+1]) * (x[i+1] - x[i]) * 0.5;
@@ -825,6 +862,15 @@ static VALUE function_integrate(int argc, VALUE *argv, VALUE self)
       rb_raise(rb_eArgError, "integrate should have 0 or 2 parameters");
     }
   return rb_float_new(private_function_integrate(self,start,end));
+}
+
+/*
+  Returns the number of points inside the function.
+*/
+static VALUE function_size(VALUE self)
+{
+  long size = function_sanity_check(self);
+  return LONG2NUM(size);
 }
 
 /*
@@ -877,6 +923,10 @@ void Init_Function()
   rb_define_method(cFunction, "point", function_point, 1);
   rb_define_method(cFunction, "x", get_x_vector, 0);
   rb_define_method(cFunction, "y", get_y_vector, 0);
+
+
+  rb_define_method(cFunction, "size", function_size, 0);
+  rb_define_alias(cFunction,  "length", "size");
 		   
 
   /* iterator */
@@ -891,6 +941,9 @@ void Init_Function()
 
   /* integration between two integer boundaries */
   rb_define_method(cFunction, "integrate", function_integrate, -1);
+
+  /* distance to a point */
+  rb_define_method(cFunction, "distance", function_distance, -1);
 
 
   /* a few more methods better written in pure Ruby */
