@@ -2,25 +2,33 @@
 
 require './mkmf2.rb'
 
+# Now, if you want to install the include file, you need to
+# set the EXTCONF_RB_INCLUDE
+if ENV.key?("EXTCONF_RB_INCLUDE")
+  include = ENV["EXTCONF_RB_INCLUDE"]
+else
+  include = nil
+end
+
 # install Dvector include and library files into base dirs,
 # and builds Dvector.so
 setup_dir("Dvector", "Dobjects", 
-          "Dobjects/Dvector", "") do |l,b,i|
+          "Dobjects/Dvector", include) do |l,b,i|
   b.add_sources("symbols.c")
 end
 # the same for Dtable
 setup_dir("Dtable", "Dobjects", 
-          "Dobjects/Dtable", "") do |l,b,i|
+          "Dobjects/Dtable", include) do |l,b,i|
   b.add_sources("symbols.c")
 end
 
-setup_dir("Flate", "", "Flate", "") do |l,b,i|
+setup_dir("Flate", "", "Flate", include) do |l,b,i|
   b.add_sources("symbols.c")
 end
 
 
 setup_dir("Function", "Dobjects", 
-          "Dobjects/Function", "") do |l,b,i|
+          "Dobjects/Function", include) do |l,b,i|
   b.add_sources("symbols.c")
 end
 
