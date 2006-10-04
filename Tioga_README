@@ -21,6 +21,8 @@ This is the README for the Tioga kernel, version 1.1.3, July 23, 2006.
 
 << What's new >>
 
+	Version 1.2.1 is as usual a bug-fix release fixing some installation problems...
+
 	Version 1.2.0 brings in a lot of new features. First and most important, we came up with a
 proper design for a real-size scheme. Now, you can use the page_setup function to ask Tioga to
 produce a preview PDF of the exact size requested, so that you can include the PDF directly in

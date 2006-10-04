@@ -1,3 +1,9 @@
+tioga (1.2.1)
+
+  * Bug fixing for extconf.rb (important, isn't it ?)
+
+ -- Vincent Fourmond <vincent.fourmond@9online.fr>, Wed Oct  4 21:43:42 CEST 2006
+
 tioga (1.2.0)
 
   * newer mkmf2
