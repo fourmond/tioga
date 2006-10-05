@@ -73,6 +73,12 @@ class ZAMSPlots
         @side_by_side_margin = 0.5
         @mass_points = [ 0.1, 0.3, 1.0, 3.0, 10.0, 100.0 ]
         @labels = [ "0.1", "0.3", "1", "3", "10", "100" ]
+        t.def_enter_page_function { enter_page }    
+    end
+    
+    def enter_page
+        t.page_setup(11*72/2,8.5*72/2)
+        t.set_frame_sides(0.15,0.85,0.85,0.15) # left, right, top, bottom in page coords        
     end
     
     def show_box_labels(title, xlabel=nil, ylabel=nil)
@@ -88,7 +94,6 @@ class ZAMSPlots
     end
     
     def zams_fancy
-        t.set_portrait
         star_types = [ # spectral types as [ typename, effective T, T string ]
             [ 'O5', 40e3, '40' ],
             [ 'B0', 28e3, '28' ],
@@ -136,7 +141,7 @@ class ZAMSPlots
         t.xlabel = 'Spectral Type'
         t.ylabel = 'Luminosity ($L_{\odot}$)'
         t.yaxis_tick_interval = 2
-        t.rescale(0.7)
+        t.rescale(0.9)
         t.show_plot(bounds) do
             t.axial_shading('start_point' => [xright, ytop], 'end_point' => [xleft, ytop], 
                 'colormap' => t.create_colormap(
@@ -218,7 +223,7 @@ class ZAMSPlots
     end
     
     def plot_H_R
-        t.rescale(0.7)
+        t.rescale(0.9)
         t.title = 'Zero-Age Main Sequence'
         t.xlabel = 'log Surface Temp'
         t.ylabel = 'log Luminosity'
@@ -239,7 +244,7 @@ class ZAMSPlots
     end
     
     def plot_T_RHO
-        t.rescale(0.7)
+        t.rescale(0.9)
         t.title = 'Zero-Age Main Sequence'
         t.xlabel = 'log Center Density'
         t.ylabel = 'log Center Temp'
@@ -259,8 +264,8 @@ class ZAMSPlots
     end
     
     def zams_BOTH
-        t.rescale(0.6)
-        bottom_margin = 0.5
+        t.rescale(0.7)
+        bottom_margin = 0.1
         t.context do
             t.set_subframe('right_margin' => @plot_with_legend_right_margin)
             t.show_title('Zero-Age Main Sequence')
@@ -283,7 +288,7 @@ class ZAMSPlots
     end
     
     def plot_convection
-        t.rescale(0.7)
+        t.rescale(0.9)
         t.title = 'Main Convection Zone'
         t.xlabel = 'Mass ($M_{\odot}$)'
         t.ylabel = 'Location (by fraction of total mass)'
@@ -365,7 +370,7 @@ class ZAMSPlots
     end
     
     def plots1
-        t.rescale(0.7)
+        t.rescale(0.9)
         t.show_title('Luminosity, Temperature, Density')
         t.no_title
         num_plots = 4; row = 1
@@ -433,7 +438,7 @@ class ZAMSPlots
     end
     
     def plots2
-        t.rescale(0.7)
+        t.rescale(0.9)
         t.show_title('Radius, Power, Opacity, Nuclear Timescale')
         t.no_title
         num_plots = 4; row = 1

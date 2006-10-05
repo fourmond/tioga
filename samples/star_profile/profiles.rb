@@ -71,6 +71,12 @@ class ProfilePlots
         @temp_vec1 = Dvector.new
         @temp_vec2 = Dvector.new
         
+        t.def_enter_page_function { enter_page }    
+    end
+    
+    def enter_page
+        t.page_setup(11*72/2,8.5*72/2)
+        t.set_frame_sides(0.15,0.85,0.85,0.15) # left, right, top, bottom in page coords        
     end
     
     def background

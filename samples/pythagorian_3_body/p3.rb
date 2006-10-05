@@ -39,6 +39,12 @@ class Pythagorian_3_body
         @section_length = 1 # in time units
         @weight = 0.5 # default line weight for non-movie plots
         @scale = 0.8
+        t.def_enter_page_function { enter_page }    
+    end
+    
+    def enter_page
+        t.page_setup(11*72/2,8.5*72/2)
+        t.set_frame_sides(0.15,0.85,0.85,0.15) # left, right, top, bottom in page coords        
     end
     
     def set_style

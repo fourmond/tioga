@@ -35,7 +35,12 @@ class StarHistory
         @track_start_param =  0.1 # fractional way from 1st to 2nd profiles
         @track_end_param = 0.0 # fractional way from last to next to last profiles
         t.def_eval_function { |str| eval(str) }
-        return self
+        t.def_enter_page_function { enter_page }    
+    end
+    
+    def enter_page
+        t.page_setup(11*72/2,8.5*72/2)
+        t.set_frame_sides(0.15,0.85,0.85,0.15) # left, right, top, bottom in page coords        
     end
     
     def read_PSIs(path = nil)

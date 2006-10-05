@@ -53,15 +53,14 @@ class MyFigures
         
         hues
         
-                        
-        if false
-            file = File.open('color_names.tex', 'w')
-            @color_list.each do |name|
-                clr = eval(name)
-                file.printf("\\definecolor{%s}{rgb}{%0.3f,%0.3f,%0.3f}\n", name, clr[0], clr[1], clr[2])
-            end
-            file.close
-        end
+        t.def_enter_page_function { enter_page }
+            
+    end
+    
+    def enter_page
+        sz = 8.5
+        t.page_setup(sz*72/2,sz*72/2)
+        t.set_frame_sides(0.15,0.85,0.85,0.15) # left, right, top, bottom in page coords        
     end
     
     def hues
@@ -422,7 +421,7 @@ class MyFigures
         t.stroke_color = Black
         t.line_width = 8 
         t.stroke_frame
-        angle = 60; size = 3; shift = -1.3
+        angle = 60; size = 3.5; shift = -1.3
         t.show_text('text' => '\sffamily\textbf{Ruby}', 'side' => BOTTOM, 'pos' => 0.27, 'shift' => shift,
             'scale' => size, 'angle' => angle)
         t.show_text('text' => '\sffamily\textbf{PDF}', 'side' => BOTTOM, 'pos' => 0.58, 'shift' => shift,
