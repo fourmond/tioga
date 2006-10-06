@@ -7,6 +7,12 @@ require 'test/unit'
 class TestDvector < Test::Unit::TestCase
     include Dobjects
     
+    def test_read_nasty_fortran_data
+        row = Dvector.read_row("dvector_read_test.data")
+        assert_equal(4, row.size)
+        assert_equal(1.0, row[-1])
+    end
+    
     def test_vector_length
         a = Dvector[3.0, 4.0]
         assert_equal(a.vector_length, 5.0)

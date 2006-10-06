@@ -4387,10 +4387,12 @@ VALUE Read_Dvectors(char *filename, VALUE destinations, int first_row_of_file, i
          buff[buff_loc] = ' ';
          // rewrite to use strtod instead of fscanf to deal with numbers from fortran like 0.501-129 for 0.501E-129
          v = strtod(num_str,&pend);
+         
          if (pend != buff+buff_loc) {
             if (pend[0] == '+' || pend[0] == '-') { // insert 'E' and try again
                 pend[5] = ' '; pend[4] = pend[3]; pend[3] = pend[2]; pend[2] = pend[1]; pend[1] = pend[0]; pend[0] = 'E';
                 v = strtod(num_str,&pend);
+                buff_loc = pend - buff;
             }
          }
          
@@ -4497,6 +4499,7 @@ VALUE Read_Rows_of_Dvectors(char *filename, VALUE destinations, int first_row_of
             if (pend[0] == '+' || pend[0] == '-') { // insert 'E' and try again
                 pend[5] = ' '; pend[4] = pend[3]; pend[3] = pend[2]; pend[2] = pend[1]; pend[1] = pend[0]; pend[0] = 'E';
                 v = strtod(num_str,&pend);
+                buff_loc = pend - buff;
             }
          }
 
@@ -4583,6 +4586,7 @@ VALUE Read_Row(char *filename, int row, VALUE row_ary) {
           if (pend[0] == '+' || pend[0] == '-') { // insert 'E' and try again
             pend[5] = ' '; pend[4] = pend[3]; pend[3] = pend[2]; pend[2] = pend[1]; pend[1] = pend[0]; pend[0] = 'E';
             v = strtod(num_str,&pend);
+            buff_loc = pend - buff;
           }
       }
 
