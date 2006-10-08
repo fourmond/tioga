@@ -4316,7 +4316,7 @@ VALUE Read_Dvectors(char *filename, VALUE destinations, int first_row_of_file, i
    double v;
    int last_row_of_file;
    const int buff_len = 10000;
-   char buff[buff_len], *num_str, *pend;
+   char buff[buff_len], *num_str, *pend, c, *cptr;
    int num_cols = 0, i, row, col, buff_loc, skip = first_row_of_file - 1;
    last_row_of_file = (number_of_rows == -1)? -1 : first_row_of_file + number_of_rows - 1;
    if ((last_row_of_file != -1 && last_row_of_file < first_row_of_file) || filename == NULL) return false;
@@ -4389,11 +4389,17 @@ VALUE Read_Dvectors(char *filename, VALUE destinations, int first_row_of_file, i
          v = strtod(num_str,&pend);
          
          if (pend != buff+buff_loc) {
-            if (pend[0] == '+' || pend[0] == '-') { // insert 'E' and try again
-                pend[5] = ' '; pend[4] = pend[3]; pend[3] = pend[2]; pend[2] = pend[1]; pend[1] = pend[0]; pend[0] = 'E';
-                v = strtod(num_str,&pend);
-                buff_loc = pend - buff;
+         if (pend != buff+buff_loc) {
+            if ((buff+buff_loc - pend >= 4) && (pend[0] == '+' || pend[0] == '-')) { // insert 'E' and try again
+                cptr = pend+5; c = *cptr; pend[5] = ' '; pend[4] = pend[3]; pend[3] = pend[2]; 
+                pend[2] = pend[1]; pend[1] = pend[0]; pend[0] = 'E';
+                v = strtod(num_str,&pend); *cptr = c; buff_loc = pend - buff;
+            } else {
+                fclose(file);
+                pend[0] = 0;
+                rb_raise(rb_eArgError, "ERROR: unreadable value in file %s in line %i: %s", filename, i , buff+buff_loc);
             }
+         }
          }
          
          if (!is_okay_number(v)) {
@@ -4448,8 +4454,8 @@ VALUE Read_Rows_of_Dvectors(char *filename, VALUE destinations, int first_row_of
    Dvector *d;
    double v, *row_data;
    const int buff_len = 10000;
-   char buff[buff_len], *num_str, *pend;
-   int num_rows = 0, i, row, col, buff_loc, skip = first_row_of_file - 1;
+   char buff[buff_len], *num_str, *pend, c, *cptr;
+   int num_rows = 0, i, row, col, buff_loc, c_loc, skip = first_row_of_file - 1;
    rows_obj = rb_Array(destinations);
    num_rows = RARRAY(rows_obj)->len;
    rows_ptr = RARRAY(rows_obj)->ptr;
@@ -4496,10 +4502,14 @@ VALUE Read_Rows_of_Dvectors(char *filename, VALUE destinations, int first_row_of
          // use strtod instead of fscanf to deal with numbers from fortran like 0.501-129 for 0.501E-129
          v = strtod(num_str,&pend);
          if (pend != buff+buff_loc) {
-            if (pend[0] == '+' || pend[0] == '-') { // insert 'E' and try again
-                pend[5] = ' '; pend[4] = pend[3]; pend[3] = pend[2]; pend[2] = pend[1]; pend[1] = pend[0]; pend[0] = 'E';
-                v = strtod(num_str,&pend);
-                buff_loc = pend - buff;
+            if ((buff+buff_loc - pend >= 4) && (pend[0] == '+' || pend[0] == '-')) { // insert 'E' and try again
+                cptr = pend+5; c = *cptr; pend[5] = ' '; pend[4] = pend[3]; pend[3] = pend[2]; 
+                pend[2] = pend[1]; pend[1] = pend[0]; pend[0] = 'E';
+                v = strtod(num_str,&pend); *cptr = c; buff_loc = pend - buff;
+            } else {
+                fclose(file);
+                pend[0] = 0;
+                rb_raise(rb_eArgError, "ERROR: unreadable value in file %s in line %i: %s", filename, i , buff+buff_loc);
             }
          }
 
@@ -4549,7 +4559,7 @@ PRIVATE
 VALUE Read_Row(char *filename, int row, VALUE row_ary) {
    FILE *file = NULL;
    const int buff_len = 10000;
-   char buff[buff_len], *num_str, *pend;
+   char buff[buff_len], *num_str, *pend, c, *cptr;
    int i, col, buff_loc;
    double v;
    if (row <= 0) {
@@ -4583,11 +4593,17 @@ VALUE Read_Row(char *filename, int row, VALUE row_ary) {
       // rewrite to use strtod instead of fscanf to deal with numbers from fortran like 0.501-129 for 0.501E-129
       v = strtod(num_str,&pend);
       if (pend != buff+buff_loc) {
-          if (pend[0] == '+' || pend[0] == '-') { // insert 'E' and try again
-            pend[5] = ' '; pend[4] = pend[3]; pend[3] = pend[2]; pend[2] = pend[1]; pend[1] = pend[0]; pend[0] = 'E';
-            v = strtod(num_str,&pend);
-            buff_loc = pend - buff;
-          }
+         if (pend != buff+buff_loc) {
+            if ((buff+buff_loc - pend >= 4) && (pend[0] == '+' || pend[0] == '-')) { // insert 'E' and try again
+                cptr = pend+5; c = *cptr; pend[5] = ' '; pend[4] = pend[3]; pend[3] = pend[2]; 
+                pend[2] = pend[1]; pend[1] = pend[0]; pend[0] = 'E';
+                v = strtod(num_str,&pend); *cptr = c; buff_loc = pend - buff;
+            } else {
+                fclose(file);
+                pend[0] = 0;
+                rb_raise(rb_eArgError, "ERROR: unreadable value in file %s in line %i: %s", filename, i , buff+buff_loc);
+            }
+         }
       }
 
       if (!is_okay_number(v)) {
