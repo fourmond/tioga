@@ -1749,10 +1749,26 @@ class FigureMaker
             end
         end
         if result
-            pdfname = "#{name}.pdf"
+            
+            pdfname = "#{name}"
+            
+            logname = "pdflatex.log"
+            texname = pdfname + ".tex"
+            figure_logname = pdfname + ".log"
+            figure_txtname = pdfname + "_figure.txt"
+            figure_pdfname = pdfname + "_figure.pdf"
+            begin
+                syscmd = "rm -f *.aux" + " " + logname + " " + texname  + " " + figure_logname 
+                syscmd = syscmd + " " + figure_txtname + " " + figure_pdfname 
+                syscmd = "cd #{@save_dir}; " + syscmd if @save_dir != nil
+                puts "#{syscmd}" unless (quiet)
+                result = system(syscmd)
+            rescue Exception => er
+            end
+
             pdfname = "#{@save_dir}/#{pdfname}" if @save_dir != nil
             pdfname = "#{run_directory}/#{pdfname}" if run_directory != nil && pdfname[0..0] != '/'
-            return pdfname
+            return pdfname + ".pdf"
         end
         return false
     end
