@@ -81,8 +81,6 @@ Dictionary Entries
 Examples
 
     def math_typesetting
-        t.landscape
-        background
         centerx = t.bounds_xmin + 0.5 * t.bounds_width
         equation =
             '\int_{-\infty}^{\infty} e^{\color{Red}-x^{2}}\, ' +
@@ -150,8 +148,6 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Math_Typesetting.jpg
 http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Strings.jpg
 
     def minipages
-        t.landscape
-        background
         centerx = t.bounds_xmin + 0.5 * t.bounds_width
         t.show_text(
             'text' => 'Examples using paragraph boxes',
@@ -178,8 +174,6 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Strings.jpg
 http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Minipages.jpg
 
     def framebox
-        t.landscape
-        background
         centerx = t.bounds_xmin + 0.5 * t.bounds_width
         t.justification = CENTERED
         t.show_text(

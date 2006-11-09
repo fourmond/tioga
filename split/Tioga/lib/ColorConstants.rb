@@ -13,8 +13,8 @@ module Tioga
 # By the way, if you want to use color_names.tex, but don't want copies of it scattered around, you can
 # put it in a directory that is on the LaTeX search path.  Check your system for details.  On Linux, I believe
 # you can "export" the path to TEXINPUTS.  On the Mac, you can try putting the file in ~/Library/texmf/tex/latex.
-# Then add the needed line to your preview TeX files by doing this in your initialize method for the plots:
-#       t.tex_preview_preamble += "\n\\include{color_names}\n"
+# Then add the needed line to your TeX files by doing this in your initialize method for the plots:
+#       t.tex_preamble += "\n\\include{color_names}\n"
 #
 # In addition to the list of predefined color names, there is a table below giving a small sample of each color.
 #

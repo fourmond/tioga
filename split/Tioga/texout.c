@@ -239,7 +239,7 @@ void Write_preview_header(VALUE fmkr, FILE *file) {
    fprintf(file, "%% Tioga preamble generated from tioga.sty.in\n");
    fprintf(file, "%s\n", Get_tex_preview_generated_preamble(fmkr));
    fprintf(file, "%% User-specified preamble\n");
-   fprintf(file, "%s\n\n", Get_tex_preview_preamble(fmkr));
+   fprintf(file, "%s\n\n", Get_tex_preamble(fmkr));
    fprintf(file, "%% Set page margins, page size and orientation.\n");
    fprintf(file, "\t\\usepackage[pdftex,tmargin=0pt,lmargin=0pt,"
 	   "rmargin=0pt,bmargin=0pt,\n");
@@ -258,10 +258,10 @@ void Write_preview_header(VALUE fmkr, FILE *file) {
    fprintf(file, "\t\\topskip=0pt\n\n");
 
    /* now, the commands to customize the font used */
-   fprintf(file, "\\settiogafontsize[10pt]{%s}\n", Get_tex_preview_fontsize(fmkr));
-   fprintf(file, "\\settiogafontfamily{\\%s}\n", Get_tex_preview_fontfamily(fmkr));
-   fprintf(file, "\\settiogafontseries{\\%s}\n", Get_tex_preview_fontseries(fmkr));
-   fprintf(file, "\\settiogafontshape{\\%s}\n", Get_tex_preview_fontshape(fmkr));
+   fprintf(file, "\\settiogafontsize[10pt]{%s}\n", Get_tex_fontsize(fmkr));
+   fprintf(file, "\\settiogafontfamily{\\%s}\n", Get_tex_fontfamily(fmkr));
+   fprintf(file, "\\settiogafontseries{\\%s}\n", Get_tex_fontseries(fmkr));
+   fprintf(file, "\\settiogafontshape{\\%s}\n", Get_tex_fontshape(fmkr));
 }
 
 

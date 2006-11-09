@@ -24,13 +24,13 @@
 
 VALUE rb_Integer_class, rb_Numeric_class;
 ID save_dir_ID, model_number_ID, add_model_number_ID, quiet_mode_ID;
-ID tex_preview_documentclass_ID, tex_preview_preamble_ID, tex_preview_pagestyle_ID;
+ID tex_preview_documentclass_ID, tex_preamble_ID, tex_preview_pagestyle_ID;
 ID tex_preview_paper_width_ID, tex_preview_paper_height_ID;
 ID tex_preview_hoffset_ID, tex_preview_voffset_ID;
 ID tex_preview_figure_width_ID, tex_preview_figure_height_ID, tex_preview_tiogafigure_command_ID;
 ID tex_preview_fullpage_ID, tex_preview_minwhitespace_ID;
 ID do_cmd_ID, make_page_ID, initialized_ID, tex_xoffset_ID, tex_yoffset_ID;
-ID tex_preview_fontsize_ID, tex_preview_fontfamily_ID, tex_preview_fontseries_ID, tex_preview_fontshape_ID;
+ID tex_fontsize_ID, tex_fontfamily_ID, tex_fontseries_ID, tex_fontshape_ID;
 
 void Init_IDs(void)
 {
@@ -49,7 +49,7 @@ void Init_IDs(void)
 	tex_xoffset_ID = rb_intern("@tex_xoffset");
 	tex_yoffset_ID = rb_intern("@tex_yoffset");
     tex_preview_documentclass_ID = rb_intern("@tex_preview_documentclass");
-    tex_preview_preamble_ID = rb_intern("@tex_preview_preamble");
+    tex_preamble_ID = rb_intern("@tex_preamble");
     tex_preview_pagestyle_ID = rb_intern("@tex_preview_pagestyle");
     
     tex_preview_paper_width_ID = rb_intern("@tex_preview_paper_width");
@@ -64,10 +64,10 @@ void Init_IDs(void)
 
     tex_preview_tiogafigure_command_ID = rb_intern("@tex_preview_tiogafigure_command");
     
-    tex_preview_fontsize_ID = rb_intern("@tex_preview_fontsize");
-    tex_preview_fontfamily_ID = rb_intern("@tex_preview_fontfamily");
-    tex_preview_fontseries_ID = rb_intern("@tex_preview_fontseries");
-    tex_preview_fontshape_ID = rb_intern("@tex_preview_fontshape");
+    tex_fontsize_ID = rb_intern("@tex_fontsize");
+    tex_fontfamily_ID = rb_intern("@tex_fontfamily");
+    tex_fontseries_ID = rb_intern("@tex_fontseries");
+    tex_fontshape_ID = rb_intern("@tex_fontshape");
 }
 
 void c_set_device_pagesize(FM *p, double width, double height) { // sizes in units of 1/720 inch
@@ -355,26 +355,26 @@ char *Get_tex_preview_figure_height(VALUE fmkr) {
 }
 
 
-char *Get_tex_preview_fontsize(VALUE fmkr) {
-   VALUE v = rb_ivar_get(fmkr, tex_preview_fontsize_ID);
+char *Get_tex_fontsize(VALUE fmkr) {
+   VALUE v = rb_ivar_get(fmkr, tex_fontsize_ID);
    if (v == Qnil) return NULL;
    return StringValuePtr(v);
 }
 
-char *Get_tex_preview_fontfamily(VALUE fmkr) {
-   VALUE v = rb_ivar_get(fmkr, tex_preview_fontfamily_ID);
+char *Get_tex_fontfamily(VALUE fmkr) {
+   VALUE v = rb_ivar_get(fmkr, tex_fontfamily_ID);
    if (v == Qnil) return NULL;
    return StringValuePtr(v);
 }
 
-char *Get_tex_preview_fontseries(VALUE fmkr) {
-   VALUE v = rb_ivar_get(fmkr, tex_preview_fontseries_ID);
+char *Get_tex_fontseries(VALUE fmkr) {
+   VALUE v = rb_ivar_get(fmkr, tex_fontseries_ID);
    if (v == Qnil) return NULL;
    return StringValuePtr(v);
 }
 
-char *Get_tex_preview_fontshape(VALUE fmkr) {
-   VALUE v = rb_ivar_get(fmkr, tex_preview_fontshape_ID);
+char *Get_tex_fontshape(VALUE fmkr) {
+   VALUE v = rb_ivar_get(fmkr, tex_fontshape_ID);
    if (v == Qnil) return NULL;
    return StringValuePtr(v);
 }
@@ -415,8 +415,8 @@ char *Get_tex_preview_documentclass(VALUE fmkr) {
    return StringValuePtr(v);
 }
 
-char *Get_tex_preview_preamble(VALUE fmkr) {
-   VALUE v = rb_ivar_get(fmkr, tex_preview_preamble_ID);
+char *Get_tex_preamble(VALUE fmkr) {
+   VALUE v = rb_ivar_get(fmkr, tex_preamble_ID);
    if (v == Qnil) return NULL;
    return StringValuePtr(v);
 }

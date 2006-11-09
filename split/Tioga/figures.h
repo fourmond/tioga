@@ -766,7 +766,7 @@ extern void draw_box_left_and_right(FM *p, char *yopt, double ytick, int nysub);
 extern VALUE do_cmd(VALUE fmkr, VALUE cmd);
 
 extern char *Get_tex_preview_documentclass(VALUE fmkr);
-extern char *Get_tex_preview_preamble(VALUE fmkr);
+extern char *Get_tex_preamble(VALUE fmkr);
 extern char *Get_tex_preview_pagestyle(VALUE fmkr);
 extern double Get_tex_xoffset(VALUE fmkr);
 extern double Get_tex_yoffset(VALUE fmkr);
@@ -782,10 +782,10 @@ extern bool Get_tex_preview_fullpage(VALUE fmkr);
 
 extern char *Get_tex_preview_tiogafigure_command(VALUE fmkr);
 
-extern char *Get_tex_preview_fontsize(VALUE fmkr);
-extern char *Get_tex_preview_fontfamily(VALUE fmkr);
-extern char *Get_tex_preview_fontseries(VALUE fmkr);
-extern char *Get_tex_preview_fontshape(VALUE fmkr);
+extern char *Get_tex_fontsize(VALUE fmkr);
+extern char *Get_tex_fontfamily(VALUE fmkr);
+extern char *Get_tex_fontseries(VALUE fmkr);
+extern char *Get_tex_fontshape(VALUE fmkr);
 
 extern char *Get_tex_preview_generated_preamble(VALUE fmkr);
 

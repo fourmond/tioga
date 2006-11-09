@@ -86,27 +86,25 @@ class FigureMaker
     
     attr_accessor :marker_defaults
     
-    attr_accessor :tex_preview_documentclass
+    attr_accessor :tex_preamble
     
-    attr_accessor :tex_preview_preamble
-    
-    attr_accessor :tex_preview_fontsize    
-    attr_accessor :tex_preview_fontfamily    
-    attr_accessor :tex_preview_fontseries    
-    attr_accessor :tex_preview_fontshape
-    
-    attr_accessor :tex_preview_pagestyle
-    attr_accessor :tex_preview_tiogafigure_command
-    
-    attr_accessor :tex_xoffset
-    attr_accessor :tex_yoffset
+    attr_accessor :tex_fontsize    
+    attr_accessor :tex_fontfamily    
+    attr_accessor :tex_fontseries    
+    attr_accessor :tex_fontshape
     
     attr_accessor :num_error_lines
-
-    attr_accessor :tex_preview_paper_width, :tex_preview_paper_height
-    attr_accessor :tex_preview_hoffset, :tex_preview_voffset
-    attr_accessor :tex_preview_figure_width, :tex_preview_figure_height
-    attr_accessor :tex_preview_minwhitespace, :tex_preview_fullpage
+    
+    # old preview attributes -- to be removed later
+    #attr_accessor :tex_preview_documentclass   
+    #attr_accessor :tex_preview_pagestyle
+    #attr_accessor :tex_preview_tiogafigure_command  
+    #attr_accessor :tex_xoffset
+    #attr_accessor :tex_yoffset
+    #attr_accessor :tex_preview_paper_width, :tex_preview_paper_height
+    #attr_accessor :tex_preview_hoffset, :tex_preview_voffset
+    #attr_accessor :tex_preview_figure_width, :tex_preview_figure_height
+    #attr_accessor :tex_preview_minwhitespace, :tex_preview_fullpage
 
     # Whether or not to create +save_dir+ if it doesn't exist
     attr_accessor :create_save_dir
@@ -130,7 +128,7 @@ class FigureMaker
         @need_to_reload_data = true
         @add_model_number = false
         @tex_preview_documentclass = 'article'
-        @tex_preview_preamble = '% start of preview preamble.  
+        @tex_preamble = '% start of preamble.  
     \usepackage[dvipsnames,usenames]{color} % need this for text colors
 '
         #     \usepackage[pdftex]{geometry} % need this for setting page size for preview
@@ -153,10 +151,10 @@ class FigureMaker
         @tex_preview_hoffset = '1in'
         @tex_preview_voffset = '1in'
         
-        @tex_preview_fontsize = '10.0'  
-        @tex_preview_fontfamily = 'rmdefault'
-        @tex_preview_fontseries = 'mddefault'
-        @tex_preview_fontshape = 'updefault'
+        @tex_fontsize = '10.0'  
+        @tex_fontfamily = 'rmdefault'
+        @tex_fontseries = 'mddefault'
+        @tex_fontshape = 'updefault'
 
         @legend_defaults = { 
             'legend_top_margin' => 0.03,
@@ -199,8 +197,8 @@ class FigureMaker
         @enter_page_function = nil
         @exit_page_function = nil
                 
-        # default TeX preview page size info
-        set_A4_landscape
+        @tex_preview_paper_width = '297mm'
+        @tex_preview_paper_height = '210mm'
 
         @plot_box_command = lambda { show_plot_box }
         
@@ -217,21 +215,21 @@ class FigureMaker
     def set_default_font_size(size, update_preview_size_string = true)
         private_set_default_font_size(size)
         return unless update_preview_size_string == true
-        self.tex_preview_fontsize = sprintf("%0.2fbp", size)
+        @tex_preview_fontsize = sprintf("%0.2fbp", size)
     end
 
     def page_setup(width,height) # in big-points (1/72 inch)
         set_device_pagesize(width*10-1, height*10-1)
-        self.tex_preview_figure_width = width.to_s + 'bp'
-        self.tex_preview_figure_height = height.to_s + 'bp'
-        self.tex_preview_paper_height = "#{height}bp"
-        self.tex_preview_paper_width = "#{width}bp"
-        self.tex_preview_tiogafigure_command = 'tiogafigureshow'
-        self.tex_preview_fullpage = false
-        self.tex_xoffset = 0
-        self.tex_yoffset = 0
-        self.tex_preview_hoffset = '0in'
-        self.tex_preview_voffset = '0in'
+        @tex_preview_figure_width = width.to_s + 'bp'
+        @tex_preview_figure_height = height.to_s + 'bp'
+        @tex_preview_paper_height = "#{height}bp"
+        @tex_preview_paper_width = "#{width}bp"
+        @tex_preview_tiogafigure_command = 'tiogafigureshow'
+        @tex_preview_fullpage = false
+        @tex_xoffset = 0
+        @tex_yoffset = 0
+        @tex_preview_hoffset = '0in'
+        @tex_preview_voffset = '0in'
         set_frame_sides(0,1,1,0)
         set_bounds(
             'left_boundary' => 0, 'right_boundary' => 1, 
@@ -242,72 +240,13 @@ class FigureMaker
         self.update_bbox(1,1)
     end
     
-    def set_A4_landscape
-        self.tex_preview_paper_width = '297mm'
-        self.tex_preview_paper_height = '210mm'
-    end
-     
-    def set_A4_portrait
-        self.tex_preview_paper_width = '210mm'
-        self.tex_preview_paper_height = '297mm'
-    end
-
-    
-    def set_A5_landscape
-        self.tex_preview_paper_width = '210mm'
-        self.tex_preview_paper_height = '148mm'
-    end
-
-    def set_A5_portrait
-        self.tex_preview_paper_width = '148mm'
-        self.tex_preview_paper_height = '210mm'
-    end
-
-    
-    def set_B5_landscape
-        self.tex_preview_paper_width = '250mm'
-        self.tex_preview_paper_height = '176mm'
-    end
-
-    def set_B5_portrait
-        self.tex_preview_paper_width = '176mm'
-        self.tex_preview_paper_height = '250mm'
-    end
-
-    
-    def set_JB5_landscape
-        self.tex_preview_paper_width = '256mm'
-        self.tex_preview_paper_height = '182mm'
-    end
-
-    def set_JB5_portrait
-        self.tex_preview_paper_width = '182mm'
-        self.tex_preview_paper_height = '257mm'
-    end
-
-    
-    def set_USLetter_landscape
-        self.tex_preview_paper_width = '11in'
-        self.tex_preview_paper_height = '8.5in'
-    end
-     
-    def set_USLetter_portrait
-        self.tex_preview_paper_width = '8.5in'
-        self.tex_preview_paper_height = '11in'
-    end
-   
-     
-    def set_USLegal_portrait
-        self.tex_preview_paper_width = '8.5in'
-        self.tex_preview_paper_height = '14in'
+    def tex_preview_preamble # for backward compatibility
+        self.tex_preamble
     end
     
-    def set_USLegal_landscape
-        self.tex_preview_paper_width = '14in'
-        self.tex_preview_paper_height = '8.5in'
+    def tex_preview_preamble=(str)
+        self.tex_preamble = str
     end
-
-    
 
     def figure_name(num)
         @figure_names[num]
@@ -587,14 +526,6 @@ class FigureMaker
         set_portrait
     end
 
-    def set_golden_ratio
-        set_aspect_ratio(1.618034)
-    end
-    
-    def golden_ratio
-        set_golden_ratio
-    end
-    
     @@keys_for_set_subframe = FigureMaker.make_name_lookup_hash(['margins',
         'left_margin', 'right_margin', 'top_margin', 'bottom_margin',
         'left', 'right', 'plot_left_margin', 'top', 'bottom' ])
@@ -1636,26 +1567,6 @@ class FigureMaker
         return cmd
     end
     
-    def make_figure(name)
-        if name.kind_of?(Integer)
-            num = name
-            name = @figure_names[num]
-        else
-            num = @figure_names.index(name)
-        end
-        return false if num == nil
-        cmd = @figure_commands[num]
-        return false unless cmd.kind_of?(Proc)
-        begin
-            reset_legend_info
-            result = private_make(name, cmd)
-            return result
-        rescue Exception => er
-            report_error(er, "ERROR while executing command: #{cmd}")
-        end
-        return false
-    end
-    
     def make_portfolio_pdf(name=nil)
         ensure_safe_save_dir
         if !(name.kind_of?String)
@@ -1690,7 +1601,35 @@ class FigureMaker
         return @figure_names.index(name)
     end
     
-    def make_preview_pdf(num)
+    def create_figure(name)
+        if name.kind_of?(Integer)
+            num = name
+            name = @figure_names[num]
+        else
+            num = @figure_names.index(name)
+        end
+        return false if num == nil
+        cmd = @figure_commands[num]
+        return false unless cmd.kind_of?(Proc)
+        begin
+            reset_legend_info
+            result = private_make(name, cmd)
+            return result
+        rescue Exception => er
+            report_error(er, "ERROR while executing command: #{cmd}")
+        end
+        return false
+    end
+
+    def make_figure(num)
+        make_pdf(num)
+    end
+
+    def make_preview_pdf(num) # old name
+        make_pdf(num)
+    end
+    
+    def make_pdf(num)
         ensure_safe_save_dir
         run_directory = @run_dir; pdflatex = @which_pdflatex; quiet = @quiet_mode
         num = num.to_i
@@ -1702,7 +1641,7 @@ class FigureMaker
         else
             name = @figure_names[num]
             begin
-                result = make_figure(num)
+                result = create_figure(num)
                 name = get_save_filename(name) # must be done after making the figure to get correct model_number
             rescue Exception => er
                 report_error(er, "ERROR: make failed for #{name}")
@@ -1749,23 +1688,19 @@ class FigureMaker
             end
         end
         if result
-            
             pdfname = "#{name}"
-            
             logname = "pdflatex.log"
             texname = pdfname + ".tex"
             figure_logname = pdfname + ".log"
             figure_txtname = pdfname + "_figure.txt"
             figure_pdfname = pdfname + "_figure.pdf"
             begin
-                syscmd = "rm -f *.aux" + " " + logname + " " + texname  + " " + figure_logname 
+                syscmd = "rm -f color_names.aux" + " " + logname + " " + texname  + " " + figure_logname 
                 syscmd = syscmd + " " + figure_txtname + " " + figure_pdfname 
                 syscmd = "cd #{@save_dir}; " + syscmd if @save_dir != nil
-                puts "#{syscmd}" unless (quiet)
                 result = system(syscmd)
             rescue Exception => er
             end
-
             pdfname = "#{@save_dir}/#{pdfname}" if @save_dir != nil
             pdfname = "#{run_directory}/#{pdfname}" if run_directory != nil && pdfname[0..0] != '/'
             return pdfname + ".pdf"

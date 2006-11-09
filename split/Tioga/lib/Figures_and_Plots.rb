@@ -104,7 +104,6 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Two_Ys.jpg
 http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Side_by_Side.jpg
 
     def rows
-        t.landscape
         t.do_box_labels('Blues, Reds, Greens', 'Position', nil)
         t.rescale(0.8)
         num_plots = 3
@@ -228,44 +227,6 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Legends.jpg
 # Makes a series of calls to show the frame edges (show_top_edge, show_left_edge, etc.)
     def show_edges
     end
-    
-# Alias for set_physical_aspect_ratio.
-    def set_aspect_ratio(width_to_height)
-    end
-    
-# Calls set_subframe to adjust the frame margins to give the requested aspect ratio relative to the page dimensions.
-    def set_physical_aspect_ratio(width_to_height)
-    end
-    
-# Calls set_subframe to adjust the frame margins to give the requested aspect ratio relative to the current frame dimensions.
-    def set_aspect_ratio_relative_to_frame(width_to_height)
-    end
-
-# Calls set_aspect_ratio to give width to height ratio of (11.0/8.5) relative to the page dimensions.
-    def set_landscape
-    end
-    
-# Alias for set_landscape.   
-    def landscape
-    end
-    
-# Calls set_aspect_ratio to give width to height ratio of (8.5/11.0) relative to the page dimensions.
-    def set_portrait
-    end
-    
-# Alias for set_portrait.   
-    def portrait
-    end
-
-# Calls set_aspect_ratio to give width to height ratio of (sqrt(5)+1)/2, called the "Golden Ratio" 
-# and dating back to 5th century B.C.  It is the value of b for a/b = b/(a+b) when a = 1.
-    def set_golden_ratio
-    end
-    
-# Alias for set_landscape.   
-    def golden_ratio
-    end
-    
 
 # :call-seq:
 #               root_figure                                     

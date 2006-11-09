@@ -34,8 +34,6 @@ Dictionary Entries
 Example
 
     def axial_shading
-        t.landscape
-        background
         t.clip_rect(0, 0, 1, 1)
         t.axial_shading(
             'start_point' => [0, 0], 'end_point' => [1, 1], 
@@ -83,8 +81,6 @@ Dictionary Entries
 Example
 
     def radial_shading
-        t.landscape
-        background
         t.clip_rect(0, 0, 1, 1)
         t.radial_shading(
             'x_hat' => [0.5, 0.2], 'y_hat' => [0.0, 0.75],

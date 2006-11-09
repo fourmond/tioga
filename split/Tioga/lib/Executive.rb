@@ -27,6 +27,17 @@ class Executive < Doc < FigureMaker
     end
 
 # :call-seq:
+#   make_pdf(name)
+#   make_pdf(number)
+#
+# Executes the corresponding code that was previously saved by def_figure.
+# Output is written to the currently specified save_dir directory.
+# Alias for make_figure.
+#
+    def make_pdf(name)
+    end
+
+# :call-seq:
 #   make_portfolio_pdf(name=nil)
 #
 # Creates a simple TeX file holding all of the figures, one per page.
@@ -34,14 +45,6 @@ class Executive < Doc < FigureMaker
 # name of the current '.rb' file.
 #
     def make_portfolio_pdf(name=nil)
-    end
-
-# :call-seq:
-#   make_preview_pdf(num)
-#
-# Calls make_figure, then calls pdflatex to make a 1 page pdf for previewing. 
-#
-    def make_preview_pdf(num)
     end
 
 
