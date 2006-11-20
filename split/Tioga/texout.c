@@ -228,7 +228,7 @@ void Close_tex(VALUE fmkr, bool quiet_mode)
    yoff = bbox_lly + Get_tex_yoffset(fmkr)*ENLARGE;
    fprintf(fp,"\\end{picture}");
    fseek(fp, cur_pos, SEEK_SET);
-   fprintf(fp,"\\begin{picture}(%d,%d)(%d,%d)", ROUND(x), ROUND(y), ROUND(xoff), ROUND(yoff));
+   fprintf(fp,"\\begin{picture}(%03d,%03d)(%02d,%d)", ROUND(x), ROUND(y), ROUND(xoff), ROUND(yoff));
    fclose(fp);
 }   
 

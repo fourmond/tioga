@@ -109,6 +109,9 @@ class FigureMaker
     # Whether or not to create +save_dir+ if it doesn't exist
     attr_accessor :create_save_dir
 
+    # Whether or not do do automatic cleanup of the files
+    attr_accessor :autocleanup
+
     
     def reset_figures # set the state to default values
         
@@ -201,6 +204,9 @@ class FigureMaker
         @tex_preview_paper_height = '210mm'
 
         @plot_box_command = lambda { show_plot_box }
+
+        # Automatic cleanup of by default
+        @autocleanup = true
         
     end
 
@@ -1690,16 +1696,25 @@ class FigureMaker
         if result
             pdfname = "#{name}"
             logname = "pdflatex.log"
-            texname = pdfname + ".tex"
-            figure_logname = pdfname + ".log"
-            figure_txtname = pdfname + "_figure.txt"
-            figure_pdfname = pdfname + "_figure.pdf"
+            files = %w(.tex .out .aux .log _figure.pdf _figure.txt).map do |suffix|
+              pdfname + suffix
+            end
+            files << logname
+            files << "color_name.aux"
+            if @save_dir # prepend directory specification
+              files.map! do |f|
+                "#{@save_dir}/#{f}"
+              end
+            end
             begin
-                syscmd = "rm -f color_names.aux" + " " + logname + " " + texname  + " " + figure_logname 
-                syscmd = syscmd + " " + figure_txtname + " " + figure_pdfname 
-                syscmd = "cd #{@save_dir}; " + syscmd if @save_dir != nil
-                result = system(syscmd)
-            rescue Exception => er
+              if @autocleanup
+                files.each do |f|
+                  begin
+                    File.delete(f)
+                  rescue
+                  end
+                end
+              end
             end
             pdfname = "#{@save_dir}/#{pdfname}" if @save_dir != nil
             pdfname = "#{run_directory}/#{pdfname}" if run_directory != nil && pdfname[0..0] != '/'
