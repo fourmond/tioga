@@ -865,6 +865,28 @@ static VALUE function_integrate(int argc, VALUE *argv, VALUE self)
 }
 
 /*
+   Computes the primitive of the Function and returns it as a new Function.
+   The newly created function shares the X vector with the previous one.
+ */
+static VALUE function_primitive(VALUE self)
+{
+  long size = function_sanity_check(self);
+  const double *x = Dvector_Data_for_Read(get_x_vector(self),NULL);
+  const double *y = Dvector_Data_for_Read(get_y_vector(self),NULL);
+  VALUE primitive = Dvector_Create();
+  long i = 0;
+  double val = 0;
+  while(i < (size - 1))
+    {
+      Dvector_Push_Double(primitive, val);
+      val += (y[i] + y[i+1]) * (x[i+1] - x[i]) * 0.5;
+      i++;
+    }
+  Dvector_Push_Double(primitive, val);
+  return Function_Create(get_x_vector(self), primitive);
+}
+
+/*
   Returns the number of points inside the function.
 */
 static VALUE function_size(VALUE self)
@@ -886,7 +908,7 @@ static VALUE function_size(VALUE self)
   - some functions for data access : #x, #y, #point;
   - some utiliy functions: #split_monotonic, #strip_nan;
   - data inspection: #min, #max;
-  - some computationnal functions: #integrate.
+  - some computationnal functions: #integrate, #primitive.
 
   And getting bigger everyday...
  */ 
@@ -941,6 +963,8 @@ void Init_Function()
 
   /* integration between two integer boundaries */
   rb_define_method(cFunction, "integrate", function_integrate, -1);
+  /* primitive */
+  rb_define_method(cFunction, "primitive", function_primitive, 0);
 
   /* distance to a point */
   rb_define_method(cFunction, "distance", function_distance, -1);
