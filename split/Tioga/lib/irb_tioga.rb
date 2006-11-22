@@ -69,7 +69,7 @@ def make_figure(num)
         return false
     end
     fm = FigureMaker.default
-    result = fm.make_preview_pdf(num)
+    result = fm.make_preview_pdf(num.to_i)
     if result != false
         $irb_figure_num = num
         return result

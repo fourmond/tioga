@@ -128,7 +128,7 @@ def command_loop
                 if num == nil || (num.to_i == 0 && num != "0")
                     puts "must provide integer figure index as arg make"
                 else
-                    result = fm.make_preview_pdf(num)
+                    result = fm.make_pdf(num.to_i)
                     if result == false
                         puts "####02FAILED" # GUI uses this
                     else
