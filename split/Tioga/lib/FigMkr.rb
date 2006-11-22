@@ -1636,6 +1636,7 @@ class FigureMaker
     end
     
     def make_pdf(num)
+        num = @figure_names.index(num) unless num.kind_of?(Integer)
         ensure_safe_save_dir
         run_directory = @run_dir; pdflatex = @which_pdflatex; quiet = @quiet_mode
         num = num.to_i
