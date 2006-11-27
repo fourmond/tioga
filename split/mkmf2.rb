@@ -477,16 +477,13 @@ module Mkmf2
   # For instance,
   #  declare_library("Biniou", "toto.rb")
   # will install the file "Biniou/toto.rb" in the common library
-  # directory. Only basenames are kept for the target, so that
-  #  declare_library("Biniou", "truc/muche/toto.rb")
-  # does also end up in "Biniou/toto.rb". Beware !
-  # If you think that this is obnoxious, tell me !
+  # directory. 
               
   def declare_library(target_dir,*files, &b)
     if files.empty?
       files << "lib/**/*.rb" 
     end
-    declare_file_set(target_dir, files, 'lib', true, &b)
+    declare_file_set(target_dir, files, 'lib', false, &b)
   end
 
   # Declares a set of files that should be executed directly be the user.
@@ -525,11 +522,14 @@ module Mkmf2
   # +skip+:: a regular expression (or whatever object that has a ===
   #          method that matches strings) saying wich files should
   #          be excluded. Defaults to /~$/.
+  # _base_dir_:: a source base directory to be stripped from the target
+  #              name
 
   def declare_file_set(target_dir, files, kind = 'lib', 
                        basename = true, 
                        rule = 'install_data',
-                       skip = /~$/, &b)
+                       skip = /~$/, delete = /((^.*\/)?lib\/)?/,
+                       base_dir = false, &b)
     source_files = []
     for glob in files
       # If glob looks like a glob, we use Dir.glob, else we add it
@@ -547,8 +547,10 @@ module Mkmf2
       filename = if basename 
                    File.basename(f)
                  else
-                   f
+                   f.dup
                  end
+      filename.gsub!(delete, '')
+      
       if target_dir.nil? or target_dir.empty?
         install_hash[f] = filename
       else

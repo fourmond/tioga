@@ -84,6 +84,9 @@ class TestFunction < Test::Unit::TestCase
     assert_equal(f.integrate, 3.5)
     assert_equal(f.integrate(0,1), 0.5)
     assert_equal(f.integrate(1,2), 3)
+
+    g = f.primitive
+    assert_equal(f.x, g.x)
   end
 
   def test_length
