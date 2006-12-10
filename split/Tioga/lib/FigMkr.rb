@@ -1701,7 +1701,7 @@ class FigureMaker
               pdfname + suffix
             end
             files << logname
-            files << "color_name.aux"
+            files << "color_names.aux"
             if @save_dir # prepend directory specification
               files.map! do |f|
                 "#{@save_dir}/#{f}"
