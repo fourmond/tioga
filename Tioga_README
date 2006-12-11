@@ -1,4 +1,4 @@
-This is the README for the Tioga kernel, version 1.1.3, July 23, 2006.
+This is the README for the Tioga kernel, version 1.3.0, December 11, 2006.
 
     Copyright (C) 2005, 2006  Bill Paxton
     
@@ -14,12 +14,70 @@ This is the README for the Tioga kernel, version 1.1.3, July 23, 2006.
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Library General Public License for more details.
     
-    You should have received a copy of the GNU Library General Public License
+    You should have received a copy of the GNU Library General Public LicenseD
     along with Tioga; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 
 << What's new >>
+
+	Version 1.3.0 will automatically remove the tex temporary files it creates
+(unless the autocleanup attribute is set false).  Commands that used to have
+"preview" in their names have been renamed to remove it.  For example, the
+old tex_preview_fontfamily is now called tex_fontfamily.  (The old names are
+actually still around for backward compatibility, but we won't be mentioning
+them anymore!)  Some other commands have gone away completely since they 
+have been made obsolete by the new approach of page layout using the
+enter page function.  As a reminder, here's what I wrote in a recent email 
+about the change in my model of what Tioga is really doing:
+
+      In the "old days", I thought of Tioga as producing intermediate files 
+      (the *_figure.tex and *_figure.txt files) that would at some later time 
+      be combined by TeX to create a figure in a TeX document.  So, in that view, 
+      the "final" figure PDF was created by TeX as part of typesetting a document.  
+      However, I naturally wanted to see what the figure looked like while I was 
+      debugging it, and so there was a "preview" ability in Tioga as well.  And 
+      before long it became clear that I was looking at things in the "wrong" way.
+
+      So there was a reversal in my image, and now I think of the process as Tioga 
+      producing the final PDF for the figure and, as part of that, calling TeX as 
+      a subroutine to get the job done.  Then the figure PDF can be used however 
+      you wish -- as part of a TeX document of course, but for anything else as 
+      well.  There is no longer any need for a "preview" and the *_figure files 
+      can be deleted immediately since they're now just temporaries created to 
+      drive TeX.
+
+      There wasn't too much needed to provide better support for this new view 
+      of things.  Mainly, you need to be able to specify exact sizes for figure 
+      and fonts.
+
+      Now for specifics.  Please take a quick look at tioga samples/plots/plots.rb 
+      that is part of the download.   At the end of the initialize routine, at line 63, 
+      there is a new addition:
+
+              t.def_enter_page_function { enter_page }
+
+      This tells tioga that whenever it is about to create a new PDF page, it should 
+      call the 'enter_page' method which is defined in the next few lines of the file:
+
+          def enter_page
+              t.page_setup(11*72/2,8.5*72/2)
+              t.set_frame_sides(0.15,0.85,0.85,0.15) # left, right, top, bottom in page coords       
+          end
+
+      The page_setup routine takes the desired width and height in "big points" (72 per inch).
+      So in this case, the PDF will be 5.5 inches wide and 4.25 inches high.  The set_frame_sides 
+      routine takes fractional positions on the page (i.e., page coordinates).  If you wanted 
+      to change the fonts, you could do that in the enter_page routine as well by adding a 
+      line like this:
+
+              t.set_default_font_size(14)
+
+      I hope this helps to clarify things.
+
+	
+
+<< What's old >>
 
 	Version 1.2.1 is as usual a bug-fix release fixing some installation problems...
 
@@ -29,8 +87,6 @@ produce a preview PDF of the exact size requested, so that you can include the P
 your documents (not only LaTeX, then). A whole bunch of debugging tools have been added: you can
 now set tracing tools with the (enter|exit)_(show_plot|subplot|subfigure) functions. As usual,
 there is a whole bunch of small improvements and new functions to Dvector and Function.
-
-<< What's old >>
 
 	Version 1.1.7 fixes a nasty runtime bug on MacOS X.
 
