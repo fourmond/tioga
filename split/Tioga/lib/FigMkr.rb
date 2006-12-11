@@ -96,15 +96,21 @@ class FigureMaker
     attr_accessor :num_error_lines
     
     # old preview attributes -- to be removed later
+    
     #attr_accessor :tex_preview_documentclass   
     #attr_accessor :tex_preview_pagestyle
     #attr_accessor :tex_preview_tiogafigure_command  
-    #attr_accessor :tex_xoffset
-    #attr_accessor :tex_yoffset
-    #attr_accessor :tex_preview_paper_width, :tex_preview_paper_height
-    #attr_accessor :tex_preview_hoffset, :tex_preview_voffset
-    #attr_accessor :tex_preview_figure_width, :tex_preview_figure_height
-    #attr_accessor :tex_preview_minwhitespace, :tex_preview_fullpage
+    attr_accessor :tex_xoffset
+    attr_accessor :tex_yoffset
+    
+    #attr_accessor :tex_preview_paper_width
+    #attr_accessor :tex_preview_paper_height
+    #attr_accessor :tex_preview_hoffset
+    #attr_accessor :tex_preview_voffset
+    #attr_accessor :tex_preview_figure_width
+    #attr_accessor :tex_preview_figure_height
+    #attr_accessor :tex_preview_minwhitespace
+    #attr_accessor :tex_preview_fullpage
 
     # Whether or not to create +save_dir+ if it doesn't exist
     attr_accessor :create_save_dir
