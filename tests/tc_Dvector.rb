@@ -9,7 +9,6 @@ class TestDvector < Test::Unit::TestCase
     
     def test_read_nasty_fortran_data
         row = Dvector.read_row("dvector_read_test.data")
-        puts "#{row}"
         assert_equal(4, row.size)
         assert_equal(1.0, row[-1])
     end
