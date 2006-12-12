@@ -526,7 +526,7 @@ PRIVATE
 }
 
 PRIVATE
-/*======================================================================*/ VALUE dtable_apply_math_op_bang(VALUE ary, double (*op)(double)) {
+VALUE dtable_apply_math_op_bang(VALUE ary, double (*op)(double)) {
    Dtable *d = Get_Dtable(ary);
    double **p = d->ptr;
    int num_cols = d->num_cols, num_rows = d->num_rows, i, j;
