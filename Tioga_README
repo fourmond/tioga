@@ -74,7 +74,8 @@ about the change in my model of what Tioga is really doing:
               t.set_default_font_size(14)
 
       I hope this helps to clarify things.
-
+      
+      Additionnaly, a #primitive method has been added to Function.
 	
 
 << What's old >>
