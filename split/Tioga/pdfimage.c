@@ -334,6 +334,7 @@ static VALUE c_private_create_monochrome_image_data(FM *p, double **data, long n
             int first_row, int last_row, int first_column, int last_column,
             double boundary, bool reversed)
 {
+   int ;
    if (first_column < 0) first_column += num_cols;
    if (first_column < 0 || first_column >= num_cols)
       rb_raise(rb_eArgError, "Sorry: invalid first_column specification (%i)", first_column);
@@ -346,8 +347,8 @@ static VALUE c_private_create_monochrome_image_data(FM *p, double **data, long n
    if (last_row < 0) last_row += num_rows;
    if (last_row < 0 || last_row >= num_rows)
       rb_raise(rb_eArgError, "Sorry: invalid last_row specification (%i)", last_row);
-   int i, j, k, width = last_column - first_column + 1, height = last_row - first_row + 1;
-   int sz = width * height;
+   int i, j, k, width = last_column - first_column + 1, height = last_row - first_row + 1, bytes_per_row = (width+7)/8;
+   int sz = bytes_per_row * 8 * height;
    if (sz <= 0) rb_raise(rb_eArgError, "Sorry: invalid data specification: width (%i) height (%i)", width, height);
    // to simplify the process, do it in two stages: first get the values and then pack the bits
    char *buff = ALLOC_N(char, sz);
@@ -356,6 +357,9 @@ static VALUE c_private_create_monochrome_image_data(FM *p, double **data, long n
       for (j = first_column; j <= last_column; j++) {
          double val = row[j];
          buff[k++] = (reversed)? (val <= boundary) : (val > boundary);
+      }
+      for (j = last_column+1; j < bytes_per_row * 8; j++) {
+         buff[k++] = 0;
       }
    }
    int num_bytes = (sz+7) >> 3;

@@ -741,7 +741,32 @@ class MyFigures
             'll' => [0.1, 0.1], 'lr' => [0.9, 0.1], 'ul' => [0.1, 0.9], 
             'color_space' => 'RGB', 'w' => 2, 'h' => 2, 'data' => samples)
     end
+
+    def mono_image_table(light, dark)
+        num_cols = 6
+        num_rows = 6
+        table = Dtable.new(num_cols, num_rows)
+        row0 = Dvector[light, dark, light, dark, light, dark]
+        row1 = Dvector[dark, light, dark, light, dark, light]
+        table.set_row(0,row0)
+        table.set_row(1,row1)
+        table.set_row(2,row0)
+        table.set_row(3,row1)
+        table.set_row(4,row0)
+        table.set_row(5,row1)
+        return table
+    end
     
+    def mono_image
+        samples = t.create_monochrome_image_data(mono_image_table(0.1, 0.9), 'boundary' => 0.5)
+        background
+        t.fill_color = Black
+        t.show_image(
+            'width' => 6, 'height' => 6, 'color_space' => 'mono', 'data' => samples,
+            'interpolate' => false,
+            'll' => [0.1, 0.1], 'lr' => [0.9, 0.1], 'ul' => [0.1, 0.9]) 
+    end
+
     def build_table(light, dark)
         num_cols = 8
         num_rows = 8
@@ -758,17 +783,7 @@ class MyFigures
         table.set_row(7,row1)
         return table
     end
-    
-    def mono_image
-        samples = t.create_monochrome_image_data(build_table(0.1, 0.9), 'boundary' => 0.5)
-        background
-        t.fill_color = Black
-        t.show_image(
-            'width' => 8, 'height' => 8, 'color_space' => 'mono', 'data' => samples,
-            'interpolate' => false,
-            'll' => [0.1, 0.1], 'lr' => [0.9, 0.1], 'ul' => [0.1, 0.9]) 
-    end
-    
+ 
     def stencil_mask
         t.show_image(
             'jpg' => "data/lucy.jpg", 'width' => 148, 'height' => 164,
