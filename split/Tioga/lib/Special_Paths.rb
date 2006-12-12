@@ -8,7 +8,7 @@ class Special_Paths < Doc < FigureMaker
 
 =begin rdoc
 Creates a path following a contour in a two dimensional table of data using the
-CONREC[http://astronomy.swin.edu.au/~pbourke/projection/conrec/] algorithm of Paul D. Bourke.
+CONREC[http://local.wasp.uwa.edu.au/~pbourke/papers/conrec/] algorithm of Paul D. Bourke.
 See show_contour.
 
 Dictionary Entries

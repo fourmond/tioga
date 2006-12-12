@@ -466,10 +466,13 @@ static void Make_Save_Fname(VALUE fmkr, char *full_name, char *f_name,
    if (with_save_dir) save = Get_save_dir(fmkr);
    if (add_mod_num) {
       mod_num = Get_model_number(fmkr);
-      fmt = ( mod_num < 10 )? "000%i" :
+      if (mod_num < 0) add_mod_num = false;
+      else {
+        fmt = ( mod_num < 10 )? "000%i" :
             ( mod_num < 100 )? "00%i" :
             ( mod_num < 1000 )? "0%i" : "%i";
-      sprintf(model, fmt, mod_num);
+        sprintf(model, fmt, mod_num);
+        }
       }
    if (with_save_dir && save != NULL && strlen(save) > 0) { 
       sprintf(full_name, "%s/", save); j = strlen(full_name); }

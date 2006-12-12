@@ -16,6 +16,7 @@ class MyFigures
         t.def_eval_function { |str| eval(str) }
 
         t.def_figure("Icon") { icon }
+        t.def_figure("mono_image") { mono_image }
         t.def_figure("Rounded_Rect") { rounded_rect }
         t.def_figure("Curve") { curve }
         t.def_figure("Arc") { arc }
@@ -756,6 +757,16 @@ class MyFigures
         table.set_row(6,row0)
         table.set_row(7,row1)
         return table
+    end
+    
+    def mono_image
+        samples = t.create_monochrome_image_data(build_table(0.1, 0.9), 'boundary' => 0.5)
+        background
+        t.fill_color = Black
+        t.show_image(
+            'width' => 8, 'height' => 8, 'color_space' => 'mono', 'data' => samples,
+            'interpolate' => false,
+            'll' => [0.1, 0.1], 'lr' => [0.9, 0.1], 'ul' => [0.1, 0.9]) 
     end
     
     def stencil_mask

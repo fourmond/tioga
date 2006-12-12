@@ -19,6 +19,7 @@ class MyPlots
         t.auto_refresh_filename = @data_filename
         t.add_model_number = true
         t.tex_preview_preamble += "\n\\include{color_names}\n"
+        @opacity_data = nil
         
         @image_right_margin = 0.07
         @margin = 0.1
@@ -565,11 +566,12 @@ class MyPlots
         end
     end
     
-    def sampled_image(title)
+    def sampled_image(title, colormap = nil)
         t.do_box_labels(title, 'Log Density', 'Log Temperature')
         data = get_press_image
         xs = @eos_logRHOs
         ys = @eos_logTs
+        colormap = t.mellow_colormap if colormap == nil
         t.show_plot([@eos_xmin, @eos_xmax, @eos_ymax, @eos_ymin]) do
             t.fill_color = Wheat
             t.fill_frame
@@ -578,7 +580,7 @@ class MyPlots
                 'll' => [xs.min, ys.min], 
                 'lr' => [xs.max, ys.min], 
                 'ul' => [xs.min, ys.max], 
-                'color_space' => t.mellow_colormap, 
+                'color_space' => colormap, 
                 'data' => data, 'value_mask' => 255,
                 'w' => @eos_data_xlen, 'h' => @eos_data_ylen)
         end
@@ -618,7 +620,8 @@ class MyPlots
             'bottom_margin' => 0.05) { color_bar(title) }
     end
     
-    def get_press_image
+    def read_press_image_data
+        return unless @opacity_data == nil
         @eos_xmin = -8.5; @eos_xmax = 2.5
         @eos_ymin = 5.7; @eos_ymax = 7.0
         @image_zmin = -3
@@ -633,6 +636,10 @@ class MyPlots
         @eos_ymin = @eos_logTs.min; @eos_ymax = @eos_logTs.max
         @opacity_data = Dtable.new(@eos_data_xlen, @eos_data_ylen)
         @opacity_data.read("data/Opacity_EoS.data")
+    end
+    
+    def get_press_image
+        read_press_image_data
         return t.create_image_data(
             @opacity_data,
             'min_value' => @image_zmin, 
