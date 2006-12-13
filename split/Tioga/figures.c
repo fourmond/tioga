@@ -424,7 +424,7 @@ void Init_FigureMaker(void) {
    rb_define_method(cFM, "append_curve_to_path", FM_append_curve_to_path, 6);
    rb_define_method(cFM, "close_path", FM_close_path, 0);
    rb_define_method(cFM, "append_points_to_path", FM_append_points_to_path, 2);
-   rb_define_method(cFM, "append_points_with_gaps_to_path", FM_append_points_with_gaps_to_path, 4);
+   rb_define_method(cFM, "private_append_points_with_gaps_to_path", FM_private_append_points_with_gaps_to_path, 4);
    rb_define_method(cFM, "append_arc_to_path", FM_append_arc_to_path, 8);
    rb_define_method(cFM, "append_rect_to_path", FM_append_rect_to_path, 4);
    rb_define_method(cFM, "append_rounded_rect_to_path", FM_append_rounded_rect_to_path, 6);
@@ -507,7 +507,7 @@ void Init_FigureMaker(void) {
    rb_define_method(cFM, "no_top_edge", FM_no_top_edge, 0);
    rb_define_method(cFM, "no_bottom_edge", FM_no_bottom_edge, 0);
 /* makers */
-   rb_define_method(cFM, "private_make_contour", FM_private_make_contour, 7);
+   rb_define_method(cFM, "private_make_contour", FM_private_make_contour, 9);
    rb_define_method(cFM, "private_make_spline_interpolated_points", FM_private_make_spline_interpolated_points, 6);
    rb_define_method(cFM, "private_make_steps", FM_private_make_steps, 8);
    

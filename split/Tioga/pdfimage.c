@@ -334,7 +334,6 @@ static VALUE c_private_create_monochrome_image_data(FM *p, double **data, long n
             int first_row, int last_row, int first_column, int last_column,
             double boundary, bool reversed)
 {
-   int ;
    if (first_column < 0) first_column += num_cols;
    if (first_column < 0 || first_column >= num_cols)
       rb_raise(rb_eArgError, "Sorry: invalid first_column specification (%i)", first_column);

@@ -172,10 +172,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define min(x,y) (x<y?x:y)
 #define max(x,y) (x>y?x:y)
 
-#define PUSH_POINT(x,y) { \
-   Dvector_Store_Double(dest_xs, num_pts, x); \
-   Dvector_Store_Double(dest_ys, num_pts, y); \
-   num_pts++; }
+#define PUSH_POINT(x,y,j) { \
+   Dvector_Store_Double(dest_xs, j, x); \
+   Dvector_Store_Double(dest_ys, j, y); \
+   j++; }
 
 int conrec(double **d,
 	   int ilb,
@@ -391,9 +391,9 @@ double x_prev=0.0, y_prev=0.0;
 		if (dx < 0) dx = -dx; if (dy < 0) dy = -dy;
 		if (num_pts == 0 || dx > x_limit || dy > y_limit) {
          if (num_pts > 0) rb_ary_push(gaps, INT2FIX(num_pts));
-         PUSH_POINT(x1,y1);
+         PUSH_POINT(x1,y1,num_pts);
 		}
-		PUSH_POINT(x2,y2);
+		PUSH_POINT(x2,y2,num_pts);
 		x_prev = x2; y_prev = y2;
 	      }
 	    }
@@ -407,12 +407,552 @@ double x_prev=0.0, y_prev=0.0;
 
 /* end of conrec */
 
+
+
+
+
+
+
+
+// the following code is from Gri
+
+
+
+
+#include <math.h>
+#include <stdio.h>
+#include <string.h>
+
+// globals to this file
+static int      nx_1, ny_1, iGT, jGT, iLE, jLE;
+
+static void     free_space_for_curve();
+static void     get_space_for_curve();
+static void     draw_the_contour(
+	   VALUE dest_xs,
+	   VALUE dest_ys,
+	   VALUE gaps);
+
+static bool     trace_contour(double z0,
+			      double *x,
+			      double *y,
+                  double **z,
+			      double **legit,
+			      VALUE dest_xs,
+			      VALUE dest_ys,
+			      VALUE gaps);
+                  
+static int      FLAG(int ni, int nj, int ind);
+static int      append_segment(double xr, double yr, double zr, double OKr,
+			       double xs, double ys, double zs, double OKs,
+			       double z0);
+
+// Space for curve, shared by several routines
+static double  *xcurve, *ycurve;
+static bool *legitcurve;
+#define INITIAL_CURVE_SIZE 100
+static int      num_in_curve, max_in_curve, num_in_path;
+static bool     curve_storage_exists = false;
+
+
+static void
+free_space_for_curve()
+{
+	if (curve_storage_exists) {
+		free(xcurve);
+		free(ycurve);
+		free(legitcurve);
+		curve_storage_exists = false;
+	}
+	num_in_curve = 0;
+	num_in_path = 0;
+}
+
+static void
+get_space_for_curve()
+{
+	max_in_curve = INITIAL_CURVE_SIZE;
+	if(curve_storage_exists) {
+		rb_raise(rb_eArgError, "storage is messed up (internal error)");
+		return;			// will not execute
+	}
+	xcurve = ALLOC_N(double, max_in_curve);
+	ycurve = ALLOC_N(double, max_in_curve);
+	legitcurve = ALLOC_N(bool, max_in_curve);
+	curve_storage_exists = true;
+	num_in_curve = 0;
+	num_in_path = 0;
+}
+
+
+
+//  gr_contour() -- draw contour line for gridded data
+//  
+//  DESCRIPTION: Draws a contour for the value z0, through data z[i][j] defined
+//  on the rectangular grid x[i] and y[j] (where 0<=i<nx and 0<=j<ny).  That
+//  the grid is rectangular but needn't be square or regular. Contours are
+//  drawn only in triangular regions surrounded by 3 good points (ie, 3 points
+//  with legit[i][j] != 0.0).
+//  
+//  The contour is labelled, with the string// lab, at intervals of
+//  contour_space_later centimeters, starting with a space of
+//  contour_space_first from the beginning of the trace.
+//  
+//  CONTOUR_VALUE MISSING_VALUE
+static void
+gr_contour(
+	   double *x,
+	   double *y,
+	   double **z,
+	   double **legit,
+	   int nx,
+	   int ny, 
+	   double z0,
+	   VALUE dest_xs,
+	   VALUE dest_ys,
+	   VALUE gaps)
+{
+	register int    i, j;
+	// Test for errors
+	if (nx <= 0) rb_raise(rb_eArgError, "nx<=0 (internal error)");
+	if (ny <= 0) rb_raise(rb_eArgError, "ny<=0 (internal error)");
+	// Save some globals
+	nx_1 = nx - 1;
+	ny_1 = ny - 1;
+	// Clear  all switches.
+	FLAG(nx, ny, -1);
+	// Get space for the curve.
+	get_space_for_curve();
+    
+	// Search for a contour intersecting various places on the grid. Whenever
+	// a contour is found to be between two grid points, call trace_contour()
+	// after defining the global variables iLE,jLE,iGT,jGT so that
+	// z[iLE]jLE] <= z0 < z[iGT][jGT], where legit[iLE][jLE] != 0
+	// and legit[iGT][jGT] != 0.
+	//
+	// NOTE: always start a contour running upwards (to greater j), between
+	// two sideways neighboring points (same j).  Later, in trace_contour(),
+	// test 'locate' for value 5.  If it's 5, it means that the same geometry
+	// obtains, so set a flag and check whether already set.  If already
+	// set, it means we've traced this contour before, so trace_contour()
+	// knows to stop then.
+
+	// Search bottom
+	for (i = 1; i < nx; i++) {
+		j = 0;
+		while (j < ny_1) {
+			// move north to first legit point
+			while (j < ny_1 
+			       && (legit == NULL || !(legit[i][j] != 0.0 && legit[i - 1][j] != 0.0))
+				) {
+				j++;
+			}
+			// trace a contour if it hits here
+			if (j < ny_1 && z[i][j] > z0 && z[i - 1][j] <= z0) {
+				iLE = i - 1;
+				jLE = j;
+				iGT = i;
+				jGT = j;
+				trace_contour(z0, x, y, z, legit, dest_xs, dest_ys, gaps);
+			}
+			// Space through legit points, that is, skipping through good
+			// data looking for another island of bad data which will
+			// thus be a new 'bottom edge'.
+			while (j < ny_1 && (legit == NULL || (legit[i][j] != 0.0 && legit[i - 1][j] != 0.0)))
+				j++;
+		}
+	}
+
+	// search right edge
+	for (j = 1; j < ny; j++) {
+		i = nx_1;
+		while (i > 0) {
+			// move west to first legit point
+			while (i > 0 && (legit == NULL || !(legit[i][j] != 0.0 && legit[i][ j - 1] != 0.0)))
+				i--;
+			// trace a contour if it hits here
+			if (i > 0 && z[i][j] > z0 && z[i][j - 1] <= z0) {
+				iLE = i;
+				jLE = j - 1;
+				iGT = i;
+				jGT = j;
+				trace_contour(z0, x, y, z, legit, dest_xs, dest_ys, gaps);
+			}
+			// space through legit points
+			while (i > 0 && (legit == NULL || legit[i][j] != 0.0 && legit[i][ j - 1] != 0.0))
+				i--;
+		}
+	}
+
+	// search top edge
+	for (i = nx_1 - 1; i > -1; i--) {
+		j = ny_1;
+		while (j > 0) {
+			while (j > 0 && (legit == NULL || !(legit[i][j] != 0.0 && legit[i + 1][ j] != 0.0)))
+				j--;
+			// trace a contour if it hits here
+			if (j > 0 && z[i][j] > z0 && z[i + 1][ j] <= z0) {
+				iLE = i + 1;
+				jLE = j;
+				iGT = i;
+				jGT = j;
+				trace_contour(z0, x, y, z, legit, dest_xs, dest_ys, gaps);
+			}
+			// space through legit points
+			while (j > 0 && (legit == NULL || legit[i][j] != 0.0 && legit[i + 1][ j] != 0.0))
+				j--;
+		}
+	}
+
+	// search left edge
+	for (j = ny_1 - 1; j > -1; j--) {
+		i = 0;
+		while (i < nx_1) {
+			while (i < nx_1 && (legit == NULL || !(legit[i][j] != 0.0 && legit[i][ j + 1] != 0.0)))
+				i++;
+			// trace a contour if it hits here
+			if (i < nx_1 && z[i][j] > z0 && z[i][j + 1] <= z0) {
+				iLE = i;
+				jLE = j + 1;
+				iGT = i;
+				jGT = j;
+				trace_contour(z0, x, y, z, legit, dest_xs, dest_ys, gaps);
+			}
+			// space through legit points
+			while (i < nx_1 && (legit == NULL || legit[i][j] != 0.0 && legit[i][ j + 1] != 0.0))
+				i++;
+		}
+	}
+
+	// Search interior. Pass up from bottom (starting at left), through all
+	// interior points. Look for contours which enter, with high to right,
+	// between iLE on left and iGT on right.
+	for (j = 1; j < ny_1; j++) {
+		int             flag_is_set;
+		for (i = 1; i < nx; i++) {
+			// trace a contour if it hits here
+			flag_is_set = FLAG(i, j, 0);
+			if (flag_is_set < 0)
+				rb_raise(rb_eArgError, "ran out of storage (internal error)");
+			if (!flag_is_set
+			    && (legit == NULL || legit[i][j] != 0.0)
+			    && z[i][j] > z0
+			    && (legit == NULL || legit[i - 1][j] != 0.0)
+			    && z[i - 1][j] <= z0) {
+				iLE = i - 1;
+				jLE = j;
+				iGT = i;
+				jGT = j;
+				trace_contour(z0, x, y, z, legit, dest_xs, dest_ys, gaps);
+			}
+		}
+	}
+	// Free up space.
+	free_space_for_curve();
+	FLAG(nx, ny, 2);
+}
+
+// trace_contour() -- trace_contour a contour line with high values of z to
+// it's right.  Stores points in (*xcurve, *ycurve) and the legit flag is
+// stored in *legitcurve; initially these must be empty; you must also free
+// them after this call, so that the next call will work OK.
+static          bool
+trace_contour(double z0,
+	      double *x,
+	      double *y,
+	      double **z,
+	      double **legit,
+	      VALUE dest_xs,
+	      VALUE dest_ys,
+	      VALUE gaps
+)
+{
+	int             i, ii, j, jj;
+	double          zp, vx, vy, zcentre;
+	int             locate;
+	// locate tells where delta-grid point is.  It codes as follows to
+	// i_test[] and j_test[] 6 7 8 3 4 5 0 1 2
+	static int      i_test[9] = {
+		0, 1, 1,		// 6 7 8
+		0, 9, 0,		// 3 4 5
+		-1, -1, 0		// 0 1 2
+	};
+	static int      j_test[9] =
+	{
+		-1, 0, 0,		// 6 7 8
+		-1, 9, 1,		// 3 4 5
+		0, 0, 1			// 0 1 2
+	};
+	static int      dtest[9] =
+	{
+		0, 1, 0,		// 6 7 8
+		1, 0, 1,		// 3 4 5
+		0, 1, 0			// 0 1 2
+	};
+
+
+	// Trace the curve, storing results with append_segment() into *xcurve,
+	// *ycurve, *legitcurve.  When done, call draw_the_contour(), which draws
+	// the contour stored in these arrays.
+	while (true) {
+	
+		append_segment(x[iLE], y[jLE], z[iLE][jLE], (legit == NULL)? 1.0: legit[iLE][jLE],
+			       x[iGT], y[jGT], z[iGT][jGT], (legit == NULL)? 1.0: legit[iGT][jGT],
+			       z0);
+		// Find the next point to check through a table lookup.
+		locate = 3 * (jGT - jLE) + (iGT - iLE) + 4;
+		i = iLE + i_test[locate];
+		j = jLE + j_test[locate];
+
+	
+		// Did it hit an edge?
+		if (i > nx_1 || i < 0 || j > ny_1 || j < 0) {
+			draw_the_contour(dest_xs, dest_ys, gaps);
+			return true;		// all done
+		}
+
+		// Test if retracing an existing contour.  See explanation
+		// above, in grcntour(), just before search starts. 
+		if (locate == 5) {
+			int             already_set = FLAG(iGT, jGT, 1);
+			if (already_set < 0) {
+				rb_raise(rb_eArgError, "ran out of storage (internal error)");
+				return false;
+			}
+			if (already_set) {
+				draw_the_contour(dest_xs, dest_ys, gaps);
+				return true;	// all done
+			}
+		}
+
+		// Following new for 2.1.13
+		if (legit != NULL && legit[i][j] == 0.0) {
+			draw_the_contour(dest_xs, dest_ys, gaps);
+			return true;		// all done
+		} 
+
+		if (!dtest[locate]) {
+			zp = z[i][j];
+			if (zp > z0)
+				iGT = i, jGT = j;
+			else
+				iLE = i, jLE = j;
+			continue;
+		}
+		vx = (x[iGT] + x[i]) * 0.5;
+		vy = (y[jGT] + y[j]) * 0.5;
+		locate = 3 * (jGT - j) + iGT - i + 4;
+		// Fourth point in rectangular boundary
+		ii = i + i_test[locate];
+		jj = j + j_test[locate];
+		bool legit_diag = 
+			(legit == NULL || (legit[iLE][jLE] != 0.0
+			 && legit[iGT][jGT] != 0.0 
+			 && legit[i][j] != 0.0
+			 && legit[ii][jj] != 0.0)) ? true : false;
+		zcentre = 0.25 * (z[iLE][jLE] + z[iGT][jGT] + z[i][j] + z[ii][jj]);
+
+		if (zcentre <= z0) {
+			append_segment(x[iGT], y[jGT], z[iGT][jGT], (legit == NULL)? 1.0: legit[iGT][jGT],
+				       vx, vy, zcentre, legit_diag,
+				       z0);
+			if (z[ii][jj] <= z0) {
+				iLE = ii, jLE = jj;
+				continue;
+			}
+			append_segment(x[ii], y[jj], z[ii][jj], (legit == NULL)? 1.0: legit[ii][jj],
+				       vx, vy, zcentre, legit_diag,
+				       z0);
+			if (z[i][j] <= z0) {
+				iGT = ii, jGT = jj;
+				iLE = i, jLE = j;
+				continue;
+			}
+			append_segment(x[i], y[j], z[i][j], (legit == NULL)? 1.0: legit[i][j],
+				       vx, vy, zcentre, legit_diag,
+				       z0);
+			iGT = i, jGT = j;
+			continue;
+		}
+		append_segment(vx, vy, zcentre, legit_diag,
+			       x[iLE], y[jLE], z[iLE][jLE], (legit == NULL)? 1.0: legit[iLE][jLE],
+			       z0);
+		if (z[i][j] > z0) {
+			iGT = i, jGT = j;
+			continue;
+		}
+		append_segment(vx, vy, zcentre, legit_diag,
+			       x[i], y[j], z[i][j], (legit == NULL)? 1.0: legit[i][j],
+			       z0);
+		if (z[ii][jj] <= z0) {
+			append_segment(vx, vy, zcentre, legit_diag,
+				       x[ii], y[jj], z[ii][jj], (legit == NULL)? 1.0: legit[ii][jj],
+				       z0);
+			iLE = ii;
+			jLE = jj;
+			continue;
+		}
+		iLE = i;
+		jLE = j;
+		iGT = ii;
+		jGT = jj;
+	}
+}
+
+// append_segment() -- append a line segment on the contour
+static double   xplot_last, yplot_last;
+static int
+append_segment(double xr, double yr, double zr, double OKr,
+	       double xs, double ys, double zs, double OKs,
+	       double z0)
+{
+	if (zr == zs) rb_raise(rb_eArgError, "Contouring problem: zr = zs, which is illegal");
+	double frac = (zr - z0) / (zr - zs);
+	if (frac < 0.0) rb_raise(rb_eArgError, "Contouring problem: frac < 0");
+	if (frac > 1.0) rb_raise(rb_eArgError, "Contouring problem: frac > 1");
+	double xplot = xr - frac * (xr - xs);
+	double yplot = yr - frac * (yr - ys);
+	// Avoid replot, which I suppose must be possible, given this code
+	if (num_in_curve > 0 && xplot == xplot_last && yplot == yplot_last)
+		return 1;
+	if (num_in_curve > max_in_curve - 1) {
+		// Get new storage if running on empty.  Better to
+		// do this with an STL vector class
+		max_in_curve *= 2;
+		int i;
+		double *tmp = ALLOC_N(double, num_in_curve);
+		for (i = 0; i < num_in_curve; i++) tmp[i] = xcurve[i];
+		free(xcurve); xcurve = ALLOC_N(double, max_in_curve);
+		for (i = 0; i < num_in_curve; i++) xcurve[i] = tmp[i];
+		for (i = 0; i < num_in_curve; i++) tmp[i] = ycurve[i];
+		free(ycurve); ycurve = ALLOC_N(double, max_in_curve);
+		for (i = 0; i < num_in_curve; i++) ycurve[i] = tmp[i];
+		free(tmp);
+		bool *tmpl = ALLOC_N(bool, num_in_curve);
+		for (i = 0; i < num_in_curve; i++)	tmpl[i] = legitcurve[i];
+		free(legitcurve); legitcurve = ALLOC_N(bool, max_in_curve);
+		for (i = 0; i < num_in_curve; i++)	legitcurve[i] = tmpl[i];
+		free(tmpl);
+	}
+	// A segment is appended only if both the present point and the last
+	// point came by interpolating between OK points.
+	xcurve[num_in_curve] = xplot;
+	ycurve[num_in_curve] = yplot;
+    if (OKr != 0.0 && OKs != 0.0)
+        legitcurve[num_in_curve] = true;
+    else
+        legitcurve[num_in_curve] = false;
+	num_in_curve++;
+	xplot_last = xplot;
+	yplot_last = yplot;
+	return 1;
+}
+
+
+// Draw contour stored in (xcurve[],ycurve[],legitcurve[]), possibly with
+// labels (depending on global Label_contours).
+// 
+// CONTOUR_VALUE MISSING_VALUE
+#define FACTOR 3.0 // contour must be FACTOR*len long to be labelled
+static void
+draw_the_contour(
+	   VALUE dest_xs,
+	   VALUE dest_ys,
+	   VALUE gaps)
+{
+	if (num_in_curve == 1) {
+		num_in_curve = 0;
+		return;
+	}
+	int    i, k;
+    for (i = 0, k = 0; i < num_in_curve; i++) {
+        if (legitcurve[i] == true) {
+            // PUSH_POINT does num_in_path++
+            PUSH_POINT(xcurve[i],ycurve[i],num_in_path);
+        } else {
+            if (num_in_path > 0 && num_in_path != k) rb_ary_push(gaps, INT2FIX(num_in_path));
+            k = num_in_path;
+            }
+    }
+    rb_ary_push(gaps, INT2FIX(num_in_path));
+    num_in_curve = 0;
+}
+
+// FLAG() -- check flag for gr_contour() and trace_contour()
+// ni = row (or, if ind==-1, number of rows)
+// nj = col (or, if ind==-1, number of cols)
+// if (ind == -1), get flag storage space; initialize flags to 0
+// if (ind == 1), check flag and then set it
+// if (ind == 2), clear the flag storage space
+// if (ind == 0), check flag, return value
+// RETURN VALUE: Normally, the flag value (0 or 1).  If the storage is
+// exhausted, return a number <0.
+#define	NBITS		32
+static int
+FLAG(int ni, int nj, int ind)
+{
+	static bool     flag_storage_exists = false;
+	static unsigned long *flag, mask[NBITS];
+	static int      size;
+	static int      ni_max;	// x-dimension is saved
+	int             i, ipos, iword, ibit, return_value;
+	switch (ind) {
+	case -1:
+		// Allocate storage for flag array
+		if (flag_storage_exists)
+			rb_raise(rb_eArgError, "storage is messed up (internal error)");
+		size = 1 + ni * nj / NBITS;	// total storage array length
+		flag = ALLOC_N(unsigned long, size);
+		// Create mask
+		mask[0] = 1;
+		for (i = 1; i < NBITS; i++)
+			mask[i] = 2 * mask[i - 1];
+		for (i = 0; i < size; i++)	// Zero out flag
+			flag[i] = 0;
+		ni_max = ni;		// Save for later
+		flag_storage_exists = true;
+		return 0;
+	case 2:
+		if (!flag_storage_exists)
+			rb_raise(rb_eArgError, "No flag storage exists");
+		free(flag);
+		flag_storage_exists = false;
+		return 0;
+	default:
+		if (!flag_storage_exists)
+			rb_raise(rb_eArgError, "No flag storage exists");
+		break;
+	}
+	// ind was not -1 or 2
+	// Find location of bit.
+	ipos = nj * ni_max + ni;
+	iword = ipos / NBITS;
+	ibit = ipos - iword * NBITS;
+	// Check for something being broken here, causing to run out of space.
+	// This should never happen, but may as well check.
+	if (iword >= size)
+		return (-99);		// no space
+	// Get flag.
+	return_value = (0 != (*(flag + iword) & mask[ibit]));
+	// If ind=1 and flag wasn't set, set the flag
+	if (ind == 1 && !return_value)
+		flag[iword] |= mask[ibit];
+	// Return the flag value
+	return return_value;
+}
+#undef NBITS
+
+// end of contour code from Gri
+
+
+
    void c_make_contour(FM *p, VALUE dest_xs, VALUE dest_ys, VALUE gaps,
-         VALUE xs, VALUE ys,  VALUE zs_data, double z_level) {
+         VALUE xs, VALUE ys,  VALUE zs_data, double z_level,  VALUE legit_data, int use_conrec) {
       long xlen, ylen, num_columns, num_rows;
       double *x_coords = Dvector_Data_for_Read(xs, &xlen);
       double *y_coords = Dvector_Data_for_Read(ys, &ylen);
       double **zs = Dtable_Ptr(zs_data, &num_columns, &num_rows);
+      double **legit = Dtable_Ptr(legit_data, &num_columns, &num_rows);
       if (x_coords == NULL || gaps == Qnil || zs == NULL || y_coords == NULL) {
          rb_raise(rb_eArgError, "Sorry: bad args for make_contour.  Need to provide xs, ys, gaps, and zs.");
       }
@@ -424,18 +964,25 @@ double x_prev=0.0, y_prev=0.0;
       if (x_limit < 0) x_limit = -x_limit;
       y_limit = 0.001*(y_coords[ylen-1] - y_coords[0])/ylen;
       if (y_limit < 0) y_limit = -y_limit;
+      
       // NOTE: conrec data is TRANSPOSE of our data, so we switch x's and y's in the call
-      conrec(zs, 0, num_rows-1, 0, num_columns-1, y_coords, x_coords, 1, &z_level, dest_ys, dest_xs, gaps, y_limit, x_limit);
+      if (use_conrec == 1) 
+        conrec(zs, 0, num_rows-1, 0, num_columns-1, y_coords, x_coords, 1, &z_level, dest_ys, dest_xs, gaps, y_limit, x_limit);
+      else 
+        gr_contour(y_coords, x_coords, zs, legit, num_rows, num_columns, z_level, dest_ys, dest_xs, gaps);
+      
    }
    
    VALUE FM_private_make_contour(VALUE fmkr,
          VALUE dest_xs, VALUE dest_ys, VALUE gaps, // these Dvectors get the results
          VALUE xs, VALUE ys, // data x coordinates and y coordinates
-         VALUE zs, VALUE z_level // the Dtable of values and the desired contour level
+         VALUE zs, VALUE z_level, // the Dtable of values and the desired contour level
+         VALUE legit, // the Dtable of flags (nonzero means okay)
+         VALUE method // int == 1 means CONREC
          ) {
       FM *p = Get_FM(fmkr);
       z_level = rb_Float(z_level);
-      c_make_contour(p, dest_xs, dest_ys, gaps, xs, ys, zs, NUM2DBL(z_level));
+      c_make_contour(p, dest_xs, dest_ys, gaps, xs, ys, zs, NUM2DBL(z_level), legit, NUM2INT(method));
       return fmkr;
    }
 

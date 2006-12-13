@@ -16,7 +16,6 @@ class MyFigures
         t.def_eval_function { |str| eval(str) }
 
         t.def_figure("Icon") { icon }
-        t.def_figure("mono_image") { mono_image }
         t.def_figure("Rounded_Rect") { rounded_rect }
         t.def_figure("Curve") { curve }
         t.def_figure("Arc") { arc }
@@ -42,6 +41,7 @@ class MyFigures
         t.def_figure("Math_Typesetting") { math_typesetting }
         t.def_figure("Squares") { both_squares }
         t.def_figure("Sample_Jpegs") { sample_jpegs }
+        t.def_figure("Monochrome_Image") { mono_image }
         t.def_figure("Axial_Shading") { axial_shading }
         t.def_figure("Radial_Shading") { radial_shading }
         t.def_figure("Dingbats") { dingbats }

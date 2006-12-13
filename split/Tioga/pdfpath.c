@@ -541,7 +541,7 @@ VALUE FM_append_points_to_path(VALUE fmkr, VALUE x_vec, VALUE y_vec)
    return fmkr;
 }
 
-VALUE FM_append_points_with_gaps_to_path(VALUE fmkr, VALUE x_vec, VALUE y_vec, VALUE gaps, VALUE close_gaps)
+VALUE FM_private_append_points_with_gaps_to_path(VALUE fmkr, VALUE x_vec, VALUE y_vec, VALUE gaps, VALUE close_gaps)
     // where there's a gap, do a moveto instead of a lineto
 {
    if (gaps == Qnil) return FM_append_points_to_path(fmkr, x_vec, y_vec);

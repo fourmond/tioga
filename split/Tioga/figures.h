@@ -532,7 +532,7 @@ extern VALUE FM_append_curve_to_path(VALUE fmkr, VALUE x1, VALUE y1, VALUE x2, V
 extern VALUE FM_close_path(VALUE fmkr); // h
 
 extern VALUE FM_append_points_to_path(VALUE fmkr, VALUE x_vec, VALUE y_vec);
-extern VALUE FM_append_points_with_gaps_to_path(VALUE fmkr, VALUE x_vec, VALUE y_vec, VALUE gaps, VALUE close_gaps);
+extern VALUE FM_private_append_points_with_gaps_to_path(VALUE fmkr, VALUE x_vec, VALUE y_vec, VALUE gaps, VALUE close_gaps);
 
 extern VALUE FM_append_arc_to_path(VALUE fmkr, VALUE x_start, VALUE y_start, VALUE x_corner, VALUE y_corner,
    VALUE x_end, VALUE y_end, VALUE dx, VALUE dy);
@@ -690,7 +690,9 @@ extern VALUE FM_private_create_monochrome_image_data(VALUE fmkr, VALUE data,
    extern VALUE FM_private_make_contour(VALUE fmkr,
          VALUE dest_xs, VALUE dest_ys, VALUE gaps, // these Dvectors get the results
          VALUE xs, VALUE ys, // data x coordinates and y coordinates
-         VALUE zs, VALUE z_level // the Dtable of values and the desired contour level
+         VALUE zs, VALUE z_level, // the Dtable of values and the desired contour level
+         VALUE legit, // the Dtable of flags (nonzero means okay)
+         VALUE method // int == 1 means use CONREC
          );
          
     extern VALUE FM_private_make_steps(VALUE fmkr, VALUE Xvec, VALUE Yvec, VALUE Xdata, VALUE Ydata,

@@ -845,6 +845,10 @@ class FigureMaker
         @pr_margin = plot_right_margin
         show_legend
     end
+    
+    def append_points_with_gaps_to_path(xs, ys, gaps, close_subpaths = false)
+        private_append_points_with_gaps_to_path(xs, ys, gaps, close_subpaths)
+    end
 
     def show_polyline(xs, ys, color = nil, legend = nil, type = nil, gaps = nil, close_subpaths = nil)
         context do
@@ -865,7 +869,7 @@ class FigureMaker
     end
     
     @@keys_for_make_contour = FigureMaker.make_name_lookup_hash([
-        'dest_xs', 'dest_ys', 'z_level', 'z', 'level', 'xs', 'ys', 'gaps', 'zs', 'data'])
+        'dest_xs', 'dest_ys', 'z_level', 'z', 'level', 'xs', 'ys', 'gaps', 'zs', 'data', 'legit', 'method'])
     def make_contour(dict)
         check_dict(dict, @@keys_for_make_contour, 'make_contour')
         z_level = dict['z_level']
@@ -885,7 +889,18 @@ class FigureMaker
             raise "Sorry: 'zs' for 'make_contour' must be a Dtable"
         end
         dest_xs.clear; dest_ys.clear; gaps.clear
-        private_make_contour(dest_xs, dest_ys, gaps, xs, ys, zs, z_level)
+        
+        legit = dict['legit']
+        if legit == nil
+          legit = Dtable.new(xs.length,ys.length).set(1.0)
+        elsif (!(legit.kind_of? Dtable))
+            raise "Sorry: 'legit' for 'make_contour' must be a Dtable -- nonzero means legitimate value in corresponding entry in zs"
+        end
+        
+        method = dict['method']
+        use_conrec = (method == 'conrec' or method == 'CONREC')? 1 : 0
+        private_make_contour(dest_xs, dest_ys, gaps, xs, ys, zs, z_level, legit, use_conrec)
+            
     end
     
     @@keys_for_make_steps = FigureMaker.make_name_lookup_hash([

@@ -7,8 +7,10 @@ module Tioga
 class Special_Paths < Doc < FigureMaker
 
 =begin rdoc
-Creates a path following a contour in a two dimensional table of data using the
-CONREC[http://local.wasp.uwa.edu.au/~pbourke/papers/conrec/] algorithm of Paul D. Bourke.
+Creates a path following a contour in a two dimensional table of data using an algorithm from
+Gri[http://gri.sourceforge.net/] done by Dan Kelley.
+(There is also an option to use the
+CONREC[http://local.wasp.uwa.edu.au/~pbourke/papers/conrec/] algorithm of Paul D. Bourke.)
 See show_contour.
 
 Dictionary Entries
@@ -16,12 +18,14 @@ Dictionary Entries
     'data'                     # Alias for 'zs'
     'xs'        => a_dvector   # The x figure coordinates for the columns of data
     'ys'        => a_dvector   # The y figure coordinates for the rows of data
+    'legit'     => a_dtable    # Optional table, same size as zs, non-zero means corresponding data is okay.
     'dest_xs'   => a_dvector   # The contour x values will be placed in this Dvector.
     'dest_ys'   => a_dvector   # The contour y values will be placed in this Dvector.
     'gaps'      => an_array    # Indices for gaps will be placed in this Array.
     'z_level'   => a_float     # The contour level
     'z'                        # Alias for 'z_level'
     'level'                    # Alias for 'z_level'
+    'method'   => a_string     # (Optional) set to 'conrec' to use that algorithm instead of the one from Gri.
 
 Example
 
