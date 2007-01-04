@@ -234,12 +234,16 @@ void Close_tex(VALUE fmkr, bool quiet_mode)
 
 
 void Write_preview_header(VALUE fmkr, FILE *file) {
+   VALUE tmp;
    fprintf(file, "\\documentclass{%s}\n\n", Get_tex_preview_documentclass(fmkr));
    /* we print out the preamble generated from tioga.sty.in */
    fprintf(file, "%% Tioga preamble generated from tioga.sty.in\n");
    fprintf(file, "%s\n", Get_tex_preview_generated_preamble(fmkr));
    fprintf(file, "%% User-specified preamble\n");
    fprintf(file, "%s\n\n", Get_tex_preamble(fmkr));
+   fprintf(file, "%% Color constants definitions\n");
+   tmp = rb_const_get(CLASS_OF(fmkr), rb_intern("COLOR_PREAMBLE"));
+   fprintf(file, "%s\n\n", StringValueCStr(tmp));
    fprintf(file, "%% Set page margins, page size and orientation.\n");
    fprintf(file, "\t\\usepackage[pdftex,tmargin=0pt,lmargin=0pt,"
 	   "rmargin=0pt,bmargin=0pt,\n");

@@ -6,6 +6,14 @@ require 'date'
 # We make up the color constants from the Tioga file.
 require './lib/ColorConstants.rb'
 
+# Generate colors
+color_specs = "% Color constants, generated from ColorConstants.rb\n"
+for const in Tioga::ColorConstants.constants
+  r,g,b = *Tioga::ColorConstants.const_get(const)
+  color_spec = sprintf "{%0.3f,%0.3f,%0.3f}", r,g,b
+  color_specs += "\\definecolor{#{const}}{rgb}#{color_spec}\n"
+end
+
 # slurp up the lines from tioga.sty.in
 i = File.open("tioga.sty.in")
 lines = i.readlines
@@ -26,7 +34,10 @@ out.print "module Tioga
     TEX_PREAMBLE = <<'End_of_preamble'\n" + 
 "\\makeatletter\n" +  
 lines.join +  
-"\n\\makeatother\nEnd_of_preamble\nend\nend"
+"\n\\makeatother\nEnd_of_preamble\n" + 
+"    COLOR_PREAMBLE = <<'End_of_preamble'\n" +
+color_specs + "\nEnd_of_preamble\n" + 
+"  end\nend"
 
 out.close
 
@@ -38,15 +49,5 @@ puts "Generating tioga.sty"
 out = File.open("../../tioga.sty", "w")
 out.puts "\\ProvidesPackage{tioga}[#{str_date}]"
 out.puts lines.join
-
-out.puts
-out.puts "% Color constants, generated from ColorConstants.rb"
-
-
-
-for const in Tioga::ColorConstants.constants
-  r,g,b = *Tioga::ColorConstants.const_get(const)
-  color_spec = sprintf "{%0.3f,%0.3f,%0.3f}", r,g,b
-  out.puts "\\definecolor{#{const}}{rgb}#{color_spec}"
-end
+out.puts color_specs
 out.close

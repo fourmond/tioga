@@ -1,6 +1,9 @@
 #!/bin/sh
 
 # A small script to produce all figures from an irb file.
+# Copyright Vincent Fourmond 2006.
+# It can be used and redistributed under the conditions of the LGPL version
+# 2.1, see file lgpl.txt in the main directory.
 set -e
 
 while test "$1" ; do 

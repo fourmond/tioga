@@ -396,7 +396,7 @@ char *Get_tex_preview_generated_preamble(VALUE fmkr) {
   VALUE v = rb_const_get(CLASS_OF(fmkr), 
 			 rb_intern("TEX_PREAMBLE"));
   if (v == Qnil) return NULL;
-  return StringValuePtr(v);
+  return StringValueCStr(v);
 }
 
 
