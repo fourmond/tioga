@@ -15,7 +15,7 @@ save a plot showing the profiles at that time.  In addition to providing a recor
 that I can consult later, the series of PDFs can also be converted to a movie showing
 the evolution.  And if, like me, you are running on a Mac, you can use the tioga GUI
 to watch the plots update in real-time as the simulation program produces results.
-(It should be possible to work out a similar arrangement with a previewer on Linux.  If
+(It should be possible to work out a similar arrangement with a  pdf viewer on Linux.  If
 you have a scheme that works, please let me know and I'll pass it on.)
 
 This section of the documentation discusses the tools in tioga for doing all of this and outlines
@@ -157,7 +157,7 @@ preview for the most recently made figure.  Here's a sample:
     cd plots_out; ... Reds_2487.tex > pdflatex.log
     => true
 
-With each call on "rv", I get a new version of the plot loaded in the previewer.  Try it (of course
+With each call on "rv", I get a new version of the plot loaded in the pdf viewer.  Try it (of course
 the Builder must be running to give different models each time).  With the Mac GUI for tioga, you
 can do the same thing with the "Refresh" command under
 the "File" menu. 

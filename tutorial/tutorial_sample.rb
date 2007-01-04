@@ -35,7 +35,6 @@ You should see something like the following:
     list_figures               ls      lists the figures in the current file
     make_figure number         mk      makes the figure
     preview number             pv      makes the figure and opens the pdf file
-    make_portfolio 'name.tex'  mp      makes a portfolio and saves TeX in 'name.tex'
     make_all                   ma      makes all of the figures in the current file
     refresh_period secs        rp      sets the seconds between auto refreshes
     auto_refresh cnt           ar      runs auto refresh cycle for cnt refreshes
@@ -46,8 +45,7 @@ You should see something like the following:
 
 The commands correspond to methods that are defined in IRB_Tioga.  You can load (and reload) a
 document with figure definitions, get a numbered list of the defined figures, make and optionally
-preview figures, make all of the figures individually, or make a portfolio file containing
-the full set of figures, one per page.
+preview figures, or make all of the figures at once.
 
 In addition to these few commands, you are talking to the standard irb tool which will call the Ruby
 interpreter for you to do other tasks as well.   This can be very useful when debugging a new
@@ -150,19 +148,19 @@ The output gives the full pathname to the output PDF file.   You
 should open that in another window just to confirm that it really is blue!
 
 
-If you have can type "open Blue.pdf" to the shell and have it open in the previewer, then
+If you have can type "open Blue.pdf" to the shell and have it open in the pdf viewer, then
 try this with the second figure:
 
     >> pv 1
     cd figures_out; pdflatex -interaction nonstopmode Red.tex > pdflatex.log
     => true
 
-With any luck, your previewer is now displaying Red.pdf for you.
+With any luck, your pdf viewer is now displaying Red.pdf for you.
 
 * NOTE: If you are using Linux, you may type something like "xpdf Blue.pdf" instead of "open Blue.pdf".
   Then you need
   to tell tioga what to do when you ask to preview a file.  It uses a global variable holding
-  a string specifying the previewer to use -- the default for this is 'open', but you can
+  a string specifying the viewer to use -- the default for this is 'open', but you can
   change it to something else.  For example, if you want to use xpdf, 
   then after loading irb_tioga, type
 
@@ -183,27 +181,9 @@ previously.  Now the Red.pdf should be displayed in green (my apologies to  colo
 readers!).  
 
 This sequence illustrates the basic development cycle for tioga:  run the program in Ruby,
-look at the result in a previewer, edit the source file, then reload and rerun to see the
+look at the result in a pdf viewer, edit the source file, then reload and rerun to see the
 changes.  It goes fairly smoothly even with a command line interface, and with a GUI,
 it gets even better.
-
-While we're at it, try out a couple more things before we move on.
-First, do a "batch" job to make all of the figures by entering "ma" (for "make_all"):
-
-    >> ma
-    cd figures_out; pdflatex -interaction nonstopmode Blue.tex > pdflatex.log
-    cd figures_out; pdflatex -interaction nonstopmode Red.tex > pdflatex.log
-    => true
-
-Then, create a PDF with a page per figure by entering "mp" (for "make_portfolio"):
-
-    >> mp
-    pdflatex -interaction nonstopmode sample.tex > pdflatex.log
-    => true
-
-This creates "sample.tex", a tiny TeX file that shows the figures,
-and "sample.pdf", with each of the figures from the file on its own page
-(as you can confirm now if you'd like).
 
 =end
 

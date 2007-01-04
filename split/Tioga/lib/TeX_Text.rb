@@ -14,7 +14,7 @@ the font by independently setting family, series, shape, and size.  Families inc
 Series include medium and bold face.  Shapes include upright, italic, slant, and small caps.  All these, and the size, are
 set in the SetTiogaFontInfo command in the TeX file preamble.  The tioga defaults for size, family, series, and shape are
 10 point roman, medium, and upright.  You can change these by means of the attributes
-tex_preview_fontfamily, tex_preview_fontseries, tex_preview_fontshape, and tex_preview_fontsize.  Just like for
+tex_fontfamily, tex_fontseries, tex_fontshape, and tex_fontsize.  Just like for
 the tex_preview page and figure sizes, these are given as strings to be copied to the TeX preview file as part
 of the SetTiogaFontInfo definition.
 
@@ -373,63 +373,63 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Framebox.jpg
    end
    
 # :call-seq:
-#               set_default_font_size(size, update_preview_size_string) # size in points                                    
+#               set_default_font_size(size, update_size_string) # size in points                                    
 #
-# Sets the font size in points. If the 'update_preview_size_string' flag is true,
-# then the 'tex_preview_fontsize' attribute will be set to match the new font size.
+# Sets the font size in points. If the 'update_size_string' flag is true,
+# then the 'tex_fontsize' attribute will be set to match the new font size.
 # The intention is that set_default_font_size gets called rarely and most font sizing is done
 # using rescale_text.
-   def set_default_font_size(size, update_preview_size_string = true)
+   def set_default_font_size(size, update_size_string = true)
+   end
+
+# :call-seq:
+#                tex_fontsize                                     
+#                tex_fontsize = a_string  # giving the font size in points
+# 
+# This string will be used as the basic font size specification in the preview TeX file.
+# Valid strings include things like '10.0' or '12.0'.
+#         
+# See also: tex_fontfamily, tex_fontseries, and tex_fontshape.
+#         
+   def tex_fontsize
    end
 
 
+# :call-seq:
+#                tex_fontfamily                                     
+#                tex_fontfamily = a_string  # giving the font family 
+# 
+# This string will be used as the basic font family specification in the preview TeX file.  Valid strings include
+# 'rmdefault', 'sfdefault', and 'ttdefault', for roman face, sans serif face, and typewriter face, respectively.
+#         
+# See also: tex_fontsize, tex_fontseries, and tex_fontshape.
+#         
+   def tex_fontfamily
+   end
+
+# :call-seq:
+#                tex_fontseries                                    
+#                tex_fontseries = a_string  # giving the font series 
+# 
+# This string will be used as the basic font series specification in the preview TeX file.  Valid strings include
+# 'mddefault' and 'bfdefault', for medium and bold face, respectively.
+#         
+# See also: tex_fontsize, tex_fontfamily, and tex_fontshape.
         
-=end 
-   def tex_preview_fontsize
+   def tex_fontseries
    end
 
 
-=begin rdoc
-:call-seq:
-               tex_preview_fontfamily                                     
-               tex_preview_fontfamily = a_string  # giving the font family 
-
-This string will be used as the basic font family specification in the preview TeX file.  Valid strings include
-'rmdefault', 'sfdefault', and 'ttdefault', for roman face, sans serif face, and typewriter face, respectively.
+# :call-seq:
+#                tex_fontshape                                   
+#                tex_fontshape = a_string  # giving the font shape 
+# 
+# This string will be used as the basic font shape specification in the preview TeX file.  Valid strings include
+# *'updefault', 'itdefault', 'sldefault', and 'scdefault', for upright, italic, slant, and small caps, respectively.
         
-See also: tex_preview_fontsize, tex_preview_fontseries, and tex_preview_fontshape.
+# See also: tex_fontsize, tex_fontfamily, and tex_fontseries.
         
-=end 
-   def tex_preview_fontfamily
-   end
-
-=begin rdoc
-:call-seq:
-               tex_preview_fontseries                                    
-               tex_preview_fontseries = a_string  # giving the font series 
-
-This string will be used as the basic font series specification in the preview TeX file.  Valid strings include
-'mddefault' and 'bfdefault', for medium and bold face, respectively.
-        
-See also: tex_preview_fontsize, tex_preview_fontfamily, and tex_preview_fontshape.
-        
-=end 
-   def tex_preview_fontseries
-   end
-
-
-=begin rdoc
-:call-seq:
-               tex_preview_fontshape                                   
-               tex_preview_fontshape = a_string  # giving the font shape 
-
-This string will be used as the basic font shape specification in the preview TeX file.  Valid strings include
-'updefault', 'itdefault', 'sldefault', and 'scdefault', for upright, italic, slant, and small caps, respectively.
-        
-See also: tex_preview_fontsize, tex_preview_fontfamily, and tex_preview_fontseries.
-        
-=end 
-   def tex_preview_fontshape
+   def tex_fontshape
    end
 
 

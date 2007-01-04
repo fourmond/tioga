@@ -105,18 +105,6 @@ def command_loop
             else
                 have_loaded = loadfile(fname, cmd)
             end
-        elsif (cmd == "make_portfolio")
-            if !have_loaded
-                puts "must load a file before make a portfolio"
-            else
-                cmd, fname = cmd_line.scanf("%s %s")
-                if fname == nil
-                    puts "must give file name as argument for make_portfolio command"
-                else
-                    fm.make_portfolio_pdf(fname)
-                    puts "####00" # GUI uses this
-                end
-            end
         elsif (cmd == "make" || cmd == "need_to_reload_data_and_make")
             if cmd == "need_to_reload_data_and_make"
                 fm.need_to_reload_data = true
@@ -142,7 +130,7 @@ def command_loop
                 puts "must load a file before make_all"
             else
                 puts "make_all"
-                fm.num_figures.times {|i| fm.make_preview_pdf(i) }
+                fm.num_figures.times {|i| fm.make_pdf(i) }
             end
             puts "####00" # GUI uses this
         elsif cmd == "name"

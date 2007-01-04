@@ -23,8 +23,6 @@ complex plots to illustrate tioga.  We'll take a quick look at what's there, and
 along the way.
 
 The starting place is the "zero age" stars, so go to the "zams" folder in "samples", and open "zams.rb" in your editor.
-If you're on a Mac, drag the file to the tioga icon and look through the plots.  If you're using irb, load "zams.rb",
-do a make_all and a make_portfolio, and load the "zams.pdf" that results in your PDF viewer.
 
 http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/zams.jpg
 

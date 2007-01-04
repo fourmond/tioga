@@ -6,13 +6,13 @@ module Tutorial
 
 = How to get a "Euro" symbol: Adding Packages to the TeX preamble
 
-You'll probably have your favorite packages that you use in TeX all the time.  If you want to have access to them when previewing figures
+You'll probably have your favorite packages that you use in TeX all the time.  If you want to have access to them when creating figures
 as well, you'll need to append the appropriate 'usepackage' commands to the preamble. 
-You can change the preamble used for previews by setting the 'tex_preview_preamble' property in the 'initialize' routine of the Ruby plot file.  For instance, here's an example that adds the 'marvosym' package:
+You can change the preamble used for figures by setting the 'tex_preamble' property in the 'initialize' routine of the Ruby plot file.  For instance, here's an example that adds the 'marvosym' package:
 
     def initialize
         @figure_maker = FigureMaker.default
-        t.tex_preview_preamble = t.tex_preview_preamble + "\n\t\\usepackage{marvosym}\n"
+        t.tex_preamble = t.tex_preamble + "\n\t\\usepackage{marvosym}\n"
         ...
     end
 
@@ -28,8 +28,7 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/marvosym_sample.jpg
 
 The rest of the "figures.rb" file gives examples of many of the ways you can use text
 and graphics by combining TeX and PDF.  Use it as a source of ideas and a jumping off
-point to get more information.  Let's take a quick look.  Load the "figures.pdf" portfolio
-in a previewer and browse a bit.
+point to get more information.  Let's take a quick look.
 
 http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/parabox.jpg
 

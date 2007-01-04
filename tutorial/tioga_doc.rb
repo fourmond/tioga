@@ -66,7 +66,7 @@ The tioga documentation is also freely available, both in this on-line form, and
 downloading (from my website[http://theory.kitp.ucsb.edu/~paxton/]), copying, and redistribution, under the terms of the
 {GNU Free Documentation License}[http://www.gnu.org/licenses/fdl.html].
 
-      Copyright (c)  2005  Bill Paxton.
+      Copyright (c)  2005, 2006  Bill Paxton.
       Permission is granted to copy, distribute and/or modify this document
       under the terms of the GNU Free Documentation License, Version 1.2
       or any later version published by the Free Software Foundation;
@@ -120,6 +120,8 @@ Aaron Hillegass for his book, {Cocoa Programming for Mac OS X}[http://www.bigner
 Jean-loup Gailly and Mark Adler for zlib[http://www.gzip.org/zlib/] and Flate.
 
 The TeXShop[http://www.uoregon.edu/~koch/texshop/texshop.html] implementors for providing a model and a tool.
+
+Dan Kelley for Gri[http://gri.sourceforge.net/] and the wonderful contour following algorithm it provides.
 
 KITP[http://www.itp.ucsb.edu/] and UCSB[http://www.ucsb.edu/] for giving me a place to play.
 

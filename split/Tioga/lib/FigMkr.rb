@@ -152,7 +152,7 @@ class FigureMaker
         @tex_preview_figure_width = '\paperwidth - 2in'
         @tex_preview_figure_height = '\paperheight - 2in'
         
-        @num_error_lines = 6
+        @num_error_lines = 10
         
         @tex_xoffset = 0
         @tex_yoffset = 0
@@ -1595,33 +1595,7 @@ class FigureMaker
     end
     
     def make_portfolio_pdf(name=nil)
-        ensure_safe_save_dir
-        if !(name.kind_of?String)
-            puts "Sorry: arg for make_portfolio must be a filename string"
-            return
-        end
-        pdflatex = @which_pdflatex
-        quiet=@quiet_mode
-        begin
-            make_portfolio(name)
-            if (@save_dir == nil)
-                syscmd = "#{pdflatex} -interaction nonstopmode #{name} > pdflatex.log"
-            else
-                syscmd = "cd #{@save_dir}; #{pdflatex} -interaction nonstopmode #{name} > pdflatex.log"
-            end
-            puts "#{syscmd}" unless quiet
-            begin
-                result = system(syscmd)
-            rescue Exception => er
-                report_error(er, "")
-                result = false
-            end
-        rescue Exception => er
-            puts "#{syscmd}" if quiet
-            report_error(er, "ERROR: make_portfolio failed for #{name}")
-            return false
-        end
-        return true
+        raise "Sorry: make_portfolio_pdf is no longer supported."
     end
 
     def figure_index(name)
@@ -1746,17 +1720,7 @@ class FigureMaker
     end
     
     def make_portfolio(name)
-        ensure_safe_save_dir
-        if @save_dir != nil
-            if @save_dir[-1..-1] != '/'
-                fullname = @save_dir + '/' + name
-            else
-                fullname = @save_dir + name
-            end
-        else
-                fullname = name
-        end
-        private_make_portfolio(name, fullname, @figure_names)
+        raise "Sorry: make_portfolio is no longer supported."
     end
     
     private

@@ -34,25 +34,14 @@ class Executive < Doc < FigureMaker
 # Output is written to the currently specified save_dir directory.
 # Alias for make_figure.
 #
-    def make_pdf(name)
-    end
-
-# :call-seq:
-#   make_portfolio_pdf(name=nil)
-#
-# Creates a simple TeX file holding all of the figures, one per page.
-# Uses the _filename_ if it is given, otherwise, appends '.tex' to the
-# name of the current '.rb' file.
-#
-    def make_portfolio_pdf(name=nil)
+    def make_pdf(n)
     end
 
 
 # :call-seq:
 #   figure_index(name)
 #
-# Returns the index of the given figure; useful to pass on to
-# make_preview_pdf
+# Returns the index of the figure with the given name.
 
 
     def figure_index(name)
@@ -72,10 +61,7 @@ class Executive < Doc < FigureMaker
    def reset_figures
    end
 
-# Opens a file with the given _name_ and writes a small TeX program to include
-# all of the currently defined figures, each on a separate page.
-    def make_portfolio(name)
-    end
+
 
 # :call-seq:
 #   reset_eval_function
@@ -99,6 +85,225 @@ class Executive < Doc < FigureMaker
     def eval_function(string)
     end
 
+
+
+# :call-seq:
+#   def_enter_page_function { |string| ... }
+#
+# The block of code is saved to be executed later whenever make_pdf is called to create a page for a figure.  
+# See also reset_enter_page_function.
+#
+    def def_enter_page_function(&cmd)
+    end
+
+# :call-seq:
+#   reset_enter_page_function
+#
+# Removes the current definition for the enter_page_function.  See also def_enter_page_function.
+#
+    def reset_enter_page_function
+    end
+
+
+
+# :call-seq:
+#   def_exit_page_function { |string| ... }
+#
+# The block of code is saved to be executed later after make_pdf has returned from creating a page for a figure.  
+# See also reset_exit_page_function.
+#
+    def def_exit_page_function(&cmd)
+    end
+
+# :call-seq:
+#   reset_exit_page_function
+#
+# Removes the current definition for the exit_page_function.  See also def_exit_page_function.
+#
+    def reset_exit_page_function
+    end
+
+
+
+# :call-seq:
+#   def_enter_show_plot_function { |string| ... }
+#
+# The block of code is saved to be executed later whenever show_plot is called.  
+# See also reset_enter_show_plot_function.
+#
+    def def_enter_show_plot_function(&cmd)
+    end
+
+# :call-seq:
+#   reset_enter_show_plot_function
+#
+# Removes the current definition for the enter_show_plot_function.  See also def_enter_show_plot_function.
+#
+    def reset_enter_show_plot_function
+    end
+
+
+
+# :call-seq:
+#   def_exit_show_plot_function { |string| ... }
+#
+# The block of code is saved to be executed whenever show_plot returns.  
+# See also reset_exit_show_plot_function.
+#
+    def def_exit_show_plot_function(&cmd)
+    end
+
+# :call-seq:
+#   reset_exit_show_plot_function
+#
+# Removes the current definition for the exit_show_plot_function.  See also def_exit_show_plot_function.
+#
+    def reset_exit_show_plot_function
+    end
+
+
+
+
+
+
+# :call-seq:
+#   def_enter_subfigure_function { |string| ... }
+#
+# The block of code is saved to be executed later whenever subfigure is called.  
+# See also reset_enter_subfigure_function.
+#
+    def def_enter_subfigure_function(&cmd)
+    end
+
+# :call-seq:
+#   reset_enter_subfigure_function
+#
+# Removes the current definition for the enter_subfigure_function.  See also def_enter_subfigure_function.
+#
+    def reset_enter_subfigure_function
+    end
+
+
+
+# :call-seq:
+#   def_exit_subfigure_function { |string| ... }
+#
+# The block of code is saved to be executed whenever subfigure returns.  
+# See also reset_exit_subfigure_function.
+#
+    def def_exit_subfigure_function(&cmd)
+    end
+
+# :call-seq:
+#   reset_exit_subfigure_function
+#
+# Removes the current definition for the exit_subfigure_function.  See also def_exit_subfigure_function.
+#
+    def reset_exit_subfigure_function
+    end
+
+
+
+
+
+
+# :call-seq:
+#   def_enter_subplot_function { |string| ... }
+#
+# The block of code is saved to be executed later whenever subplot is called.  
+# See also reset_enter_subplot_function.
+#
+    def def_enter_subplot_function(&cmd)
+    end
+
+# :call-seq:
+#   reset_enter_subplot_function
+#
+# Removes the current definition for the enter_subplot_function.  See also def_enter_subplot_function.
+#
+    def reset_enter_subplot_function
+    end
+
+
+
+# :call-seq:
+#   def_exit_subplot_function { |string| ... }
+#
+# The block of code is saved to be executed whenever subplot returns.  
+# See also reset_exit_subplot_function.
+#
+    def def_exit_subplot_function(&cmd)
+    end
+
+# :call-seq:
+#   reset_exit_subplot_function
+#
+# Removes the current definition for the exit_subplot_function.  See also def_exit_subplot_function.
+#
+    def reset_exit_subplot_function
+    end
+
+
+
+
+
+
+
+
+
+
+# :call-seq:
+#   def_enter_context_function { |string| ... }
+#
+# The block of code is saved to be executed later whenever context is called.  
+# See also reset_enter_context_function.
+#
+    def def_enter_context_function(&cmd)
+    end
+
+# :call-seq:
+#   reset_enter_context_function
+#
+# Removes the current definition for the enter_context_function.  See also def_enter_context_function.
+#
+    def reset_enter_context_function
+    end
+
+
+
+# :call-seq:
+#   def_exit_context_function { |string| ... }
+#
+# The block of code is saved to be executed whenever context returns.  
+# See also reset_exit_context_function.
+#
+    def def_exit_context_function(&cmd)
+    end
+
+# :call-seq:
+#   reset_exit_context_function
+#
+# Removes the current definition for the exit_context_function.  See also def_exit_context_function.
+#
+    def reset_exit_context_function
+    end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # :call-seq:
 #               run_dir                                     
 #
@@ -112,6 +317,22 @@ class Executive < Doc < FigureMaker
 #
 # The path name for the directory where output files will be created.
    def save_dir
+   end
+
+# :call-seq:
+#               create_save_dir                                     
+#               create_save_dir = a_boolean
+#
+# Whether or not to create +save_dir+ if it doesn't exist.
+   def create_save_dir
+   end
+
+# :call-seq:
+#               autocleanup                                     
+#               autocleanup = a_boolean
+#
+# Whether or not do do automatic cleanup of the temporary files when create a PDF for a figure.
+   def autocleanup
    end
 
 # :call-seq:

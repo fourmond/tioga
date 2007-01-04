@@ -25,7 +25,7 @@ class MyFigures
         t.def_figure("Rendering_Modes") { rendering_modes }
         t.def_figure("Marker_Names") { marker_names }
         t.def_figure("Text J_and_A") { justification_and_alignment }
-        t.def_figure("Test_Pattern") { test_pattern }
+        #t.def_figure("Test_Pattern") { test_pattern }
         t.def_figure("Strings") { strings }
         t.def_figure("Arrows") { show_arrows }
         t.def_figure("Marker_Horizontal_Scaling") { marker_horizontal_scaling }

@@ -37,8 +37,6 @@ DocStructure -- The basic anatomy of a tioga document and "batch-mode" operation
 
 Sample -- Intro to using "irb" as a tioga front-end
 
-Figures -- How tioga uses PDF and TeX to make figures
-
 SimpleFigure -- A first look at a nontrivial tioga figure definition
 
 TextForTeX -- How to Add Packages and How (and How Not) to Enter Text for TeX

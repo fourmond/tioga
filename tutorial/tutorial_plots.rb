@@ -12,7 +12,7 @@ fundamentals of making figures with FigureMaker.  This section builds on that kn
 making figures that are plots.  We'll use "plots.rb" as a source of examples. 
 
 You'll find "plots.rb" file in the "samples/plots" folder.  Load it in irb,
-do a make_all and a make_portfolio, and take a look through the resulting "plots.pdf" to see what's there.
+do a make_all and take a look through the resulting pdf's to see what's there.
 Alternatively, if you're on a Mac, drag the "plots.rb" file to the tioga icon and look through
 the plots (the down-arrow key is useful for this, or you can turn on "slide show" under the "View" menu).
 

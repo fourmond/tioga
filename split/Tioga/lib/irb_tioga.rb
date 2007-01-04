@@ -28,34 +28,6 @@ $which_pdflatex = 'pdflatex'
 
 $have_loaded_figure_file = false
 
-# :call-seq:
-#  make_portfolio filename
-#  make_portfolio
-#
-# Creates a simple TeX file holding all of the figures, one per page.
-# Uses the _filename_ if it is given, otherwise, appends '.tex' to the
-# name of the current '.rb' file.
-def make_portfolio(name=nil)
-    if !$have_loaded_figure_file
-        puts "must load a file before ask to make a portfolio"
-        return false
-    end
-    if name == nil
-        name = $figure_filename.split('.')[0] + '.tex'
-    end
-    fm = FigureMaker.default
-    result = fm.make_portfolio_pdf(name)
-end
-
-# :call-seq:
-#  mp filename
-#  mp
-#
-# Alias for make_portfolio.
-def mp(name=nil)
-    make_portfolio(name)
-end
-
 $irb_figure_num = 0
 
 # :call-seq:
@@ -69,7 +41,7 @@ def make_figure(num)
         return false
     end
     fm = FigureMaker.default
-    result = fm.make_preview_pdf(num.to_i)
+    result = fm.make_pdf(num.to_i)
     if result != false
         $irb_figure_num = num
         return result
@@ -127,7 +99,7 @@ $open_command = 'open'
 #  preview figure_number
 #
 # Calls make_figure, then does a system call to open the resulting file.
-# This of course assumes that you have a default PDF previewer set up to
+# This of course assumes that you have a default PDF viewer set up to
 # respond to the "open" command.  The actual command used to do the open
 # is taken from the current value of the global variable $open_command
 # which is initialize to "open".  You can modify this variable if you
@@ -342,7 +314,6 @@ def list_cmds
     puts "list_figures                  ls          lists the figures in the current file"
     puts "make_figure number            mk          makes the figure"
     puts "preview number                pv          makes the figure and opens the pdf file"
-    puts "make_portfolio 'name.tex'     mp          makes a portfolio and saves TeX in 'name.tex'"
     puts "make_all                      ma          makes all of the figures in the current file"
     puts "refresh_period secs           rp          sets the seconds between auto refreshes"
     puts "auto_refresh cnt              ar          runs auto refresh cycle for cnt refreshes"

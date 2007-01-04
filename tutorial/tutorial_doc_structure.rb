@@ -190,7 +190,7 @@ Now we have a working file that can be loaded into a tioga front-end.  Alternati
         def run
             t.figure_names.each do |name| 
                 puts "\nMake #{name}.pdf"
-                t.make_preview_pdf(name)
+                t.make_pdf(name)
             end
         end
      
