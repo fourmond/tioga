@@ -87,7 +87,6 @@ class TestFMkr < Test::Unit::TestCase
         str = file.read
         do_one_string(str)
     end
-    
 end
 
 

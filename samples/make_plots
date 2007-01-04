@@ -1,0 +1,46 @@
+#!/bin/sh
+
+# A small script to produce all figures from an irb file.
+set -e
+
+while test "$1" ; do 
+    case $1 in
+	--viewer)
+	    shift
+	    VIEWER=$1
+	    VIEW=1
+	    ;;
+	--view)
+	    VIEW=1
+	    ;;
+	*)
+	    break;
+	    ;;
+    esac
+    shift
+done;
+
+while test "$1"; do
+    DIR=`dirname $1`
+    echo "Going to directory $DIR"
+    cd $DIR;
+    NAME=`basename $1`
+    if test "$VIEW"; then
+	CMD="preview_all"
+    else
+	CMD="make_all"
+    fi;
+    if test "$VIEWER"; then
+	CMD2='$open_command'"='$VIEWER'"
+    else
+	CMD2=""
+    fi;
+    cat - <<EOF | ruby -r Tioga/irb_tioga
+include Tioga::IRB_Tioga
+ld '$NAME'
+$CMD2
+$CMD
+EOF
+    cd -;
+    shift;
+done;

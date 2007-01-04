@@ -111,6 +111,20 @@ def preview(num)
 end
 
 # :call-seq:
+#  preview_all
+#
+# Calls #preview for all figures
+def preview_all
+    fm = FigureMaker.default
+    if !$have_loaded_figure_file
+        puts "must load a file before ask to list figure names"
+        return false
+    end
+    fm.num_figures.times {|i| preview(i) }
+    return true
+end
+
+# :call-seq:
 #  pv figure_number
 #
 # Alias for #preview.
