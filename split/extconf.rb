@@ -54,7 +54,7 @@ custom_rule("Tioga/lib/TexPreamble.rb",
             [ "cd Tioga; " + Mkmf2.config_var("RUBY_INSTALL_NAME") + 
               " mk_tioga_sty.rb"],
             ["Tioga/lib/ColorConstants.rb",
-             "Tioga/tioga.sty.in"]
+             "Tioga/tioga.sty.in", "Tioga/mk_tioga_sty.rb"]
             )
 
 # we check the presence of zlib library
