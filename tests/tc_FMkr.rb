@@ -64,7 +64,7 @@ end
 class TestFMkr < Test::Unit::TestCase
 
     def test_fmkr
-        MyPlots.new.t.make_preview_pdf("Icon")
+        MyPlots.new.t.make_pdf("Icon")
         puts " "
         puts " "
         puts " "

@@ -122,7 +122,7 @@ def command_loop
                     else
                         puts "####02OK #{result}"
                     end
-                    puts "#{result}"
+                    puts "made #{result}"
                 end
             end
         elsif cmd == "make_all"
@@ -176,7 +176,7 @@ def command_loop
             if fname == nil
                 puts "must give pdflatex name as argument for set_which_pdflatex command"
             else
-                fm.which_pdflatex = fname
+                FigureMaker.pdflatex = fname
                 puts "use #{fname}"
             end
         else

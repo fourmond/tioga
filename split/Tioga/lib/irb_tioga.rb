@@ -23,7 +23,7 @@ require 'Tioga/tioga.rb'
 module Tioga
 module IRB_Tioga
 
-$which_pdflatex = 'pdflatex'
+FigureMaker.pdflatex = 'pdflatex'
 # you can modify this to give full pathname for your favorite pdflatex
 
 $have_loaded_figure_file = false
@@ -299,6 +299,23 @@ def quiet
 end
 
 # :call-seq:
+#  reload_and_review
+#
+# Does reload followed by review.
+def reload_and_review
+    reload
+    review
+end
+
+# :call-seq:
+#  rr
+#
+# Alias for reload_and_review.
+def rr
+    reload_and_review
+end
+
+# :call-seq:
 #  verbose
 #
 # Turn on messages.
@@ -322,12 +339,13 @@ end
 def list_cmds
     puts "Command                   short form      description"
     puts "load_figures 'filename'       ld          loads the figure definition file"
-    puts "reload                        rl          reloads the most recently loaded file"
-    puts "refresh                       rf          sets 'need_to_reload_data' and redoes make"
-    puts "review                        rv          sets 'need_to_reload_data' and redoes preview"
     puts "list_figures                  ls          lists the figures in the current file"
     puts "make_figure number            mk          makes the figure"
     puts "preview number                pv          makes the figure and opens the pdf file"
+    puts "reload                        rl          reloads the most recently loaded file"
+    puts "refresh                       rf          sets 'need_to_reload_data' and redoes make"
+    puts "review                        rv          sets 'need_to_reload_data' and redoes preview"
+    puts "reload_and_review             rr          does reload followed by review"
     puts "make_all                      ma          makes all of the figures in the current file"
     puts "refresh_period secs           rp          sets the seconds between auto refreshes"
     puts "auto_refresh cnt              ar          runs auto refresh cycle for cnt refreshes"
@@ -337,6 +355,14 @@ def list_cmds
     puts "version                                   prints the Tioga FigureMaker version string"
     puts "list_cmds                                 prints this message"
     return true
+end
+
+# :call-seq:
+#  cmds
+#
+# Prints out a short description of the commands.
+def cmds
+  list_cmds
 end
 
 end # module IRB_Tioga

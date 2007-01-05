@@ -28,6 +28,7 @@ class FigureMaker
     include FigureConstants
     
     @@default_figure_maker = nil
+    @@which_pdflatex = nil
     @@initialized = false  # set true by the C code when first make a figure
 
     # The tag used for cvs export 
@@ -54,6 +55,16 @@ class FigureMaker
         @@default_figure_maker = fm
     end
     
+    def FigureMaker.pdflatex
+    	@@which_pdflatex = 'pdflatex' if @@which_pdflatex == nil
+    	@@which_pdflatex
+    end
+    
+    def FigureMaker.pdflatex=(s)
+    	@@which_pdflatex = s
+    end
+    
+    
     def FigureMaker.make_name_lookup_hash(ary)
         dict = Hash.new
         ary.each { |name| dict[name] = true }
@@ -69,8 +80,6 @@ class FigureMaker
     attr_reader   :run_dir
     
     attr_accessor :save_dir
-    
-    attr_accessor :which_pdflatex
     
     attr_accessor :quiet_mode
     
@@ -131,7 +140,6 @@ class FigureMaker
         @legend_info = [ ]
         @run_dir = Dir.getwd
         @save_dir = nil
-        @which_pdflatex = 'pdflatex'
         @quiet_mode = false
         @model_number = -1
         @need_to_reload_data = true
@@ -1633,7 +1641,7 @@ class FigureMaker
     def make_pdf(num)
         num = @figure_names.index(num) unless num.kind_of?(Integer)
         ensure_safe_save_dir
-        run_directory = @run_dir; pdflatex = @which_pdflatex; quiet = @quiet_mode
+        run_directory = @run_dir; pdflatex = FigureMaker.pdflatex; quiet = @quiet_mode
         num = num.to_i
         num_figures = @figure_names.size
         num += num_figures if num < 0
@@ -1656,7 +1664,7 @@ class FigureMaker
             else
                 syscmd = "cd #{@save_dir}; #{pdflatex} -interaction nonstopmode #{name}.tex > pdflatex.log"
             end
-            puts "#{syscmd}" unless (quiet)
+            puts "#{name}" unless (quiet)
             begin
                 result = system(syscmd)
             rescue Exception => er

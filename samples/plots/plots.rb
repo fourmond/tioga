@@ -18,7 +18,6 @@ class MyPlots
         @data_filename = "data/datalog.data"
         t.auto_refresh_filename = @data_filename
         t.add_model_number = true
-        t.tex_preview_preamble += "\n\\include{color_names}\n"
         @opacity_data = nil
         
         @image_right_margin = 0.07
@@ -123,7 +122,6 @@ class MyPlots
     
     def reds
         read_data
-        #t.do_box_labels('Reds Plot', 'Position', '\textcolor[rgb]{1,0,0}{Reds}')
         t.do_box_labels('Reds Plot', 'Position', '\textcolor{Crimson}{Reds}')
         show_model_number
         xs = @positions
@@ -139,7 +137,7 @@ class MyPlots
         ys = @reds
         t.xaxis_log_values = true
         t.yaxis_log_values = true
-        t.show_plot(plot_boundaries(xs,ys,@margin,-1,1)) { t.show_polyline(xs,ys,Red) }
+        t.show_plot(plot_boundaries(xs,ys,@margin,-1,1)) { t.show_polyline(xs,ys,Teal) }
     end
     
     def greens
