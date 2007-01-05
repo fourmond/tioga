@@ -22,6 +22,7 @@ This is the README for the Tioga kernel, version 1.3.1, December 12, 2006.
 << What's new >>
 	  Version 1.3.1 is as usual a bug-fix release, although bugs
 were not that obvious this time. Among other things,
+  * it fixes some troubles with IRB and the Mac GUI
   * it fixes the use of Tioga custom colors in the LaTeX materials,
   such as in one of the figures in samples/figures/figures.rb. 
   * quite a bit of code cleaning
