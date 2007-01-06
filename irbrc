@@ -40,3 +40,5 @@ end
 
 require 'Tioga/irb_tioga.rb'
 include Tioga::IRB_Tioga
+$open_command = 'open'
+$open_list_command = 'open'

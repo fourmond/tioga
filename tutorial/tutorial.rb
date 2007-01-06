@@ -15,7 +15,8 @@ The tutorial also contains material introducing the command
 line interface and the graphical interface (for the Mac) along with hints and suggestions for using tioga
 effectively.
 
-The first step is to locate the samples folder and take a look at what's inside.  You should find a +README+ and 5 subfolders.
+The first step is to locate the samples folder and take a look at what's inside.  You should find a +README+ 
+and several subfolders.
 
 * figures
 * plots
@@ -35,13 +36,11 @@ UsingRuby -- The bare essentials for using ruby with tioga
 
 DocStructure -- The basic anatomy of a tioga document and "batch-mode" operation
 
-Sample -- Intro to using "irb" as a tioga front-end
+IRB_tioga -- Intro to using interactive ruby as a tioga front-end
 
 SimpleFigure -- A first look at a nontrivial tioga figure definition
 
 TextForTeX -- How to Add Packages and How (and How Not) to Enter Text for TeX
-
-MacGUI -- Intro to tioga's graphical user interface for the Mac
 
 Plots -- The extras for making plots
 

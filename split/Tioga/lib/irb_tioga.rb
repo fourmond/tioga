@@ -30,6 +30,10 @@ $have_loaded_figure_file = false
 
 $irb_figure_num = 0
 
+$open_command = 'open'
+
+$open_list_command = 'open'
+
 # :call-seq:
 #  make_figure number
 #
@@ -92,8 +96,6 @@ end
 def rv
     review
 end
-
-$open_command = 'open'
 
 # :call-seq:
 #  preview figure_number
@@ -301,7 +303,7 @@ end
 # Calls save_list and then opens the file.
 def open_list(fname = 'names.txt')
     save_list(fname)
-    system('open ' + fname)
+    system($open_list_command + ' ' + fname)
     return true
 end
 
