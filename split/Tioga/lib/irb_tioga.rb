@@ -256,7 +256,7 @@ def make_all
         puts "must load a file before ask to list figure names"
         return false
     end
-    fm.num_figures.times {|i| make_figure(i) }
+    fm.figure_names.each_with_index { |name,i| puts "#{name}"; make_figure(i) }
     return true
 end
 
@@ -273,13 +273,7 @@ end
 #
 # Give a numbered list of the currently defined figures.
 def list_figures
-    fm = FigureMaker.default
-    if !$have_loaded_figure_file
-        puts "must load a file before ask to list figure names"
-        return false
-    end
-    fm.figure_names.each_with_index { |name,i| STDOUT.printf("%3i %s\n",i,name) }
-    return true
+  write_list_to_file(STDOUT)
 end
 
 # :call-seq:
@@ -288,6 +282,45 @@ end
 # Alias for list_figures.
 def ls
     list_figures
+end
+
+# :call-seq:
+#  save_list(fname)
+#
+# Save a list of the currently defined figures to the file.
+def save_list(fname)
+  file = File.new(fname,'w')
+  write_list_to_file(file)
+  file.close
+  return true
+end
+
+# :call-seq:
+#  open_list(fname = 'names.txt')
+#
+# Calls save_list and then opens the file.
+def open_list(fname = 'names.txt')
+    save_list(fname)
+    system('open ' + fname)
+    return true
+end
+
+# :call-seq:
+#  ol
+#
+# Alias for open_list.
+def ol
+    open_list
+end
+
+def write_list_to_file(file)
+    fm = FigureMaker.default
+    if !$have_loaded_figure_file
+        puts "must load a file before ask to list figure names"
+        return false
+    end
+    fm.figure_names.each_with_index { |name,i| file.printf("%3i    %s\n",i,name) }
+    return true
 end
 
 # :call-seq:
@@ -341,6 +374,10 @@ def list_cmds
     puts "Command                   short form      description"
     puts "load_figures 'filename'       ld          loads the figure definition file"
     puts "list_figures                  ls          lists the figures in the current file"
+    puts "save_list 'filename'          sl          saves list of figures to the named file"
+    puts "          'filename' defaults to 'names.txt'"
+    puts "open_list 'filename'          ol          calls save_list and then opens the file"
+    puts "          'filename' defaults to 'names.txt'"
     puts "make_figure number            mk          makes the figure"
     puts "preview number                pv          makes the figure and opens the pdf file"
     puts "reload                        rl          reloads the most recently loaded file"
@@ -354,7 +391,7 @@ def list_cmds
     puts "quiet                                     turn off all but essential messages"
     puts "verbose                                   undo the effect of the quiet command"
     puts "version                                   prints the Tioga FigureMaker version string"
-    puts "list_cmds                                 prints this message"
+    puts "cmds                                      prints this message"
     return true
 end
 

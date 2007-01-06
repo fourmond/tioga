@@ -236,7 +236,7 @@ class MyFigures
         t.show_marker('marker' => Bullet, 
             'xs' => [x_start, x_corner,  x_end],
             'ys' => [y_start, y_corner,  y_end],
-            'scale' => 0.6, 'color' => Red);
+            'scale' => 0.6, 'color' => Crimson);
     end
     
     def curve
