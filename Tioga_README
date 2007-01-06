@@ -20,27 +20,11 @@ This is the README for the Tioga kernel, version 1.3.1, December 12, 2006.
 
 
 << What's new >>
-	  Version 1.3.1 is as usual a bug-fix release, although bugs
-were not that obvious this time. Among other things,
-  * it fixes some troubles with IRB and the Mac GUI
-  * it fixes the use of Tioga custom colors in the LaTeX materials,
-  such as in one of the figures in samples/figures/figures.rb. 
-  * quite a bit of code cleaning
-  * some documentation updates
-  * and, last but not least, the samples/ directory now contains a shell
-  script to create and optionally display all the figures defined in
-  one IRB Tioga ruby file. If, say, you can use gv to view PDFs, try
-  out the following line:
 
-  cd samples; ./make_plots --viewer gv figures/figures.rb
-  
-  Enjoy !!
-
-	--Vincent
-
-
-		In addition to the items Vincent describes above, there are also some 
-enhancements to the irb_tioga package.  As you probably recall, it is a Tioga 
+	Version 1.3.2 (following immediately on the heels of 1.3.1 because I was tardy!)
+	
+		In addition to the items Vincent described below for 1.3.1, there are also some 
+new enhancements to the irb_tioga package.  As you probably recall, it is a Tioga 
 front-end in irb that provides a set of commands to make pdf's and get them
 opened in your favorite previewer.  The basic 3-window model of operation is to have
 your Tioga ruby source file open in a text editor window, irb open in a terminal
@@ -71,6 +55,24 @@ an email to tioga-news.
 
 	Cheers,
 	Bill
+
+	  Version 1.3.1 is as usual a bug-fix release, although bugs
+were not that obvious this time. Among other things,
+  * it fixes some troubles with IRB and the Mac GUI
+  * it fixes the use of Tioga custom colors in the LaTeX materials,
+  such as in one of the figures in samples/figures/figures.rb. 
+  * quite a bit of code cleaning
+  * some documentation updates
+  * and, last but not least, the samples/ directory now contains a shell
+  script to create and optionally display all the figures defined in
+  one IRB Tioga ruby file. If, say, you can use gv to view PDFs, try
+  out the following line:
+
+  cd samples; ./make_plots --viewer gv figures/figures.rb
+  
+  Enjoy !!
+
+	--Vincent
 
 	
 << What's old >>
