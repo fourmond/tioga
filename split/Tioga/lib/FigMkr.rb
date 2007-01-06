@@ -1660,11 +1660,10 @@ class FigureMaker
         end
         if result
             if (@save_dir == nil)
-                syscmd = "#{pdflatex} -interaction nonstopmode #{name}.tex &> pdflatex.log"
+                syscmd = "#{pdflatex} -interaction nonstopmode #{name}.tex > pdflatex.log 2>&1"
             else
-                syscmd = "cd #{@save_dir}; #{pdflatex} -interaction nonstopmode #{name}.tex &> pdflatex.log"
+                syscmd = "cd #{@save_dir}; #{pdflatex} -interaction nonstopmode #{name}.tex > pdflatex.log 2>&1"
             end
-            #puts "#{name}" unless (quiet)
             begin
                 result = system(syscmd)
             rescue Exception => er
@@ -1732,23 +1731,6 @@ class FigureMaker
     end
     
     private
-
-    # This function is de facto overwritten by the one after, I comment it
-    # out.
-    
-#     def report_error(er, msg)
-#         puts msg
-#         puts ""
-#         puts "    " + "#{er.message}"
-#         line_count = 0
-#         er.backtrace.each do |line|
-#             if line_count < @num_error_lines
-#                 puts "    " + line
-#             end
-#             line_count = line_count + 1
-#         end
-#         puts "ERROR"  # GUI uses this
-#     end
 
     def internal_show_image(dict, is_mask)
         check_dict(dict, @@keys_for_show_image, 'show_image')

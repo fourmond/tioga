@@ -91,6 +91,12 @@ extra backslashes.  Number 4 is also valid (I think), at least it is if "\s" is 
 Oops, I just checked and "\s" is actually replaced by a space, so that one's wrong too.
 The take-home message is get in the habit of using single quotes unless you really need to do substitutions.
 
+
+---
+
+Now let's look at the extras in tioga for making plots -- next stop: Plots.
+
+
 =end
 
 module TextForTeX

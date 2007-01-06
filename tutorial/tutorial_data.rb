@@ -48,6 +48,12 @@ call on tioga to make a PDF file.
 And if you're still wondering what's inside that PDF file, you might be able to use the Flate decompression method
 to find out!
 
+
+---
+
+Now let's see how to make plots with a false-color image of sampled data -- next stop: SampledData.
+
+
 =end
 
 module Data

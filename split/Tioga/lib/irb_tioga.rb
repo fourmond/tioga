@@ -27,11 +27,8 @@ FigureMaker.pdflatex = 'pdflatex'
 # you can modify this to give full pathname for your favorite pdflatex
 
 $have_loaded_figure_file = false
-
 $irb_figure_num = 0
-
 $open_command = 'open'
-
 $open_list_command = 'open'
 
 # :call-seq:
@@ -373,27 +370,29 @@ end
 #
 # Prints out a short description of the commands.
 def list_cmds
+    puts ""
     puts "Command                   short form      description"
-    puts "load_figures 'filename'       ld          loads the figure definition file"
-    puts "list_figures                  ls          lists the figures in the current file"
-    puts "save_list 'filename'          sl          saves list of figures to the named file"
-    puts "          'filename' defaults to 'names.txt'"
-    puts "open_list 'filename'          ol          calls save_list and then opens the file"
-    puts "          'filename' defaults to 'names.txt'"
-    puts "make_figure number            mk          makes the figure"
-    puts "preview number                pv          makes the figure and opens the pdf file"
-    puts "reload                        rl          reloads the most recently loaded file"
-    puts "refresh                       rf          sets 'need_to_reload_data' and redoes make"
-    puts "review                        rv          sets 'need_to_reload_data' and redoes preview"
-    puts "reload_and_review             rr          does reload followed by review"
+    puts "load_figures 'tiogafile'      ld          loads the tioga figure definition file into ruby"
+    puts "preview number                pv          makes the figure and opens the pdf file in a viewer"
+    puts "          the pdf viewer is specified by the value of the $open_command variable in irb"
+    puts "reload_and_review             rr          reloads the figures file and redoes the preview"
+    puts "open_list 'outputfile'        ol          saves and opens a numbered list of figure names"
+    puts "          'outputfile' can be omitted -- it defaults to 'names.txt'"
+    puts "          the text editor is specified by the value of the $open_list_command variable in irb"
+    puts ""
+    puts "Those are the four essential commands.  Here are some others that are also available."
+    puts "list_figures                  ls          lists the figures by number for the current file"
+    puts "save_list 'outputfile'        sl          saves list of figures to the named file"
+    puts "make_figure number            mk          makes the pdf file for the figure"
     puts "make_all                      ma          makes all of the figures in the current file"
-    puts "refresh_period secs           rp          sets the seconds between auto refreshes"
-    puts "auto_refresh cnt              ar          runs auto refresh cycle for cnt refreshes"
-    puts "eval_function string          ef          call the current file's eval function"
-    puts "quiet                                     turn off all but essential messages"
-    puts "verbose                                   undo the effect of the quiet command"
+    puts "reload                        rl          reloads the most recently loaded file"
+    puts "review                        rv          redoes preview for the most recently viewed figure"
+    puts "eval_function string          ef          calls the current file's eval function"
+    puts "quiet                                     turns off all but essential messages"
+    puts "verbose                                   undoes the effect of the quiet command"
     puts "version                                   prints the Tioga FigureMaker version string"
     puts "cmds                                      prints this message"
+    puts ""
     return true
 end
 

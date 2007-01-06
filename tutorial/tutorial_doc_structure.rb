@@ -208,6 +208,9 @@ To make the PDF's, just type 'ruby < sample_batch.rb' to the shell; the terminal
 
 After that completes, the "figures_out" folder should have the PDF files along with a bunch of other things described in the rest of this tutorial.
 
+---
+
+Now let's see about using interactive ruby as a tioga front-end -- next stop: IRB_tioga.
 
 =end
 

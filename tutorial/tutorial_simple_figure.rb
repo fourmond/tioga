@@ -146,6 +146,15 @@ comes from the factory.  I've made a new color that might be called "ReallyLight
 converting standard "Tan" from RGB to HLS, changing the lightness to a number close to 1,
 and then converting back to RGB.  You can of course play similar games with the saturation.
 If you create a color you like, just save the RGB triple for later use.  
+
+
+---
+
+Now let's look at how tioga uses TeX to do text -- next stop: TextForTeX.
+
+
+
+
 =end
 
 module SimpleFigure

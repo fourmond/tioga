@@ -59,8 +59,6 @@ For your first visit, you should read on to see about licenses, credits, etc.
 
 Tioga is free software.  Source code for the kernel is available at the website under the terms of
 the {GNU Lesser General Library Public License}[http://www.gnu.org/licenses/licenses.html#LGPL].
-The complete Xcode project file for the Mac GUI is also available at the website under the terms of
-the {GNU General Public License}[http://www.gnu.org/licenses/licenses.html#GPL].
 
 The tioga documentation is also freely available, both in this on-line form, and for
 downloading (from my website[http://theory.kitp.ucsb.edu/~paxton/]), copying, and redistribution, under the terms of the

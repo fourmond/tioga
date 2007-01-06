@@ -15,8 +15,16 @@ The tutorial also contains material introducing the command
 line interface and the graphical interface (for the Mac) along with hints and suggestions for using tioga
 effectively.
 
-The first step is to locate the samples folder and take a look at what's inside.  You should find a +README+ 
-and several subfolders.
+By the way, the tutorial assumes you want to use Ruby directly to write the programs that 
+describe the figures and plots.  If instead of that you'd prefer a command-line interface along the
+lines of gnuplot, then be sure to read all about {ctioga}[http://sciyag.rubyforge.org/ctioga/index.html].
+Basically, ctioga writes the ruby tioga program for you, making it easy to do easy plots while still
+having the ability to do more complex ones by adding options to the command line.  
+
+---
+
+The first step in the tutorial is to locate the samples folder and take a look at what's inside.  
+You should find a +README+ and several subfolders.
 
 * figures
 * plots

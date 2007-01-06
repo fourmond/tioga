@@ -304,6 +304,12 @@ to save the given text along with the current line formating attributes for late
 use by show_legend.  The show_legend routine uses various attributes defining the
 layout of the legend information to show the saved text and make the sample lines.
 
+
+---
+
+Now let's review the tools for reading and manipulating the data for plots -- next stop: Data.
+
+
 =end
 
 module Plots

@@ -170,7 +170,7 @@ routine and then painted by appending it to the path and calling stroke.  Since 
 contour line for particular level may come in many disconnected pieces, we use the
 "append_points_with_gaps_to_path" routine which knows how to deal with such things.
 
-BTW: If you're looking for the routine to add labels to contours automatically, you won't find it.
+BTW: If you're looking for the routine to add labels to contours automatically, you won't find it in tioga.
 I've never been particularly pleased with the job done by standard algorithms.  Instead, 
 I decided to go at the problem in a different way and give you the actual contour data in
 a form that you can work with to make your own choices.  This also means you can try using
@@ -180,6 +180,10 @@ a legend to identify the levels if there aren't too many.
 Of course, if someone develops
 a great algorithm for doing contour labels, they can package it up as a Ruby extension
 and let us all share.  I'd love to see that happen, and Ruby is a great platform for it.
+
+---
+
+Now let's see how to create a sequence of PDFs and convert it to a movie -- next stop: Animation.
 
 =end
 

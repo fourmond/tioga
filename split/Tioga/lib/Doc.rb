@@ -53,7 +53,9 @@ Facilities for Storing Numeric Data
 - Dobjects::Dvector
 - Dobjects::Dtable
 
-For more information on PDF, consult the Adode PDF Reference document.  It's a huge collection of details (over 1000 pages at last count), and I've borrowed extensively from it in some of the following descriptions of methods that map directly to PDF operations.
+For more information on PDF, consult the Adode PDF Reference document.  
+It's a huge collection of details (over 1000 pages at last count), and I've borrowed 
+extensively from it in some of the following descriptions of methods that map directly to PDF operations.
 
 
 =end

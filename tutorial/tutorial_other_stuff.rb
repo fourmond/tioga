@@ -77,7 +77,7 @@ The "ZAMS fancy" plot is mainly for fun.  But it gives examples of setting up sp
 
 ---
 
-Let's move on to the next folder in samples, "star_history".  Load "history.rb" in tioga (GUI or irb) and take a look at the plots.  Here's the first one:
+Let's move on to the next folder in samples, "star_history".  Load "history.rb" in IRB_tioga and take a look at the plots.  Here's the first one:
 
 http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/H_R_T_RHO.jpg
 
@@ -167,7 +167,20 @@ Sometimes a colleague (initials LB) will e-mail me with a request for a specific
         file.close
     end
 
-Once we've succeeded in reading the profile status data, we open a file, "C_O_profile.data", and output the selected information in a form that will be easy for our colleague to use.  The next step is to convince said colleague to learn how to do this on his own -- wish me luck on that one!
+Once we've succeeded in reading the profile status data, we open a file, "C_O_profile.data", 
+and output the selected information in a form that will be easy for our colleague to use.  
+The next step is to convince said colleague to learn how to do this on his own -- wish me luck on that one!
+  
+---
+
+We've reached the end of the tutorial.  I hope you've enjoyed it, and I hope you will enjoy using tioga.
+You should sign up for the two mailing lists, {tioga-news}[http://rubyforge.org/mailman/listinfo/tioga-news] 
+and {tioga-users}[http://rubyforge.org/mailman/listinfo/tioga-users].  The first is for
+general information from the tioga developers about new releases and such.  The second is for comments,
+questions, and answers concerning tioga.  
+
+Have fun and happy plotting!
+
 
 =end
 

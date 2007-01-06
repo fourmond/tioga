@@ -136,6 +136,10 @@ rather than reference-counting may seem like a trivial difference, but in fact i
 to an extension writer like myself.  So, dear Python users, please be patient and give Ruby a try.  You might
 even come to like it.  You might also want to take a quick look at this article: {Should Ruby Be Added to Your Programming Repertoire?}[http://www.developer.com/lang/other/article.php/3496186]
 
+---
+
+Now let's look at the basic anatomy of a tioga document -- next stop: DocStructure.
+
 =end
 
 module UsingRuby
