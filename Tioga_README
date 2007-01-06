@@ -38,8 +38,42 @@ were not that obvious this time. Among other things,
 
 	--Vincent
 
-<< What's old >>
 
+		In addition to the items Vincent describes above, there are also some 
+enhancements to the irb_tioga package.  As you probably recall, it is a Tioga 
+front-end in irb that provides a set of commands to make pdf's and get them
+opened in your favorite previewer.  The basic 3-window model of operation is to have
+your Tioga ruby source file open in a text editor window, irb open in a terminal
+window, and the PDF file open in a previewer.  You edit and save the ruby program 
+for your figure or plot, type a command to irb_tioga to get the file reloaded and 
+the pdf recreated, then look at the result in the previewer.  Repeat until happy!
+
+		The recent additions to irb_tioga are simply further efforts to make that
+cycle smoother.  There's a new command, called "reload_and_review" ("rr" for short),
+that combines the standard operations into one: it reloads the new version of
+the ruby file, rebuilds the most recently created figures, and opens it in the
+previewer.  And if typing "rr<return>" is too much for you, remember that irb
+has a nice history feature, so you can just type up-arrow and return.  Cool!
+
+		I often have Tioga files that define a long list of figures.  There's another
+new command in irb_tioga that writes the list of figures with numbers to a file
+and then opens that file.  So now in addition to the 3 windows mentioned above,
+I also have another text editor window with a list of figures giving numbers and
+names -- a quick glance at that is enough to tell me what number to give to the
+"pv" command in irb_tioga to get the figure I want.
+
+		Finally, some previewers need a gentle kick in the pants to reload a PDF file
+after it has been modified.  For example, Preview on the Mac discards requests to
+open a PDF that it already has opened, even if the file has been written since
+the previous open.  Happily, other people have solved this one for us.  There's a 
+simple script that gets Preview to do "Open/Revert" -- I'll send out a copy of this in
+an email to tioga-news.
+
+	Cheers,
+	Bill
+
+	
+<< What's old >>
 	
 		Vincent has added a #primitive method to Function (during breaks from
 writing his thesis).
@@ -108,7 +142,10 @@ about the change in my model of what Tioga is really doing:
 
 	--Bill
 
+<<<<<<< Tioga_README
+=======
 	
+>>>>>>> 1.18
 
 	Version 1.2.1 is as usual a bug-fix release fixing some installation problems...
 
