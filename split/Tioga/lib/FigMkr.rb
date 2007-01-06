@@ -1660,17 +1660,17 @@ class FigureMaker
         end
         if result
             if (@save_dir == nil)
-                syscmd = "#{pdflatex} -interaction nonstopmode #{name}.tex > pdflatex.log"
+                syscmd = "#{pdflatex} -interaction nonstopmode #{name}.tex &> pdflatex.log"
             else
-                syscmd = "cd #{@save_dir}; #{pdflatex} -interaction nonstopmode #{name}.tex > pdflatex.log"
+                syscmd = "cd #{@save_dir}; #{pdflatex} -interaction nonstopmode #{name}.tex &> pdflatex.log"
             end
-            puts "#{name}" unless (quiet)
+            #puts "#{name}" unless (quiet)
             begin
                 result = system(syscmd)
             rescue Exception => er
                 report_error(er, "")
                 result = false
-            end
+            end            
             if !result
                 if (@save_dir == nil)
                     logname = "pdflatex.log"

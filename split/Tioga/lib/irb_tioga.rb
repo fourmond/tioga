@@ -106,8 +106,9 @@ $open_command = 'open'
 # want to have preview execute someother operation with the new PDF file.
 def preview(num)
     fname = make_figure(num)
-    return unless fname.kind_of? String
+    return false unless fname.kind_of? String
     system($open_command + ' ' + fname)
+    return true
 end
 
 # :call-seq:
