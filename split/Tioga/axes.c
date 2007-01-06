@@ -256,12 +256,12 @@ static char *Create_Label(double value, int scale, int prec, bool log_values, bo
      if (exponent < 0) {
         char form[10];
         int numdig = ABS(exponent)+1;
-        sprintf(form, "%%.%df", numdig);
+        sprintf(form, "$\\mathrm{%%.%df}$", numdig);
         sprintf(buff, form, pow_val);
      } else if (abs(value - pow_val) > 0.1) {
-        sprintf(buff, "%0.2f", pow_val);
+        sprintf(buff, "$\\mathrm{%0.2f}$", pow_val);
      } else {
-        sprintf(buff, "%d", (int) value);
+        sprintf(buff, "$\\mathrm{%d}$", (int) value);
      }
    } else if (log_values) {
      /* Exponential, i.e. 10^-1, 1, 10, 10^2, etc */
@@ -279,7 +279,7 @@ static char *Create_Label(double value, int scale, int prec, bool log_values, bo
       /* This is necessary to prevent labels like "-0.0" on some systems */
       scale2 = pow(10., prec);
       value = floor((value * scale2) + .5) / scale2;
-      sprintf(form, "%%.%df", (int) prec);
+      sprintf(form, "$\\mathrm{%%.%df}$", (int) prec);
       sprintf(buff, form, value);
    }
    int len = strlen(buff);
