@@ -27,6 +27,8 @@ require 'readline'
 include Readline
 # for some reason, the pipes don't work unless I use the Readline package
 
+$open_command = 'repreview'
+
 def report_error(er, msg)
     fm = FigureMaker.default
     puts msg
@@ -42,28 +44,32 @@ def report_error(er, msg)
     puts "ERROR"  # GUI uses this
 end
 
+def make_and_preview(num, pdf_viewer)
+    fm = FigureMaker.default
+    result = fm.make_pdf(num)
+    if result == false
+        puts "####02FAILED" # GUI uses this
+    else
+        puts "####02OK #{result}"
+    end
+    system(pdf_viewer + ' ' + result) if pdf_viewer != nil
+    return result
+end
+
 def loadfile(fname, cmd)
     fm = FigureMaker.default
     have_loaded = false
     fm.reset_state
     begin
-        puts "load #{fname}"
         load(fname) # this should define the TiogaFigures class
-        refresh_fname = fm.auto_refresh_filename
-        if refresh_fname != nil
-            refresh_fname = "#{fm.run_dir}/#{refresh_fname}" if fm.run_dir != nil && refresh_fname[0..0] != '/'
-            puts "####03OK #{refresh_fname}" # GUI uses this
-        end
         have_loaded = true
-        if cmd == "load_and_list"
-            num_fig = fm.num_figures
-            if num_fig == 0
-                puts "ERROR: Failed to define any figures.  Remember to invoke 'new' for the class containing the figure definitions"
-            end
-            response = "####01OK " + num_fig.to_s
-            num_fig.times { |i| response = response + ' ' + fm.figure_name(i) }
-            puts response # GUI uses this
+        num_fig = fm.num_figures
+        if num_fig == 0
+            puts "ERROR: Failed to define any figures.  Remember to invoke 'new' for the class containing the figure definitions"
         end
+        response = "####01OK " + num_fig.to_s
+        num_fig.times { |i| response = response + ' ' + fm.figure_name(i) }
+        puts response # GUI uses this
     rescue Exception => er
         report_error(er, "ERROR: load failed for #{fname}\n####01")
     end
@@ -74,6 +80,7 @@ def command_loop
     fm = FigureMaker.default
     fname = nil
     pname = nil
+    pdf_viewer = nil
     have_loaded = false
     
     loop do
@@ -84,7 +91,6 @@ def command_loop
         cmd = cmd.to_s
         puts "\n\n"
         if cmd == "exit"
-            puts "exiting"
             puts "###\n"  # this marks end of command -- DON'T change it since the GUI depends on it!
             exit
         elsif (cmd == "need_to_reload_data")
@@ -98,7 +104,7 @@ def command_loop
             rescue
             end
             puts "####00" # GUI uses this
-        elsif (cmd == "load" || cmd == "load_and_list")
+        elsif (cmd == "load")
             cmd, fname = cmd_line.scanf("%s %s")
             if fname == nil
                 puts "must give file name as argument for load command"
@@ -116,21 +122,23 @@ def command_loop
                 if num == nil || (num.to_i == 0 && num != "0")
                     puts "must provide integer figure index as arg make"
                 else
-                    result = fm.make_pdf(num.to_i)
-                    if result == false
-                        puts "####02FAILED" # GUI uses this
-                    else
-                        puts "####02OK #{result}"
-                    end
-                    puts "made #{result}"
+                    result = make_and_preview(num.to_i, pdf_viewer)
                 end
             end
         elsif cmd == "make_all"
             if !have_loaded
                 puts "must load a file before make_all"
             else
-                puts "make_all"
-                fm.num_figures.times {|i| fm.make_pdf(i) }
+                fm.figure_names.each_with_index { |name,i| result = fm.make_pdf(i); puts "#{result}";  }
+                puts "---done---"
+            end
+            puts "####00" # GUI uses this
+        elsif cmd == "view_all"
+            if !have_loaded
+                puts "must load a file before make_all"
+            else
+                fm.figure_names.each_with_index { |name,i| make_and_preview(i, pdf_viewer) }
+                puts "---done---"
             end
             puts "####00" # GUI uses this
         elsif cmd == "name"
@@ -177,7 +185,13 @@ def command_loop
                 puts "must give pdflatex name as argument for set_which_pdflatex command"
             else
                 FigureMaker.pdflatex = fname
-                puts "use #{fname}"
+            end
+        elsif cmd == "set_which_viewer"
+            cmd, fname = cmd_line.scanf("%s %s")
+            if fname == nil
+                puts "must give viewer name as argument for set_which_viewer command"
+            else
+                pdf_viewer = fname
             end
         else
             puts "invalid command <#{cmd}> in command line <#{cmd_line}>"
