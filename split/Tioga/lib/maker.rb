@@ -196,18 +196,17 @@ def command_loop
             else
                 FigureMaker.pdflatex = pdflatexname
             end
-        elsif cmd == "review_figure_pdf"
+        elsif cmd == "review"
             # this is for reviewing a previously made pdf file
             if pdf_name == nil
-               puts "must set pdf_name before calling review_figure_pdf"
+               puts "must set pdf_name before calling review"
             elsif pdf_viewer == nil
-               puts "must set pdf_viewer before calling review_figure_pdf"
+               puts "must set pdf_viewer before calling review"
             else
               cmd, figure_pdf_name = cmd_line.scanf("%s %s")
               if figure_pdf_name == nil
-                 puts "must give figure pdf name as argument for copy_figure_pdf"
+                 puts "must give figure pdf name as argument for review"
               else
-                 puts "reuse #{figure_pdf_name}"
                  system("cp " + figure_pdf_name + " " + pdf_name)
                  system(pdf_viewer + ' ' + pdf_name)
               end
