@@ -15,6 +15,13 @@ class MyPlots
     def initialize
         @t = FigureMaker.default
         t.def_figure("Icon_Test") { icon_test }
+        t.def_enter_page_function { enter_page }
+    end
+    
+    def enter_page
+        sz = 8.5
+        t.page_setup(sz*72/2,sz*72/2)
+        t.set_frame_sides(0.15,0.85,0.85,0.15) # left, right, top, bottom in page coords        
     end
 
     def icon_test
@@ -27,11 +34,12 @@ class MyPlots
             'start_point' => [0, 0],
             'end_point' => [0, 1], 
             'colormap' => t.create_gradient_colormap('hue' => t.rgb_to_hls(Linen)[0],
-                            'saturation' => 0.3, 'starting_L' => 0.6, 'ending_L' => 0.99))
+                            'saturation' => 0.3, 'starting_L' => 0.6, 'ending_L' => 0.99)
+        )
         t.stroke_color = Black
         t.line_width = 8 
         t.stroke_frame
-        angle = 60; size = 3; shift = -1.3
+        angle = 60; size = 3.5; shift = -1.3
         t.show_text('text' => '\sffamily\textbf{Ruby}', 'side' => BOTTOM, 'pos' => 0.27, 'shift' => shift,
             'scale' => size, 'angle' => angle)
         t.show_text('text' => '\sffamily\textbf{PDF}', 'side' => BOTTOM, 'pos' => 0.58, 'shift' => shift,
@@ -46,13 +54,13 @@ class MyPlots
             'color' => Grey,
             'mode' => FILL, 'horizontal_scale' => 0.9, 'vertical_scale' => -0.4, 'italic_angle' => -7)
         t.context do
-            t.fill_opacity = 1.0
-            t.show_marker('font' => Helvetica, 'string' => 'Tioga', 'scale' => scale, 'point' => [x+0.01,y],
-                'mode' => STROKE_AND_CLIP, 'horizontal_scale' => 0.9)
-            t.axial_shading( # this fills the 'Tioga' string
-                'start_point' => [0, -0.06],
-                'end_point' => [0, 1.4], 
-                'colormap' => t.rainbow_colormap)
+          t.fill_opacity = 1.0
+          t.show_marker('font' => Helvetica, 'string' => 'Tioga', 'scale' => scale, 'point' => [x+0.01,y],
+              'mode' => STROKE_AND_CLIP, 'horizontal_scale' => 0.9)
+          t.axial_shading( # this fills the 'Tioga' string
+              'start_point' => [0, -0.06],
+              'end_point' => [0, 1.4], 
+              'colormap' => t.rainbow_colormap)
         end
         t.show_marker('font' => Times_Roman, 'string' => 'Compare this to the file samples/Icon.pdf', 
             'scale' => 0.85, 'point' => [x,0.93], 'color' => Crimson)
