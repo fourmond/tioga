@@ -1009,7 +1009,10 @@ class FigureMaker
     @@keys_for_show_arrow = FigureMaker.make_name_lookup_hash([
         'x_head', 'y_head', 'x_tail', 'y_tail', 'head', 'tail',
         'color', 'head_color', 'tail_color', 'line_color',
-        'head_marker', 'tail_marker', 'line_width', 'head_scale', 'tail_scale'])
+        'head_marker', 'tail_marker', 'line_width', 
+        'head_angle', 'tail_angle',  
+        'head_scale', 'tail_scale'])
+
     def show_arrow(dict)
         check_dict(dict, @@keys_for_show_arrow, 'show_arrow')
         if check_pair(head = dict['head'], 'head', 'show_arrow')
@@ -1035,6 +1038,8 @@ class FigureMaker
         color = get_if_given_else_default(dict, 'color', Black)
         head_color = get_if_given_else_default(dict, 'head_color', color)
         tail_color = get_if_given_else_default(dict, 'tail_color', color)
+        head_angle = get_if_given_else_default(dict, 'head_angle', 0)
+        tail_angle = get_if_given_else_default(dict, 'tail_angle', -180)
         line_color = get_if_given_else_default(dict, 'line_color', color)
         head_marker = get_if_given_else_default(dict, 'head_marker', Arrowhead)
         tail_marker = get_if_given_else_default(dict, 'tail_marker', BarThin)
@@ -1053,7 +1058,7 @@ class FigureMaker
         pg_dx = convert_figure_to_output_dx(dx)
         pg_dy = convert_figure_to_output_dy(dy)
         len = (pg_dx*pg_dx + pg_dy*pg_dy).sqrt
-        chsz = convert_figure_to_output_dx(default_text_height_dx)
+        chsz = convert_figure_to_output_dx(default_text_height_dx) * head_scale
         chsz = -chsz if chsz < 0
         newlen = len - 0.5*chsz
         newlen = 0 if newlen < 0
@@ -1067,11 +1072,16 @@ class FigureMaker
                 just = CENTERED
             end
             show_marker('marker' => head_marker, 'point' => [x_head, y_head], 'color' => head_color,
-                'justification' => just, 'angle'=> angle, 'scale' => head_scale)
+                'justification' => just, 'angle'=> (angle + head_angle), 'scale' => head_scale)
         end
         if tail_marker != 'None'
+            if tail_marker == Arrowhead || tail_marker == ArrowheadOpen
+                just = RIGHT_JUSTIFIED
+            else
+                just = CENTERED
+            end
             show_marker('marker' => tail_marker, 'point' => [x_tail, y_tail], 'color' => tail_color,
-                'angle'=> angle, 'scale' => tail_scale)
+                'angle'=> (angle + tail_angle), 'scale' => tail_scale, 'justification' => just)
         end
         self.line_cap = prev_line_cap if prev_line_cap != LINE_CAP_BUTT
         self.line_width = prev_line_width if prev_line_width != line_width
