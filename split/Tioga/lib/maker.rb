@@ -104,9 +104,8 @@ def command_loop
             exit
         elsif (cmd == "need_to_reload_data")
             fm.need_to_reload_data = true
-        elsif (cmd == "eval_function")
-            skip = "eval_function".length
-            string = cmd_line[skip+1..-1]
+        elsif (cmd == "eval")
+            string = cmd_line[5..-1]
             begin
                 result = fm.eval_function(string)
                 puts result.to_s
