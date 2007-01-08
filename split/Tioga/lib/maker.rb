@@ -49,10 +49,11 @@ def make_and_preview(num, pdf_viewer)
     result = fm.make_pdf(num)
     if result == false
         puts "####02FAILED" # GUI uses this
-    else
-        puts "####02OK #{result}"
+        return result
     end
-    system(pdf_viewer + ' ' + result) if pdf_viewer != nil
+    puts "####02OK #{result}"
+    return result if pdf_viewer == nil
+    system(pdf_viewer + ' ' + result)
     return result
 end
 
