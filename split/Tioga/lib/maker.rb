@@ -55,7 +55,9 @@ def make_and_preview(num, pdf_viewer, name = nil)
     return result if pdf_viewer == nil
     if (name != nil)
       pdf_name = name
-      system("cp " + result + " " + pdf_name)
+      syscmd = "cp " + result + " " + pdf_name
+      puts "#{result}"
+      system(syscmd)
     else
       pdf_name = result
     end
