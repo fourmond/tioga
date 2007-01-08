@@ -44,7 +44,7 @@ def report_error(er, msg)
     puts "ERROR"  # GUI uses this
 end
 
-def make_and_preview(num, pdf_viewer)
+def make_and_preview(num, pdf_viewer, name = nil)
     fm = FigureMaker.default
     result = fm.make_pdf(num)
     if result == false
@@ -53,7 +53,13 @@ def make_and_preview(num, pdf_viewer)
     end
     puts "####02OK #{result}"
     return result if pdf_viewer == nil
-    system(pdf_viewer + ' ' + result)
+    if (name != nil)
+      pdf_name = name
+      system("cp " + result + " " + pdf_name)
+    else
+      pdf_name = result
+    end
+    system(pdf_viewer + ' ' + pdf_name)
     return result
 end
 
@@ -79,9 +85,9 @@ end
 
 def command_loop
     fm = FigureMaker.default
-    fname = nil
-    pname = nil
+    fname = nil # the name of the current tioga figures file
     pdf_viewer = nil
+    pdf_name = nil # if not nil, use this name for all the pdfs
     have_loaded = false
     
     loop do
@@ -112,6 +118,7 @@ def command_loop
             else
                 have_loaded = loadfile(fname, cmd)
             end
+            pdf_name = fname + ".pdf"
         elsif (cmd == "make" || cmd == "need_to_reload_data_and_make")
             if cmd == "need_to_reload_data_and_make"
                 fm.need_to_reload_data = true
@@ -123,7 +130,7 @@ def command_loop
                 if num == nil || (num.to_i == 0 && num != "0")
                     puts "must provide integer figure index as arg make"
                 else
-                    result = make_and_preview(num.to_i, pdf_viewer)
+                    result = make_and_preview(num.to_i, pdf_viewer, pdf_name)
                 end
             end
         elsif cmd == "make_all"
@@ -138,7 +145,7 @@ def command_loop
             if !have_loaded
                 puts "must load a file before make_all"
             else
-                fm.figure_names.each_with_index { |name,i| make_and_preview(i, pdf_viewer) }
+                fm.figure_names.each_with_index { |name,i| make_and_preview(i, pdf_viewer, pdf_name) }
                 puts "---done---"
             end
             puts "####00" # GUI uses this
@@ -181,18 +188,20 @@ def command_loop
                 end
             end
         elsif cmd == "set_which_pdflatex"
-            cmd, fname = cmd_line.scanf("%s %s")
-            if fname == nil
+            cmd, pdflatexname = cmd_line.scanf("%s %s")
+            if pdflatexname == nil
                 puts "must give pdflatex name as argument for set_which_pdflatex command"
             else
-                FigureMaker.pdflatex = fname
+                FigureMaker.pdflatex = pdflatexname
             end
+        elsif cmd == "set_pdf_name"
+            cmd, pdf_name = cmd_line.scanf("%s %s")
         elsif cmd == "set_which_viewer"
-            cmd, fname = cmd_line.scanf("%s %s")
-            if fname == nil
+            cmd, viewername = cmd_line.scanf("%s %s")
+            if viewername == nil
                 puts "must give viewer name as argument for set_which_viewer command"
             else
-                pdf_viewer = fname
+                pdf_viewer = viewername
             end
         else
             puts "invalid command <#{cmd}> in command line <#{cmd_line}>"
