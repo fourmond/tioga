@@ -402,24 +402,84 @@ class FigureMaker
         end
         self.no_bottom_edge
     end
+
+    Required = '!required!'.to_sym
+
+    # A helper function to prepare a default hash for a function, and to check
+    # for extraneous or missing arguments. It takes two arguments:
+    # * _dict_, the user-provided dictionnary to check and complete
+    # * _specs_, a hash representing the valid arguments and their default
+    # value.
+    # Symbols in the _specs_ hash have special meanings:
+    # * a normal symbol means: call self.symbol to get the default value. If
+    #   this call fails with a MethodMissing error, the symbol is returned.
+    # * a '->stuff'.to_sym symbol means: copy the value from the value
+    #   associated with the key 'stuff'.
+    # * a '!required!' symbol means that if the key is missing from
+    #   the original, raise an exception. (use the Required consant for that)
+    #
+    # You should find a few examples in the constants of this class...
+    #
+    # This function modifies _dict_ in place !
+    def prepare_argument_hash(spec, dict, strict = true)
+      for key in dict.keys
+        if (not spec.key?(key)) and strict
+          warn "Unkown key #{key} for #{caller.first}, information removed"
+          dict.delete(key)
+        end
+      end
+      for key in spec.keys
+        dict[key] = argument_value(spec, dict, key)
+      end
+      return dict
+    end
+
+    # Returns the value associated with the given key. Default value is
+    # returned in case the key is missing from the _dict_ hash. See
+    def argument_value(spec, dict, key)
+      return dict[key] if dict.key?(key)
+      raise "Unknown key asked for" unless spec.key?(key)
+      default = spec[key]
+      return default unless default.is_a?(::Symbol)
+      if default.to_s =~ /^->(.*)/ # Special symbol:
+        # return the value of the pointed key
+        return argument_value(spec, dict, $1)
+      elsif default == Required
+        raise "Required key #{key} is missing from #{dict.inspect}"
+      end 
+      begin
+        return self.send(default)
+      rescue NoMethodError 
+        return default
+      end
+    end
     
     @@keys_for_save_legend_info = FigureMaker.make_name_lookup_hash(['text', 'dy',
         'line_color', 'stroke_color', 'line_width', 'stroke_width', 
         'line_cap', 'line_type', 'marker', 'marker_color', 'marker_scale', 'marker_dict' ])
+    
+    Save_legend_info_args = {
+      'text' => Required,
+      'dy' => :legend_text_dy,
+      'line_color' => :line_color,
+      'line_width' => :line_width,
+      'line_cap' => :line_cap,
+      'line_type' => :line_type,
+      'stroke_color' => nil,
+      'stroke_width' => nil,
+      'marker' => nil,
+      'marker_dict' => nil, # use again #prepare_argument_hash ?
+      'marker_color' => nil,
+      'marker_scale' => nil,
+    }
+
     def save_legend_info(arg)
         if arg.kind_of?String
             dict = { 'text' => arg }
-        elsif arg.kind_of?Hash
-            dict = arg
-            check_dict(dict, @@keys_for_save_legend_info, 'save_legend_info')
         else
-            raise "Sorry: argument for save_legend_info must be text or a dictionary"
+          dict = arg
         end
-        dict['line_color'] = self.line_color if dict['line_color'] == nil
-        dict['line_width'] = self.line_width if dict['line_width'] == nil
-        dict['line_cap'] = self.line_cap if dict['line_cap'] == nil
-        dict['line_type'] = self.line_type if dict['line_type'] == nil
-        dict['dy'] = self.legend_text_dy if dict['dy'] == nil
+        prepare_argument_hash(Save_legend_info_args, dict)
         if dict['marker_dict'] == nil
             dict['marker'] = false if dict['marker'] == nil
             dict['marker_color'] = self.line_color if dict['marker_color'] == nil

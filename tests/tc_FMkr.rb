@@ -95,6 +95,17 @@ class TestFMkr < Test::Unit::TestCase
         str = file.read
         do_one_string(str)
     end
+
+    # A test function for the new scheme of Hash specifications
+    def test_arguments
+      a = { 'biniou' => 0,
+        'stuff' => '->biniou'.to_sym,
+      }
+      b = MyPlots.new.t.prepare_argument_hash(a, {})
+      assert_equal(b['stuff'], 0)
+      assert_equal(b['biniou'], 0)
+    end
+
 end
 
 
