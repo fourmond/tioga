@@ -1671,10 +1671,6 @@ class FigureMaker
         @figure_commands[num] = cmd
         return cmd
     end
-    
-    def make_portfolio_pdf(name=nil)
-        raise "Sorry: make_portfolio_pdf is no longer supported."
-    end
 
     def figure_index(name)
         return @figure_names.index(name)
@@ -1711,7 +1707,6 @@ class FigureMaker
     def make_pdf(num)
         num = @figure_names.index(num) unless num.kind_of?(Integer)
         ensure_safe_save_dir
-        run_directory = @run_dir; pdflatex = FigureMaker.pdflatex; quiet = @quiet_mode
         num = num.to_i
         num_figures = @figure_names.size
         num += num_figures if num < 0
@@ -1728,6 +1723,26 @@ class FigureMaker
                 result = false
             end
         end
+        finish_making_pdf(result, name)
+    end
+    
+    def make_portfolio_pdf(name, fignames=nil)
+        make_portfolio(name, fignames)
+    end
+    
+    def make_portfolio(name, fignames=nil)
+        fignames = @figure_names if fignames == nil
+        result = private_make_portfolio(name, fignames)
+        finish_making_pdf(result, name)
+    end
+    
+    private
+    
+    
+    def finish_making_pdf(result, name)
+        pdflatex = FigureMaker.pdflatex
+        quiet = @quiet_mode
+        run_directory = @run_dir
         if result
             if (@save_dir == nil)
                 syscmd = "#{pdflatex} -interaction nonstopmode #{name}.tex > pdflatex.log 2>&1"
@@ -1795,12 +1810,6 @@ class FigureMaker
         end
         return false
     end
-    
-    def make_portfolio(name)
-        raise "Sorry: make_portfolio is no longer supported."
-    end
-    
-    private
 
     def internal_show_image(dict, is_mask)
         check_dict(dict, @@keys_for_show_image, 'show_image')

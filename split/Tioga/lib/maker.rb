@@ -44,7 +44,8 @@ def report_error(er, msg)
     puts "ERROR"  # GUI uses this
 end
 
-def make_and_preview(num, pdf_viewer, name = nil)
+
+def make_pdf(num)
     fm = FigureMaker.default
     result = fm.make_pdf(num)
     if result == false
@@ -52,6 +53,13 @@ def make_and_preview(num, pdf_viewer, name = nil)
         return result
     end
     puts "####02OK #{result}"
+    return result
+end
+
+
+def make_and_preview(num, pdf_viewer, name = nil)
+    result = make_pdf(num)
+    fm = FigureMaker.default
     return result if pdf_viewer == nil
     if (name != nil)
       pdf_name = name
@@ -61,9 +69,10 @@ def make_and_preview(num, pdf_viewer, name = nil)
     else
       pdf_name = result
     end
-    system(pdf_viewer + ' ' + pdf_name)
+    reload_pdf(pdf_viewer, pdf_name)
     return result
 end
+
 
 def loadfile(fname, cmd)
     fm = FigureMaker.default
@@ -84,6 +93,23 @@ def loadfile(fname, cmd)
     end
     return have_loaded
 end
+
+
+def reload_pdf(pdf_viewer, pdf_name, revert=true, refocus=true)
+    syscmd = pdf_viewer + ' ' + pdf_name
+    if revert
+      syscmd += " True"
+    else
+      syscmd += " False"
+    end
+    if refocus
+      syscmd += " True"
+    else
+      syscmd += " False"
+    end
+    system(syscmd)
+end
+
 
 def command_loop
     fm = FigureMaker.default
@@ -119,8 +145,9 @@ def command_loop
             else
                 have_loaded = loadfile(fname, cmd)
             end
+            fname = fname[0..-4] if fname[-3..-1] == ".rb"
             pdf_name = fname + ".pdf"
-        elsif (cmd == "make" || cmd == "need_to_reload_data_and_make")
+        elsif (cmd == "make" || cmd == "make_pdf" || cmd == "need_to_reload_data_and_make")
             if cmd == "need_to_reload_data_and_make"
                 fm.need_to_reload_data = true
             end
@@ -130,6 +157,11 @@ def command_loop
                 cmd, num = cmd_line.scanf("%s %s")
                 if num == nil || (num.to_i == 0 && num != "0")
                     puts "must provide integer figure index as arg make"
+                elsif cmd == "make_pdf"
+                    i = num.to_i
+                    result = fm.make_pdf(i)
+                    puts "####03OK #{i} #{result}"
+                    puts "#{result}"
                 else
                     result = make_and_preview(num.to_i, pdf_viewer, pdf_name)
                 end
@@ -138,10 +170,27 @@ def command_loop
             if !have_loaded
                 puts "must load a file before make_all"
             else
-                fm.figure_names.each_with_index { |name,i| result = fm.make_pdf(i); puts "#{result}";  }
+                fm.figure_names.each_with_index { |name,i| 
+                    result = fm.make_pdf(i)
+                    puts "####03OK #{i} #{result}"
+                    puts "#{result}"
+                }
                 puts "---done---"
             end
-            puts "####00" # GUI uses this
+        elsif cmd == "make_portfolio"
+            if !have_loaded
+                puts "must load a file before make_portfolio"
+            else
+                cmd, name = cmd_line.scanf("%s %s")
+                name = "portfolio" if name == nil
+                portfolio_name = fm.make_portfolio(name,fm.figure_names)
+                reload_pdf(pdf_viewer, portfolio_name, false) # current Preview has bug for thumbnails when Revert
+                puts " "
+                puts "Note: the current Preview fails to remake thumbnails after a Revert,"
+                puts "so for now we have to do a Close and Open sequence as a workaround."
+                puts "This will be changed as soon as a fixed Preview is available from Apple."
+                puts " "
+            end
         elsif cmd == "view_all"
             if !have_loaded
                 puts "must load a file before make_all"
@@ -206,10 +255,10 @@ def command_loop
               if figure_pdf_name == nil
                  puts "must give figure pdf name as argument for review"
               elsif cmd == "show"
-                 system(pdf_viewer + ' ' + figure_pdf_name)
+                 reload_pdf(pdf_viewer, pdf_name)
               else
                  system("cp " + figure_pdf_name + " " + pdf_name)
-                 system(pdf_viewer + ' ' + pdf_name)
+                 reload_pdf(pdf_viewer, pdf_name)
               end
             end
         elsif cmd == "set_pdf_name"
@@ -221,6 +270,7 @@ def command_loop
             else
                 pdf_viewer = viewername
             end
+        elsif cmd == "done"
         else
             puts "invalid command <#{cmd}> in command line <#{cmd_line}>"
         end

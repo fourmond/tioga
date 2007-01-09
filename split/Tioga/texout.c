@@ -337,37 +337,27 @@ void Rename_tex(char *oldname, char *newname)
    rename(old_ofile, new_ofile); // from stdio.h
 }
 
-VALUE FM_private_make_portfolio(VALUE fmkr, VALUE name, VALUE filename, VALUE fignames)
+void private_make_portfolio(char *name, VALUE fignames)
 {
-    /*
-    FM *p = Get_FM(fmkr); // not in use
-    */
     FILE *file;
-    /*
-    VALUE figname; // not in use
-    */
-    char *fname;
     int i, len;
-    name = rb_String(name);
-    filename = rb_String(filename);
-    fname = RSTRING(filename)->ptr;
-    file = fopen(fname, "w");
-    fprintf(file, "%% Portfolio file %s\n", RSTRING(name)->ptr);
-    Write_preview_header(fmkr, file);
-    fprintf(file, "%% The document starts here.\n");
+    char tex_fname[256];
+    sprintf(tex_fname, "%s.tex", name);
+    file = fopen(tex_fname, "w");
+    if (file == NULL)
+       rb_raise(rb_eArgError, "Sorry: can't open %s.\n", tex_fname);
+    fprintf(file, "%% Tioga Portfolio %s\n\n", name);
+    fprintf(file, "\\documentclass{article}\n");
+    fprintf(file, "\\usepackage{pdfpages}\n");
     fprintf(file, "\\begin{document}\n");
-    fprintf(file, "\\pagestyle{%s}\n\n", Get_tex_preview_pagestyle(fmkr));   
     fprintf(file, "%% Start of figures, one per page\n\n");
     fignames = rb_Array(fignames);
     len = RARRAY(fignames)->len;
     for (i=0; i < len; i++) {
-        fprintf(file, "\\begin{figure}\n");
-        Write_figure_command(fmkr, Get_String(fignames, i), file);
-        fprintf(file, "\\end{figure}\n\\clearpage\n\n");
+        fprintf(file, "\\includepdf{%s.pdf}\n", Get_String(fignames, i));
     }
-    fprintf(file, "\\end{document}\n");
+    fprintf(file, "\n\\end{document}\n");
     fclose(file);
-    return fmkr;
 }
 
 

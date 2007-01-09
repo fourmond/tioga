@@ -527,7 +527,6 @@ VALUE FM_private_make(VALUE fmkr, VALUE name, VALUE cmd) {
    p->root_figure = true;
    p->in_subplot = false;
    result = rb_funcall(fmkr, make_page_ID, 1, cmd);
-//   result = rb_funcall(fmkr, do_cmd_ID, 1, cmd);
    Write_grestore();
    if (result == Qfalse) quiet = true;
    Close_pdf(fmkr, quiet);
@@ -542,5 +541,12 @@ VALUE FM_private_make(VALUE fmkr, VALUE name, VALUE cmd) {
    }
    *p = saved;
    return result;
+}
+   
+VALUE FM_private_make_portfolio(VALUE fmkr, VALUE name, VALUE fignames) {
+   char full_name[STRLEN];
+   Make_Save_Fname(fmkr, full_name, (name == Qnil)? NULL : StringValuePtr(name), true, false, false);
+   private_make_portfolio(full_name, fignames);
+   return rb_str_new2(full_name);
 }
 

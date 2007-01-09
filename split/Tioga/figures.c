@@ -304,7 +304,7 @@ void Init_FigureMaker(void) {
    Init_Font_Dictionary();
    rb_define_method(cFM, "private_make", FM_private_make, 2);
    rb_define_method(cFM, "get_save_filename", FM_get_save_filename, 1);
-   rb_define_method(cFM, "private_make_portfolio", FM_private_make_portfolio, 3);
+   rb_define_method(cFM, "private_make_portfolio", FM_private_make_portfolio, 2);
    
 /* page attribute accessors */
    attr_reader(root_figure)
