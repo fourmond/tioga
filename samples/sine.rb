@@ -18,13 +18,6 @@ class MyPlots
   
   def initialize (outdir = nil)
     @t = FigureMaker.default
-    
-    # setting output dir
-    if defined? outdir
-      t.save_dir = outdir
-    else
-      t.save_dir = '.'
-    end
 
     # we will store in @data both X and Y columns
     @data = []

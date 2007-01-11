@@ -16,8 +16,6 @@ class MyPlots
         t.def_eval_function { |str| eval(str) }
         
         @data_filename = "data/datalog.data"
-        t.auto_refresh_filename = @data_filename
-        t.add_model_number = true
         @opacity_data = nil
         
         @image_right_margin = 0.07
@@ -32,35 +30,33 @@ class MyPlots
         @big_blues = Dvector.new
         @big_blues_scale = 11.0
         
-        @blues_plot = t.def_figure("Blues") { blues }
-        @reds_plot = t.def_figure("Greens") { greens }
-        @reds_plot = t.def_figure("Reds") { reds }
+        t.def_figure("Blues") { blues }
+        t.def_figure("Reds") { reds }
+        t.def_figure("Greens") { greens }
         t.def_figure("Log_Reds") { log_reds }
-        @side_by_side_plot = t.def_figure("Side_by_Side") { side_by_side }
-        @two_yaxes_plot = t.def_figure("Two_Ys") { two_yaxes }
-        @legend_inside_plot = t.def_figure("Legends") { legends }
-        @legend_inside_plot = t.def_figure("Reds_and_Blues") { reds_blues }
-        @legend_inside_plot = t.def_figure("Legend_Inside") { legend_inside }
-        @legend_outside_plot = t.def_figure("Legend_Outside") { legend_outside }
-        @column_triplets_plot = t.def_figure("Column_Triplets") { column_triplets }
-        @row_triplets_plot = t.def_figure("Row_Triplets") { row_triplets }
-        @rows_plot = t.def_figure("Rows") { rows }
-        @columns_plot = t.def_figure("Columns") { columns }
-        @array_plot = t.def_figure("Array") { array }
-        @trio_plot = t.def_figure("Trio") { trio }
-        @collage_plot = t.def_figure("Collage") { collage }
-        @labels_plot = t.def_figure("Labels") { labels }
-        @error_bars_plot = t.def_figure("Error_Bars") { error_bars }
-        @error_bars_plot = t.def_figure("Error_Bars2") { error_bars2 }
-        @arrows_plot = t.def_figure("Arrows") { arrows }
-        @special_y_plot = t.def_figure("Special_Y") { special_y }
-        @bins_plot = t.def_figure("Sampled_Splines") { sampled_splines }
-        @bins2_plot = t.def_figure("Steps") { steps }
-        @bins2_plot = t.def_figure("Splines") { splines }
-        @sampled_data_plot = t.def_figure("Sampled_Data") { sampled_data }
-        @samples_with_contours_plot = t.def_figure("Contours") { samples_with_contours }
-
-        t.def_figure("TestContours") { test_samples_with_contours }
+        t.def_figure("Side_by_Side") { side_by_side }
+        t.def_figure("Two_Ys") { two_yaxes }
+        t.def_figure("Legends") { legends }
+        t.def_figure("Reds_and_Blues") { reds_blues }
+        t.def_figure("Legend_Inside") { legend_inside }
+        t.def_figure("Legend_Outside") { legend_outside }
+        t.def_figure("Column_Triplets") { column_triplets }
+        t.def_figure("Row_Triplets") { row_triplets }
+        t.def_figure("Rows") { rows }
+        t.def_figure("Columns") { columns }
+        t.def_figure("Array") { array }
+        t.def_figure("Trio") { trio }
+        t.def_figure("Collage") { collage }
+        t.def_figure("Labels") { labels }
+        t.def_figure("Error_Bars") { error_bars }
+        t.def_figure("Error_Bars2") { error_bars2 }
+        t.def_figure("Arrows") { arrows }
+        t.def_figure("Special_Y") { special_y }
+        t.def_figure("Sampled_Splines") { sampled_splines }
+        t.def_figure("Steps") { steps }
+        t.def_figure("Splines") { splines }
+        t.def_figure("Sampled_Data") { sampled_data }
+        t.def_figure("Contours") { samples_with_contours }
 
         t.model_number = -1
         
@@ -137,7 +133,7 @@ class MyPlots
         ys = @reds
         t.xaxis_log_values = true
         t.yaxis_log_values = true
-        t.show_plot(plot_boundaries(xs,ys,@margin,-1,1)) { t.show_polyline(xs,ys,Teal) }
+        t.show_plot(plot_boundaries(xs,ys,@margin,-1,1)) { t.show_polyline(xs,ys,Red) }
     end
     
     def greens

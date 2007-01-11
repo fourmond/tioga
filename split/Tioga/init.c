@@ -23,7 +23,7 @@
 #include "pdfs.h"
 
 VALUE rb_Integer_class, rb_Numeric_class;
-ID save_dir_ID, model_number_ID, add_model_number_ID, quiet_mode_ID;
+ID save_dir_ID, quiet_mode_ID;
 ID tex_preview_documentclass_ID, tex_preamble_ID, tex_preview_pagestyle_ID;
 ID tex_preview_paper_width_ID, tex_preview_paper_height_ID;
 ID tex_preview_hoffset_ID, tex_preview_voffset_ID;
@@ -43,8 +43,6 @@ void Init_IDs(void)
 	initialized_ID = rb_intern("@@initialized");
 	// instance variables
 	save_dir_ID = rb_intern("@save_dir");
-	model_number_ID = rb_intern("@model_number");
-	add_model_number_ID = rb_intern("@add_model_number");
 	quiet_mode_ID = rb_intern("@quiet_mode");    
 	tex_xoffset_ID = rb_intern("@tex_xoffset");
 	tex_yoffset_ID = rb_intern("@tex_yoffset");
@@ -433,18 +431,6 @@ char *Get_tex_preview_tiogafigure_command(VALUE fmkr) {
    return StringValuePtr(v);
 }
 
-static int Get_model_number(VALUE fmkr) {
-   VALUE v = rb_ivar_get(fmkr, model_number_ID);
-   if (v == Qnil) return 0;
-   v = rb_Integer(v);
-   return NUM2INT(v);
-}
-
-static bool Get_add_model_number(VALUE fmkr) {
-   VALUE v = rb_ivar_get(fmkr, add_model_number_ID);
-   return v != Qfalse && v != Qnil;
-}
-
 static bool Get_quiet_mode(VALUE fmkr) {
    VALUE v = rb_ivar_get(fmkr, quiet_mode_ID);
    return v != Qfalse && v != Qnil;
@@ -460,20 +446,10 @@ static void Set_initialized() {
 }
 
 static void Make_Save_Fname(VALUE fmkr, char *full_name, char *f_name,
-   bool with_save_dir, bool with_pdf_extension, bool add_mod_num) {
+   bool with_save_dir, bool with_pdf_extension) {
    int i, j, k, len, mod_len, mod_num, did_mod_num = false;
    char c, *fmt, model[STRLEN], *save=NULL;
    if (with_save_dir) save = Get_save_dir(fmkr);
-   if (add_mod_num) {
-      mod_num = Get_model_number(fmkr);
-      if (mod_num < 0) add_mod_num = false;
-      else {
-        fmt = ( mod_num < 10 )? "000%i" :
-            ( mod_num < 100 )? "00%i" :
-            ( mod_num < 1000 )? "0%i" : "%i";
-        sprintf(model, fmt, mod_num);
-        }
-      }
    if (with_save_dir && save != NULL && strlen(save) > 0) { 
       sprintf(full_name, "%s/", save); j = strlen(full_name); }
    else j = 0;
@@ -481,30 +457,20 @@ static void Make_Save_Fname(VALUE fmkr, char *full_name, char *f_name,
    len = strlen(f_name);
    for (i=0; i < len; i++) {
       c = f_name[i];
-      if (add_mod_num && c == '.' && !did_mod_num) {
-         mod_len = strlen(model); full_name[j++] = '_';
-         for (k=0; k < mod_len; k++) full_name[j++] = model[k]; /* insert model number before . */
-         did_mod_num = true;
-         }
       full_name[j++] = c;
       }
    full_name[j] = '\0';
    char *dot = strrchr(full_name,'.');
    if (dot == NULL || strcmp(dot+1,"pdf") != 0) { /* add pdf extension */
-      if (add_mod_num && !did_mod_num) {
-         mod_len = strlen(model); full_name[j++] = '_';
-         for (k=0; k < mod_len; k++) full_name[j++] = model[k]; /* insert model number at end */
-      }
-   full_name[j] = '\0';
-   if (!with_pdf_extension) return;
-   strcpy(full_name+j, ".pdf");
-   }
+        full_name[j] = '\0';
+        if (!with_pdf_extension) return;
+        strcpy(full_name+j, ".pdf");
+     }
 }
    
 VALUE FM_get_save_filename(VALUE fmkr, VALUE name) {
    char full_name[STRLEN];
-   bool add_mod_num = Get_add_model_number(fmkr);
-   Make_Save_Fname(fmkr, full_name, (name == Qnil)? NULL : StringValuePtr(name), false, false, add_mod_num);
+   Make_Save_Fname(fmkr, full_name, (name == Qnil)? NULL : StringValuePtr(name), false, false);
    return rb_str_new2(full_name);
 }
    
@@ -513,14 +479,13 @@ VALUE FM_private_make(VALUE fmkr, VALUE name, VALUE cmd) {
    FM *p = Get_FM(fmkr);
    FM saved = *p;
    VALUE result;
-   bool add_mod_num = Get_add_model_number(fmkr);
    bool quiet = Get_quiet_mode(fmkr);
    if (!Get_initialized()) {
       Init_pdf();
       Init_tex();
       Set_initialized();
    }
-   Make_Save_Fname(fmkr, full_name, (name == Qnil)? NULL : StringValuePtr(name), true, true, false);
+   Make_Save_Fname(fmkr, full_name, (name == Qnil)? NULL : StringValuePtr(name), true, true);
    Open_pdf(fmkr, full_name, quiet);
    Open_tex(fmkr, full_name, quiet);
    Write_gsave();
@@ -531,21 +496,14 @@ VALUE FM_private_make(VALUE fmkr, VALUE name, VALUE cmd) {
    if (result == Qfalse) quiet = true;
    Close_pdf(fmkr, quiet);
    Close_tex(fmkr, quiet);
-   if (!add_mod_num) {
-      Create_wrapper(fmkr, full_name, quiet);   
-   } else { // need to do this after make the plot so get correct model number
-      Make_Save_Fname(fmkr, mod_num_name, (name == Qnil)? NULL : StringValuePtr(name), true, true, true);
-      Rename_pdf(full_name, mod_num_name);
-      Rename_tex(full_name, mod_num_name);
-      Create_wrapper(fmkr, mod_num_name, quiet);   
-   }
+   Create_wrapper(fmkr, full_name, quiet);   
    *p = saved;
    return result;
 }
    
 VALUE FM_private_make_portfolio(VALUE fmkr, VALUE name, VALUE fignames) {
    char full_name[STRLEN];
-   Make_Save_Fname(fmkr, full_name, (name == Qnil)? NULL : StringValuePtr(name), true, false, false);
+   Make_Save_Fname(fmkr, full_name, (name == Qnil)? NULL : StringValuePtr(name), true, false);
    private_make_portfolio(full_name, fignames);
    return rb_str_new2(full_name);
 }

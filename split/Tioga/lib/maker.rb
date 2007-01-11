@@ -45,31 +45,16 @@ def report_error(er, msg)
 end
 
 
-def make_pdf(num)
+def require_pdf(num)
     fm = FigureMaker.default
-    result = fm.make_pdf(num)
+    puts "#{fm.figure_names[num]}"
+    result = fm.require_pdf(num)
     if result == false
         puts "####02FAILED" # GUI uses this
         return result
     end
     puts "####02OK #{result}"
-    return result
-end
-
-
-def make_and_preview(num, pdf_viewer, name = nil)
-    result = make_pdf(num)
-    fm = FigureMaker.default
-    return result if pdf_viewer == nil
-    if (name != nil)
-      pdf_name = name
-      syscmd = "cp " + result + " " + pdf_name
-      puts "#{result}"
-      system(syscmd)
-    else
-      pdf_name = result
-    end
-    reload_pdf(pdf_viewer, pdf_name)
+    puts "#{result}"
     return result
 end
 
@@ -107,6 +92,7 @@ def reload_pdf(pdf_viewer, pdf_name, revert=true, refocus=true)
     else
       syscmd += " False"
     end
+    syscmd += " > /dev/null"
     system(syscmd)
 end
 
@@ -128,8 +114,6 @@ def command_loop
         if cmd == "exit"
             puts "###\n"  # this marks end of command -- DON'T change it since the GUI depends on it!
             exit
-        elsif (cmd == "need_to_reload_data")
-            fm.need_to_reload_data = true
         elsif (cmd == "eval")
             string = cmd_line[5..-1]
             begin
@@ -140,50 +124,33 @@ def command_loop
             puts "####00" # GUI uses this
         elsif (cmd == "load")
             cmd, fname = cmd_line.scanf("%s %s")
-            if fname == nil
-                puts "must give file name as argument for load command"
-            else
-                have_loaded = loadfile(fname, cmd)
-            end
+            have_loaded = loadfile(fname, cmd)
             fname = fname[0..-4] if fname[-3..-1] == ".rb"
             pdf_name = fname + ".pdf"
-        elsif (cmd == "make" || cmd == "make_pdf" || cmd == "need_to_reload_data_and_make")
-            if cmd == "need_to_reload_data_and_make"
-                fm.need_to_reload_data = true
-            end
-            if !have_loaded
-                puts "must load a file before make a figure"
-            else
-                cmd, num = cmd_line.scanf("%s %s")
-                if num == nil || (num.to_i == 0 && num != "0")
-                    puts "must provide integer figure index as arg make"
-                elsif cmd == "make_pdf"
-                    i = num.to_i
-                    result = fm.make_pdf(i)
-                    puts "####03OK #{i} #{result}"
-                    puts "#{result}"
-                else
-                    result = make_and_preview(num.to_i, pdf_viewer, pdf_name)
+        elsif (cmd == "preview")
+            cmd, num = cmd_line.scanf("%s %s")
+            result = require_pdf(num.to_i)
+            fm = FigureMaker.default
+            return result if pdf_viewer == nil
+            syscmd = "cp " + result + " " + pdf_name
+            system(syscmd)
+            result = reload_pdf(pdf_viewer, pdf_name)
+        elsif cmd == "show"
+            # this is for showing a previously made pdf file in it's own window
+            cmd, figure_pdf_name = cmd_line.scanf("%s %s")
+            reload_pdf(pdf_viewer, figure_pdf_name)
+        elsif (cmd == "make_portfolio" || cmd == "make_all")
+            fm.num_figures.times { |i| 
+                if fm.figure_pdfs[i] == nil
+                  require_pdf(i)
                 end
-            end
-        elsif cmd == "make_all"
-            if !have_loaded
-                puts "must load a file before make_all"
-            else
-                fm.figure_names.each_with_index { |name,i| 
-                    result = fm.make_pdf(i)
-                    puts "####03OK #{i} #{result}"
-                    puts "#{result}"
-                }
-                puts "---done---"
-            end
-        elsif cmd == "make_portfolio"
-            if !have_loaded
-                puts "must load a file before make_portfolio"
-            else
+              }
+            if cmd == "make_portfolio"
                 cmd, name = cmd_line.scanf("%s %s")
                 name = "portfolio" if name == nil
-                portfolio_name = fm.make_portfolio(name,fm.figure_names)
+                puts "#{name}"
+                portfolio_name = fm.make_portfolio(name)
+                puts "#{portfolio_name}"
                 reload_pdf(pdf_viewer, portfolio_name, false) # current Preview has bug for thumbnails when Revert
                 puts " "
                 puts "Note: the current Preview fails to remake thumbnails after a Revert,"
@@ -191,85 +158,31 @@ def command_loop
                 puts "This will be changed as soon as a fixed Preview is available from Apple."
                 puts " "
             end
-        elsif cmd == "view_all"
-            if !have_loaded
-                puts "must load a file before make_all"
-            else
-                fm.figure_names.each_with_index { |name,i| make_and_preview(i, pdf_viewer, pdf_name) }
-                puts "---done---"
-            end
-            puts "####00" # GUI uses this
         elsif cmd == "name"
-            if !have_loaded
-                puts "must load a file before ask for figure names"
-            else
-                cmd, num = cmd_line.scanf("%s %s")
-                if (num == nil)
-                    puts "must give index of figure as argument for name command"
-                else
-                    eval_str = "fm.figure_name(#{num})"
-                    begin
-                        puts eval(eval_str)
-                    rescue Exception
-                        puts "invalid figure number #{num}"
-                    end
-                end
+            cmd, num = cmd_line.scanf("%s %s")
+            eval_str = "fm.figure_name(#{num})"
+            begin
+                puts eval(eval_str)
+            rescue Exception
+                puts "invalid figure number #{num}"
             end
         elsif cmd == "names"
-            if !have_loaded
-                puts "must load a file before ask for figure names"
-            else
-                puts fm.figure_names
-            end
+            puts fm.figure_names
         elsif cmd == "list"
-            if !have_loaded
-                puts "must load a file before ask to list figure names"
-            else
-                fm.figure_names.each_with_index { |name,i| STDOUT.printf("%3i %s\n",i,name) }
-            end
+            fm.figure_names.each_with_index { |name,i| STDOUT.printf("%3i %s\n",i,name) }
         elsif cmd == "num_figures"
-            if !have_loaded
-                puts "must load a file before ask how many figures"
-            else
-                eval_str = "fm.num_figures"
-                begin
-                    puts eval(eval_str).to_s
-                rescue Exception
-                end
+            eval_str = "fm.num_figures"
+            begin
+                puts eval(eval_str).to_s
+            rescue Exception
             end
         elsif cmd == "set_which_pdflatex"
             cmd, pdflatexname = cmd_line.scanf("%s %s")
-            if pdflatexname == nil
-                puts "must give pdflatex name as argument for set_which_pdflatex command"
-            else
-                FigureMaker.pdflatex = pdflatexname
-            end
-        elsif cmd == "review" || cmd == "show"
-            # this is for reviewing a previously made pdf file
-            if pdf_name == nil
-               puts "must set pdf_name before calling review"
-            elsif pdf_viewer == nil
-               puts "must set pdf_viewer before calling review"
-            else
-              cmd, figure_pdf_name = cmd_line.scanf("%s %s")
-              if figure_pdf_name == nil
-                 puts "must give figure pdf name as argument for review"
-              elsif cmd == "show"
-                 reload_pdf(pdf_viewer, pdf_name)
-              else
-                 system("cp " + figure_pdf_name + " " + pdf_name)
-                 reload_pdf(pdf_viewer, pdf_name)
-              end
-            end
+            FigureMaker.pdflatex = pdflatexname
         elsif cmd == "set_pdf_name"
             cmd, pdf_name = cmd_line.scanf("%s %s")
         elsif cmd == "set_which_viewer"
-            cmd, viewername = cmd_line.scanf("%s %s")
-            if viewername == nil
-                puts "must give viewer name as argument for set_which_viewer command"
-            else
-                pdf_viewer = viewername
-            end
+            cmd, pdf_viewer = cmd_line.scanf("%s %s")
         elsif cmd == "done"
         else
             puts "invalid command <#{cmd}> in command line <#{cmd_line}>"

@@ -17,11 +17,38 @@ class Executive < Doc < FigureMaker
     end
 
 # :call-seq:
+#   require_pdf(name)
+#   require_pdf(number)
+#
+# Calls make_pdf if the pdf for the figure has not yet been created.
+# Returns the full file name of the pdf.
+#
+    def require_pdf(name)
+    end
+
+# :call-seq:
+#   require_all
+#
+# Calls require_pdf for each of the figures.
+#
+    def require_all
+    end
+
+# :call-seq:
+#   make_all
+#
+# Calls make_pdf for each of the figures.  See also require_all.
+#
+    def make_all
+    end
+
+# :call-seq:
 #   make_figure(name)
 #   make_figure(number)
 #
 # Executes the corresponding code that was previously saved by def_figure.
 # Output is written to the currently specified save_dir directory. 
+# Alias for make_pdf.
 #
     def make_figure(name)
     end
@@ -32,9 +59,27 @@ class Executive < Doc < FigureMaker
 #
 # Executes the corresponding code that was previously saved by def_figure.
 # Output is written to the currently specified save_dir directory.
-# Alias for make_figure.
+# See also require_pdf.
 #
     def make_pdf(n)
+    end
+
+# :call-seq:
+#   make_portfolio(name)
+#
+# Creates a multipage pdf file containing the all of the figures.
+# Automatically calls require_all so that all the pdfs will be available.  The portfolio will
+# have the given _name_ with a ".pdf" extension and will be placed in the save_dir.
+#
+    def make_portfolio(name)
+    end
+
+# :call-seq:
+#   make_portfolio_pdf(name)
+#
+# Alias for make_portfolio.
+#
+    def make_portfolio_pdf(name)
     end
 
 
@@ -289,21 +334,6 @@ class Executive < Doc < FigureMaker
     end
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # :call-seq:
 #               run_dir                                     
 #
@@ -353,61 +383,10 @@ class Executive < Doc < FigureMaker
    end
 
 # :call-seq:
-#               model_number                                     
-#               model_number = an_integer
-#
-# This can be set by your figure routines.  It is used by the output routines if add_model_number is +true+.
-# The value should be an integer between 0 and 9999.
-   def model_number
-   end
-
-# :call-seq:
 #               get_save_filename(name) -> a_string
 #
 # Returns a string with the filename that will be used for saving the figure with the given _name_.
    def get_save_filename(name)
-   end
-
-# :call-seq:
-#               add_model_number                                     
-#               add_model_number = true_or_false
-#
-# This flag is initially +false+.  If it is set to +true+, then the output routines will append the
-# current model_number to the file names.  For example, if the plot name is "sample", the output names
-# when add_model_number is +false+ will be "sample_figure.pdf", "sample_figure.txt", "sample.tex", and
-# "sample.pdf".  However, if add_model_number is +true+ and +model_number+ is 57, say, then the names will
-# be "sample_0057_figure.pdf", "sample_0057_figure.txt", "sample_0057.tex", and
-# "sample_0057.pdf".
-# This can be useful if you are collecting several versions of
-# a figure for different sets of input data.
-   def add_model_number
-   end
-
-# :call-seq:
-#               need_to_reload_data                                     
-#               need_to_reload_data = true_or_false
-#
-# This flag is set to +true+ by the tioga front end for "refresh" commands.  Plot routines that support
-# auto-refresh can use this flag to avoid unnecessary reloading of data.  For example, a read_data method
-# that is called by all of the plotting definitions
-# might look like the following (in this example, the method "t" returns the default FigureMaker):
-#
-#     def read_data
-#         return unless t.need_to_reload_data
-#         ... read the data ...
-#         t.need_to_reload_data = false
-#     end
-# 
-   def need_to_reload_data
-   end
-
-# :call-seq:
-#               auto_refresh_filename                                     
-#               auto_refresh_filename = a_string
-#
-# If this is non-nil, the front end will only do an automatic refresh when this file has
-# been modified since the time of the last refresh.
-   def auto_refresh_filename
    end
 
 # :call-seq:
@@ -430,6 +409,26 @@ class Executive < Doc < FigureMaker
 # Returns the name from the figure_names array.
    def figure_name(num)
    end
+
+# :call-seq:
+#               figure_pdfs                                     
+#
+# An array of full pdf filenames for the currently defined figures.
+# All entries in the array initialized to +nil+.  When a pdf is created
+# for a figure, the full filename for the pdf is placed in this array
+# in position corresponding to the figure's location in figure_names. 
+   def figure_pdfs
+   end
+
+# :call-seq:
+#               figure_pdf(num) -> a_string or nil                                 
+#               figure_pdf(name) -> a_string or nil                    
+#
+# Returns the corresponding entry from the figure_pdfs array.
+   def figure_pdf(num)
+   end
+   
+
 
 
 end # class

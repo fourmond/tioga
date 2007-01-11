@@ -76,20 +76,14 @@ class FigureMaker
     attr_reader   :num_figures
     
     attr_reader   :figure_names
+    
+    attr_reader   :figure_pdfs
 
     attr_reader   :run_dir
     
     attr_accessor :save_dir
     
     attr_accessor :quiet_mode
-    
-    attr_accessor :model_number
-    
-    attr_accessor :add_model_number
-    
-    attr_accessor :need_to_reload_data
-    
-    attr_accessor :auto_refresh_filename
     
     attr_accessor :legend_defaults
     
@@ -103,29 +97,36 @@ class FigureMaker
     attr_accessor :tex_fontshape
     
     attr_accessor :num_error_lines
-    
-    # old preview attributes -- to be removed later
-    
-    #attr_accessor :tex_preview_documentclass   
-    #attr_accessor :tex_preview_pagestyle
-    #attr_accessor :tex_preview_tiogafigure_command  
-    attr_accessor :tex_xoffset
-    attr_accessor :tex_yoffset
-    
-    #attr_accessor :tex_preview_paper_width
-    #attr_accessor :tex_preview_paper_height
-    #attr_accessor :tex_preview_hoffset
-    #attr_accessor :tex_preview_voffset
-    #attr_accessor :tex_preview_figure_width
-    #attr_accessor :tex_preview_figure_height
-    #attr_accessor :tex_preview_minwhitespace
-    #attr_accessor :tex_preview_fullpage
 
     # Whether or not to create +save_dir+ if it doesn't exist
     attr_accessor :create_save_dir
 
     # Whether or not do do automatic cleanup of the files
     attr_accessor :autocleanup
+    
+    
+    
+    # old preview attributes -- to be removed later
+    
+            attr_accessor :model_number
+            attr_accessor :add_model_number   
+            attr_accessor :need_to_reload_data  
+            attr_accessor :auto_refresh_filename
+    
+            #attr_accessor :tex_preview_documentclass   
+            #attr_accessor :tex_preview_pagestyle
+            #attr_accessor :tex_preview_tiogafigure_command  
+            attr_accessor :tex_xoffset
+            attr_accessor :tex_yoffset
+    
+            #attr_accessor :tex_preview_paper_width
+            #attr_accessor :tex_preview_paper_height
+            #attr_accessor :tex_preview_hoffset
+            #attr_accessor :tex_preview_voffset
+            #attr_accessor :tex_preview_figure_width
+            #attr_accessor :tex_preview_figure_height
+            #attr_accessor :tex_preview_minwhitespace
+            #attr_accessor :tex_preview_fullpage
 
     
     def reset_figures # set the state to default values
@@ -137,6 +138,7 @@ class FigureMaker
         @name = nil
         @auto_refresh_filename = nil
         @figure_names = [ ]
+        @figure_pdfs = [ ]
         @legend_info = [ ]
         @run_dir = Dir.getwd
         @save_dir = nil
@@ -270,6 +272,17 @@ class FigureMaker
 
     def figure_name(num)
         @figure_names[num]
+    end
+
+    def figure_pdf(name)
+        if name.kind_of?(Integer)
+            num = name
+            name = @figure_names[num]
+        else
+            num = @figure_names.index(name)
+        end
+        return nil if num == nil
+        @figure_pdfs[num]
     end
     
     def line_color
@@ -1717,22 +1730,41 @@ class FigureMaker
             name = @figure_names[num]
             begin
                 result = create_figure(num)
-                name = get_save_filename(name) # must be done after making the figure to get correct model_number
+                name = get_save_filename(name)
             rescue Exception => er
                 report_error(er, "ERROR: make failed for #{name}")
                 result = false
             end
         end
-        finish_making_pdf(result, name)
+        return unless result
+        return @figure_pdfs[num] = finish_making_pdf(result, name)
     end
     
-    def make_portfolio_pdf(name, fignames=nil)
-        make_portfolio(name, fignames)
+    def make_all
+        @figure_names.length.times do |i|
+            make_pdf(i) if @figure_pdfs[i] == nil
+        end
+        return true
     end
     
-    def make_portfolio(name, fignames=nil)
-        fignames = @figure_names if fignames == nil
-        result = private_make_portfolio(name, fignames)
+    def require_pdf(num)
+        num = @figure_names.index(num) unless num.kind_of?(Integer)
+        make_pdf(num) if @figure_pdfs[num] == nil
+        return @figure_pdfs[num]
+    end
+    
+    def require_all
+        @figure_names.length.times { |i| require_pdf(i) if @figure_pdfs[i] == nil }
+        return true
+    end
+    
+    def make_portfolio_pdf(name)
+        make_portfolio(name)
+    end
+    
+    def make_portfolio(name)
+        require_all
+        result = private_make_portfolio(name, @figure_names)
         finish_making_pdf(result, name)
     end
     
@@ -1782,7 +1814,7 @@ class FigureMaker
             end
         end
         if result
-            pdfname = "#{name}"
+            pdfname = name
             logname = "pdflatex.log"
             files = %w(.tex .out .aux .log _figure.pdf _figure.txt).map do |suffix|
               pdfname + suffix
@@ -1806,7 +1838,8 @@ class FigureMaker
             end
             pdfname = "#{@save_dir}/#{pdfname}" if @save_dir != nil
             pdfname = "#{run_directory}/#{pdfname}" if run_directory != nil && pdfname[0..0] != '/'
-            return pdfname + ".pdf"
+            pdfname += ".pdf"
+            return pdfname
         end
         return false
     end
