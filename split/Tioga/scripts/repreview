@@ -1,0 +1,2 @@
+#!/bin/bash
+osascript '/Users/billpaxton/Library/Scripts/Reload_Preview_Document.scpt' $1

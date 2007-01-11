@@ -3,7 +3,7 @@
 require 'tk'
 require 'Tioga/tioga.rb'
 
-class TiogaGUI  
+class TiogaPointClick  
   
   include Tioga
   
@@ -432,5 +432,5 @@ class TiogaGUI
   
 end
 
-TiogaGUI.new(ARGV[0])
+TiogaPointClick.new(ARGV[0])
 
