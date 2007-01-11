@@ -10,20 +10,6 @@ class TiogaPointClick
   def fm
     FigureMaker.default
   end
-
-  
-  def report_error(er, msg)
-      puts msg
-      puts " "
-      puts "    " + "#{er.message}"
-      line_count = 0
-      er.backtrace.each do |line|
-          if line_count < fm.num_error_lines
-              puts "    " + line
-          end
-          line_count = line_count + 1
-      end
-  end
   
   
   def make_all_pdfs
@@ -38,22 +24,27 @@ class TiogaPointClick
   def make_portfolio(name = nil)
     return unless @have_loaded
     make_all_pdfs
-    name = "portfolio" if name == nil
+    name = @title_name + '_portfolio' if name == nil
     puts "#{name}"
     portfolio_name = fm.make_portfolio(name)
     puts "#{portfolio_name}"
     view_pdf(portfolio_name)
+    return unless $mac_command_key
     puts " "
-    puts "Note: the current Preview fails to remake thumbnails after a Revert,"
-    puts "so for now we have to do a Close and Open sequence as a workaround."
-    puts "This will be changed as soon as a fixed Preview is available from Apple."
+    puts "Note: Preview fails to make updated thumbnails after a Revert for a portfolio,"
+    puts "so for now you'll have to Close and redo Open as a workaround."
     puts " "
   end
 
 
   def require_pdf(num)
     puts "\n#{fm.figure_names[num]}"
-    return fm.require_pdf(num)
+    begin
+      result = fm.require_pdf(num)
+      puts result
+      return result
+    rescue
+    end
   end
   
   
@@ -89,10 +80,13 @@ class TiogaPointClick
       puts "\nloading #{fname}"
       load(fname) # this should define the TiogaFigures class
       num_fig = fm.num_figures
-      if num_fig == 0
-          puts "ERROR: Failed to define any figures.  Remember to invoke 'new' for the class containing the figure definitions"
+      if num_fig == 0 
+          raise "Failed to define any figures.  ' +
+            'Remember to invoke 'new' for the class containing the figure definitions"
       end
-      @root.title('Tioga:' + fname.split('/')[-1])
+      @title_name = fname.split('/')[-1]
+      @title_name = @title_name[0..-4] if @title_name[-3..-1] == ".rb"
+      @root.title('Tioga:' + @title_name)
       @listBox.delete(0, 'end')
       fm.figure_names.each { |name| @listBox.insert('end', name) }
       fname = fname[0..-4] if fname[-3..-1] == ".rb"
@@ -101,6 +95,20 @@ class TiogaPointClick
       set_selection(0) if reselect
     rescue Exception => er
       report_error(er, "ERROR: load failed for #{fname}\n")
+    end
+  end
+
+  
+  def report_error(er, msg)
+    puts msg
+    puts " "
+    puts "    " + "#{er.message}"
+    line_count = 0
+    er.backtrace.each do |line|
+        if line_count < fm.num_error_lines
+            puts "    " + line
+        end
+        line_count = line_count + 1
     end
   end
   
@@ -184,7 +192,8 @@ class TiogaPointClick
         puts "\neval " + str
         result = fm.eval_function(str)
         puts result
-    rescue
+    rescue Exception => er
+      report_error(er, "ERROR: eval failed for #{str}\n")
     end
   end
 
@@ -193,8 +202,9 @@ class TiogaPointClick
     filetypes = [["Ruby Files", "*.rb"]]
     filename = Tk.getOpenFile('filetypes' => filetypes,
                               'parent' => @root)
+    return unless filename.kind_of?String && filename.length > 0
     set_working_dir(filename)
-    loadfile(filename) unless filename == ""
+    loadfile(filename)
   end
 
 
