@@ -21,6 +21,7 @@
 =end
 
 require 'tk'
+
 require 'Tioga/tioga.rb'
 
 class TiogaPointClick  
@@ -43,25 +44,22 @@ class TiogaPointClick
   
   def make_portfolio(name = nil)
     return unless @have_loaded
-    make_all_pdfs
     name = @title_name + '_portfolio' if name == nil
-    puts "#{name}"
+    append_to_log "#{name}\n"
+    make_all_pdfs
     portfolio_name = fm.make_portfolio(name)
-    puts "#{portfolio_name}"
+    append_to_log "#{portfolio_name}\n"
     view_pdf(portfolio_name)
     return unless $mac_command_key
-    puts " "
-    puts "Note: Preview fails to make updated thumbnails after a Revert for a portfolio,"
-    puts "so for now you'll have to Close and redo Open as a workaround."
-    puts " "
+    append_to_log "\nNote: Preview fails to make updated thumbnails after a Revert for a portfolio,"
+    append_to_log "so for now you'll have to Close and redo Open as a workaround.\n"
   end
 
 
   def require_pdf(num)
-    puts "\n#{fm.figure_names[num]}"
     begin
       result = fm.require_pdf(num)
-      puts result
+      append_to_log result + "\n"
       return result
     rescue
     end
@@ -97,7 +95,7 @@ class TiogaPointClick
     @have_loaded = false
     fm.reset_state
     begin
-      puts "\nloading #{fname}"
+      append_to_log "loading #{fname}\n"
       load(fname) # this should define the TiogaFigures class
       num_fig = fm.num_figures
       if num_fig == 0 
@@ -120,13 +118,13 @@ class TiogaPointClick
 
   
   def report_error(er, msg)
-    puts msg
-    puts " "
-    puts "    " + "#{er.message}"
+    append_to_log msg
+    append_to_log " "
+    append_to_log "    " + "#{er.message}"
     line_count = 0
     er.backtrace.each do |line|
         if line_count < fm.num_error_lines
-            puts "    " + line
+            append_to_log "    " + line
         end
         line_count = line_count + 1
     end
@@ -209,12 +207,20 @@ class TiogaPointClick
   def eval
     begin
         str = @evalEntry.get
-        puts "\neval " + str
+        append_to_log "eval " + str
         result = fm.eval_function(str)
-        puts result
+        append_to_log result.to_s + "\n"
     rescue Exception => er
       report_error(er, "ERROR: eval failed for #{str}\n")
     end
+  end
+  
+  
+  def append_to_log(str)
+    return if @logText == nil
+    return unless str.kind_of?String
+    @logText.insert('end', str + "\n")
+    @logText.see('end')
   end
 
  
@@ -222,7 +228,7 @@ class TiogaPointClick
     filetypes = [["Ruby Files", "*.rb"]]
     filename = Tk.getOpenFile('filetypes' => filetypes,
                               'parent' => @root)
-    return unless filename.kind_of?String && filename.length > 0
+    return unless (filename.kind_of?String) && (filename.length > 0)
     set_working_dir(filename)
     loadfile(filename)
   end
@@ -327,8 +333,8 @@ class TiogaPointClick
   end
 
 
-  def createMenubar
-    menubar = TkFrame.new(@root) { background 'WhiteSmoke' }
+  def createMenubar(parent)
+    menubar = TkFrame.new(parent) { background 'WhiteSmoke' }
     
     addTiogaMenu(menubar)
     addFileMenu(menubar)
@@ -336,38 +342,61 @@ class TiogaPointClick
  
     menubar.pack('side' => 'top', 'fill' => 'x', 'padx' => 8, 'pady' => 8)
   end
+  
+  
+  def createLogText(parent)
+    
+    logFrame = TkFrame.new(parent) { background 'WhiteSmoke' }
+    
+    logText = TkText.new(logFrame) {
+      borderwidth 0
+      selectborderwidth 0
+      height 6
+      font $log_font
+    }
+
+    scrollBar = TkScrollbar.new(logFrame) { command proc { |*args| logText.yview(*args) } }
+    logText.yscrollcommand(proc { |first, last| scrollBar.set(first, last) })
+ 
+    scrollBar.pack('side' => 'right', 'fill' => 'y', 'pady' => 3)
+    logText.pack('side' => 'right', 'fill' => 'both', 'expand' => true, 'pady' => 2)
+    
+    logFrame.pack('side' => 'right', 'fill' => 'both', 'expand' => true)
+    
+    @logText = logText
+  end
  
  
-  def createFigureList
-    # Figure List
-    listFrame = TkFrame.new(@root) { background 'WhiteSmoke' }
+  def createFigureList(parent)
+
+    listFrame = TkFrame.new(parent) { background 'WhiteSmoke' }
     listBox = TkListbox.new(listFrame) {
       selectmode 'single'
       background 'white'
       borderwidth 0
       height 6
+      font $figures_font
     }
-    scrollBar = TkScrollbar.new(listFrame) {
-      command proc { |*args| listBox.yview(*args) } }
-    listBox.yscrollcommand(proc { |first, last|
-      scrollBar.set(first, last)
-    })
+    scrollBar = TkScrollbar.new(listFrame) { command proc { |*args| listBox.yview(*args) } }
+    listBox.yscrollcommand(proc { |first, last| scrollBar.set(first, last) })
     
     listBox.bind('ButtonRelease-1') { figureSelected }
  
     spacer = TkFrame.new(listFrame) { background 'WhiteSmoke' }
     spacer.pack('side' => 'left', 'padx' => 4) 
+    
     listBox.pack('side' => 'left', 'fill' => 'both', 'expand' => true, 'pady' => 2)
     scrollBar.pack('side' => 'right', 'fill' => 'y', 'pady' => 3)
-    listFrame.pack('side' => 'top', 'fill' => 'both', 'expand' => true)
+    
+    listFrame.pack('side' => 'left', 'fill' => 'both', 'expand' => true)
  
     @listBox = listBox
   end
   
   
-  def createEvalField
+  def createEvalField(parent)
   
-    evalFrame = TkFrame.new(@root, 'background' => 'WhiteSmoke') do
+    evalFrame = TkFrame.new(parent, 'background' => 'WhiteSmoke') do
     	pack('side' => 'bottom', 'fill' => 'x', 'pady' => 4)
     end
   
@@ -400,15 +429,15 @@ class TiogaPointClick
       
       parts = filename.split('/')
       if parts[-1].length < 2 || parts[-1][-2..-1] != "rb"
-        puts "ERROR: filename must have extension 'rb'   instead has <" + parts[-1][-2..-1] + ">"
+        append_to_log "ERROR: filename must have extension 'rb'   instead has <" + parts[-1][-2..-1] + ">"
         exit
       end
       dir = ""
       parts[0..-2].each {|part| dir << '/' + part unless part.length == 0 }
-      puts " "
-      puts filename
+      append_to_log " "
+      append_to_log filename
       
-      puts "changing working directory to " + dir
+      append_to_log "changing working directory to " + dir
       Dir.chdir(dir) # change current working directory
     end
   end
@@ -418,10 +447,14 @@ class TiogaPointClick
       
     # set the standard defaults
     $pdf_viewer = "xpdf"
-    $geometry = '250x180+750+50'
+    #$geometry = '250x180+750+50'
+    $geometry = '750x200+450+50'
     $background = 'WhiteSmoke'
     $mac_command_key = false
     $change_working_directory = true
+    
+    $log_font = 'system 12'
+    $figures_font = 'system 12'
     
     tpcrcname = ENV['HOME'] + '/.tpcrc'
     tpcrc = File.open(tpcrcname, 'r')
@@ -447,16 +480,19 @@ class TiogaPointClick
     @history = [ ]
     resetHistory
  
-    createMenubar
-    createFigureList
-    createEvalField
+    createMenubar(@root)
+    contentFrame = TkFrame.new(@root) { background 'WhiteSmoke' }
+    createFigureList(contentFrame)
+    createLogText(contentFrame)
+    contentFrame.pack('side' => 'top', 'fill' => 'both', 'expand' => true)
+    createEvalField(@root)
     @root.bind('Key-Up', proc { prev_in_list })
     @root.bind('Key-Down', proc { next_in_list })
     @root.bind('Key-Left', proc { back })
     @root.bind('Key-Right', proc { forward })
     
     loadfile(filename) unless filename == ""
-    Tk.mainloop
+    Tk.mainloop(false)
     
   end
   
