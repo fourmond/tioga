@@ -49,16 +49,33 @@ The following small file takes care of creating the pdfs for the movie.
                       # tell ProfilePlots to reload the data
                       @have_data = false
                       puts "\n" + fname
-                      t.add_model_number = true
-                      t.model_number = n
                       t.make_pdf(plot_number)
+                      pdf_name = t.figure_pdfs(plot_number)
+                      name = pdf_name[0..-5] # remove the '.pdf'
+                      name = append_sequence_number_to_name(name, n)
+                      syscmd = 'mv ' + pdf_name + ' ' + name + '.pdf'
+                      puts syscmd
+                      system(syscmd)
                   rescue
                       # end up here if the File.open failed
-                      # just continue to the next model number
+                      # just continue to check the next possible model number
                   end
                   n = n + 1
               end
               puts "\n"
+          end
+          
+          def append_sequence_number_to_name(name, n)
+            # always use at least 4 digits.  add leading 0's if necessary.
+            name += '_'
+            if n < 10
+              name += '000'
+            elsif n < 100
+              name += '00'
+            elsif n < 1000
+              name += '0'
+            end
+            name += n.to_s
           end
  
       end
@@ -71,13 +88,6 @@ says where the movie pdfs will go.  The arguments 'file_prefix' and 'file_suffix
 get wrapped around each model number to generate a name for a model data file.  
 The 'plot_number' argument says which plot to do from ProfilePlots.  The last two arguments,
 'first_model' and 'last_model', give the option of selecting a section of models for the movie.
-
-Notice that the run method sets t.add_model_number to true so that the pdf files will have
-the data model number added to their filenames.  This will ensure that the movie frames have the
-same order as the models.  There is also a line, @have_data = false, that is specific to
-the ProfilePlots class.  It tells the plot routines in ProfilePlots that they need to reload
-the data file since we've moved to a different model.  You may need to do something similar
-for your plotting routines.
   
 Once we've got movie_batch.rb set up, the movie pdfs can be created simply by having ruby run it.
 

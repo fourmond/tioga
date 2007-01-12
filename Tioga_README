@@ -21,7 +21,7 @@ This is the README for the Tioga kernel, version 1.3.1, December 12, 2006.
 
 << What's new >>
 
-	Version 1.3.2 (following immediately on the heels of 1.3.1 because I was tardy!)
+	Version 1.3.2
 	
 		In addition to the items Vincent described below for 1.3.1, there are also some 
 new enhancements to the irb_tioga package.  As you probably recall, it is a Tioga 

@@ -59,30 +59,11 @@ def mk(num)
 end
 
 # :call-seq:
-#  refresh
-#
-# Sets 'need_to_reload_data' true and redoes make for the most recently made figure.
-def refresh
-    fm = FigureMaker.default
-    fm.need_to_reload_data = true
-    make_figure($irb_figure_num)
-end
-
-# :call-seq:
-#  rf
-#
-# Alias for #refresh.
-def rf
-    refresh
-end
-
-# :call-seq:
 #  review
 #
-# Sets 'need_to_reload_data' true and redoes preview for the most recently made figure.
+# Redoes preview for the most recently made figure.
 def review
     fm = FigureMaker.default
-    fm.need_to_reload_data = true
     preview($irb_figure_num)
 end
 
@@ -169,58 +150,6 @@ end
 # Alias for #reload.
 def rl
     reload
-end
-
-$irb_period_for_refresh = 1.0
-
-# :call-seq:
-#  refresh_period seconds
-#
-# Sets the seconds between auto refreshes.
-def refresh_period(seconds)
-    $irb_period_for_refresh = seconds
-end
-
-# :call-seq:
-#  rp seconds
-#
-# Alias for refresh_period.
-def rp(seconds)
-    refresh_period(seconds)
-end
-
-# :call-seq:
-#  auto_refresh cnt
-#
-# Starts the auto refresh cycle and runs for _cnt_ refreshes.
-def auto_refresh(cnt)
-    fm = FigureMaker.default
-    filename = fm.auto_refresh_filename
-    if filename != nil
-        modtime = File.mtime(filename)
-    end
-    cnt = cnt.to_i
-    refresh; cnt -= 1
-    while cnt > 0
-        sleep($irb_period_for_refresh)
-        if filename == nil
-            refresh; cnt -= 1
-        else
-            newtime = File.mtime(filename)
-            if newtime != modtime
-                modtime = newtime
-                refresh; cnt -= 1
-            end
-        end
-    end
-end
-
-# :call-seq:
-#  ar cnt
-#
-# Alias for auto_refresh.
-def ar(cnt)
-    auto_refresh(cnt)
 end
 
 # :call-seq:
