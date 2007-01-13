@@ -20,11 +20,9 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 =end
 
-require 'tk'
-
 require 'Tioga/tioga.rb'
 
-class TiogaPointClick  
+class TiogaUI  
   
   include Tioga
   
@@ -33,8 +31,15 @@ class TiogaPointClick
   end
   
   
+  def check_have_loaded
+    return true if @have_loaded
+    append_to_log "Must open a file first!"
+    return false
+  end
+  
+  
   def make_all_pdfs
-    return unless @have_loaded
+    return unless check_have_loaded
     fm.num_figures.times { |i| 
         if fm.figure_pdfs[i] == nil
           require_pdf(i)
@@ -42,14 +47,15 @@ class TiogaPointClick
       }
   end
   
-  def make_portfolio(name = nil)
-    return unless @have_loaded
-    name = @title_name + '_portfolio' if name == nil
+  def make_portfolio(view = true)
+    return unless check_have_loaded
+    name = @title_name + '_portfolio'
     append_to_log "#{name}\n"
     make_all_pdfs
     portfolio_name = fm.make_portfolio(name)
-    append_to_log "#{portfolio_name}\n"
+    return unless view
     view_pdf(portfolio_name)
+    return if @batch_mode
     return unless $mac_command_key
     append_to_log "\nNote: Preview fails to make updated thumbnails after a Revert for a portfolio,"
     append_to_log "so for now you'll have to Close and redo Open as a workaround.\n"
@@ -58,10 +64,12 @@ class TiogaPointClick
 
   def require_pdf(num)
     begin
+      append_to_log fm.figure_names[num] + "\n"
       result = fm.require_pdf(num)
-      append_to_log result + "\n"
       return result
     rescue
+      puts "error return from require_pdf"
+      return nil
     end
   end
   
@@ -82,6 +90,9 @@ class TiogaPointClick
 
 
   def view_pdf(pdf_file)
+    if pdf_file == nil
+      raise 'view_pdf called with nil'
+    end
     system($pdf_viewer + ' ' + pdf_file + " > /dev/null")
   end
   
@@ -95,6 +106,7 @@ class TiogaPointClick
     @have_loaded = false
     fm.reset_state
     begin
+      
       append_to_log "loading #{fname}\n"
       load(fname) # this should define the TiogaFigures class
       num_fig = fm.num_figures
@@ -102,15 +114,20 @@ class TiogaPointClick
           raise "Failed to define any figures.  ' +
             'Remember to invoke 'new' for the class containing the figure definitions"
       end
+      
       @title_name = fname.split('/')[-1]
       @title_name = @title_name[0..-4] if @title_name[-3..-1] == ".rb"
-      @root.title('Tioga:' + @title_name)
-      @listBox.delete(0, 'end')
-      fm.figure_names.each { |name| @listBox.insert('end', name) }
       fname = fname[0..-4] if fname[-3..-1] == ".rb"
       @pdf_name = fname + ".pdf"
       @have_loaded = true
+      
+      return if @batch_mode
+      
+      @root.title('Tioga:' + @title_name)
+      @listBox.delete(0, 'end')
+      fm.figure_names.each { |name| @listBox.insert('end', name) }
       set_selection(0) if reselect
+      
     rescue Exception => er
       report_error(er, "ERROR: load failed for #{fname}\n")
     end
@@ -140,7 +157,7 @@ class TiogaPointClick
   
   
   def reload
-    return unless @have_loaded
+    return unless check_have_loaded
     selection = @listBox.curselection[0]
     name = (selection.kind_of?(Integer))? fm.figure_names[selection] : nil
     loadfile(@tioga_filename, false)
@@ -154,7 +171,7 @@ class TiogaPointClick
 
   
   def next_in_list
-    return unless @have_loaded
+    return unless check_have_loaded
     num = @listBox.curselection[0] + 1
     num = 0 if num >= @listBox.size
     set_selection(num)
@@ -162,7 +179,7 @@ class TiogaPointClick
 
   
   def prev_in_list
-    return unless @have_loaded
+    return unless check_have_loaded
     num = @listBox.curselection[0] - 1
     num = @listBox.size - 1 if num < 0
     set_selection(num)
@@ -217,6 +234,10 @@ class TiogaPointClick
   
   
   def append_to_log(str)
+    if @batch_mode
+      puts str
+      return
+    end
     return if @logText == nil
     return unless str.kind_of?String
     @logText.insert('end', str + "\n")
@@ -443,42 +464,107 @@ class TiogaPointClick
   end
 
  
-  def initialize(filename)
+  def initialize(filename,opt1,opt2)
       
     # set the standard defaults
-    $pdf_viewer = "xpdf"
-    #$geometry = '250x180+750+50'
-    $geometry = '750x200+450+50'
+    $pdf_viewer = "xpdf -remote tioga"
+    $geometry = '600x250+700+50'
     $background = 'WhiteSmoke'
     $mac_command_key = false
     $change_working_directory = true
-    
     $log_font = 'system 12'
     $figures_font = 'system 12'
     
-    tpcrcname = ENV['HOME'] + '/.tpcrc'
-    tpcrc = File.open(tpcrcname, 'r')
-    if (tpcrc != nil)
-      tpcrc.close
-      load(tpcrcname)
+    tiogainit_name = ENV['HOME'] + '/.tiogainit'
+    file = File.open(tiogainit_name, 'r')
+    if (file != nil)
+    
+      $filename = filename
+      $opt1 = opt1
+      $opt2 = opt2
+      
+      file.close
+      load(tiogainit_name)
+    
+      filename = $filename
+      opt1 = $opt1
+      opt2 = $opt2
+    
+      $filename = nil
+      $opt1 = nil
+      $opt2 = nil
+      
     end
     
-    set_working_dir(filename)
+    set_working_dir(filename) unless filename == nil
+
+    @tioga_filename = filename
+    @pdf_name = nil
+    @have_loaded = false
     
+    @history = [ ]
+    resetHistory
+    
+    if (filename != nil)
+      
+      @batch_mode = true
+    
+      if opt1 == '-l'
+        loadfile(filename)
+        fm.figure_names.each_with_index { |name,i| puts sprintf("%3i    %s\n",i,name) }
+        return
+      elsif opt1 != nil && (opt1.kind_of?String) && (/^\d+$/ === opt1[1..-1])
+        loadfile(filename)
+        view_pdf(require_pdf(opt1[1..-1].to_i))
+        return
+      elsif (opt1 == '-s' || opt1 == '-m') && opt2 != nil
+        opt2 = opt2.to_i if (/^\d+$/ === opt2)
+        loadfile(filename)
+        view_pdf(require_pdf(opt2)) if opt1 == '-s'
+        return
+      elsif opt1 == '-p'
+        loadfile(filename)
+        puts fm.num_figures
+        if fm.num_figures == 1
+          view_pdf(require_pdf(0))
+        else
+          make_portfolio(true) # make and show
+        end
+        return
+      elsif opt1 == '-a'
+        loadfile(filename)
+        make_all_pdfs
+        return
+      elsif opt1 != nil || filename == '-help'
+        puts 'Sorry: ' + opt1 + ' is not a recognized option.' unless opt1 == '-help' || filename == '-help'
+        puts "\nCommand line arguments must always start with the name of the tioga figures .rb file."
+        puts "The rest of the command line should be one of the following cases."
+        puts ''
+        puts '    -l          list the defined figures by number and name'
+        puts '    -<num>      show a figure PDF: <num> is the figure number (0 for the first figure)'
+        puts '    -s <fig>    show a figure PDF: <fig> is the figure name or number'
+        puts '    -p          show a portfolio of all the figures'
+        puts '    -m <fig>    make a figure PDF without showing it'
+        puts '    -a          make all the figure PDFs without showing them'
+        puts "\nFor more information, visit http://theory.kitp.ucsb.edu/~paxton/tioga.html"
+        puts ''
+        return
+      end
+    
+    end
+     
+    @batch_mode = false
+    
+    @accel_key = ($mac_command_key)? 'Cmd' : 'Ctrl'
+    @bind_key = ($mac_command_key)? 'Command' : 'Control'
+
+    require 'tk'
+   
     @root = TkRoot.new { 
       geometry $geometry
       background $background
       pady 2
       }
-
-    @tioga_filename = filename
-    @pdf_name = nil
-    
-    @accel_key = ($mac_command_key)? 'Cmd' : 'Ctrl'
-    @bind_key = ($mac_command_key)? 'Command' : 'Control'
-    
-    @history = [ ]
-    resetHistory
  
     createMenubar(@root)
     contentFrame = TkFrame.new(@root) { background 'WhiteSmoke' }
@@ -491,12 +577,12 @@ class TiogaPointClick
     @root.bind('Key-Left', proc { back })
     @root.bind('Key-Right', proc { forward })
     
-    loadfile(filename) unless filename == ""
+    loadfile(filename) unless filename == nil
     Tk.mainloop(false)
     
   end
   
 end
 
-TiogaPointClick.new(ARGV[0])
+TiogaUI.new(ARGV[0],ARGV[1],ARGV[2])
 

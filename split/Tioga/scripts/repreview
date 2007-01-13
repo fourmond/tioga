@@ -1,2 +1,8 @@
 #!/bin/bash
-osascript '/Users/billpaxton/Library/Scripts/Reload_Preview_Document.scpt' $1
+
+# when this script runs, your normal $PATH list is not used!
+# so the AppleScript needs to be in a standard location
+
+echo $PATH
+
+osascript '/usr/bin/Reload_Preview_Document.scpt' $*

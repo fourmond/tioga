@@ -1,0 +1,3 @@
+#!/bin/bash
+ruby -e "require 'Tioga/tioga_ui.rb'" -- $*
+

@@ -318,15 +318,6 @@ class MyFigures
         )
     end
     
-    def gradient_shading
-        t.axial_shading(
-            'start_point' => [0, 0],
-            'end_point' => [0, 1], 
-            'colormap' => t.create_gradient_colormap('hue' => t.rgb_to_hls(Linen)[0],
-                            'saturation' => 0.3, 'starting_L' => 0.6, 'ending_L' => 0.99)
-        )
-    end
-    
     def text_justification
         background
         centerx = t.bounds_xmin + 0.5 * t.bounds_width
@@ -418,7 +409,21 @@ class MyFigures
         margin = 0.02 
         t.set_subframe('left' => margin, 'right' => margin, 'top' => margin, 'bottom' => margin)
         t.clip_to_frame
-        gradient_shading
+        if true # this is the normal "cool" tioga icon
+          t.axial_shading(
+              'start_point' => [0, 0],
+              'end_point' => [0, 1], 
+              'colormap' => t.create_gradient_colormap('hue' => t.rgb_to_hls(Linen)[0],
+                              'saturation' => 0.3, 'starting_L' => 0.6, 'ending_L' => 0.99)
+          )
+        else # this is the "hot" icon for when the droplet is working
+          t.axial_shading(
+              'start_point' => [0, 0],
+              'end_point' => [0, 1], 
+              'colormap' => t.create_gradient_colormap('hue' => t.rgb_to_hls(Linen)[0],
+                              'saturation' => 1, 'starting_L' => 0.3, 'ending_L' => 0.99)
+          )
+        end
         t.stroke_color = Black
         t.line_width = 8 
         t.stroke_frame
