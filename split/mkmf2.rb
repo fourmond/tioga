@@ -379,7 +379,12 @@ module Mkmf2
 
       # Then, we expand the files:
       for f in sources
-        @sources += Dir.glob(f)
+        files = Dir.glob(f)
+        if files.empty?
+          @sources << f
+        else
+          @sources += files
+        end
       end
 
       # and we update the list of current object files
@@ -704,6 +709,7 @@ module Mkmf2
   # nil, the second part says which name it should have as global variable.
   MKMF_GLOBAL_VARIABLES =   {
     "CFLAGS" => nil, 
+    "CXXFLAGS" => nil, 
     "LDFLAGS" => nil, 
     "DLDFLAGS" => nil,
     "CPPFLAGS" => nil,

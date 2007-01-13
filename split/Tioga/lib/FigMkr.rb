@@ -1086,6 +1086,7 @@ class FigureMaker
         'head_angle', 'tail_angle',  
         'head_scale', 'tail_scale'])
 
+    # TODO: add linestyle capacities to arrows.
     def show_arrow(dict)
         check_dict(dict, @@keys_for_show_arrow, 'show_arrow')
         if check_pair(head = dict['head'], 'head', 'show_arrow')
@@ -1136,7 +1137,9 @@ class FigureMaker
         newlen = len - 0.5*chsz
         newlen = 0 if newlen < 0
         frac = newlen / len
-        stroke_line(x_tail + frac*dx, y_tail + frac*dy, x_tail, y_tail)
+        # Don't actually stroke the line if line_width is null. Can be used
+        # to draw only the markers.
+        stroke_line(x_tail + frac*dx, y_tail + frac*dy, x_tail, y_tail) if line_width > 0
         angle = convert_to_degrees(dx, dy)
         if head_marker != 'None'
             if head_marker == Arrowhead || head_marker == ArrowheadOpen
@@ -2011,7 +2014,7 @@ class FigureMaker
     
     def check_pair(ary, name, who_called)
         return false if ary == nil
-        if !(ary.kind_of?Array) and ary.size == 2
+        if !(ary.kind_of?(Array) || ary.kind_of?(Dvector)) and ary.size == 2
             raise "Sorry: '#{name}' must be array [x,y] for #{who_called}."
         end
         return true

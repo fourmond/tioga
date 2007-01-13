@@ -53,6 +53,9 @@ the previous open.  Happily, other people have solved this one for us.  There's 
 simple script that gets Preview to do "Open/Revert" -- I'll send out a copy of this in
 an email to tioga-news.
 
+		Moerover, numbers on axis are now written in math mode, so that minus signs
+have the right size. (and more funny details if you play around with custom fonts).
+
 	Cheers,
 	Bill
 
