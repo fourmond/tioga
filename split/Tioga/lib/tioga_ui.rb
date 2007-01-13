@@ -26,6 +26,7 @@ class TiogaUI
   
   include Tioga
   
+  
   def fm
     FigureMaker.default
   end
@@ -38,20 +39,20 @@ class TiogaUI
   end
   
   
-  def make_all_pdfs
+  def make_all_pdfs(view = true)
     return unless check_have_loaded
     fm.num_figures.times { |i| 
-        if fm.figure_pdfs[i] == nil
-          require_pdf(i)
-        end
+        pdf_name = require_pdf(i)
+        view_pdf(pdf_name) if view && pdf_name != nil
       }
   end
+  
   
   def make_portfolio(view = true)
     return unless check_have_loaded
     name = @title_name + '_portfolio'
     append_to_log "#{name}\n"
-    make_all_pdfs
+    make_all_pdfs(false)
     portfolio_name = fm.make_portfolio(name)
     return unless view
     view_pdf(portfolio_name)
@@ -62,51 +63,35 @@ class TiogaUI
   end
 
 
-  def require_pdf(num)
+  def require_pdf(arg) # num is either figure number or name
     begin
+      num = arg
+      num = fm.figure_names.index(num) unless num == nil || num.kind_of?(Integer)
+      if num == nil || num < 0 || num >= fm.num_figures
+        puts 'Sorry: ' + arg.to_s + ' is an invalid figure specification.'
+        raise
+      end
       append_to_log fm.figure_names[num] + "\n"
       result = fm.require_pdf(num)
       return result
     rescue
-      puts "error return from require_pdf"
       return nil
     end
-  end
-  
-  
-  def preview(num)
-    result = require_pdf(num)
-    return result if $pdf_viewer == nil
-    syscmd = "cp " + result + " " + @pdf_name
-    system(syscmd)
-    saveInHistory(num)
-    return view_pdf(@pdf_name)
-  end
-  
-  
-  def show_in_own_window
-    view_pdf(fm.figure_pdfs[@listBox.curselection[0]])
   end
 
 
   def view_pdf(pdf_file)
-    if pdf_file == nil
-      raise 'view_pdf called with nil'
-    end
-    system($pdf_viewer + ' ' + pdf_file + " > /dev/null")
-  end
-  
-  
-  def figureSelected
-    preview(@listBox.curselection[0])
+    return if pdf_file == nil
+    system($pdf_viewer + ' ' + pdf_file)# + " > /dev/null") # suppress bogus messages from pdflatex
   end
 
 
-  def loadfile(fname, reselect=true)
+  def loadfile(reselect=true)
     @have_loaded = false
     fm.reset_state
     begin
       
+      fname = $filename
       append_to_log "loading #{fname}\n"
       load(fname) # this should define the TiogaFigures class
       num_fig = fm.num_figures
@@ -132,8 +117,205 @@ class TiogaUI
       report_error(er, "ERROR: load failed for #{fname}\n")
     end
   end
+  
+  
+  def set_working_dir(filename)
+    return unless $change_working_directory
+    
+    # if necessary, add the current directory to the front of the filename
+    filename = Dir.getwd + '/' + filename if filename[0..0] != '/'
+    
+    parts = filename.split('/')
+    if parts[-1].length < 2 || parts[-1][-2..-1] != "rb"
+      append_to_log "ERROR: filename must have extension 'rb'   instead has <" + parts[-1][-2..-1] + ">"
+      exit
+    end
+    dir = ""
+    parts[0..-2].each {|part| dir << '/' + part unless part.length == 0 }
+    append_to_log " "
+    append_to_log filename
+    
+    if dir != Dir.getwd
+      append_to_log "changing working directory to " + dir
+      Dir.chdir(dir) # change current working directory
+    end
+    
+    $filename = filename
+
+  end
+  
+  
+  def show_help(filename,opt1)
+    unless opt1 == '-help' || filename == '-help' || filename == nil
+      puts 'Sorry: ' + opt1 + ' is not a recognized option.' 
+    end
+    puts "\nThis is brief description of the command line options for tioga."
+    puts "\nThey include the usual help and version commands."
+    puts '    -help       print this message'
+    puts '    -v          print the tioga version information'
+    puts "\nOther commands all start with the name of a tioga ruby file (with extension .rb)."
+    puts "     BTW: since the extension is known, you can skip typing it if you like."
+    puts "\nThe input file need not be in your current working directory;"
+    puts "     tioga automatically changes its working directory to the directory containing the file,"
+    puts "     and that's also the location for the created PDFs."
+    puts "\nIf there are no other items on the command line, tioga shows the first figure defined in the file."
+    puts "\nIf there are other items, the rest of the command line should be one of the following cases:"
+    puts '    -l          list the defined figures by number and name'
+    puts '    -<num>      show a figure PDF: <num> is the figure number, starting from 0'
+    puts '    -s <fig>    make and then show a figure PDF: <fig> is the figure name or number'
+    puts '    -s          make and then show all the figure PDFs, each in a separate viewer window'
+    puts '    -m <fig>    make a figure PDF without showing it'
+    puts '    -m          make all the figure PDFs without showing them'
+    puts '    -p          make all the PDFs and show a portfolio combining them as a single, multi-page PDF'
+    puts "\nThe viewer for showing PDFs is specified by the $pdf_viewer variable in tioga."
+    puts "     That variable can be set by creating a .tiogainit file in your home directory."
+    puts "     Your current setting for $pdf_viewer is " + $pdf_viewer + '.'
+    puts "     To change it, edit ~/.tiogainit to add the line $pdf_viewer = 'my viewer command'"
+    puts "     The shell command tioga uses for show is the $pdf_viewer string followed by the PDF filename."
+    puts "\nFor more information, visit http://theory.kitp.ucsb.edu/~paxton/tioga.html"
+    puts ''
+  end
+  
+  
+  def setdir_and_load
+    set_working_dir($filename)
+    loadfile
+  end
+
+ 
+  def initialize(filename,opt1,opt2)
+    
+    $filename = filename
+    $opt1 = opt1
+    $opt2 = opt2
+      
+    # set the standard defaults
+    $pdf_viewer = "xpdf"
+    $geometry = '600x250+700+50'
+    $background = 'WhiteSmoke'
+    $mac_command_key = false
+    $change_working_directory = true
+    $log_font = 'system 12'
+    $figures_font = 'system 12'
+    
+    tiogainit_name = ENV['HOME'] + '/.tiogainit'
+    file = File.open(tiogainit_name, 'r')
+    if (file != nil)
+      
+      file.close
+      load(tiogainit_name)
+      
+    end
+
+    if $filename != nil && $filename[-3..-1] != '.rb' && 
+        $filename[-3..-1] != '.RB' && $filename != '-help' && $filename != '-v'
+      $filename += '.rb'
+    end
+    
+    @pdf_name = nil
+    @have_loaded = false
+
+    
+    if (true) 
+      
+      # currently, we are only supporting command line interface.
+      # the code for making a Ruby/Tk interface can be enabled if you want to play with it.
+      
+      @batch_mode = true
+      
+      if $filename == nil || $filename == '-help'
+        show_help(nil,nil)
+      elsif $filename == '-v'
+        puts FigureMaker.version
+      elsif opt1 == nil
+        setdir_and_load
+        view_pdf(require_pdf(0))
+      elsif opt1 == '-l'
+        setdir_and_load
+        fm.figure_names.each_with_index { |name,i| puts sprintf("%3i    %s\n",i,name) }
+      elsif opt1 != nil && (opt1.kind_of?String) && (/^\d+$/ === opt1[1..-1])
+        setdir_and_load
+        view_pdf(require_pdf(opt1[1..-1].to_i))
+      elsif (opt1 == '-s' || opt1 == '-m') 
+        setdir_and_load
+        if opt2 != nil
+          opt2 = opt2.to_i if (/^\d+$/ === opt2)
+          pdf_name = require_pdf(opt2)
+          view_pdf(pdf_name) if opt1 == '-s'
+        else
+          make_all_pdfs(opt1 == '-s')
+        end
+      elsif opt1 == '-p'
+        setdir_and_load
+        if fm.num_figures == 1
+          view_pdf(require_pdf(0))
+        else
+          make_portfolio(true) # make and show
+        end
+      else # unrecognized command
+        show_help($filename,opt1)
+      end
+      
+      return
+    
+    end
+     
+=begin   
+    # Ruby/Tk
+    
+    @batch_mode = false
+    
+    @history = [ ]
+    resetHistory
+    
+    @accel_key = ($mac_command_key)? 'Cmd' : 'Ctrl'
+    @bind_key = ($mac_command_key)? 'Command' : 'Control'
+
+    require 'tk'
+   
+    @root = TkRoot.new { 
+      geometry $geometry
+      background $background
+      pady 2
+      }
+ 
+    createMenubar(@root)
+    contentFrame = TkFrame.new(@root) { background 'WhiteSmoke' }
+    createFigureList(contentFrame)
+    createLogText(contentFrame)
+    contentFrame.pack('side' => 'top', 'fill' => 'both', 'expand' => true)
+    createEvalField(@root)
+    @root.bind('Key-Up', proc { prev_in_list })
+    @root.bind('Key-Down', proc { next_in_list })
+    @root.bind('Key-Left', proc { back })
+    @root.bind('Key-Right', proc { forward })
+    
+    loadfile unless $filename == nil
+    Tk.mainloop(false)
+=end
+    
+  end
 
   
+  def append_to_log(str)
+    if @batch_mode
+      puts str
+      return
+    end
+    return if @logText == nil
+    return unless str.kind_of?String
+    @logText.insert('end', str + "\n")
+    @logText.see('end')
+  end
+
+
+=begin  
+  
+  
+  def figureSelected
+    preview(@listBox.curselection[0])
+  end
+
   def report_error(er, msg)
     append_to_log msg
     append_to_log " "
@@ -145,6 +327,21 @@ class TiogaUI
         end
         line_count = line_count + 1
     end
+  end
+  
+  
+  def preview(num)
+    result = require_pdf(num)
+    return result if $pdf_viewer == nil
+    syscmd = "cp " + result + " " + @pdf_name
+    system(syscmd)
+    saveInHistory(num)
+    return view_pdf(@pdf_name)
+  end
+  
+  
+  def show_in_own_window
+    view_pdf(fm.figure_pdfs[@listBox.curselection[0]])
   end
   
   
@@ -160,7 +357,7 @@ class TiogaUI
     return unless check_have_loaded
     selection = @listBox.curselection[0]
     name = (selection.kind_of?(Integer))? fm.figure_names[selection] : nil
-    loadfile(@tioga_filename, false)
+    loadfile(false)
     num = fm.figure_names.index(name)
     unless num.kind_of?(Integer)
       reset_history
@@ -232,18 +429,6 @@ class TiogaUI
     end
   end
   
-  
-  def append_to_log(str)
-    if @batch_mode
-      puts str
-      return
-    end
-    return if @logText == nil
-    return unless str.kind_of?String
-    @logText.insert('end', str + "\n")
-    @logText.see('end')
-  end
-
  
   def openDocument
     filetypes = [["Ruby Files", "*.rb"]]
@@ -251,7 +436,7 @@ class TiogaUI
                               'parent' => @root)
     return unless (filename.kind_of?String) && (filename.length > 0)
     set_working_dir(filename)
-    loadfile(filename)
+    loadfile
   end
 
 
@@ -444,174 +629,7 @@ class TiogaUI
 
   end
   
-  
-  def set_working_dir(filename)
-    if $change_working_directory && filename[0..0] == '/'
-      
-      parts = filename.split('/')
-      if parts[-1].length < 2 || parts[-1][-2..-1] != "rb"
-        append_to_log "ERROR: filename must have extension 'rb'   instead has <" + parts[-1][-2..-1] + ">"
-        exit
-      end
-      dir = ""
-      parts[0..-2].each {|part| dir << '/' + part unless part.length == 0 }
-      append_to_log " "
-      append_to_log filename
-      
-      append_to_log "changing working directory to " + dir
-      Dir.chdir(dir) # change current working directory
-    end
-  end
-  
-  
-  def show_help(filename,opt1)
-    unless opt1 == '-help' || filename == '-help' || filename == nil
-      puts 'Sorry: ' + opt1 + ' is not a recognized option.' 
-    end
-    puts "\nThis is brief description of the command line options for tioga."
-    puts "\nThere are the usual help and version commands."
-    puts '    -help       print this message'
-    puts '    -v          print the tioga version information'
-    puts "\nOther commands all start with the name of a tioga ruby file (with extension .rb)."
-    puts "     BTW: since the extension is known, you can skip typing it if you like."
-    puts "\nThe input file need not be in your current working directory;"
-    puts "     tioga automatically changes its working directory to the directory containing the file,"
-    puts "     and that's also the location for the created PDFs."
-    puts "\nIf there are no other items on the command line, tioga shows the first figure defined in the file."
-    puts "\nIf there are other items, the rest of the command line should be one of the following cases:"
-    puts '    -l          list the defined figures by number and name'
-    puts '    -<num>      show a figure PDF: <num> is the figure number, starting from 0'
-    puts '    -s <fig>    show a figure PDF: <fig> is the figure name or number'
-    puts '    -p          show a portfolio of all the figures'
-    puts '    -m <fig>    make a figure PDF without showing it'
-    puts '    -a          make all the figure PDFs without showing them'
-    puts "\nThe viewer for showing PDFs is specified by the $pdf_viewer variable in tioga."
-    puts "     That variable can be set by creating a .tiogainit file in your home directory."
-    puts "     Your current setting for $pdf_viewer is " + $pdf_viewer + '.'
-    puts "     To change it, edit ~/.tiogainit to add the line $pdf_viewer = 'my_viewer_choice'"
-    puts "\nFor more information, visit http://theory.kitp.ucsb.edu/~paxton/tioga.html"
-    puts ''
-  end
-
- 
-  def initialize(filename,opt1,opt2)
-      
-    # set the standard defaults
-    $pdf_viewer = "xpdf -remote tioga"
-    $geometry = '600x250+700+50'
-    $background = 'WhiteSmoke'
-    $mac_command_key = false
-    $change_working_directory = true
-    $log_font = 'system 12'
-    $figures_font = 'system 12'
-    
-    tiogainit_name = ENV['HOME'] + '/.tiogainit'
-    file = File.open(tiogainit_name, 'r')
-    if (file != nil)
-    
-      $filename = filename
-      $opt1 = opt1
-      $opt2 = opt2
-      
-      file.close
-      load(tiogainit_name)
-    
-      filename = $filename
-      opt1 = $opt1
-      opt2 = $opt2
-    
-      $filename = nil
-      $opt1 = nil
-      $opt2 = nil
-      
-    end
-
-    if filename != nil && filename[-3..-1] != '.rb' && 
-        filename[-3..-1] != '.RB' && filename != '-help' && filename != '-v'
-      filename += '.rb'
-    end
-    
-    @tioga_filename = filename
-    @pdf_name = nil
-    @have_loaded = false
-    
-    @history = [ ]
-    resetHistory
-    
-    if (true) 
-      
-      # currently, we are only supporting batch mode
-      # the code for making a Ruby/Tk interface can be enabled
-      # by changing if (true) to if (filename != nil)
-      
-      @batch_mode = true
-      
-      if filename == nil
-        show_help(filename,opt1)
-      elsif filename == '-help'
-        show_help(nil,nil)
-      elsif filename == '-v'
-        puts FigureMaker.version
-      elsif opt1 == nil
-        set_working_dir(filename); loadfile(filename)
-        view_pdf(require_pdf(0))
-      elsif opt1 == '-l'
-        set_working_dir(filename); loadfile(filename)
-        fm.figure_names.each_with_index { |name,i| puts sprintf("%3i    %s\n",i,name) }
-      elsif opt1 != nil && (opt1.kind_of?String) && (/^\d+$/ === opt1[1..-1])
-        set_working_dir(filename); loadfile(filename)
-        view_pdf(require_pdf(opt1[1..-1].to_i))
-      elsif (opt1 == '-s' || opt1 == '-m') && opt2 != nil
-        opt2 = opt2.to_i if (/^\d+$/ === opt2)
-        set_working_dir(filename); loadfile(filename)
-        view_pdf(require_pdf(opt2)) if opt1 == '-s'
-      elsif opt1 == '-p'
-        set_working_dir(filename); loadfile(filename)
-        puts fm.num_figures
-        if fm.num_figures == 1
-          view_pdf(require_pdf(0))
-        else
-          make_portfolio(true) # make and show
-        end
-      elsif opt1 == '-a'
-        set_working_dir(filename); loadfile(filename)
-        make_all_pdfs
-      elsif opt1 != nil || filename == '-help'
-        show_help(filename,opt1)
-      end
-      
-      return
-    
-    end
-     
-    @batch_mode = false
-    
-    @accel_key = ($mac_command_key)? 'Cmd' : 'Ctrl'
-    @bind_key = ($mac_command_key)? 'Command' : 'Control'
-
-    require 'tk'
-   
-    @root = TkRoot.new { 
-      geometry $geometry
-      background $background
-      pady 2
-      }
- 
-    createMenubar(@root)
-    contentFrame = TkFrame.new(@root) { background 'WhiteSmoke' }
-    createFigureList(contentFrame)
-    createLogText(contentFrame)
-    contentFrame.pack('side' => 'top', 'fill' => 'both', 'expand' => true)
-    createEvalField(@root)
-    @root.bind('Key-Up', proc { prev_in_list })
-    @root.bind('Key-Down', proc { next_in_list })
-    @root.bind('Key-Left', proc { back })
-    @root.bind('Key-Right', proc { forward })
-    
-    loadfile(filename) unless filename == nil
-    Tk.mainloop(false)
-    
-  end
+=end  
   
 end
 
