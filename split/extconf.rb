@@ -41,8 +41,6 @@ declare_library("Tioga",
                 "Tioga/lib/FigMkr.rb",
                 "Tioga/lib/FigureConstants.rb",
                 "Tioga/lib/MarkerConstants.rb",
-                "Tioga/lib/maker.rb",
-                "Tioga/lib/irb_tioga.rb",
                 "Tioga/lib/tioga_ui.rb",
                 "Tioga/lib/Utils.rb",
                 "Tioga/lib/TexPreamble.rb")
