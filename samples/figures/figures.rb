@@ -404,26 +404,24 @@ class MyFigures
     end
     
     def icon
+        tioga_cool = false
         t.fill_color = SlateGray
         t.fill_frame
         margin = 0.02 
         t.set_subframe('left' => margin, 'right' => margin, 'top' => margin, 'bottom' => margin)
         t.clip_to_frame
-        if true # this is the normal "cool" tioga icon
-          t.axial_shading(
+        saturation = (tioga_cool)? 0.3 : 0.7
+        starting_L = (tioga_cool)? 0.6 : 0.2
+        ending_L = (tioga_cool)? 0.99 : 0.2
+        t.axial_shading(
               'start_point' => [0, 0],
               'end_point' => [0, 1], 
-              'colormap' => t.create_gradient_colormap('hue' => t.rgb_to_hls(Linen)[0],
-                              'saturation' => 0.3, 'starting_L' => 0.6, 'ending_L' => 0.99)
-          )
-        else # this is the "hot" icon for when the droplet is working
-          t.axial_shading(
-              'start_point' => [0, 0],
-              'end_point' => [0, 1], 
-              'colormap' => t.create_gradient_colormap('hue' => t.rgb_to_hls(Linen)[0],
-                              'saturation' => 1, 'starting_L' => 0.3, 'ending_L' => 0.99)
-          )
-        end
+              'colormap' => t.create_gradient_colormap(
+                              'hue' => t.rgb_to_hls(Linen)[0],
+                              'saturation' => saturation, 
+                              'starting_L' => starting_L, 
+                              'ending_L' => ending_L)
+              )
         t.stroke_color = Black
         t.line_width = 8 
         t.stroke_frame
@@ -442,8 +440,13 @@ class MyFigures
             'color' => Grey,
             'mode' => FILL, 'horizontal_scale' => 0.9, 'vertical_scale' => -0.4, 'italic_angle' => -7)
         t.fill_opacity = 1.0
-        t.show_marker('font' => Helvetica, 'string' => 'Tioga', 'scale' => scale, 'point' => [x+0.01,y],
-            'mode' => STROKE_AND_CLIP, 'horizontal_scale' => 0.9)
+        if tioga_cool
+          t.show_marker('font' => Helvetica, 'string' => 'Tioga', 'scale' => scale, 'point' => [x+0.01,y],
+              'mode' => STROKE_AND_CLIP, 'horizontal_scale' => 0.9)
+        else
+          t.show_marker('font' => Helvetica_BoldOblique, 'string' => 'Tioga', 'scale' => scale, 'point' => [x+0.02,y],
+              'mode' => STROKE_AND_CLIP, 'horizontal_scale' => 0.9)
+        end
         t.axial_shading( # this fills the 'Tioga' string
             'start_point' => [0, -0.06],
             'end_point' => [0, 1.4], 

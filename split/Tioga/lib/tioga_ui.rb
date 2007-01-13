@@ -462,6 +462,36 @@ class TiogaUI
       Dir.chdir(dir) # change current working directory
     end
   end
+  
+  
+  def show_help(filename,opt1)
+    unless opt1 == '-help' || filename == '-help' || filename == nil
+      puts 'Sorry: ' + opt1 + ' is not a recognized option.' 
+    end
+    puts "\nThis is brief description of the command line options for tioga."
+    puts "\nThere are the usual help and version commands."
+    puts '    -help       print this message'
+    puts '    -v          print the tioga version information'
+    puts "\nOther commands all start with the name of a tioga ruby file (with extension .rb)."
+    puts "     BTW: since the extension is known, you can skip typing it if you like."
+    puts "\nThe input file need not be in your current working directory;"
+    puts "     tioga automatically changes its working directory to the directory containing the file,"
+    puts "     and that's also the location for the created PDFs."
+    puts "\nIf there are no other items on the command line, tioga shows the first figure defined in the file."
+    puts "\nIf there are other items, the rest of the command line should be one of the following cases:"
+    puts '    -l          list the defined figures by number and name'
+    puts '    -<num>      show a figure PDF: <num> is the figure number, starting from 0'
+    puts '    -s <fig>    show a figure PDF: <fig> is the figure name or number'
+    puts '    -p          show a portfolio of all the figures'
+    puts '    -m <fig>    make a figure PDF without showing it'
+    puts '    -a          make all the figure PDFs without showing them'
+    puts "\nThe viewer for showing PDFs is specified by the $pdf_viewer variable in tioga."
+    puts "     That variable can be set by creating a .tiogainit file in your home directory."
+    puts "     Your current setting for $pdf_viewer is " + $pdf_viewer + '.'
+    puts "     To change it, edit ~/.tiogainit to add the line $pdf_viewer = 'my_viewer_choice'"
+    puts "\nFor more information, visit http://theory.kitp.ucsb.edu/~paxton/tioga.html"
+    puts ''
+  end
 
  
   def initialize(filename,opt1,opt2)
@@ -495,9 +525,12 @@ class TiogaUI
       $opt2 = nil
       
     end
-    
-    set_working_dir(filename) unless filename == nil
 
+    if filename != nil && filename[-3..-1] != '.rb' && 
+        filename[-3..-1] != '.RB' && filename != '-help' && filename != '-v'
+      filename += '.rb'
+    end
+    
     @tioga_filename = filename
     @pdf_name = nil
     @have_loaded = false
@@ -505,51 +538,49 @@ class TiogaUI
     @history = [ ]
     resetHistory
     
-    if (filename != nil)
+    if (true) 
+      
+      # currently, we are only supporting batch mode
+      # the code for making a Ruby/Tk interface can be enabled
+      # by changing if (true) to if (filename != nil)
       
       @batch_mode = true
-    
-      if opt1 == '-l'
-        loadfile(filename)
+      
+      if filename == nil
+        show_help(filename,opt1)
+      elsif filename == '-help'
+        show_help(nil,nil)
+      elsif filename == '-v'
+        puts FigureMaker.version
+      elsif opt1 == nil
+        set_working_dir(filename); loadfile(filename)
+        view_pdf(require_pdf(0))
+      elsif opt1 == '-l'
+        set_working_dir(filename); loadfile(filename)
         fm.figure_names.each_with_index { |name,i| puts sprintf("%3i    %s\n",i,name) }
-        return
       elsif opt1 != nil && (opt1.kind_of?String) && (/^\d+$/ === opt1[1..-1])
-        loadfile(filename)
+        set_working_dir(filename); loadfile(filename)
         view_pdf(require_pdf(opt1[1..-1].to_i))
-        return
       elsif (opt1 == '-s' || opt1 == '-m') && opt2 != nil
         opt2 = opt2.to_i if (/^\d+$/ === opt2)
-        loadfile(filename)
+        set_working_dir(filename); loadfile(filename)
         view_pdf(require_pdf(opt2)) if opt1 == '-s'
-        return
       elsif opt1 == '-p'
-        loadfile(filename)
+        set_working_dir(filename); loadfile(filename)
         puts fm.num_figures
         if fm.num_figures == 1
           view_pdf(require_pdf(0))
         else
           make_portfolio(true) # make and show
         end
-        return
       elsif opt1 == '-a'
-        loadfile(filename)
+        set_working_dir(filename); loadfile(filename)
         make_all_pdfs
-        return
       elsif opt1 != nil || filename == '-help'
-        puts 'Sorry: ' + opt1 + ' is not a recognized option.' unless opt1 == '-help' || filename == '-help'
-        puts "\nCommand line arguments must always start with the name of the tioga figures .rb file."
-        puts "The rest of the command line should be one of the following cases."
-        puts ''
-        puts '    -l          list the defined figures by number and name'
-        puts '    -<num>      show a figure PDF: <num> is the figure number (0 for the first figure)'
-        puts '    -s <fig>    show a figure PDF: <fig> is the figure name or number'
-        puts '    -p          show a portfolio of all the figures'
-        puts '    -m <fig>    make a figure PDF without showing it'
-        puts '    -a          make all the figure PDFs without showing them'
-        puts "\nFor more information, visit http://theory.kitp.ucsb.edu/~paxton/tioga.html"
-        puts ''
-        return
+        show_help(filename,opt1)
       end
+      
+      return
     
     end
      

@@ -32,7 +32,8 @@ class MyPlots
 
   # in make_data, we create the data set to be plotted
   def make_data
-    xAxis = Dvector.new(500) {|i| 2*PI*i/100.0 }
+    num = 25
+    xAxis = Dvector.new(num) {|i| 2*PI*i/(num-1) }
     
     yAxis = xAxis.sin
 
@@ -64,21 +65,20 @@ class MyPlots
   def exec_plot
     make_data
     t.do_box_labels('Curve $y = \sin x$', '$x$', '$y$')
-    xs = @data[0]
-    ys = @data[1]
+    xs = @data[0]; ys = @data[1]
     t.show_plot(plot_boundaries(xs,ys,@margin)) {
-      # plot lines
-      t.show_polyline(xs,ys,Red)
-      # plot markers
+      t.show_polyline(xs,ys,Indigo) # plot lines
       t.show_marker('Xs' => xs, 'Ys' => ys,
-                    'marker' => Asterisk, 'scale' => 0.5, 
-                    'color' => Blue)
+                    'marker' => [ ZapfDingbats, 114 ],
+                    'scale' => 1.2, 
+                    'color' => Blue) if true # plot markers
     }
   end
 
   def run
     t.make_preview_pdf("Plot")
   end
+  
 end
 
 p = MyPlots.new($*[0])
