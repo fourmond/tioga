@@ -7,24 +7,19 @@ module Tioga
 = Tutorial
 
 This tutorial gives a guided tour through the programs included in the "samples" subfolder
-found in the installation folder.  The hope is that it will give you
-an understanding of the samples that will let you pick and choose from them as a way of
-getting started on your own applications.
-
-The tutorial also contains material introducing the command
-line interface and the graphical interface (for the Mac) along with hints and suggestions for using tioga
-effectively.
+found in the installation folder.  It also contains material introducing the command
+line interface along with hints and suggestions for using tioga effectively.
 
 By the way, the tutorial assumes you want to use Ruby directly to write the programs that 
-describe the figures and plots.  If instead of that you'd prefer a command-line interface along the
-lines of gnuplot, then be sure to read all about {ctioga}[http://sciyag.rubyforge.org/ctioga/index.html].
-Basically, ctioga writes the ruby tioga program for you, making it easy to do easy plots while still
-having the ability to do more complex ones by adding options to the command line.  
-
+describe the figures and plots. If instead of that you'd prefer a command-line interface 
+along the lines of gnuplot, then be sure to read all about {Ctioga}[http://sciyag.rubyforge.org/ctioga/index.html]. 
+Basically, Ctioga writes the ruby program for you, making it easy to do easy plots while still having 
+the ability to do complex ones by adding options to the command line.
+  
 ---
 
 The first step in the tutorial is to locate the samples folder and take a look at what's inside.  
-You should find a +README+ and several subfolders.
+You should find a +README+ and several subfolders including:
 
 * figures
 * plots
@@ -42,9 +37,9 @@ Here are the sections of the tutorial, in the order they are intended to be read
 
 UsingRuby -- The bare essentials for using ruby with tioga
 
-DocStructure -- The basic anatomy of a tioga document and "batch-mode" operation
+DocStructure -- The basic anatomy of a tioga document
 
-IRB_tioga -- Intro to using interactive ruby as a tioga front-end
+CommandLine -- How to run tioga from the shell
 
 SimpleFigure -- A first look at a nontrivial tioga figure definition
 

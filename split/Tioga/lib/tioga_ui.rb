@@ -30,6 +30,18 @@ class TiogaUI
   def fm
     FigureMaker.default
   end
+
+  
+  def append_to_log(str)
+    if @batch_mode
+      puts str
+      return
+    end
+    return if @logText == nil
+    return unless str.kind_of?String
+    @logText.insert('end', str + "\n")
+    @logText.see('end')
+  end
   
   
   def check_have_loaded
@@ -67,21 +79,34 @@ class TiogaUI
     begin
       num = arg
       num = fm.figure_names.index(num) unless num == nil || num.kind_of?(Integer)
-      if num == nil || num < 0 || num >= fm.num_figures
-        puts 'Sorry: ' + arg.to_s + ' is an invalid figure specification.'
+      if fm.num_figures == 0
+        puts "\nCan't build pdf because failed to define any figures."
+        puts ''
         raise
       end
-      append_to_log fm.figure_names[num] + "\n"
+      if num == nil || num < 0 || num >= fm.num_figures
+        puts "\n" + arg.to_s + ' is an invalid figure specification.'
+        puts ''
+        raise
+      end
       result = fm.require_pdf(num)
+      if result == nil
+        puts "\nFailed during attempt to create pdf file."
+        puts ''
+        raise
+      end
+      #append_to_log result + "\n"
       return result
-    rescue
-      return nil
     end
   end
 
 
   def view_pdf(pdf_file)
-    return if pdf_file == nil
+    if pdf_file == nil || pdf_file == false
+      puts "\nERROR: invalid pdf file."
+      puts ''
+      raise
+    end
     system($pdf_viewer + ' ' + pdf_file)# + " > /dev/null") # suppress bogus messages from pdflatex
   end
 
@@ -149,7 +174,7 @@ class TiogaUI
     unless opt1 == '-help' || filename == '-help' || filename == nil
       puts 'Sorry: ' + opt1 + ' is not a recognized option.' 
     end
-    puts "\nThis is brief description of the command line options for tioga."
+    puts "\nThis is a brief description of the command line options for tioga."
     puts "\nThey include the usual help and version commands."
     puts '    -help       print this message'
     puts '    -v          print the tioga version information'
@@ -174,6 +199,22 @@ class TiogaUI
     puts "     The shell command tioga uses for show is the $pdf_viewer string followed by the PDF filename."
     puts "\nFor more information, visit http://theory.kitp.ucsb.edu/~paxton/tioga.html"
     puts ''
+  end
+
+
+  def report_error(er, msg)
+    append_to_log msg
+    append_to_log " "
+    append_to_log "    " + "#{er.message}"
+    line_count = 0
+    reached_here = false
+    er.backtrace.each do |line|
+        reached_here = true if line.include?('Tioga/tioga_ui.rb')
+        if (line_count < fm.num_error_lines) and (reached_here == false)
+            append_to_log "    " + line
+        end
+        line_count = line_count + 1
+    end
   end
   
   
@@ -216,51 +257,67 @@ class TiogaUI
     @have_loaded = false
 
     
-    if (true) 
+    if (true)
       
-      # currently, we are only supporting command line interface.
-      # the code for making a Ruby/Tk interface can be enabled if you want to play with it.
+      begin
+        # currently, we are only supporting command line interface.
+        # the code for making a Ruby/Tk interface can be enabled if you want to play with it.
       
-      @batch_mode = true
+        @batch_mode = true
       
-      if $filename == nil || $filename == '-help'
-        show_help(nil,nil)
-      elsif $filename == '-v'
-        puts FigureMaker.version
-      elsif opt1 == nil
-        setdir_and_load
-        view_pdf(require_pdf(0))
-      elsif opt1 == '-l'
-        setdir_and_load
-        fm.figure_names.each_with_index { |name,i| puts sprintf("%3i    %s\n",i,name) }
-      elsif opt1 != nil && (opt1.kind_of?String) && (/^\d+$/ === opt1[1..-1])
-        setdir_and_load
-        view_pdf(require_pdf(opt1[1..-1].to_i))
-      elsif (opt1 == '-s' || opt1 == '-m') 
-        setdir_and_load
-        if opt2 != nil
-          opt2 = opt2.to_i if (/^\d+$/ === opt2)
-          pdf_name = require_pdf(opt2)
-          view_pdf(pdf_name) if opt1 == '-s'
-        else
-          make_all_pdfs(opt1 == '-s')
-        end
-      elsif opt1 == '-p'
-        setdir_and_load
-        if fm.num_figures == 1
+      
+        if $filename == nil || $filename == '-help'
+          show_help(nil,nil)
+        elsif $filename == '-v'
+          puts FigureMaker.version
+        elsif opt1 == nil
+          setdir_and_load
           view_pdf(require_pdf(0))
-        else
-          make_portfolio(true) # make and show
+        elsif opt1 == '-l'
+          setdir_and_load
+          fm.figure_names.each_with_index { |name,i| puts sprintf("%3i    %s\n",i,name) }
+        elsif opt1 != nil && (opt1.kind_of?String) && (/^\d+$/ === opt1[1..-1])
+          setdir_and_load
+          view_pdf(require_pdf(opt1[1..-1].to_i))
+        elsif (opt1 == '-s' || opt1 == '-m') 
+          setdir_and_load
+          if opt2 != nil
+            opt2 = opt2.to_i if (/^\d+$/ === opt2)
+            pdf_name = require_pdf(opt2)
+            if opt1 == '-s'
+              view_pdf(pdf_name)
+            else
+              puts pdf_name
+            end
+          else
+            make_all_pdfs(opt1 == '-s')
+          end
+        elsif opt1 == '-p'
+          setdir_and_load
+          if fm.num_figures == 1
+            view_pdf(require_pdf(0))
+          else
+            make_portfolio(true) # make and show
+          end
+        else # unrecognized command
+          show_help($filename,opt1)
         end
-      else # unrecognized command
-        show_help($filename,opt1)
+      rescue
       end
       
       return
     
     end
-     
-=begin   
+
+    # call start_Tk here if you want to use the Ruby/Tk interface
+    
+  end
+  
+
+
+=begin  
+
+  def start_Tk
     # Ruby/Tk
     
     @batch_mode = false
@@ -292,41 +349,11 @@ class TiogaUI
     
     loadfile unless $filename == nil
     Tk.mainloop(false)
-=end
-    
   end
-
-  
-  def append_to_log(str)
-    if @batch_mode
-      puts str
-      return
-    end
-    return if @logText == nil
-    return unless str.kind_of?String
-    @logText.insert('end', str + "\n")
-    @logText.see('end')
-  end
-
-
-=begin  
   
   
   def figureSelected
     preview(@listBox.curselection[0])
-  end
-
-  def report_error(er, msg)
-    append_to_log msg
-    append_to_log " "
-    append_to_log "    " + "#{er.message}"
-    line_count = 0
-    er.backtrace.each do |line|
-        if line_count < fm.num_error_lines
-            append_to_log "    " + line
-        end
-        line_count = line_count + 1
-    end
   end
   
   

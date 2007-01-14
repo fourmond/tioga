@@ -1796,7 +1796,7 @@ class FigureMaker
                 else
                     logname = "#{@save_dir}/pdflatex.log"
                 end
-                puts "ERROR: #{pdflatex} failed.  see #{logname} for details."
+                puts "ERROR: #{pdflatex} failed."
                 file = File.open(logname)
                 if file == nil
                     puts "cannot open #{logname}"
@@ -1920,8 +1920,10 @@ class FigureMaker
         end
         puts "    " + "#{er.message}" + "  [version: " + FigureMaker.version + "]"
         line_count = 0
+        reached_FigMkr = false
         er.backtrace.each do |line|
-            if line_count < @num_error_lines
+            reached_FigMkr = true if line.include?('Tioga/FigMkr.rb')
+            if (line_count < @num_error_lines) and (reached_FigMkr == false)
                 puts "    " + line
             end
             line_count = line_count + 1

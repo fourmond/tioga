@@ -27,14 +27,12 @@
 ===Tioga
 
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Icon.jpg
+http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Icon.jpeg
 
 Tioga is a program for creating figures and plots using Ruby, PDF, and TeX.
 
 It was originally designed, implemented, and documented by {Bill Paxton}[http://theory.kitp.ucsb.edu/~paxton/].
-
-    Kavli Institute for Theoretical Physics
-    University of California, Santa Barbara
+{Vincent Fourmond}[http://vincent.fourmond.neuf.fr] has also been an active developer of Tioga for sometime now.
 
 The tioga kernel is a {Ruby}[http://www.rubycentral.com/misc/intro.html] 
 extension providing a set of classes and modules

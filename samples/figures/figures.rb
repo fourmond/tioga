@@ -404,20 +404,24 @@ class MyFigures
     end
     
     def icon
-        tioga_cool = false
+        tioga_cool = true
+        sz = 4.25
+        t.page_setup(sz*72,sz*72)
+        t.set_frame_sides(0.05,0.95,0.85,0.15) # left, right, top, bottom in page coords        
         t.fill_color = SlateGray
         t.fill_frame
         margin = 0.02 
         t.set_subframe('left' => margin, 'right' => margin, 'top' => margin, 'bottom' => margin)
         t.clip_to_frame
-        saturation = (tioga_cool)? 0.3 : 0.7
+        saturation = (tioga_cool)? 0.4 : 1
         starting_L = (tioga_cool)? 0.6 : 0.2
-        ending_L = (tioga_cool)? 0.99 : 0.2
+        ending_L = (tioga_cool)? 0.9 : 1
+        hue = (tioga_cool)? (t.rgb_to_hls(Linen)[0]) : (t.rgb_to_hls(SlateGray)[0])
         t.axial_shading(
               'start_point' => [0, 0],
               'end_point' => [0, 1], 
               'colormap' => t.create_gradient_colormap(
-                              'hue' => t.rgb_to_hls(Linen)[0],
+                              'hue' => hue,
                               'saturation' => saturation, 
                               'starting_L' => starting_L, 
                               'ending_L' => ending_L)
@@ -425,7 +429,7 @@ class MyFigures
         t.stroke_color = Black
         t.line_width = 8 
         t.stroke_frame
-        angle = 60; size = 3.5; shift = -1.3
+        angle = 60; size = 3.5; shift = -1.0
         t.show_text('text' => '\sffamily\textbf{Ruby}', 'side' => BOTTOM, 'pos' => 0.27, 'shift' => shift,
             'scale' => size, 'angle' => angle)
         t.show_text('text' => '\sffamily\textbf{PDF}', 'side' => BOTTOM, 'pos' => 0.58, 'shift' => shift,
@@ -433,24 +437,28 @@ class MyFigures
         t.show_text('text' => '\textbf{\TeX}', 'side' => BOTTOM, 'pos' => 0.86, 'shift' => shift,
             'scale' => size, 'angle' => angle)
         x = t.bounds_xmin + 0.5 * t.bounds_width
-        y = 0.68; scale = 7
+        y = 0.68; scale = 9
         t.line_width = 2
         t.fill_opacity = 0.6
         t.show_marker('font' => Helvetica, 'string' => 'Tioga', 'scale' => scale, 'point' => [x+0.03,y-0.28],
             'color' => Grey,
             'mode' => FILL, 'horizontal_scale' => 0.9, 'vertical_scale' => -0.4, 'italic_angle' => -7)
         t.fill_opacity = 1.0
+        t.show_marker(
+              'font' => Helvetica_BoldOblique, 'string' => 'Tioga', 
+              'scale' => scale, 'point' => [x+0.02,y],
+              'mode' => STROKE_AND_CLIP, 'horizontal_scale' => 0.9)
         if tioga_cool
-          t.show_marker('font' => Helvetica, 'string' => 'Tioga', 'scale' => scale, 'point' => [x+0.01,y],
-              'mode' => STROKE_AND_CLIP, 'horizontal_scale' => 0.9)
+          t.axial_shading( # this fills the 'Tioga' string
+              'start_point' => [0, -0.06],
+              'end_point' => [0, 1.4], 
+              'colormap' => t.rainbow_colormap)
         else
-          t.show_marker('font' => Helvetica_BoldOblique, 'string' => 'Tioga', 'scale' => scale, 'point' => [x+0.02,y],
-              'mode' => STROKE_AND_CLIP, 'horizontal_scale' => 0.9)
+          t.axial_shading( # this fills the 'Tioga' string
+              'start_point' => [0, 0.4],
+              'end_point' => [0, 2.3], 
+              'colormap' => t.rainbow_colormap)
         end
-        t.axial_shading( # this fills the 'Tioga' string
-            'start_point' => [0, -0.06],
-            'end_point' => [0, 1.4], 
-            'colormap' => t.rainbow_colormap)
     end
 
     def marker_horizontal_scaling
