@@ -224,29 +224,44 @@ class TiogaUI
   end
 
  
-  def initialize(filename,opt1,opt2)
+  def initialize(args)
     
-    $filename = filename
-    $opt1 = opt1
-    $opt2 = opt2
-      
     # set the standard defaults
+    $tioga_args = args
     $pdf_viewer = "xpdf"
+    $change_working_directory = true
+ 
+=begin     
+    # Ruby/Tk defaults
     $geometry = '600x250+700+50'
     $background = 'WhiteSmoke'
     $mac_command_key = false
-    $change_working_directory = true
     $log_font = 'system 12'
     $figures_font = 'system 12'
+=end
     
     tiogainit_name = ENV['HOME'] + '/.tiogainit'
     file = File.open(tiogainit_name, 'r')
     if (file != nil)
-      
       file.close
       load(tiogainit_name)
-      
     end
+    
+    # check for an initialization file
+    if ($tioga_args.length >= 3) && ($tioga_args[1] == '-x')
+      file = File.open($tioga_args[2], 'r')
+      if (file != nil)
+        file.close
+        load($tioga_args[2])
+      end
+      opt1 = $tioga_args[3] if $tioga_args.length >= 4
+      opt2 = $tioga_args[4] if $tioga_args.length >= 5
+    else
+      opt1 = $tioga_args[1] if $tioga_args.length >= 2
+      opt2 = $tioga_args[2] if $tioga_args.length >= 3
+    end
+
+    $filename = $tioga_args[0] if $tioga_args.length >= 1
 
     if $filename != nil && $filename[-3..-1] != '.rb' && 
         $filename[-3..-1] != '.RB' && $filename != '-help' && $filename != '-v'
@@ -256,7 +271,6 @@ class TiogaUI
     @pdf_name = nil
     @have_loaded = false
 
-    
     if (true)
       
       begin
@@ -264,7 +278,6 @@ class TiogaUI
         # the code for making a Ruby/Tk interface can be enabled if you want to play with it.
       
         @batch_mode = true
-      
       
         if $filename == nil || $filename == '-help'
           show_help(nil,nil)
@@ -660,5 +673,5 @@ class TiogaUI
   
 end
 
-TiogaUI.new(ARGV[0],ARGV[1],ARGV[2])
+TiogaUI.new(ARGV)
 
