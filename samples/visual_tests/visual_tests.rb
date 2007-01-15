@@ -474,11 +474,11 @@ class MyPlots
     def arrows
       x = 2.3
       y = 4.234
-      t.do_box_labels("Arrows tests", "Position", "Blues")
+      #t.do_box_labels("Arrows tests", "Position", "Blues")
       t.show_plot([0,x + 1,0,y + 1]) do
         t.show_arrow('head' => [x,y], 
                      'tail' => [0, 0], 
-                     'color' => Crimson,
+                     'color' => Blue,
                      'line_width' => 0.05)
         t.show_arrow('head' => [0.5 * x, 0.5 * y], 
                      'tail' => [0, 0], 

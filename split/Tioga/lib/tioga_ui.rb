@@ -62,7 +62,7 @@ class TiogaUI
   
   
   def make_portfolio(view = true)
-    return unless check_have_loaded
+    return unless check_have_loaded && okay_to_make_portfolio
     name = @title_name + '_portfolio'
     make_all_pdfs(false)
     portfolio_name = fm.make_portfolio(name)
@@ -75,10 +75,24 @@ class TiogaUI
   end
 
 
+  def okay_to_make_portfolio
+    true
+  end
+
+  def okay_to_make_pdf(num)
+    true
+  end
+  
+  def okay_to_show_pdf(pdf_file)
+    true
+  end
+
+
   def require_pdf(arg) # num is either figure number or name
     begin
       num = arg
       num = fm.figure_names.index(num) unless num == nil || num.kind_of?(Integer)
+      return nil unless okay_to_make_pdf(arg)
       if fm.num_figures == 0
         puts "\nCan't build pdf because failed to define any figures."
         puts ''
@@ -102,6 +116,7 @@ class TiogaUI
 
 
   def view_pdf(pdf_file)
+    return nil unless okay_to_show_pdf(pdf_file)
     if pdf_file == nil || pdf_file == false
       puts "\nERROR: invalid pdf file."
       puts ''

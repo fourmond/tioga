@@ -43,6 +43,10 @@ you'll see something like this:
          To change it, edit ~/.tiogainit to add the line $pdf_viewer = 'my viewer command'
          The shell command tioga uses for show is the $pdf_viewer string followed by the PDF file name.
 
+    To facilitate the use of this interface from scripts, you can insert the following immediately
+         after the tioga figures filename and before any of the options listed above.
+         -x <filename>  run the named ruby file before loading the tioga figures file
+
     For more information, visit http://theory.kitp.ucsb.edu/~paxton/tioga.html
 
 Let's begin exploring these commands by making a PDF for one of the figures defined in sample.rb --
@@ -343,7 +347,26 @@ that solely does the equivalent of 'tioga filename -p' for any files dropped on 
 
 
 If you create another user interface for tioga that you'd like to share, please let me know and I'll add it to this list.
- 
+
+
+== Details that you will probably never need to know
+
+Here are a few details that might be useful if you decide to write scripts that use the tioga command line interface.
+
+The -x option lets you run another initialization file after ~/.tiogainit has finished and before the tioga
+figures file is loaded.  An array of command line arguments for tioga can be found in the variable $tioga_args.
+Your initialization file can modify the $tioga_args array however it pleases -- the array is not unloaded until
+after the initialization is over.  
+
+In addition to $tioga_args and $pdf_viewer, there is another global variable called $change_working_directory
+that is true by default.  If you set it false tioga will not change the current working directory 
+to match the file path.
+
+There are three "filter" routines that by default always return true.  They are called
+okay_to_make_pdf(num), okay_to_show_pdf(pdf_filename), and okay_to_make_portfolio.  You can redefine these methods
+in class TiogaUI if you need to block certain actions.  For example, to make a subset of the figures, you
+could invoke the usual -m option that normally makes all the pdfs with okay_to_make_pdf redefined so that it only returns true
+for the figures you really want to make. 
 
 ---
 
