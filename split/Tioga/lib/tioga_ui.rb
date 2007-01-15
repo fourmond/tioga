@@ -184,7 +184,7 @@ class TiogaUI
     puts "     tioga automatically changes its working directory to the directory containing the file,"
     puts "     and that's also the location for the created PDFs."
     puts "\nIf there are no other items on the command line, tioga shows the first figure defined in the file."
-    puts "\nIf there are other items, the rest of the command line should be one of the following cases:"
+    puts "\nIf there are other items, the rest of the command line should be one of the following cases."
     puts '    -l          list the defined figures by number and name'
     puts '    -<num>      show a figure PDF: <num> is the figure number, starting from 0'
     puts '    -s <fig>    make and then show a figure PDF: <fig> is the figure name or number'
@@ -197,6 +197,9 @@ class TiogaUI
     puts "     Your current setting for $pdf_viewer is " + $pdf_viewer + '.'
     puts "     To change it, edit ~/.tiogainit to add the line $pdf_viewer = 'my viewer command'"
     puts "     The shell command tioga uses for show is the $pdf_viewer string followed by the PDF filename."
+    puts "\nTo facilitate the use of this interface from scripts, you can insert the following immediately"
+    puts '     after the tioga figures filename and before any of the options listed above.'
+    puts "     -x <filename>  run the named ruby file before loading the tioga figures file"
     puts "\nFor more information, visit http://theory.kitp.ucsb.edu/~paxton/tioga.html"
     puts ''
   end
