@@ -347,8 +347,8 @@ If you create another user interface for tioga that you'd like to share, please 
 
 ---
 
-Okay, enough goofing around from the command line.  Time to start digging into the details of defining figures and
-plots in tioga -- next stop, a SimpleFigure.
+Okay, enough goofing around from the command line.  Time to start digging into the details of using Ruby to define figures and
+plots in tioga -- next stop, UsingRuby.
 
 =end
 

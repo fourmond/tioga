@@ -128,7 +128,11 @@ gentle pace and an introductory level.
 
 ---
 
-A few words to the many Fortran77 users who are wondering why Ruby rather than Fortran -- please think Ruby AND Fortran, and forget about ever bothering with C.  You may be using sm[http://www.astro.princeton.edu/~rhl/sm/] for plotting now.  In that case, just think of Ruby as a replacement for the sm macro language.  But with Ruby, you'll be learning a real programming language with lots of other uses beyond making plots.  And in my experience, Ruby was MUCH easier to learn and much friendlier to use.
+A few words to the many Fortran77 users who are wondering why Ruby rather than Fortran -- please think Ruby AND Fortran, and 
+forget about ever bothering with C.  You may be using sm[http://www.astro.princeton.edu/~rhl/sm/] for plotting now.  
+In that case, just think of Ruby as a replacement for the sm macro language.  But with Ruby, you'll be learning a real 
+programming language with lots of other uses beyond making plots.  And in my experience, Ruby was MUCH easier to learn 
+than the sm macro language and much friendlier to use.
 
 A few words to the many Python users who are wondering why Ruby rather than Python --  partly it's accidental.  I happened to get started with Ruby rather than Python because of recommendations from others (Piet Hut, especially -- see the Ruby-based {"Art of Computational Science"}[http://www.artcompsci.org/] project he's doing with Jun Makino).   On the language level, I'm pleased with Ruby's clean and consistent design.  On the implementation level, I'm impressed with Ruby's reliability and
 the API it provides for doing C extensions.  The use of trace-and-sweep garbage collection
@@ -138,7 +142,7 @@ even come to like it.  You might also want to take a quick look at this article:
 
 ---
 
-Now let's look at the basic anatomy of a tioga document -- next stop: DocStructure.
+Now that we are ruby experts, let's look at a tioga figure definition -- next stop: SimpleFigure.
 
 =end
 

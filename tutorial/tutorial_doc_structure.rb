@@ -156,7 +156,7 @@ The figures are defined to call routines "blue" and "red", so we'll add those ne
 
 We could use the file as it is now, but I like to have the output files go in a subfolder rather than
 cluttering up the top level folder where the definition file lives.  We can specify a "save directory"
-by setting the FigureMaker "save_dir" attribute.  That'll be our last addition.  Here's the final version of "sample.rb".
+by setting the FigureMaker "save_dir" attribute.  That will be our last addition.  Here's the final version of "sample.rb".
     
     require 'Tioga/FigureMaker'
     

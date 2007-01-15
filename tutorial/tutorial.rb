@@ -35,11 +35,11 @@ examples of non-trivial applications.
 
 Here are the sections of the tutorial, in the order they are intended to be read.
 
-UsingRuby -- The bare essentials for using ruby with tioga
-
 DocStructure -- The basic anatomy of a tioga document
 
 CommandLine -- How to run tioga from the shell
+
+UsingRuby -- The bare essentials for using ruby for tioga
 
 SimpleFigure -- A first look at a nontrivial tioga figure definition
 

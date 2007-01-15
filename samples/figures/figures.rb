@@ -407,7 +407,7 @@ class MyFigures
         tioga_cool = true
         sz = 4.25
         t.page_setup(sz*72,sz*72)
-        t.set_frame_sides(0.05,0.95,0.85,0.15) # left, right, top, bottom in page coords        
+        t.set_frame_sides(0.05,0.95,0.90,0.10) # left, right, top, bottom in page coords        
         t.fill_color = SlateGray
         t.fill_frame
         margin = 0.02 

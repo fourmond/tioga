@@ -345,7 +345,7 @@ void c_rotated_string_at_points(FM *p, double rotation, int font_number, unsigne
       x = convert_figure_to_output_x(p,xs[i]) + shiftx;
       y = convert_figure_to_output_y(p,ys[i]) + shifty;
       if(!is_okay_number(x) || ! is_okay_number(y))
-	continue; /* we forget this point if at least one coordinate is not
+            continue; /* we forget this point if at least one coordinate is not
 		     'real'
 		  */
       update_bbox(p,x+llx, y+lly);
@@ -358,7 +358,7 @@ void c_rotated_string_at_points(FM *p, double rotation, int font_number, unsigne
       if (b == 0 && c == 0 && a == 1 && d == 1) {
          fprintf(TF, "%i %i Td (", idx, idy);
       } else {
-         fprintf(TF, "%0.2f %0.2f %0.2f %0.2f %i %i Tm (", a, b, c, d, idx, idy);
+         fprintf(TF, "%0.6f %0.6f %0.6f %0.6f %i %i Tm (", a, b, c, d, idx, idy);
       }
       while ((char_code = *cp++) != '\0') {
          if (char_code == '\\')
@@ -399,7 +399,7 @@ VALUE FM_private_show_marker(VALUE fmkr, VALUE integer_args, VALUE stroke_width,
          stroke_width = rb_Float(stroke_width);
          double width = NUM2DBL(stroke_width);
          prev_line_width = p->line_width; // restore it later
-         fprintf(TF, "%0.3f w\n", width * ENLARGE);
+         fprintf(TF, "%0.6f w\n", width * ENLARGE);
       }
    } else {
       string = rb_String(string);

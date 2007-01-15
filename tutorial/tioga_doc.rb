@@ -46,9 +46,6 @@ into a PDF file and the text into a TeX file.  These get combined when you
 include the figure or plot in a TeX document by placing the graphics in a box first
 and then adding a layer with the text on top of the graphics.
 
-There is a simple command-line front-end that can be loaded into irb, the standard "interactive Ruby shell".
-There is also a graphical user interface for the Mac.
-
 The {Tutorial}[http://theory.kitp.ucsb.edu/~paxton/tioga_doc/classes/Tioga/Tutorial.html] will get you started, 
 and the {FigureMaker}[http://theory.kitp.ucsb.edu/~paxton/tioga_doc/classes/Tioga.html] reference material will keep you going.  
 For your first visit, you should read on to see about licenses, credits, etc.

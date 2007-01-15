@@ -6,12 +6,16 @@ module Tutorial
 
 = A first look at a nontrivial tioga figure definition
 
-Back in irb with "figures.rb" loaded, make and preview the "Curve" figure (use "ls" to find the figure number).
+In the samples/figures directory, enter this to the shell to make a pdf 
+show it in your viewer.
+
+  tioga figures -s 'Curve'
+  
 This is what you should see.
 
 http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/append_curve.jpg
 
-In the source file, the definition looks like this (with line numbers added):
+In the source file, the definition looks like this (with line numbers added for this tutorial only):
 
   1  def curve
   2      t.landscape
@@ -89,11 +93,16 @@ Insert the following before the move_to_point call on line 9.
         t.line_width = 1; t.line_color = LightBlue
         t.stroke
 
-Try by doing reload and preview in irb again.
+
+Redo the figure by doing this command again.
+
+  tioga figures -s 'Curve'
+
+Does the result look like this?
 
 http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/append_curve2.jpg
 
-Okay, but the line now goes through the numbers
+Okay, that's progress but the line now goes through the numbers
 for points 1 and 2, so we'll need to move them a little.  Try adjusting the "at" positions in
 the calls to show_marker for Circled1 and Circled2 until you get something that looks ok.
 Here's what I ended up with after changing the positions this way:

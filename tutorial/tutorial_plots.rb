@@ -11,10 +11,11 @@ so by the time you get here, you're familiar with the basic structure of a tioga
 fundamentals of making figures with FigureMaker.  This section builds on that knowledge to add the tools needed for
 making figures that are plots.  We'll use "plots.rb" as a source of examples. 
 
-You'll find "plots.rb" file in the "samples/plots" folder.  Load it in irb,
-do a make_all and take a look through the resulting pdf's to see what's there.
-Alternatively, if you're on a Mac, drag the "plots.rb" file to the tioga icon and look through
-the plots (the down-arrow key is useful for this, or you can turn on "slide show" under the "View" menu).
+You'll find "plots.rb" file in the "samples/plots" folder.  Make a portfolio by entering
+
+  tioga plots -p
+
+Take a look to see what's there.
 
 As you can see, the examples range from the simple ("Blues") to the complex ("Contours").  Along the way,
 they illustrate ways of combining plots ("Side_by_Side", "Two_Ys", "Rows", "Columns", etc.), and

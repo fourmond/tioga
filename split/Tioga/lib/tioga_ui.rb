@@ -53,8 +53,9 @@ class TiogaUI
   
   def make_all_pdfs(view = true)
     return unless check_have_loaded
-    fm.num_figures.times { |i| 
+    fm.num_figures.times { |i|
         pdf_name = require_pdf(i)
+        append_to_log pdf_name unless view
         view_pdf(pdf_name) if view && pdf_name != nil
       }
   end
@@ -63,7 +64,6 @@ class TiogaUI
   def make_portfolio(view = true)
     return unless check_have_loaded
     name = @title_name + '_portfolio'
-    append_to_log "#{name}\n"
     make_all_pdfs(false)
     portfolio_name = fm.make_portfolio(name)
     return unless view
@@ -107,7 +107,7 @@ class TiogaUI
       puts ''
       raise
     end
-    system($pdf_viewer + ' ' + pdf_file)# + " > /dev/null") # suppress bogus messages from pdflatex
+    system($pdf_viewer + ' ' + pdf_file)
   end
 
 
