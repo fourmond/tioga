@@ -68,6 +68,9 @@ end
 # Looking for the presence of the is_nan (implies the rest -- isfinite)
 have_func("isnan","math.h")
 
+# Installing scripts
+declare_exec 'scripts/tioga'
+
 write_makefile
 
 

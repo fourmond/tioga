@@ -244,9 +244,7 @@ class TiogaUI
 =end
     
     tiogainit_name = ENV['HOME'] + '/.tiogainit'
-    file = File.open(tiogainit_name, 'r')
-    if (file != nil)
-      file.close
+    if File.exist?(tiogainit_name)
       load(tiogainit_name)
     end
     
