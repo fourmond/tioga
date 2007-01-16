@@ -501,10 +501,10 @@ VALUE FM_private_make(VALUE fmkr, VALUE name, VALUE cmd) {
    return result;
 }
    
-VALUE FM_private_make_portfolio(VALUE fmkr, VALUE name, VALUE fignames) {
+VALUE FM_private_make_portfolio(VALUE fmkr, VALUE name, VALUE fignums, VALUE fignames) {
    char full_name[STRLEN];
    Make_Save_Fname(fmkr, full_name, (name == Qnil)? NULL : StringValuePtr(name), true, false);
-   private_make_portfolio(full_name, fignames);
+   private_make_portfolio(full_name, fignums, fignames);
    return rb_str_new2(full_name);
 }
 

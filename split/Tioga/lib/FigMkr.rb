@@ -1743,11 +1743,13 @@ class FigureMaker
         return @figure_pdfs[num] = finish_making_pdf(result, name)
     end
     
-    def make_all
-        @figure_names.length.times do |i|
-            make_pdf(i) if @figure_pdfs[i] == nil
-        end
-        return true
+    def make_all(fignums=nil)
+      if fignums == nil
+        @figure_names.length.times {|i| make_pdf(i)}
+      else
+        fignums.each {|i| make_pdf(i)}
+      end
+      return true
     end
     
     def require_pdf(num)
@@ -1756,18 +1758,22 @@ class FigureMaker
         return @figure_pdfs[num]
     end
     
-    def require_all
-        @figure_names.length.times { |i| require_pdf(i) if @figure_pdfs[i] == nil }
+    def require_all(fignums=nil)
+        if fignums == nil
+          @figure_names.length.times { |i| require_pdf(i) if @figure_pdfs[i] == nil }
+        else
+          fignums.each { |i| require_pdf(i) if @figure_pdfs[i] == nil }
+        end
         return true
     end
     
-    def make_portfolio_pdf(name)
-        make_portfolio(name)
+    def make_portfolio_pdf(name,fignums=nil)
+        make_portfolio(name,fignums)
     end
     
-    def make_portfolio(name)
-        require_all
-        result = private_make_portfolio(name, @figure_names)
+    def make_portfolio(name,fignums=nil)
+        require_all(fignums)
+        result = private_make_portfolio(name, fignums, @figure_names)
         finish_making_pdf(result, name)
     end
     
@@ -1920,11 +1926,21 @@ class FigureMaker
         end
         puts "    " + "#{er.message}" + "  [version: " + FigureMaker.version + "]"
         line_count = 0
-        reached_FigMkr = false
+        show_count = 0
+        past_callers_routines = false
+        in_callers_routines = false
         er.backtrace.each do |line|
-            reached_FigMkr = true if line.include?('Tioga/FigMkr.rb')
-            if (line_count < @num_error_lines) and (reached_FigMkr == false)
+            if (line.include?('Tioga/FigMkr.rb')) || (line.include?('Tioga/tioga_ui.rb'))
+              if in_callers_routines
+                past_callers_routines = true 
+                in_callers_routines = false
+              end
+            else
+              in_callers_routines = true
+            end 
+            if (show_count < @num_error_lines) and in_callers_routines
                 puts "    " + line
+                show_count = show_count + 1
             end
             line_count = line_count + 1
         end

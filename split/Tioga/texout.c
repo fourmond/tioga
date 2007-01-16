@@ -337,10 +337,10 @@ void Rename_tex(char *oldname, char *newname)
    rename(old_ofile, new_ofile); // from stdio.h
 }
 
-void private_make_portfolio(char *name, VALUE fignames)
+void private_make_portfolio(char *name, VALUE fignums, VALUE fignames)
 {
     FILE *file;
-    int i, len;
+    int i, len, numfigs, j;
     char tex_fname[256];
     sprintf(tex_fname, "%s.tex", name);
     file = fopen(tex_fname, "w");
@@ -353,8 +353,21 @@ void private_make_portfolio(char *name, VALUE fignames)
     fprintf(file, "%% Start of figures, one per page\n\n");
     fignames = rb_Array(fignames);
     len = RARRAY(fignames)->len;
-    for (i=0; i < len; i++) {
-        fprintf(file, "\\includepdf{%s.pdf}\n", Get_String(fignames, i));
+    if (fignums == Qnil) {
+        for (i=0; i < len; i++) {
+            fprintf(file, "\\includepdf{%s.pdf}\n", Get_String(fignames, i));
+        }
+    } else {
+        fignums = rb_Array(fignums);
+        numfigs = RARRAY(fignums)->len;
+        for (i=0; i < numfigs; i++) {
+            j = NUM2INT(RARRAY(fignums)->ptr[i]);
+            if (j >= 0 && j < len) fprintf(file, "\\includepdf{%s.pdf}\n", Get_String(fignames, j));
+            else {
+                fclose(file);
+                rb_raise(rb_eArgError, "Requested figure numbers must be >= 0 and < num_figures.");
+            }
+        }
     }
     fprintf(file, "\n\\end{document}\n");
     fclose(file);

@@ -27,19 +27,21 @@ class Executive < Doc < FigureMaker
     end
 
 # :call-seq:
-#   require_all
+#   require_all(fignums=nil)
 #
-# Calls require_pdf for each of the figures.
+# Calls require_pdf for each of the figures listed in _fignums_.  
+# Does all the defined figures if _fignums_ is +nil+
 #
-    def require_all
+    def require_all(fignums=nil)
     end
 
 # :call-seq:
-#   make_all
+#   make_all(fignums=nil)
 #
-# Calls make_pdf for each of the figures.  See also require_all.
+# Calls make_pdf for each of the figures listed in _fignums_.  
+# Does all the defined figures if _fignums_ is +nil+. See also require_all.
 #
-    def make_all
+    def make_all(fignums=nil)
     end
 
 # :call-seq:
@@ -65,21 +67,23 @@ class Executive < Doc < FigureMaker
     end
 
 # :call-seq:
-#   make_portfolio(name)
+#   make_portfolio(name,fignums=nil)
 #
-# Creates a multipage pdf file containing the all of the figures.
-# Automatically calls require_all so that all the pdfs will be available.  The portfolio will
+# Creates a multipage pdf file containing the figures listed in _fignums_.  
+# Does all the defined figures if _fignums_ is +nil+. 
+# First, make_portfolio calls require_all(fignums) so that all the pdfs will be available.  
+# The portfolio will
 # have the given _name_ with a ".pdf" extension and will be placed in the save_dir.
 #
-    def make_portfolio(name)
+    def make_portfolio(name,fignums=nil)
     end
 
 # :call-seq:
-#   make_portfolio_pdf(name)
+#   make_portfolio_pdf(name,fignums=nil)
 #
 # Alias for make_portfolio.
 #
-    def make_portfolio_pdf(name)
+    def make_portfolio_pdf(name,fignums=nil)
     end
 
 

@@ -137,7 +137,9 @@ the problem on the Mac.
 So, you're at your beloved Mac looking at a Preview window that is still displaying the old version even though the file has been 
 modified and we've asked
 Preview to Open it again.  Just to check that the new version of the pdf is really out there, go to the File menu in Preview 
-and do the Revert command.
+and do the Revert command.  (If you don't have a Revert command, you need an updated version of Preview!)
+  
+  
 Now you should be looking at the new version of the file.  If you're happy doing that each time, fine.  But since there is
 no keyboard shortcut for Revert, I find it too obnoxious to accept.  The work-around is to replace 'open' in .tiogainit by
 'repreview' which is the name of a shell script provided in the tioga download.  The repreview script gets called with the
@@ -346,7 +348,8 @@ them to see a larger version.
 that solely does the equivalent of 'tioga filename -p' for any files dropped on it.
 
 
-If you create another user interface for tioga that you'd like to share, please let me know and I'll add it to this list.
+If you create another user interface for tioga that you'd like to share, please let me know 
+and I'll add it to this list.
 
 
 == Details that you will probably never need to know

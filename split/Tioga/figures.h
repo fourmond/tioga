@@ -735,8 +735,8 @@ extern int Get_int(VALUE obj, ID name_ID);
 extern VALUE FM_private_make(VALUE fmkr, VALUE name, VALUE cmd);
 extern VALUE FM_get_save_filename(VALUE fmkr, VALUE name);
 
-extern VALUE FM_private_make_portfolio(VALUE fmkr, VALUE name, VALUE fignames);
-extern void private_make_portfolio(char *filename, VALUE fignames);
+extern VALUE FM_private_make_portfolio(VALUE fmkr, VALUE name, VALUE fignums, VALUE fignames);
+extern void private_make_portfolio(char *filename, VALUE fignums, VALUE fignames);
 
 extern void Init_PlotAxis(void);
 extern void Initialize_Figure(VALUE fmkr);
