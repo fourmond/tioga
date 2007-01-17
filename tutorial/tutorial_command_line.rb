@@ -11,43 +11,65 @@ module Tutorial
 
 Our starting place is samples/sample.rb containing the little program described in #DocStructure.
 After you 'cd' to the samples directory, type 'tioga' and hit +RETURN+.  If the install worked okay,
-you'll see something like this:
+you'll see something like this.  Take a moment to read it over since the rest of this section of the
+tutorial will be based on the description given here.
 
-    This is a brief description of the command line options for tioga.
+    This program is a command line interface for the open-source tioga kernel.
+    The tioga kernel is for creating figures and plots using Ruby, PDF, and TeX.
+    Following is a brief description of the tioga command line options.
+    For more information, visit http://theory.kitp.ucsb.edu/~paxton/tioga.html.
 
-    They include the usual help and version commands.
-        -help       print this message
-        -v          print the tioga version information
+    Before any command line information is processed, tioga runs ~/.tiogainit if it exists.
+        The primary use of this file is to set your default pdf viewer command (see below).
 
-    Other commands all start with the name of a tioga ruby file (with extension .rb).
-         BTW: since the extension is known, you can skip typing it if you like.
+    If there are no command line arguments, or the argument is -h, this help info is output.
 
-    The input file need not be in your current working directory;
-         tioga automatically changes its working directory to the directory containing the file,
-         and that's also the location for the created PDFs.
+    Otherwise, the command line should start with the name of a tioga file.
+         Since the extension is assumed to be ".rb", you can skip typing it if you like.
 
-    If there are no other items on the command line, tioga shows the first figure defined in the file.
+    The remainder of the command line should consist of an optional series of control commands
+        followed by a figure command.
 
-    If there are other items, the rest of the command line should be one of the following cases:
-        -l          list the defined figures by number and name
-        -<num>      show a figure PDF: <num> is the figure number, starting from 0
-        -s <fig>    make and then show a figure PDF: <fig> is the figure name or number
-        -s          make and then show all the figure PDFs, each in a separate viewer window
-        -m <fig>    make a figure PDF without showing it
-        -m          make all the figure PDFs without showing them
-        -p          make all the PDFs and show a portfolio combining them as a single, multi-page PDF
+    Any control commands are done after ~/.tiogainit and before the figure file is loaded.
+         -r file      runs the file using Ruby's require method.
+         -C dir       changes the working directory.
+                      If there is no -C command, tioga changes the working directory to the
+                      location of the figure file.
+         -v           prints the tioga version information.
+
+    The figure command comes last and should be one of these:
+         -l           output a list of the defined figures by number and name.
+         -m <figs>    make PDFs without showing them in the viewer.
+         -s <figs>    make and show PDFs, each in a separate viewer window.
+         -p <figs>    make PDFs and show the portfolio as a single, multi-page document.
+
+    If the figure command is omitted, then tioga shows the first figure in the file.
+
+    If <figs> is omitted, then tioga does all the figures defined in the file
+         ordered by their definition index numbers.
+
+    Otherwise, <figs> must be either
+         a defined figure name as supplied to def_figure in the tioga file, or
+         a valid ruby array index number for a figure, or
+         a valid ruby range specification selecting a sequence of figures, or
+         a spaceless, comma-separated list of figure indices and ranges.
+         
+         Figure index numbers are assigned starting at 0 for the first figure defined in the file.
+         Index of -1 refers to the last figure defined following the usual Ruby indexing rules.
+
+         For example, -s Plot1 makes and shows the pdf for the figure named Plot1,
+         and -p 5,0..3,-1 makes a portfolio with the figure having index 5 on page 1,
+         followed by 4 pages showing the first 4 figures defined in the file (range 0..3),
+         and finishing with the last figure defined (index -1).
 
     The viewer for showing PDFs is specified by the $pdf_viewer variable in tioga.
-         That variable can be set by creating a .tiogainit file in your home directory.
+         The default value can be set by creating a .tiogainit file in your home directory.
+         The .tiogainit file is run before any command line options are processed.
          Your current setting for $pdf_viewer is /Users/billpaxton/Library/bin/repreview.
-         To change it, edit ~/.tiogainit to add the line $pdf_viewer = 'my viewer command'
-         The shell command tioga uses for show is the $pdf_viewer string followed by the PDF file name.
-
-    To facilitate the use of this interface from scripts, you can insert the following immediately
-         after the tioga figures filename and before any of the options listed above.
-         -x <filename>  run the named ruby file before loading the tioga figures file
-
-    For more information, visit http://theory.kitp.ucsb.edu/~paxton/tioga.html
+         To change it, edit ~/.tiogainit to add the line $pdf_viewer = 'my viewer command'.
+         The command tioga uses to show a pdf is $pdf_viewer + ' ' + full_PDF_filename.
+         You can use the -e control command to try a different viewer setting
+         by doing the $pdf_viewer assignment from the command line.
 
 Let's begin exploring these commands by making a PDF for one of the figures defined in sample.rb --
 enter this line to the shell (that's a lowercase L after the dash, not the numeral one):
@@ -84,7 +106,7 @@ If the viewer didn't open correctly, then there's some work to be done as descri
 == Setting the PDF viewer for tioga
 
 You specify the viewer for tioga by creating a file called ".tiogainit" in your home directory.
-Each time it starts, tioga checks for ~/.tiogainit and loads it if it is there.  The contents of .tiogainit
+Each time it starts, tioga loads ~/.tiogainit if it exists.  The contents of .tiogainit
 must be a sequence of valid Ruby commands, one of which should assign a string value to the global variable $pdf_viewer.
 To show a pdf file, tioga takes the value of $pdf_viewer, appends a space followed by the file name, and then launches
 a shell to execute that command.
@@ -94,9 +116,9 @@ On Linux, you may want to use xpdf.  If that isn't already set as the default, c
   $pdf_viewer = 'xpdf' # for linux
   
 On the Mac, you'll probably want to use Preview, and since the $pdf_viewer command is going to the shell,
-you might expect to do $pdf_viewer = 'open'.  The reason this probably isn't what you'll end up wanting
+you might that $pdf_viewer = 'open' would be what you'd want.  The reason this probably isn't what you'll end up wanting
 is the subject of the next section.
-Go ahead and put that in your .tiogainit for now, and then we'll fix it later.
+Go ahead and put that in your .tiogainit for now, and then we'll see about fixing it later.
 
   $pdf_viewer = 'open' # first try for the Mac
 
@@ -131,7 +153,7 @@ reenter the command:
 It will rebuild Red.pdf and call the viewer to redisplay it.  So, the question is "What's in the window?" -- are you looking at
 the new version with a green square or the old version with it's red square?  It all depends on how the viewer decides to
 treat a request to open a file that it already is showing.  At the time of writing, xpdf on linux reloads the file while
-Preview on the Mac doesn't.  The rest of this section will assume that's the case and discuss how to deal with 
+Preview on the Mac doesn't.  The following comments will assume that's the case and discuss how to deal with 
 the problem on the Mac.
 
 So, you're at your beloved Mac looking at a Preview window that is still displaying the old version even though the file has been 
@@ -140,7 +162,7 @@ Preview to Open it again.  Just to check that the new version of the pdf is real
 and do the Revert command.  (If you don't have a Revert command, you need an updated version of Preview!)
   
   
-Now you should be looking at the new version of the file.  If you're happy doing that each time, fine.  But since there is
+Now you should be looking at the new version of the file.  If you're happy opening the File menu and selecting Revert each time, fine.  But since there is
 no keyboard shortcut for Revert, I find it too obnoxious to accept.  The work-around is to replace 'open' in .tiogainit by
 'repreview' which is the name of a shell script provided in the tioga download.  The repreview script gets called with the
 file name, it then passes the file name along to an AppleScript called Reload_Preview_Document.scpt which is also a part of the tioga
@@ -156,7 +178,7 @@ Before the script can do it's thing, you may need to enable AppleScripts on your
   then close the window.
 
 That takes care of enabling AppleScripts in general, but you may still need to tell Preview to allow script access.
-If Preview seems to be ignoring our Open/Revert script, enter this line to the shell to change a flag in its settings:
+If Preview seems to be ignoring our Open/Revert script, enter this line to the shell to change a flag in Preview's settings:
 
   defaults write /Applications/Preview.app/Contents/Info NSAppleScriptEnabled -bool YES
 
@@ -196,15 +218,17 @@ With luck, your pdf viewer will even provide thumbnails for the figures.
 
 Let's look at a more interesting figure.
 In the samples directory, find sine.rb and open it in your text editor.
-There's a lot going on here that won't make sense yet.  We will start getting into the details in the next section of the tutorial -- but we can still have some fun with it now.  Go to the end of the file where the 'exec_plot' method is defined.
-We are going to make some changes to alter the appearance of the figure.  First, however, let's see what it
-looks like now.  Enter this to the shell:
+There's a lot going on here that won't make sense yet -- we will start getting into the details in 
+the next section of the tutorial -- but we can still have some fun with it now.  Go to the end of 
+the file where the 'exec_plot' method is defined.
+We are going to make some changes to alter the appearance of the figure.  First, however, let's see 
+what it looks like now.  Enter this to the shell:
 
   tioga sine
 
 You should now be viewing a plot of a blue sine wave going from 0 to 2 pi with the title "Curve y = sin x".
 Well, actually, it's just a set of straight lines connecting some values of sin(x) sampled uniformly in x,
-but for this tutorial that's good enough.
+but for this example that's good enough.
 
 Leaving the pdf still in a viewer window, go back to the editor.  Find where it says "t.show_polyline(xs,ys,Blue)"
 and change Blue to Red.  Then redo the shell call on tioga.  Now the sine curve should be red.  Right?  Presuming that
@@ -236,8 +260,8 @@ Still want more options?  Okay, do this:
   
   tioga figures/figures.rb -s Dingbats
   
-These are given in MarkerConstants where it tells how to use a dingbat -- say we'd like to use number 114.
-Then find the line in sine.rb where it says 
+These are given in MarkerConstants where it tells how to use a dingbat.  Let's change the figure to use 
+number 114 to mark points on the curve.  Find the line in sine.rb where it says 
 
   'marker' => Asterisk,
 
@@ -245,8 +269,8 @@ and replace it by
   
   'marker' => [ZapfDingbats, 114],
 
-While you're at it, change the marker color to Crimson, set the line color to Teal, and then redo 'tioga sine'.
-It should look like this.
+While you're at it, change the marker color to Crimson, set the line color to Teal, and then 
+redo 'tioga sine' in the shell.  The result should look like this.
 
 http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/sine.jpeg
 
@@ -288,8 +312,8 @@ Again, we get the information we need to find the problem: the method 'do_box_la
 and the call to it is on line 63.
 
 Put the `s' back, and we'll look at the final kind of bug, one that shows up when TeX is running.
-In the same line in sine, change '$y$' to '$y'.  Recall that text such as this gets passed along to TeX, and
-the `$' tells TeX to enter or leave math mode.  By removing the closing `$' we'll make TeX unhappy.  Here's
+In the same line in sine, change `$y$' to `$y'.  Recall that text such as this gets passed along to TeX, and
+the `$' tells TeX to enter or leave math mode.  By removing the closing `$' we'll make TeX very unhappy.  Here's
 the output:
 
   ERROR: pdflatex failed.
@@ -308,7 +332,7 @@ the output:
   
 This time we don't get a specific line number in the tioga file, but we still get some good hints.
 TeX suggests that either we have an extra `}' or we've forgotten a `$'.
-Then it outputs the line '<argument> \tiogasetfont {$y\BS }' that contains the problem line of text `$y'.
+Then it outputs the line `<argument> \tiogasetfont {$y\BS }' that contains the problem line of text `$y'.
 Clues like that are typically enough to let you quickly find the problem.  
 
 When there is a failure
@@ -332,7 +356,7 @@ while executing in pdflatex, you'll have to delete them yourself.
 If you've looked at the tioga reference material, you might have noticed that
 it talks about the "tioga kernel" and describes it as a tool for creating PDFs.  There's
 no mention of a user interface as an integral part of tioga, and the interface we've described here
-is just a simple "add-on" provided as part of the tioga download.  There are several other options
+is an optional "add-on" provided as part of the tioga download.  There are several other options
 available -- here's the current list.
 
 {Ctioga}[http://sciyag.rubyforge.org/ctioga/index.html] by Vincent Fourmond is a command-line plotting
@@ -345,31 +369,10 @@ created using Ruby on Rails.  The browser page has thumbnails for all the figure
 them to see a larger version.
 
 {Tioga Droplet}[http://theory.kitp.ucsb.edu/~paxton/tioga.html] by me (Bill Paxton) is a tiny Mac application
-that solely does the equivalent of 'tioga filename -p' for any files dropped on it.
-
+whose only function is to do the equivalent of 'tioga filename -p' for any files dropped on it.
 
 If you create another user interface for tioga that you'd like to share, please let me know 
 and I'll add it to this list.
-
-
-== Details that you will probably never need to know
-
-Here are a few details that might be useful if you decide to write scripts that use the tioga command line interface.
-
-The -x option lets you run another initialization file after ~/.tiogainit has finished and before the tioga
-figures file is loaded.  An array of command line arguments for tioga can be found in the variable $tioga_args.
-Your initialization file can modify the $tioga_args array however it pleases -- the array is not unloaded until
-after the initialization is over.  
-
-In addition to $tioga_args and $pdf_viewer, there is another global variable called $change_working_directory
-that is true by default.  If you set it false tioga will not change the current working directory 
-to match the file path.
-
-There are three "filter" routines that by default always return true.  They are called
-okay_to_make_pdf(num), okay_to_show_pdf(pdf_filename), and okay_to_make_portfolio.  You can redefine these methods
-in class TiogaUI if you need to block certain actions.  For example, to make a subset of the figures, you
-could invoke the usual -m option that normally makes all the pdfs with okay_to_make_pdf redefined so that it only returns true
-for the figures you really want to make. 
 
 ---
 
