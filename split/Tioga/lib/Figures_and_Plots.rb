@@ -233,8 +233,26 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Legends.jpg
 #
 # Flag starts +true+ and is set to +false+ by the doing_subfigure routine which is called on entry to the #subfigure routine.
 # This is simply provided as a convenience for routines that need to know whether they are being called as a subfigure or as
-# a top-level figure.
+# a top-level figure.  Same as not in_subplot.
    def root_figure
+   end
+
+# :call-seq:
+#               in_subfigure                                     
+#
+# Flag starts +false+ and is set to +true+ by the doing_subfigure routine which is called on entry to the #subfigure routine.
+# This is simply provided as a convenience for routines that need to know whether they are being called as a subfigure or as
+# a top-level figure. Same as not root_figure.
+   def in_subfigure
+   end
+   
+# :call-seq:
+#               root_plot                                     
+#
+# Flag starts +true+ and is set to +false+ by the doing_subplot routine which is called on entry to the #subplot routine.
+# This is simply provided as a convenience for routines that need to know whether they are being called as a subplot or as
+# a top-level plot.  Same as not in_subplot.
+   def root_plot
    end
    
 # :call-seq:
@@ -242,7 +260,7 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Legends.jpg
 #
 # Flag starts +false+ and is set to +true+ by the doing_subplot routine which is called on entry to the #subplot routine.
 # This is simply provided as a convenience for routines that need to know whether they are being called as a subplot or as
-# a top-level plot.
+# a top-level plot.  Same as not root_plot.
    def in_subplot
    end
    

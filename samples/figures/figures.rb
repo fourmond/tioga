@@ -405,9 +405,14 @@ class MyFigures
     
     def icon
         tioga_cool = true
-        sz = 4.25
-        t.page_setup(sz*72,sz*72)
-        t.set_frame_sides(0.05,0.95,0.90,0.10) # left, right, top, bottom in page coords        
+        # set aspect ratio and font scale depending on whether root figure or not
+        unless t.in_subfigure
+          sz = 4.25; scale = 9
+          t.page_setup(sz*72,sz*72)
+          t.set_frame_sides(0.05,0.95,0.90,0.10) # left, right, top, bottom in page coords
+        else
+          scale = 7   
+        end
         t.fill_color = SlateGray
         t.fill_frame
         margin = 0.02 
@@ -437,7 +442,7 @@ class MyFigures
         t.show_text('text' => '\textbf{\TeX}', 'side' => BOTTOM, 'pos' => 0.86, 'shift' => shift,
             'scale' => size, 'angle' => angle)
         x = t.bounds_xmin + 0.5 * t.bounds_width
-        y = 0.68; scale = 9
+        y = 0.68
         t.line_width = 2
         t.fill_opacity = 0.6
         t.show_marker('font' => Helvetica, 'string' => 'Tioga', 'scale' => scale, 'point' => [x+0.03,y-0.28],

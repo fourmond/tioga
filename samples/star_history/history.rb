@@ -131,11 +131,15 @@ class StarHistory
         end
     end
     
-    def stroke_track(xs, ys, color=Black, legend=nil, type=Line_Type_Solid)
+    def stroke_HR_T_RHO_track(xs, ys, color)
+        stroke_track(xs, ys, color, nil, Line_Type_Solid, 0)
+    end
+    
+    def stroke_track(xs, ys, color=Black, legend=nil, type=Line_Type_Solid, offset=@track_first)
         t.stroke_color = color
         t.line_type = type
         if @gap_in_tracks
-            t.append_points_with_gaps_to_path(xs,ys,[@helium_gap_start-@track_first],false)
+            t.append_points_with_gaps_to_path(xs,ys,[@helium_gap_start-offset],false)
         else
             t.append_points_to_path(xs,ys)
         end
@@ -154,10 +158,6 @@ class StarHistory
         t.line_type = Line_Type_Solid
         t.stroke_color = Green
         d.profile_Ages.each { |age| t.stroke_line(age, base, age, top) }
-    end
-    
-    def mark_spot(x, y, color = Red)
-        t.show_marker('x' => x, 'y' => y, 'marker' => Bullet, 'scale' => 0.5, 'color' => color);
     end
     
     def min_of_many(ary, y_limit = nil)
@@ -186,13 +186,38 @@ class StarHistory
         end
     end
     
+    def initial_mark_spot(x, y)
+        t.show_marker(
+          'x' => x, 
+          'y' => y, 
+          'marker' => Bullet, 
+          'scale' => 0.5, 
+          'color' => Red);
+    end
+    
+    def final_mark_spot(x, y)
+        t.show_marker(
+          'x' => x, 
+          'y' => y, 
+          'marker' => [ZapfDingbats, 103], 
+          'scale' => 2, 
+          'color' => GrayBlue);
+    end
+    
     def background
         t.fill_color = FloralWhite
         t.fill_frame
     end
     
+    def mark_spot(x, y)
+        t.show_mark(
+          'x' => x, 
+          'y' => y, 
+          'marker' => [ZapfDingbats, 103],
+          'scale' => 2, 
+          'color' => GrayBlue)
+    end
+    
 end
 
 StarHistory.new
-
-

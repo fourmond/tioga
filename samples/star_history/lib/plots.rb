@@ -24,7 +24,6 @@ class StarHistory
     end
     
     def mark_last_value(xs, ys)
-        mark_spot(xs[-1], ys[-1])
         mark_line_at_loc(xs, ys, -1)
     end
     
@@ -72,23 +71,23 @@ class StarHistory
     end
     
     def plot_Ts
-        plot_one_value(d.log_surface_Temp, '$\log$ T surf')
+        plot_one_value(d.log_surface_Temp, '$\log$ T surface')
     end
     
     def plot_Tc
-        plot_one_value(d.log_center_Temp, '$\log$ T cntr')
+        plot_one_value(d.log_center_Temp, '$\log$ T center')
     end
     
     def plot_Rho
-        plot_one_value(d.log_center_Density, '$\log$ $\rho$ cntr')
+        plot_one_value(d.log_center_Density, '$\log$ $\rho$ center')
     end
     
     def plot_Psi
-        plot_one_value(d.center_Degeneracy, '$\Psi$ cntr')
+        plot_one_value(d.center_Degeneracy, '$\Psi$ center')
     end
     
     def plot_Z
-        plot_one_value(1.0 - d.center_H - d.center_He, 'Z cntr')
+        plot_one_value(1.0 - d.center_H - d.center_He, 'Z center')
     end
     
     def plot_3alpha

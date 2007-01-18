@@ -116,7 +116,7 @@ class StarHistory
                 t.show_xlabel('log Surface Temperature')
                 t.show_ylabel('log Luminosity $\mathrm{L_\odot}$')
                 add_ZAMS(@zams_log_Surface_Temp, @zams_log_Luminosity)
-                stroke_track(xs, ys, Blue)
+                stroke_HR_T_RHO_track(xs, ys, Blue)
                 dots_in_gap(xs, ys)
                 mark_points(xs, ys)
             end
@@ -143,7 +143,7 @@ class StarHistory
                 add_PSI(@psi0, 0)
                 add_PSI(@psi5, 5)
                 add_PSI(@psi100, 100)
-                stroke_track(xs, ys, Blue)
+                stroke_HR_T_RHO_track(xs, ys, Blue)
                 dots_in_gap(xs, ys)
                 mark_points(xs, ys)
             end

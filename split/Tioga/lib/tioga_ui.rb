@@ -198,10 +198,13 @@ class TiogaUI
     puts '     -v           prints version information.'
     puts "\nThe figure command comes last and should be one of these:"
     puts "     -l           output a list of the defined figures by number and name."
+    puts "     -<num>       make and show figure with index equal <num> (0 <= num < num_figures)."
     puts "     -m <figs>    make PDFs without showing them in the viewer."
     puts "     -s <figs>    make and show PDFs, each in a separate viewer window."
-    puts "     -p <figs>    make PDFs and show the portfolio as a single, multi-page document."
-    puts "\nIf the figure command is omitted, then it defaults to -s 0."
+    puts "     -S <figs>    show previously made PDFs, each in a separate viewer window."
+    puts "     -p <figs>    make PDFs and show the portfolio as a multi-page document."
+    puts "     -P <figs>    make portfolio from existing PDFs and show it as a multi-page document."
+    puts "\nIf the figure command is omitted, then it defaults to -0."
     puts "\nIf <figs> is omitted, then tioga does all the figures defined in the file"
     puts "     ordered by their definition index numbers."
     puts "\nOtherwise, <figs> must be either"
@@ -362,14 +365,18 @@ class TiogaUI
     
     cmd = $tioga_args[argnum]
     argnum = argnum + 1
-
-    if cmd == '-l'
+    
+    if /^-\d+$/ === cmd
+      view_pdf(require_pdf(cmd[1..-1].to_i))
+    elsif cmd == '-l'
       fm.figure_names.each_with_index do |name,i| 
         puts sprintf("%3i    %s\n",i,name)
       end
+    elsif cmd == '-h' || cmd == '-help'
+      show_help(nil,nil)
     elsif (cmd == '-s' || cmd == '-m')
       if argnum == $tioga_args.length
-        make_all_pdfs(cmd == '-s')
+        make_all_pdfs(cmd != '-m')
         return
       end
       arg = $tioga_args[argnum]
@@ -387,10 +394,6 @@ class TiogaUI
         end
       end
     elsif cmd == '-p'
-      if fm.num_figures == 1
-        view_pdf(require_pdf(0))
-        return
-      end
       if argnum == $tioga_args.length
         make_portfolio(true)
         return
@@ -401,7 +404,7 @@ class TiogaUI
       else
         fignums = [arg]
       end
-      make_portfolio(true,fignums)
+      make_portfolio(true, fignums)
     else # unrecognized command
       show_help($filename,cmd)
     end

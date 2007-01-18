@@ -741,6 +741,14 @@ class FigureMaker
             context { doing_subfigure; set_subframe(margins); cmd.call }
         }      
     end
+    
+    def root_plot
+        return ! self.in_subplot
+    end
+    
+    def in_subfigure
+        return ! self.root_figure
+    end
 
     def subplot(margins=nil,&cmd)
         trace_cmd_one_arg(@enter_subplot_function, @exit_subplot_function, margins) {        

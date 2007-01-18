@@ -11,7 +11,7 @@ module Tutorial
 
 Our starting place is samples/sample.rb containing the little program described in #DocStructure.
 After you 'cd' to the samples directory, type 'tioga' and hit +RETURN+.  If the install worked okay,
-you'll see something like this.  Take a moment to read it over since the rest of this section of the
+you'll see something like this.  Take a moment to read it since the rest of this section of the
 tutorial will be based on the description given here.
 
     This program is a command line interface for the open-source tioga kernel.
@@ -24,48 +24,47 @@ tutorial will be based on the description given here.
 
     If there are no command line arguments, or the argument is -h, this help info is output.
 
-    Otherwise, the command line should start with the name of a tioga file.
-         Since the extension is assumed to be ".rb", you can skip typing it if you like.
+    Otherwise, the command line should start with a tioga file name (with extension .rb).
+         (Since the extension is known, you can skip typing it if you like.)
 
     The remainder of the command line should consist of an optional series of control commands
         followed by a figure command.
 
     Any control commands are done after ~/.tiogainit and before the figure file is loaded.
-         -r file      runs the file using Ruby's require method.
+         -r file      runs the file (using Ruby's require method).
          -C dir       changes the working directory.
                       If there is no -C command, tioga changes the working directory to the
-                      location of the figure file.
-         -v           prints the tioga version information.
+                      location of the figure file .
+         -v           prints version information.
 
     The figure command comes last and should be one of these:
          -l           output a list of the defined figures by number and name.
+         -<num>       make and show figure with index equal <num> (0 <= num < num_figures).
          -m <figs>    make PDFs without showing them in the viewer.
          -s <figs>    make and show PDFs, each in a separate viewer window.
-         -p <figs>    make PDFs and show the portfolio as a single, multi-page document.
+         -S <figs>    show previously made PDFs, each in a separate viewer window.
+         -p <figs>    make PDFs and show the portfolio as a multi-page document.
+         -P <figs>    make portfolio from existing PDFs and show it as a multi-page document.
 
-    If the figure command is omitted, then tioga shows the first figure in the file.
+    If the figure command is omitted, then it defaults to -0.
 
     If <figs> is omitted, then tioga does all the figures defined in the file
          ordered by their definition index numbers.
 
     Otherwise, <figs> must be either
-         a defined figure name as supplied to def_figure in the tioga file, or
-         a valid ruby array index number for a figure, or
+         a defined figure name (as supplied to def_figure in the tioga file), or
+         a valid ruby array index number for a figure (can be negative), or
          a valid ruby range specification selecting a sequence of figures, or
-         a spaceless, comma-separated list of figure indices and ranges.
-         
-         Figure index numbers are assigned starting at 0 for the first figure defined in the file.
-         Index of -1 refers to the last figure defined following the usual Ruby indexing rules.
+         a space-less, comma-separated list of figure indices and ranges.
 
          For example, -s Plot1 makes and shows the pdf for the figure named Plot1,
          and -p 5,0..3,-1 makes a portfolio with the figure having index 5 on page 1,
-         followed by 4 pages showing the first 4 figures defined in the file (range 0..3),
-         and finishing with the last figure defined (index -1).
+         followed by pages showing the figures with indices 0, 1, 2, 3, and -1.
 
     The viewer for showing PDFs is specified by the $pdf_viewer variable in tioga.
          The default value can be set by creating a .tiogainit file in your home directory.
          The .tiogainit file is run before any command line options are processed.
-         Your current setting for $pdf_viewer is /Users/billpaxton/Library/bin/repreview.
+         Your current setting for $pdf_viewer is repreview.
          To change it, edit ~/.tiogainit to add the line $pdf_viewer = 'my viewer command'.
          The command tioga uses to show a pdf is $pdf_viewer + ' ' + full_PDF_filename.
          You can use the -e control command to try a different viewer setting

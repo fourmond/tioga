@@ -119,21 +119,21 @@ class ProfilePlots
     def show_mass_locs(xs, ymin)
         return if xs == d.sx_M
         y1 = ymin + t.default_text_height_dy * 1.5
-        t.save_legend_separator(1.5)
+        #t.save_legend_separator(1.5)
         x = xs[d.sx_M.where_closest(d.star_Mass * 0.5)]
         t.line_type = Line_Type_Solid
         t.line_width = 2
         t.stroke_color = LightSteelBlue
         t.stroke_line(x, ymin, x, y1)
-        t.save_legend_info('50\% $ M_{tot} $')
+        t.save_legend_info('text' => '50\% $ M_{tot} $')
         x = xs[d.sx_M.where_closest(d.star_Mass * 0.95)]
         t.stroke_color = MediumSlateBlue
         t.stroke_line(x, ymin, x, y1)
-        t.save_legend_info('95\%')
+        t.save_legend_info('text' => '95\%')
         x = xs[d.sx_M.where_closest(d.star_Mass * 0.999)]
         t.stroke_color = MediumBlue
         t.stroke_line(x, ymin, x, y1)
-        t.save_legend_info('99.9\%')
+        t.save_legend_info('text' => '99.9\%')
     end
     
     def abundances(xs, title, xlabel, xleft, xright, ymin = -5, ymax = 0)
