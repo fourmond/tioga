@@ -114,7 +114,8 @@ class TiogaUI
       puts ''
       raise
     end
-    system($pdf_viewer + ' ' + pdf_file)
+    system($pdf_viewer + ' ' + pdf_file + ' > /dev/null')
+    append_to_log pdf_file
   end
 
 
