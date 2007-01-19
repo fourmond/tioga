@@ -769,7 +769,7 @@ EOT
       a = Dvector[1,2,3]
       b = Dvector[3,2,1]
       out = StringIO.new("", "w")
-      Dvector.write(out, a,b)
+      Dvector.write(out, [a,b])
       out.close
       input = StringIO.new(out.string)
       c,d = Dvector.fancy_read(input)
