@@ -478,7 +478,7 @@ class FigureMaker
         'line_cap', 'line_type', 'marker', 'marker_color', 'marker_scale', 'marker_dict' ])
     
     Save_legend_info_args = {
-      'text' => Required,
+      'text' => nil,
       'dy' => :legend_text_dy,
       'line_color' => :line_color,
       'line_width' => :line_width,
