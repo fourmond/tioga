@@ -255,21 +255,21 @@ static char *Create_Label(double value, int scale, int prec, bool log_values, bo
      pow_val = pow(10.0, sav_val);
      if (exponent < 0) {
         char form[10];
-        int numdig = ABS(exponent)+1;
-        sprintf(form, "$\\mathrm{%%.%df}$", numdig);
+        int numdig = ABS(exponent)+1; 
+        sprintf(form, (s->vertical)? "\\tiogayaxisnumericlabel{%%.%df}" : "\\tiogaxaxisnumericlabel{%%.%df}", numdig);
         sprintf(buff, form, pow_val);
      } else if (abs(value - pow_val) > 0.1) {
-        sprintf(buff, "$\\mathrm{%0.2f}$", pow_val);
+        sprintf(buff, (s->vertical)? "\\tiogayaxisnumericlabel{%0.2f}" : "\\tiogaxaxisnumericlabel{%0.2f}", pow_val);
      } else {
-        sprintf(buff, "$\\mathrm{%d}$", (int) value);
+        sprintf(buff,  (s->vertical)? "\\tiogayaxisnumericlabel{%d}" : "\\tiogaxaxisnumericlabel{%d}", (int) value);
      }
    } else if (log_values) {
      /* Exponential, i.e. 10^-1, 1, 10, 10^2, etc */
      double abs_diff = fabs(value - exponent);
-     if (abs_diff > 0.1) sprintf(buff, "$\\mathrm{10^{%0.1f}}$", value);
+     if (abs_diff > 0.1) sprintf(buff,  (s->vertical)? "\\tiogayaxisnumericlabel{10^{%0.1f}}" : "\\tiogaxaxisnumericlabel{10^{%0.1f}}", value);
      else if (exponent == 0) strcpy(buff, "1");
      else if (exponent == 1) strcpy(buff, "10");
-     else sprintf(buff, "$\\mathrm{10^{%d}}$", exponent);
+     else sprintf(buff,  (s->vertical)? "\\tiogayaxisnumericlabel{10^{%d}}" : "\\tiogaxaxisnumericlabel{10^{%d}}", exponent);
    } else {   /* Linear */
       char form[10];
       double scale2;
@@ -279,7 +279,7 @@ static char *Create_Label(double value, int scale, int prec, bool log_values, bo
       /* This is necessary to prevent labels like "-0.0" on some systems */
       scale2 = pow(10., prec);
       value = floor((value * scale2) + .5) / scale2;
-      sprintf(form, "$\\mathrm{%%.%df}$", (int) prec);
+      sprintf(form, (s->vertical)?  "\\tiogayaxisnumericlabel{%%.%df}" : "\\tiogaxaxisnumericlabel{%%.%df}", (int) prec);
       sprintf(buff, form, value);
    }
    int len = strlen(buff);
@@ -390,7 +390,9 @@ static char **Get_Labels(FM *p, PlotAxis *s)
       for (i = 0; i < s->nmajors; i++) {
          ps = NULL;
          if (i == upper_right && !s->log_values && mode && scale)
-            sprintf(ps = postfix, " (x$\\mathrm{10^{%d}}$)", scale);
+            sprintf(ps = postfix, 
+                (s->vertical)? " (x\\tiogayaxisnumericlabel{10^{%d}})" : " (x\\tiogaxaxisnumericlabel{10^{%d}})", 
+                scale);
          if (i == lower_left && s->nmajors >= 2 && s->vertical && 
                 (s->majors[i] == ((s->reversed)? s->axis_max : s->axis_min)) &&
                 (s->other_axis_type == AXIS_WITH_MAJOR_TICKS_AND_NUMERIC_LABELS ||

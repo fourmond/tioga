@@ -24,7 +24,7 @@
 
 VALUE rb_Integer_class, rb_Numeric_class;
 ID save_dir_ID, quiet_mode_ID;
-ID tex_preview_documentclass_ID, tex_preamble_ID, tex_preview_pagestyle_ID;
+ID tex_preview_documentclass_ID, tex_preamble_ID, tex_xaxis_numeric_label_ID, tex_yaxis_numeric_label_ID, tex_preview_pagestyle_ID;
 ID tex_preview_paper_width_ID, tex_preview_paper_height_ID;
 ID tex_preview_hoffset_ID, tex_preview_voffset_ID;
 ID tex_preview_figure_width_ID, tex_preview_figure_height_ID, tex_preview_tiogafigure_command_ID;
@@ -48,6 +48,8 @@ void Init_IDs(void)
 	tex_yoffset_ID = rb_intern("@tex_yoffset");
     tex_preview_documentclass_ID = rb_intern("@tex_preview_documentclass");
     tex_preamble_ID = rb_intern("@tex_preamble");
+    tex_xaxis_numeric_label_ID = rb_intern("@tex_xaxis_numeric_label");
+    tex_yaxis_numeric_label_ID = rb_intern("@tex_yaxis_numeric_label");
     tex_preview_pagestyle_ID = rb_intern("@tex_preview_pagestyle");
     
     tex_preview_paper_width_ID = rb_intern("@tex_preview_paper_width");
@@ -415,6 +417,18 @@ char *Get_tex_preview_documentclass(VALUE fmkr) {
 
 char *Get_tex_preamble(VALUE fmkr) {
    VALUE v = rb_ivar_get(fmkr, tex_preamble_ID);
+   if (v == Qnil) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_xaxis_numeric_label(VALUE fmkr) {
+   VALUE v = rb_ivar_get(fmkr, tex_xaxis_numeric_label_ID);
+   if (v == Qnil) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_yaxis_numeric_label(VALUE fmkr) {
+   VALUE v = rb_ivar_get(fmkr, tex_yaxis_numeric_label_ID);
    if (v == Qnil) return NULL;
    return StringValuePtr(v);
 }

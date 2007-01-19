@@ -390,7 +390,6 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Framebox.jpg
 # Valid strings include things like '10.0' or '12.0'.
 #         
 # See also: tex_fontfamily, tex_fontseries, and tex_fontshape.
-#         
    def tex_fontsize
    end
 
@@ -403,7 +402,6 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Framebox.jpg
 # 'rmdefault', 'sfdefault', and 'ttdefault', for roman face, sans serif face, and typewriter face, respectively.
 #         
 # See also: tex_fontsize, tex_fontseries, and tex_fontshape.
-#         
    def tex_fontfamily
    end
 
@@ -414,8 +412,7 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Framebox.jpg
 # This string will be used as the basic font series specification in the preview TeX file.  Valid strings include
 # 'mddefault' and 'bfdefault', for medium and bold face, respectively.
 #         
-# See also: tex_fontsize, tex_fontfamily, and tex_fontshape.
-        
+# See also: tex_fontsize, tex_fontfamily, and tex_fontshape.  
    def tex_fontseries
    end
 
@@ -426,12 +423,10 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Framebox.jpg
 # 
 # This string will be used as the basic font shape specification in the preview TeX file.  Valid strings include
 # *'updefault', 'itdefault', 'sldefault', and 'scdefault', for upright, italic, slant, and small caps, respectively.
-        
+#
 # See also: tex_fontsize, tex_fontfamily, and tex_fontseries.
-        
    def tex_fontshape
    end
-
 
 
 end # class

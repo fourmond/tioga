@@ -236,11 +236,21 @@ void Close_tex(VALUE fmkr, bool quiet_mode)
 void Write_preview_header(VALUE fmkr, FILE *file) {
    VALUE tmp;
    fprintf(file, "\\documentclass{%s}\n\n", Get_tex_preview_documentclass(fmkr));
+   
+   
+   //fprintf(file,"\\newcommand{\\tiogaxnumericlabel}[1]{$#1$}\n");
+   //fprintf(file,"\\newcommand{\\tiogaynumericlabel}[1]{$#1$}\n");
+   
+   
    /* we print out the preamble generated from tioga.sty.in */
    fprintf(file, "%% Tioga preamble generated from tioga.sty.in\n");
    fprintf(file, "%s\n", Get_tex_preview_generated_preamble(fmkr));
    fprintf(file, "%% User-specified preamble\n");
    fprintf(file, "%s\n\n", Get_tex_preamble(fmkr));
+   fprintf(file, "%% Command for numeric labels on xaxis\n");
+   fprintf(file, "\\newcommand{\\tiogaxaxisnumericlabel}[1]{%s}\n\n", Get_tex_xaxis_numeric_label(fmkr));
+   fprintf(file, "%% Command for numeric labels on yaxis\n");
+   fprintf(file, "\\newcommand{\\tiogayaxisnumericlabel}[1]{%s}\n\n", Get_tex_yaxis_numeric_label(fmkr));
    fprintf(file, "%% Color constants definitions\n");
    tmp = rb_const_get(CLASS_OF(fmkr), rb_intern("COLOR_PREAMBLE"));
    fprintf(file, "%s\n\n", StringValueCStr(tmp));

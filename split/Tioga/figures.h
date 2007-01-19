@@ -770,6 +770,8 @@ extern VALUE do_cmd(VALUE fmkr, VALUE cmd);
 
 extern char *Get_tex_preview_documentclass(VALUE fmkr);
 extern char *Get_tex_preamble(VALUE fmkr);
+extern char *Get_tex_xaxis_numeric_label(VALUE fmkr);
+extern char *Get_tex_yaxis_numeric_label(VALUE fmkr);
 extern char *Get_tex_preview_pagestyle(VALUE fmkr);
 extern double Get_tex_xoffset(VALUE fmkr);
 extern double Get_tex_yoffset(VALUE fmkr);

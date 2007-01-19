@@ -91,6 +91,9 @@ class FigureMaker
     
     attr_accessor :tex_preamble
     
+    attr_accessor :tex_xaxis_numeric_label
+    attr_accessor :tex_yaxis_numeric_label
+    
     attr_accessor :tex_fontsize    
     attr_accessor :tex_fontfamily    
     attr_accessor :tex_fontseries    
@@ -154,6 +157,9 @@ class FigureMaker
         # This has been commented out as it's place lie in the texout.c, for
         # it's parameters to be set properly...
         @tex_preview_pagestyle = 'empty'
+        
+        @tex_xaxis_numeric_label = '$#1$'
+        @tex_yaxis_numeric_label = '$#1$'
         
         @tex_preview_fullpage = true
         @tex_preview_minwhitespace = nil # use default
