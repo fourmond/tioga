@@ -254,7 +254,7 @@ static char *Create_Label(double value, int scale, int prec, bool log_values, bo
      value = pow(10.0, exponent);
      pow_val = pow(10.0, sav_val);
      if (exponent < 0) {
-        char form[10];
+        char form[60];
         int numdig = ABS(exponent)+1; 
         sprintf(form, (s->vertical)? "\\tiogayaxisnumericlabel{%%.%df}" : "\\tiogaxaxisnumericlabel{%%.%df}", numdig);
         sprintf(buff, form, pow_val);
