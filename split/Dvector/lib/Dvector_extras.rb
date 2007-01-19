@@ -208,6 +208,14 @@ module Dobjects
       
       return res
     end
+
+    # Writes an array of Dvectors into a text _file_ 
+    def Dvector.write(file, *cols)
+      nb = cols.map {|d| d.size}.max # The number of lines
+      nb.times do |i|
+        file.puts(cols.map {|d| d[i].to_s }.join("\t"))
+      end
+    end
     
   end
 end

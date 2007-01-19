@@ -764,5 +764,17 @@ EOT
       v = Dvector[0.0/0.0, 0.0/0.0, 1,2,4,5,9,0.0/0.0,0.1]
       assert_equal(v.bounds, [0.1, 9])
     end
+
+    def test_write_dvectors
+      a = Dvector[1,2,3]
+      b = Dvector[3,2,1]
+      out = StringIO.new("", "w")
+      Dvector.write(out, a,b)
+      out.close
+      input = StringIO.new(out.string)
+      c,d = Dvector.fancy_read(input)
+      assert_equal(a,c)
+      assert_equal(b,d)
+    end
     
 end
