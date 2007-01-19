@@ -210,15 +210,19 @@ module Dobjects
     end
 
     WRITE_DEFAULTS = {
-      'separator' => "\t"
+      'sep' => "\t",
+      'write_mode' => "a",
     }
 
     # Writes an array of Dvectors into a text _file_ 
     def Dvector.write(file, cols, options = {})
       ops = WRITE_DEFAULTS.update(options)
+      if file.is_a?(String)
+        file = File.open(file, ops["write_mode"])
+      end 
       nb = cols.map {|d| d.size}.max # The number of lines
       nb.times do |i|
-        file.puts(cols.map {|d| d[i].to_s }.join(ops["separator"]))
+        file.puts(cols.map {|d| d[i].to_s }.join(ops["sep"]))
       end
     end
     
