@@ -71,15 +71,20 @@ have_func("isnan","math.h")
 # Installing scripts
 declare_exec 'scripts/tioga'
 
-# Installing MacOS specific scripts:
-# Creating the script
-custom_rule("repreview", 
-            [ "echo '#:/bin/sh' > repreview",
-              "echo \"osascript '$(EXEC_INSTALL_DIR)/Reload_Preview_Document.scpt' $*\" >> repreview"
-            ]) 
-declare_exec 'repreview'
-declare_exec 'scripts/Reload_Preview_Document.scpt'
 
+if Config::CONFIG["target"] =~ /darwin/i
+  # Installing MacOS specific scripts:
+  # Creating the script
+  puts "MacOS specific installation"
+  custom_rule("repreview", 
+              [ "echo '#!/bin/sh' > repreview",
+                "echo \"osascript '$(EXEC_INSTALL_DIR)/Reload_Preview_Document.scpt'\" '$$*' >> repreview"
+              ]) 
+  declare_exec 'repreview'
+  declare_exec 'scripts/Reload_Preview_Document.scpt'
+else
+  puts "Skipping MacOS-specific files"
+end
 
 
 write_makefile
