@@ -31,6 +31,7 @@ class MyFigures
         #t.def_figure("Test_Pattern") { test_pattern }
         t.def_figure("Strings") { strings }
         t.def_figure("Arrows") { show_arrows }
+        t.def_figure("Arrows_second_take") { show_arrows_second_take }
         t.def_figure("Marker_Horizontal_Scaling") { marker_horizontal_scaling }
         t.def_figure("Marker_Vertical_Scaling") { marker_vertical_scaling }
         t.def_figure("Marker_Italic_Angle") { marker_italic_angle }
@@ -395,6 +396,29 @@ class MyFigures
             x = center_x + dx; y = center_y + dy;
             t.show_arrow('head' => [x,y], 'tail'=> [center_x, center_y], 'head_scale' => 1.5,
                 'tail_marker' => 'None', 'head_color' => t.hls_to_rgb([angle, hls[1], hls[2]]))
+        end
+    end
+
+    def show_arrows_second_take
+        t.stroke_rect(0,0,1,1)
+        center_x = 0.5; center_y = 0.5; len = 0.45
+        hls = t.rgb_to_hls(Red)
+        angles = 36
+        delta = 360.0/angles
+        angles.times do |angle|
+            angle *= delta
+            dx = len*cos(angle*RADIANS_PER_DEGREE)
+            dy = len*sin(angle*RADIANS_PER_DEGREE)
+            x = center_x + dx; y = center_y + dy;
+            t.show_arrow('head' => [x,y], 
+                         'tail'=> [center_x + 0.5 * dx, 
+                                   center_y + 0.5 * dy], 
+                         'head_scale' => 1.5,
+                         'tail_marker' => Semicircle,
+                         'tail_just' => RIGHT_JUSTIFIED,
+                         'head_color' => t.hls_to_rgb([angle, hls[1], hls[2]]),
+                         'tail_color' => t.hls_to_rgb([- angle, hls[1], hls[2]]),
+                         'line_style' => Line_Type_Dash)
         end
     end
     

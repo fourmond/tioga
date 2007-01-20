@@ -1122,7 +1122,8 @@ class FigureMaker
     
     @@keys_for_show_arrow = FigureMaker.make_name_lookup_hash([
         'x_head', 'y_head', 'x_tail', 'y_tail', 'head', 'tail',
-        'color', 'head_color', 'tail_color', 'line_color',
+        'color', 'head_color', 'tail_color', 'line_color', 
+        'line_style', 
         'head_marker', 'tail_marker', 'line_width', 
         'head_angle', 'head_just', 'tail_just', 'tail_angle',   
         'head_scale', 'tail_scale'])
@@ -1182,6 +1183,10 @@ class FigureMaker
         self.line_width = line_width if prev_line_width != line_width
         prev_stroke_color = self.stroke_color
         self.stroke_color = line_color if line_color != prev_stroke_color
+        prev_line_type = self.line_type
+        if dict['line_style']
+            self.line_type = dict['line_style']
+        end
         dx = x_head - x_tail
         dy = y_head - y_tail
         pg_dx = convert_figure_to_output_dx(dx)
@@ -1225,6 +1230,7 @@ class FigureMaker
         self.line_cap = prev_line_cap if prev_line_cap != LINE_CAP_BUTT
         self.line_width = prev_line_width if prev_line_width != line_width
         self.stroke_color = prev_stroke_color if prev_stroke_color != line_color
+        self.line_type = prev_line_type
     end
     
     @@keys_for_axial_shading = FigureMaker.make_name_lookup_hash(['extend_start', 'extend_end',
