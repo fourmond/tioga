@@ -1124,7 +1124,7 @@ class FigureMaker
         'x_head', 'y_head', 'x_tail', 'y_tail', 'head', 'tail',
         'color', 'head_color', 'tail_color', 'line_color',
         'head_marker', 'tail_marker', 'line_width', 
-        'head_angle', 'tail_angle',  
+        'head_angle', 'head_just', 'tail_just', 'tail_angle',   
         'head_scale', 'tail_scale'])
 
     # TODO: add linestyle capacities to arrows.
@@ -1162,6 +1162,20 @@ class FigureMaker
         head_scale = dict['head_scale']
         head_scale = @marker_defaults['scale'] if head_scale == nil
         tail_scale = dict['tail_scale']
+
+        # Automatic detection of marker justification
+        dict['tail_just'] ||= if tail_marker == Arrowhead || tail_marker == ArrowheadOpen
+                                RIGHT_JUSTIFIED
+                              else
+                                CENTERED
+                              end
+
+        dict['head_just'] ||= if head_marker == Arrowhead || head_marker == ArrowheadOpen
+                                RIGHT_JUSTIFIED
+                              else
+                                CENTERED
+                              end
+                                
         prev_line_cap = self.line_cap
         self.line_cap = LINE_CAP_BUTT if prev_line_cap != LINE_CAP_BUTT
         prev_line_width = self.line_width
@@ -1175,21 +1189,29 @@ class FigureMaker
         len = (pg_dx*pg_dx + pg_dy*pg_dy).sqrt
         chsz = convert_figure_to_output_dx(default_text_height_dx) * head_scale
         chsz = -chsz if chsz < 0
-        newlen = len - 0.5*chsz
-        newlen = 0 if newlen < 0
-        frac = newlen / len
+        
+        tail_frac = if dict['tail_just'] == RIGHT_JUSTIFIED
+                      0.5 * chsz/len
+                    else
+                      0.0
+                    end
+        head_frac = if dict['head_just'] == RIGHT_JUSTIFIED
+                      (len - 0.5 * chsz)/len
+                    else
+                      1.0
+                    end
+        if head_frac < tail_frac # Pretty uncommon, I guess
+          head_frac = tail_frac = 0.5 # We put everything in the middle, then
+        end
+
         # Don't actually stroke the line if line_width is null. Can be used
         # to draw only the markers.
-        stroke_line(x_tail + frac*dx, y_tail + frac*dy, x_tail, y_tail) if line_width > 0
+        stroke_line(x_tail + tail_frac*dx, y_tail + tail_frac*dy, 
+                    x_tail + head_frac*dx, y_tail + head_frac*dy) if line_width > 0
         angle = convert_to_degrees(dx, dy)
         if head_marker != 'None'
-            if head_marker == Arrowhead || head_marker == ArrowheadOpen
-                just = RIGHT_JUSTIFIED
-            else
-                just = CENTERED
-            end
             show_marker('marker' => head_marker, 'point' => [x_head, y_head], 'color' => head_color,
-                'justification' => just, 'angle'=> (angle + head_angle), 'scale' => head_scale)
+                'justification' => dict['head_just'], 'angle'=> (angle + head_angle), 'scale' => head_scale)
         end
         if tail_marker != 'None'
             if tail_marker == Arrowhead || tail_marker == ArrowheadOpen
@@ -1198,7 +1220,7 @@ class FigureMaker
                 just = CENTERED
             end
             show_marker('marker' => tail_marker, 'point' => [x_tail, y_tail], 'color' => tail_color,
-                'angle'=> (angle + tail_angle), 'scale' => tail_scale, 'justification' => just)
+                'angle'=> (angle + tail_angle), 'scale' => tail_scale, 'justification' => dict['tail_just'])
         end
         self.line_cap = prev_line_cap if prev_line_cap != LINE_CAP_BUTT
         self.line_width = prev_line_width if prev_line_width != line_width

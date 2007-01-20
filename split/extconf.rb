@@ -72,7 +72,7 @@ have_func("isnan","math.h")
 declare_exec 'scripts/tioga'
 
 
-if Config::CONFIG["target"] =~ /darwin/i
+# if Config::CONFIG["target"] =~ /darwin/i
   # Installing MacOS specific scripts:
   # Creating the script
   puts "MacOS specific installation"
@@ -82,9 +82,9 @@ if Config::CONFIG["target"] =~ /darwin/i
               ]) 
   declare_exec 'repreview'
   declare_exec 'scripts/Reload_Preview_Document.scpt'
-else
-  puts "Skipping MacOS-specific files"
-end
+# else
+#   puts "Skipping MacOS-specific files"
+# end
 
 
 write_makefile
