@@ -140,7 +140,7 @@ class Executive < Doc < FigureMaker
 #   def_enter_page_function { |string| ... }
 #
 # The block of code is saved to be executed later whenever make_pdf is called to create a page for a figure.  
-# See also reset_enter_page_function.
+# See also reset_enter_page_function, default_enter_page_function.
 #
     def def_enter_page_function(&cmd)
     end
@@ -148,9 +148,72 @@ class Executive < Doc < FigureMaker
 # :call-seq:
 #   reset_enter_page_function
 #
-# Removes the current definition for the enter_page_function.  See also def_enter_page_function.
+# Removes the current definition for the enter_page_function.  See also def_enter_page_function, default_enter_page_function.
 #
     def reset_enter_page_function
+    end
+
+# :call-seq:
+#   default_enter_page_function
+#
+# Calls page_setup with the current default_page_width and default_page_height.
+# Then calls set_frame_sides with default_frame_left, default_frame_right, default_frame_top, and default_frame_bottom.
+#
+    def default_enter_page_function
+    end
+
+# :call-seq:
+#   default_page_width
+#   default_page_width = a_float
+#
+# The page width for use by default_enter_page_function.
+#
+    def default_page_width
+    end
+
+# :call-seq:
+#   default_page_height
+#   default_page_height = a_float
+#
+# The page height for use by default_enter_page_function.
+#
+    def default_page_height
+    end
+
+# :call-seq:
+#   default_frame_left
+#   default_frame_left = a_float
+#
+# The frame left for use by default_enter_page_function.
+#
+    def default_frame_left
+    end
+
+# :call-seq:
+#   default_frame_right
+#   default_frame_right = a_float
+#
+# The frame right for use by default_enter_page_function.
+#
+    def default_frame_right
+    end
+
+# :call-seq:
+#   default_frame_top
+#   default_frame_top = a_float
+#
+# The frame top for use by default_enter_page_function.
+#
+    def default_frame_top
+    end
+
+# :call-seq:
+#   default_frame_bottom
+#   default_frame_bottom = a_float
+#
+# The frame bottom for use by default_enter_page_function.
+#
+    def default_frame_bottom
     end
 
 
@@ -370,11 +433,11 @@ class Executive < Doc < FigureMaker
    end
 
 # :call-seq:
-#               which_pdflatex                                     
-#               which_pdflatex = a_string
+#               pdflatex                                     
+#               pdflatex = a_string
 #
 # The name for the pdflatex to use.  Defaults to 'pdflatex'.
-   def which_pdflatex
+   def pdflatex
    end
 
 # :call-seq:

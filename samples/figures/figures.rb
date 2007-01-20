@@ -1,8 +1,11 @@
 #  figures.rb
 
+require 'figure_styles.rb'
+
 class MyFigures
 
     include Tioga
+    include MyFigureStyles
     include FigureConstants
     
     def t
@@ -59,9 +62,8 @@ class MyFigures
     end
     
     def enter_page
-        sz = 8.5
-        t.page_setup(sz*72/2,sz*72/2)
-        t.set_frame_sides(0.15,0.85,0.85,0.15) # left, right, top, bottom in page coords        
+        set_default_style # defined in figure_styles.rb
+        t.default_enter_page_function
     end
     
     def hues
@@ -92,7 +94,7 @@ class MyFigures
         t.fill_rect(x, y + yfrac * height, width, (1-yfrac) * height)
         t.fill_color = eval(name)
         t.fill_rect(x, y, width, yfrac * height)
-        t.show_text('text' => '\sffamily ' + name, 'x' => x + 0.5 * width, 'y' => y + dy * height,
+        t.show_text('text' => name, 'x' => x + 0.5 * width, 'y' => y + dy * height,
             'justification' => CENTERED, 'scale' => 0.55)
         t.line_color = Black
         t.stroke_width = 0.5
@@ -104,6 +106,7 @@ class MyFigures
     end
     
     def color_page(first)
+        sans_serif_style
         width = 0.13; height = 0.094
         x = x0 = 0.02; y = y0 = 0.895
         dx = 0.14; dy = 0.11
@@ -407,9 +410,9 @@ class MyFigures
         tioga_cool = true
         # set aspect ratio and font scale depending on whether root figure or not
         unless t.in_subfigure
-          sz = 4.25; scale = 9
+          sz = 4.25; scale = 8
           t.page_setup(sz*72,sz*72)
-          t.set_frame_sides(0.05,0.95,0.90,0.10) # left, right, top, bottom in page coords
+          t.set_frame_sides(0.05,0.95,0.91,0.09) # left, right, top, bottom in page coords
         else
           scale = 7   
         end

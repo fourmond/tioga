@@ -71,6 +71,8 @@ class FigureMaker
         return dict
     end
 
+    attr_accessor :style_filename
+
     attr_accessor :legend_info
     
     attr_reader   :num_figures
@@ -91,13 +93,20 @@ class FigureMaker
     
     attr_accessor :tex_preamble
     
-    attr_accessor :tex_xaxis_numeric_label
-    attr_accessor :tex_yaxis_numeric_label
+    attr_accessor :xaxis_numeric_label_tex
+    attr_accessor :yaxis_numeric_label_tex
     
     attr_accessor :tex_fontsize    
     attr_accessor :tex_fontfamily    
     attr_accessor :tex_fontseries    
     attr_accessor :tex_fontshape
+    
+    attr_accessor :default_page_width
+    attr_accessor :default_page_height
+    attr_accessor :default_frame_left
+    attr_accessor :default_frame_right
+    attr_accessor :default_frame_top
+    attr_accessor :default_frame_bottom
     
     attr_accessor :num_error_lines
 
@@ -133,7 +142,6 @@ class FigureMaker
 
     
     def reset_figures # set the state to default values
-        
         @figure_commands = []
         @num_figures = 0
         @create_save_dir = true # creates +save_dir+ by default
@@ -157,6 +165,13 @@ class FigureMaker
         # This has been commented out as it's place lie in the texout.c, for
         # it's parameters to be set properly...
         @tex_preview_pagestyle = 'empty'
+        @default_page_width = 72*5 # in big-points (1/72 inch)
+        @default_page_height = 72*5 # in big-points (1/72 inch)
+
+        @default_frame_left = 0.15 # as fraction of width from left edge
+        @default_frame_right = 0.85 # as fraction of width from left edge
+        @default_frame_top = 0.85 # as fraction of width from bottom edge
+        @default_frame_bottom = 0.15 # as fraction of width from bottom edge
         
         @tex_xaxis_numeric_label = '$#1$'
         @tex_yaxis_numeric_label = '$#1$'
@@ -219,7 +234,7 @@ class FigureMaker
         @enter_context_function = nil
         @exit_context_function = nil
 
-        @enter_page_function = nil
+        @enter_page_function = lambda { default_enter_page_function }
         @exit_page_function = nil
                 
         @tex_preview_paper_width = '297mm'
@@ -236,8 +251,20 @@ class FigureMaker
         reset_figures
     end
 
+
     def reset_state        
         reset_figures
+    end
+    
+       
+    def default_line_scale=(s)
+      self.rescale_lines(s)
+    end
+
+    def default_enter_page_function
+        page_setup(self.default_page_width,self.default_page_height)
+        set_frame_sides(self.default_frame_left,self.default_frame_right,
+                      self.default_frame_top,self.default_frame_bottom)
     end
 
     def set_default_font_size(size, update_preview_size_string = true)
@@ -267,7 +294,7 @@ class FigureMaker
         self.update_bbox(1,0)
         self.update_bbox(1,1)
     end
-    
+
     def tex_preview_preamble # for backward compatibility
         self.tex_preamble
     end

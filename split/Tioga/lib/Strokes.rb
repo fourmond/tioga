@@ -113,7 +113,7 @@ class Strokes < Doc < FigureMaker
    end
 
 
-# Multiply default_line_scale by the given _scale_ and adjust line_width accordingly.
+# Adjust default_line_scale by multiplying it by the given _scale_ and adjust the current line_width accordingly.
    def rescale_lines(scale)
    end
    

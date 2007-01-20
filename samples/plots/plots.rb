@@ -1,10 +1,13 @@
 # plots.rb
 
+require 'plot_styles'
+
 class MyPlots
 
     include Math
     include Tioga
     include FigureConstants
+    include MyPlotStyles
     
     def t
         @figure_maker
@@ -12,6 +15,7 @@ class MyPlots
 
     def initialize
         @figure_maker = FigureMaker.default
+
         t.save_dir = 'plots_out'
         t.def_eval_function { |str| eval(str) }
         
@@ -59,14 +63,15 @@ class MyPlots
         t.def_figure("Contours") { samples_with_contours }
 
         t.model_number = -1
+        t.autocleanup = false
         
         t.def_enter_page_function { enter_page }
             
     end
     
     def enter_page
-        t.page_setup(11*72/2,8.5*72/2)
-        t.set_frame_sides(0.15,0.85,0.85,0.15) # left, right, top, bottom in page coords        
+        set_default_plot_style
+        t.default_enter_page_function
     end
     
     def read_data
@@ -117,6 +122,7 @@ class MyPlots
     end
     
     def reds
+        sans_serif_style unless t.in_subplot
         read_data
         t.do_box_labels('Reds Plot', 'Position', '\textcolor{Crimson}{Reds}')
         show_model_number

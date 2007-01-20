@@ -60,6 +60,13 @@ module FigureConstants
     AXIS_WITH_MAJOR_TICKS_AND_NUMERIC_LABELS = 4
     AXIS_WITH_TICKS_AND_NUMERIC_LABELS = 5
 
+
+    EDGE_HIDDEN = 0
+    EDGE_LINE_ONLY = 1
+    EDGE_WITH_MAJOR_TICKS_ONLY = 2
+    EDGE_WITH_TICKS = 3
+    
+
     Line_Type_Solid = [[], 0]
     Line_Type_Dot = [[1, 2], 0]
     Line_Type_Dots = Line_Type_Dot
@@ -68,12 +75,28 @@ module FigureConstants
     Line_Type_Dashes = Line_Type_Dash
     Line_Type_Short_Dashes = Line_Type_Dash
     
+    LINE_TYPE_SOLID = Line_Type_Solid
+    LINE_TYPE_DOT = Line_Type_Dot
+    LINE_TYPE_DOTS = Line_Type_Dots
+    LINE_TYPE_DASH = Line_Type_Dash
+    LINE_TYPE_SHORT_DASH = Line_Type_Short_Dash
+    LINE_TYPE_DASHES = Line_Type_Dashes
+    LINE_TYPE_SHORT_DASHES = Line_Type_Short_Dashes
+    
+    
     Line_Type_Long_Dash = [[6, 2], 0]
     Line_Type_Long_Dashes = Line_Type_Long_Dash
     Line_Type_Dot_Dash = [[1, 2, 4, 2], 0]
     Line_Type_Dot_Short_Dash = Line_Type_Dot_Dash
     Line_Type_Dot_Long_Dash = [[1, 2, 6, 2], 0]
     Line_Type_Short_Dash_Long_Dash = [[4, 2, 6, 2], 0]
+    
+    LINE_TYPE_LONG_DASH = Line_Type_Long_Dash
+    LINE_TYPE_LONG_DASHES = Line_Type_Long_Dashes
+    LINE_TYPE_DOT_DASH = Line_Type_Dot_Dash
+    LINE_TYPE_DOT_SHORT_DASH = Line_Type_Dot_Short_Dash
+    LINE_TYPE_DOT_LONG_DASH = Line_Type_Dot_Long_Dash
+    LINE_TYPE_SHORT_DASH_LONG_DASH = Line_Type_Short_Dash_Long_Dash
 
     LINE_CAP_BUTT = 0
     LINE_CAP_ROUND = 1

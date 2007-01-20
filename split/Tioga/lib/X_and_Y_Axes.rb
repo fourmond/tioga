@@ -1,8 +1,16 @@
 #  X_and_Y_Axes.rb
 
 module Tioga
+=begin rdoc
 
-# These are the methods and attributes for the plot axes.
+These are the methods and attributes for the plot axes.
+
+There are separate sets of commands for the x and y axes.
+
+See Tutorial::Plots for more information.
+
+=end
+
 
 class X_and_Y_Axes < Doc < FigureMaker
 
@@ -228,11 +236,37 @@ class X_and_Y_Axes < Doc < FigureMaker
    end
 
 # :call-seq:
+#               xaxis_numeric_label_tex
+#               xaxis_numeric_label_tex = a_string
+#
+# The string for a numeric label is put in this TeX command string to be formatted.
+# For example, '$#1$' will give the numbers in math mode, while '$\mathsf{#1}$' will 
+# show the label using the math sans-serif font.
+   def xaxis_numeric_label_tex
+   end
+
+# :call-seq:
+#               yaxis_numeric_label_tex
+#               yaxis_numeric_label_tex = a_string
+#
+# The string for a numeric label is put in this TeX command string to be formatted.
+# For example, '$#1$' will give the numbers in math mode, while '$\mathsf{#1}$' will 
+# show the label using the math sans-serif font.
+   def yaxis_numeric_label_tex
+   end
+
+
+
+
+
+
+# :call-seq:
 #               xaxis_numeric_label_decimal_digits
 #               xaxis_numeric_label_decimal_digits = an_integer_value
 #
 # If non-negative, then use this number of digits after the decimal when creating numeric
 # labels for the x axis.
+# See also tex_xaxis_numeric_label.
    def xaxis_numeric_label_decimal_digits
    end
 
@@ -395,6 +429,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               xaxis_numeric_label_scale = a_float
 #
 # Scaling factor relative to default_text_scale for the numeric labels on the x axis in plots.
+# See also tex_xaxis_numeric_label.
    def xaxis_numeric_label_scale
    end
 
@@ -405,6 +440,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 # Distance to shift the reference point for showing numeric labels on the x axis
 # measured in character heights with positive directed out away from the plot for
 # x axis on top or bottom, or toward positive y values for x axis at y origin.
+# See also tex_xaxis_numeric_label.
    def xaxis_numeric_label_shift
    end
 
@@ -413,6 +449,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               xaxis_numeric_label_angle = a_float_in_degrees
 #
 # Numeric labels on the x axis are rotated by this angle from vertical.
+# See also tex_xaxis_numeric_label.
    def xaxis_numeric_label_angle
    end
 
@@ -421,6 +458,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               xaxis_numeric_label_alignment = an_alignment
 #
 # The #alignment setting for numeric labels on the x axis.
+# See also tex_xaxis_numeric_label.
    def xaxis_numeric_label_alignment
    end
 
@@ -429,6 +467,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               xaxis_numeric_label_justification = a_justification
 #
 # The #justification setting for numeric labels on the x axis.
+# See also tex_xaxis_numeric_label.
    def xaxis_numeric_label_justification
    end
 
@@ -473,6 +512,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #
 # If non-negative, then use this number of digits after the decimal when creating numeric
 # labels for the y axis.
+# See also tex_yaxis_numeric_label.
    def yaxis_numeric_label_decimal_digits
    end
 
@@ -655,6 +695,7 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Special_Y.jpg
 #               yaxis_numeric_label_scale = a_float
 #
 # Scaling factor relative to default_text_scale for the numeric labels on the y axis in plots.
+# See also tex_yaxis_numeric_label.
    def yaxis_numeric_label_scale
    end
 
@@ -665,6 +706,7 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Special_Y.jpg
 # Distance to shift the reference point for showing numeric labels on the y axis
 # measured in character heights with positive directed out away from the plot for
 # y axis on left or right, or toward positive x values for y axis at x origin.
+# See also tex_yaxis_numeric_label.
    def yaxis_numeric_label_shift
    end
 
@@ -673,6 +715,7 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Special_Y.jpg
 #               yaxis_numeric_label_angle = a_float_in_degrees
 #
 # Numeric labels on the y axis are rotated by this angle from horizontal.
+# See also tex_yaxis_numeric_label.
    def yaxis_numeric_label_angle
    end
 
@@ -681,8 +724,10 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Special_Y.jpg
 #               yaxis_numeric_label_alignment = an_alignment
 #
 # The #alignment setting for numeric labels on the y axis.
+# See also tex_yaxis_numeric_label.
    def yaxis_numeric_label_alignment
    end
+  
 
 # :call-seq:
 #               yaxis_numeric_label_justification
@@ -699,28 +744,6 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Special_Y.jpg
 # If 0, then tioga will pick the interval between major tick marks on the x axis.
 # Otherwise, this will be used as the interval in x coordinates for the spacing between major ticks.
    def xaxis_tick_interval
-   end
-
-# :call-seq:
-#               tex_xaxis_numeric_label
-#               tex_xaxis_numeric_label = a_string
-#
-# This string serves as a TeX command to format numeric labels on the xaxis.
-# For example, you might set tex_xaxis_numeric_label to '$\mathsf{#1}$' if you
-# want the xaxis numeric labels shown in the math sans serif font.
-# See also tex_yaxis_numeric_label.
-   def tex_xaxis_numeric_label
-   end
-
-# :call-seq:
-#               tex_yaxis_numeric_label
-#               tex_yaxis_numeric_label = a_string
-#
-# This string serves as a TeX command to format numeric labels on the yaxis.
-# For example, you might set tex_yaxis_numeric_label to '$\mathsf{#1}$' if you
-# want the xaxis numeric labels shown in the math sans serif font.
-# See also tex_xaxis_numeric_label.
-   def tex_yaxis_numeric_label
    end
 
 

@@ -306,6 +306,48 @@ use by show_legend.  The show_legend routine uses various attributes defining th
 layout of the legend information to show the saved text and make the sample lines.
 
 
+== Plot Styles
+
+You may have noticed the file plot_styles.rb in the samples/plots directory.  It has a couple of routines for setting
+the tioga attributes that determine plot formats.  In plots.rb itself, at the top of the file, you'll find a line that does
+
+  require 'plot_styles'
+  
+Open plot_styles.rb in your text edit and let's take a look inside.  It defines a module called MyPlotStyles, and if we
+check the plots.rb file again, we'll find that it does 'include MyPlotStyles'.  That means that within the MyPlots class
+in plots.rb we can directly use any methods defined in MyPlotStyles.  Turns out that there are currently two such methods
+(although you may want to add more later).  The first is called sans_serif_style, and as the name suggests it changes
+a few attributes so that TeX will use sans serif fonts.  The second method in MyPlotStyles is set_default_plot_style,
+and it gives values to all of the tioga attributes relevant to figures and plots.
+
+You may want to add special styles of your own -- if you make something that might be of interest to others, let us know.
+
+There are several options for how style methods are used.  One would be to call a style method from the
+initialization routine for your plot class (such as at the start of MyPlots initialize, just after setting
+@figure_maker).  If you take that approach, you don't need to have your own 'enter_page' function since the
+default will do just fine.  An alternative that I often use is to have an enter_page function and call the
+style method from there.  This is the method implemented in plots.rb currently.  At the end of the initialization
+method, there's a line that defines our enter_page_function:
+
+        t.def_enter_page_function { enter_page }
+
+And then we define out enter_page as follows:
+
+    def enter_page
+        set_default_plot_style
+        t.default_enter_page_function
+    end
+
+A final way to use the style methods is to call them directyly from a plot definition.  This is
+illustrated by the method reds.  It begins with this line:
+
+    sans_serif_style unless t.in_subplot
+
+This is doing a conditional style change.  If we use the Reds plot by itself, it switches to
+sans serif, but if we combine it as part of "super-plot", then it uses whatever has already
+been set up.  I don't mean to suggest that you start having lots of conditional style changes;
+the point here is simply that styles can be set in various ways at various stages of creating a plot.
+
 ---
 
 Now let's review the tools for reading and manipulating the data for plots -- next stop: Data.
