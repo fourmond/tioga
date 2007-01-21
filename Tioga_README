@@ -1,6 +1,6 @@
-This is the README for the Tioga kernel, version 1.3.1, December 12, 2006.
+This is the README for the Tioga kernel, version 1.4, January 21, 2007.
 
-    Copyright (C) 2005, 2006  Bill Paxton
+    Copyright (C) 2005, 2006, 2007  Bill Paxton
     
     This file is part of Tioga.
     
@@ -21,43 +21,36 @@ This is the README for the Tioga kernel, version 1.3.1, December 12, 2006.
 
 << What's new >>
 
-	Version 1.3.2
+	Version 1.4 is a major overhaul with particular emphasis on the tioga user interface.
+Please take a moment to go through the new section of the tutorial titled, CommandLine.
+It gives a detailed discussion of the new tioga command line interface that replaces
+irb_tioga and the old mac gui.  There is a also new small drag-and-drop application for the Mac
+called "Tioga Droplet" that takes any file dropped on it and sends it to the new tioga
+command line interface to have a portfolio created and displayed.  There
+is also a browser-based viewer called Vtioga that JJ Fleck has developed that uses
+command line tioga to create pdfs, converts them to png's, and displays them in a
+browser page using Ruby on Rails.  And Vicent Fourmond has of course been continuing his
+development of Ctioga.  So there are now several nice options available for tioga user
+interfaces.  [BTW: The old mac gui for tioga is now an orphan; I've decided I can't commit to
+giving it the amount of attention it seems to need to stay healthy!  The current upheaval
+in the user interface area is a result of my decision that things needed to get simpler.
+If you've become hopelessly addicted to the old mac gui, I'll happily let you adopt it.
+Just let me know, and it's yours to maintain and develop as long as your sanity lasts.]
+
+	If you take a look in tioga/samples/plots, you will find a new item: plot_styles.rb.
+Do you like to use a sans-serif font for your plots?  Then 'require plot_styles.rb' in your plot file,
+'include MyPlotStyles' in your plot class (the module defined in plot_styles.rb), and call the 'sans_serif_style' method at the beginning of your plot definition 
+(or from your enter_page function, or from your
+plot class initialization method).  Curious about what tioga attributes there are for
+dealing with the appearance of plots?  Scan through the set_default_plot_style method
+in plot_styles.rb.  Want a style that's not in plot_styles.rb?  Great!  Write it yourself,
+and share it with the rest of us by sending a message to tioga-users!
+
+
+
 	
-		In addition to the items Vincent described below for 1.3.1, there are also some 
-new enhancements to the irb_tioga package.  As you probably recall, it is a Tioga 
-front-end in irb that provides a set of commands to make pdf's and get them
-opened in your favorite previewer.  The basic 3-window model of operation is to have
-your Tioga ruby source file open in a text editor window, irb open in a terminal
-window, and the PDF file open in a previewer.  You edit and save the ruby program 
-for your figure or plot, type a command to irb_tioga to get the file reloaded and 
-the pdf recreated, then look at the result in the previewer.  Repeat until happy!
-
-		The recent additions to irb_tioga are simply further efforts to make that
-cycle smoother.  There's a new command, called "reload_and_review" ("rr" for short),
-that combines the standard operations into one: it reloads the new version of
-the ruby file, rebuilds the most recently created figures, and opens it in the
-previewer.  And if typing "rr<return>" is too much for you, remember that irb
-has a nice history feature, so you can just type up-arrow and return.  Cool!
-
-		I often have Tioga files that define a long list of figures.  There's another
-new command in irb_tioga that writes the list of figures with numbers to a file
-and then opens that file.  So now in addition to the 3 windows mentioned above,
-I also have another text editor window with a list of figures giving numbers and
-names -- a quick glance at that is enough to tell me what number to give to the
-"pv" command in irb_tioga to get the figure I want.
-
-		Finally, some previewers need a gentle kick in the pants to reload a PDF file
-after it has been modified.  For example, Preview on the Mac discards requests to
-open a PDF that it already has opened, even if the file has been written since
-the previous open.  Happily, other people have solved this one for us.  There's a 
-simple script that gets Preview to do "Open/Revert" -- I'll send out a copy of this in
-an email to tioga-news.
-
-		Moerover, numbers on axis are now written in math mode, so that minus signs
-have the right size. (and more funny details if you play around with custom fonts).
-
-	Cheers,
-	Bill
+<< What's old >>
+	
 
 	  Version 1.3.1 is as usual a bug-fix release, although bugs
 were not that obvious this time. Among other things,
@@ -76,13 +69,9 @@ were not that obvious this time. Among other things,
   Enjoy !!
 
 	--Vincent
-
-	
-<< What's old >>
 	
 		Vincent has added a #primitive method to Function (during breaks from
 writing his thesis).
-
 
     	There is a new contour algorithm.  Thank you to Roy Mayfield for telling me about the
 Gri contour following routine (http://gri.sourceforge.net/).  Tioga's make_contour method now

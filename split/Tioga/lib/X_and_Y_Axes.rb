@@ -5,8 +5,6 @@ module Tioga
 
 These are the methods and attributes for the plot axes.
 
-There are separate sets of commands for the x and y axes.
-
 See Tutorial::Plots for more information.
 
 =end
@@ -240,7 +238,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               xaxis_numeric_label_tex = a_string
 #
 # The string for a numeric label is put in this TeX command string to be formatted.
-# For example, '$#1$' will give the numbers in math mode, while '$\mathsf{#1}$' will 
+# For example, `$#1$' will give the numbers in math mode, while `$\mathsf{#1}$' will 
 # show the label using the math sans-serif font.
    def xaxis_numeric_label_tex
    end
@@ -250,7 +248,7 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               yaxis_numeric_label_tex = a_string
 #
 # The string for a numeric label is put in this TeX command string to be formatted.
-# For example, '$#1$' will give the numbers in math mode, while '$\mathsf{#1}$' will 
+# For example, `$#1$' will give the numbers in math mode, while `$\mathsf{#1}$' will 
 # show the label using the math sans-serif font.
    def yaxis_numeric_label_tex
    end
