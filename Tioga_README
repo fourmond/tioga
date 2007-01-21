@@ -29,7 +29,7 @@ called "Tioga Droplet" that takes any file dropped on it and sends it to the new
 command line interface to have a portfolio created and displayed.  There
 is also a browser-based viewer called Vtioga that JJ Fleck has developed that uses
 command line tioga to create pdfs, converts them to png's, and displays them in a
-browser page using Ruby on Rails.  And Vicent Fourmond has of course been continuing his
+browser page using Ruby on Rails.  And Vincent Fourmond has of course been continuing his
 development of Ctioga.  So there are now several nice options available for tioga user
 interfaces.  [BTW: The old mac gui for tioga is now an orphan; I've decided I can't commit to
 giving it the amount of attention it seems to need to stay healthy!  The current upheaval
@@ -44,7 +44,13 @@ Do you like to use a sans-serif font for your plots?  Then 'require plot_styles.
 plot class initialization method).  Curious about what tioga attributes there are for
 dealing with the appearance of plots?  Scan through the set_default_plot_style method
 in plot_styles.rb.  Want a style that's not in plot_styles.rb?  Great!  Write it yourself,
-and share it with the rest of us by sending a message to tioga-users!
+and share it with the rest of us by sending a message to tioga-users! 
+
+Additionnally, some more classical functionalities have been added: 
+  * show_arrow now allows to specify a 'line_style' and justification for
+  the markers, see the plot samples/figures/figures.rb: Arrows_second_take
+  * a function Dvector.write has been added that does exactly the
+  reverse of Dvector.(fancy_)read.
 
 
 
