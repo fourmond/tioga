@@ -25,6 +25,9 @@ class MyPlots
     @margin = 0.05
     # we define the plot: 
     @plot = t.def_figure("sine") { exec_plot }    
+    
+    t.xaxis_numeric_label_tex = '$X=#1$'
+    t.tex_yaxis_numeric_label = 'y=#1'
   end
 
 

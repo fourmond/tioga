@@ -256,6 +256,24 @@ class FigureMaker
         reset_figures
     end
     
+    
+    def tex_xaxis_numeric_label
+      self.xaxis_numeric_label_tex
+    end
+    
+    def tex_xaxis_numeric_label=(str)
+      self.xaxis_numeric_label_tex = str
+    end
+    
+    
+    def tex_yaxis_numeric_label
+      self.yaxis_numeric_label_tex
+    end
+    
+    def tex_yaxis_numeric_label=(str)
+      self.yaxis_numeric_label_tex = str
+    end
+    
        
     def default_line_scale=(s)
       self.rescale_lines(s)
