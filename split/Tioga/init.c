@@ -48,8 +48,8 @@ void Init_IDs(void)
 	tex_yoffset_ID = rb_intern("@tex_yoffset");
     tex_preview_documentclass_ID = rb_intern("@tex_preview_documentclass");
     tex_preamble_ID = rb_intern("@tex_preamble");
-    xaxis_numeric_label_tex_ID = rb_intern("@tex_xaxis_numeric_label");
-    yaxis_numeric_label_tex_ID = rb_intern("@tex_yaxis_numeric_label");
+    xaxis_numeric_label_tex_ID = rb_intern("@xaxis_numeric_label_tex");
+    yaxis_numeric_label_tex_ID = rb_intern("@yaxis_numeric_label_tex");
     tex_preview_pagestyle_ID = rb_intern("@tex_preview_pagestyle");
     
     tex_preview_paper_width_ID = rb_intern("@tex_preview_paper_width");
