@@ -255,9 +255,6 @@ class X_and_Y_Axes < Doc < FigureMaker
 
 
 
-
-
-
 # :call-seq:
 #               xaxis_numeric_label_decimal_digits
 #               xaxis_numeric_label_decimal_digits = an_integer_value

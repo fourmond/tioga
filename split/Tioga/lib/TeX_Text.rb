@@ -27,7 +27,6 @@ in big points on the output page.  At least that's the size the text will have i
 and the TeX document doesn't decide to change things!  With text that is being passed to TeX for typesetting, the final
 decisions aren't made until the last moment.  See Page_Frame_Bounds for more details.
 
-See X_and_Y_Axes for xaxis_numeric_label_tex and yaxis_numeric_label_tex.
 See Tutorial::TextForTeX for information about how to add packages and how (and how not) to enter text for TeX.
 
 =end
@@ -427,6 +426,27 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Framebox.jpg
 #
 # See also: tex_fontsize, tex_fontfamily, and tex_fontseries.
    def tex_fontshape
+   end
+
+
+# :call-seq:
+#               tex_xaxis_numeric_label
+#               tex_xaxis_numeric_label = a_string
+#
+# The string for a numeric label is put in this TeX command string to be formatted.
+# For example, `$#1$' will give the numbers in math mode, while `$\mathsf{#1}$' will 
+# show the label using the math sans-serif font.   Alias for xaxis_numeric_label_tex.
+   def tex_xaxis_numeric_label
+   end
+
+# :call-seq:
+#               tex_yaxis_numeric_label
+#               tex_yaxis_numeric_label = a_string
+#
+# The string for a numeric label is put in this TeX command string to be formatted.
+# For example, `$#1$' will give the numbers in math mode, while `$\mathsf{#1}$' will 
+# show the label using the math sans-serif font.   Alias for yaxis_numeric_label_tex.
+   def tex_yaxis_numeric_label
    end
 
 

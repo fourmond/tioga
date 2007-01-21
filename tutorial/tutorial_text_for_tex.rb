@@ -92,6 +92,8 @@ Oops, I just checked and "\s" is actually replaced by a space, so that one's wro
 The take-home message is get in the habit of using single quotes unless you really need to do substitutions.
 
 
+For all listing of the methods and attributes in tioga that related to TeX text, see Tioga::TeX_Text.
+
 ---
 
 Now let's look at the extras in tioga for making plots -- next stop: Plots.
