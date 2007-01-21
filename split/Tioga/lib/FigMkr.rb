@@ -173,8 +173,8 @@ class FigureMaker
         @default_frame_top = 0.85 # as fraction of width from bottom edge
         @default_frame_bottom = 0.15 # as fraction of width from bottom edge
         
-        @tex_xaxis_numeric_label = '$#1$'
-        @tex_yaxis_numeric_label = '$#1$'
+        @xaxis_numeric_label_tex = '$#1$'
+        @yaxis_numeric_label_tex = '$#1$'
         
         @tex_preview_fullpage = true
         @tex_preview_minwhitespace = nil # use default
