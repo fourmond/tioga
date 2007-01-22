@@ -428,8 +428,17 @@ class Executive < Doc < FigureMaker
 #               autocleanup                                     
 #               autocleanup = a_boolean
 #
-# Whether or not do do automatic cleanup of the temporary files when create a PDF for a figure.
+# Whether or not to do automatic cleanup of the temporary files when create a PDF for a figure (default is true).
    def autocleanup
+   end
+
+# :call-seq:
+#               multithreads_okay_for_tioga                                     
+#               multithreads_okay_for_tioga = a_boolean
+#
+# Whether or not to use multithreading wherever possible (default is true).  Currently, this only is used when making
+# a batch of pdfs -- if multithreads_okay_for_tioga is true, then we launch all the pdflatex shells in parallel.
+   def multithreads_okay_for_tioga
    end
 
 # :call-seq:

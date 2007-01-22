@@ -53,13 +53,6 @@ class TiogaUI
   end
   
   
-  def make_1_pdf(i, view)
-    pdf_name = require_pdf(i)
-    append_to_log pdf_name unless view
-    view_pdf(pdf_name) if view && pdf_name != nil
-  end
-  
-  
   def make_all_pdfs(view = true, fignums = nil)
     return unless check_have_loaded
     fm.make_all(fignums,true)

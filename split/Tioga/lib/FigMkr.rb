@@ -30,6 +30,7 @@ class FigureMaker
     @@default_figure_maker = nil
     @@which_pdflatex = nil
     @@initialized = false  # set true by the C code when first make a figure
+    
 
     # The tag used for cvs export 
     CVS_TAG = "$Name$"
@@ -115,6 +116,9 @@ class FigureMaker
 
     # Whether or not do do automatic cleanup of the files
     attr_accessor :autocleanup
+
+    # Whether or not do do multithreading for parallel pdflatex calls
+    attr_accessor :multithreads_okay_for_tioga
     
     
     
@@ -244,6 +248,9 @@ class FigureMaker
 
         # Automatic cleanup of by default
         @autocleanup = true
+        
+        # multithreads by default
+        @multithreads_okay_for_tioga = true
         
     end
 
@@ -1817,54 +1824,36 @@ class FigureMaker
     end
     
     
-    def make_all(fignums=nil, report=false)
-      if fignums == nil
-        fignums = Array.new(@figure_names.length) {|i| i}
-      end
-      results = Array.new(fignums.length) do |i| 
-        puts @figure_names[i] if report
-        start_making_pdf(fignums[i])
-      end
-      if true # run separate threads for the pdflatex processing
-        threads = []
-        results.length.times do |which_result|
-          if results[which_result]
-            threads << Thread.new(which_result) do |i|
-              num = fignums[i]
-              @figure_pdfs[num] = finish_making_pdf(results[i], @figure_names[num])
-              puts num.to_s + ' ' + @figure_pdfs[num] if report
-            end
-          end
-        end
-        threads.each {|thr| thr.join}
-      else
-        results.length.times do |i|
-          result = results[i]
-          if result
-            num = fignums[i]
-            @figure_pdfs[num] = finish_making_pdf(results[i], @figure_names[num])
-            puts num.to_s + ' ' + @figure_pdfs[num] if report
-          end
-        end
-      end
-      return true
-    end
-    
-    
     def require_pdf(num)
-        num = @figure_names.index(num) unless num.kind_of?(Integer)
+        num = get_num_for_pdf(num)
         make_pdf(num) if @figure_pdfs[num] == nil
         return @figure_pdfs[num]
     end
     
     
-    def require_all(fignums=nil)
-        if fignums == nil
-          @figure_names.length.times { |i| require_pdf(i) if @figure_pdfs[i] == nil }
-        else
-          fignums.each { |i| require_pdf(i) if @figure_pdfs[i] == nil }
+    def require_all(fignums=nil, report=false, always_make=false)
+      fignums = Array.new(@figure_names.length) {|i| i} if fignums == nil
+      results = []
+      nums = []
+      fignums.each do |num|
+        if always_make || (@figure_pdfs[num] == nil)
+          result = start_making_pdf(num)
+          if result
+            puts @figure_names[num] if report
+            nums << num
+            results << result
+          else
+            puts 'ERROR: Failed to make pdf for ' + @figure_names[num]
+          end
         end
-        return true
+      end
+      finish_making_pdfs(results,fignums,report)
+      return true
+    end
+    
+    
+    def make_all(fignums=nil, report=false)
+      require_all(fignums, report, true)
     end
     
     
@@ -1911,6 +1900,33 @@ class FigureMaker
           end
         end
         return result
+    end
+    
+      
+    def finish_making_pdfs(results,fignums,report)
+      if @@multithreads_okay_for_tioga # run separate threads for the pdflatex processing
+        threads = []
+        results.length.times do |which_result|
+          if results[which_result]
+            threads << Thread.new(which_result) do |i|
+              num = fignums[i]
+              @figure_pdfs[num] = finish_making_pdf(results[i], @figure_names[num])
+              puts num.to_s + ' ' + @figure_pdfs[num] if report
+            end
+          end
+        end
+        threads.each {|thr| thr.join}
+      else
+        results.length.times do |i|
+          result = results[i]
+          if result
+            num = fignums[i]
+            @figure_pdfs[num] = finish_making_pdf(results[i], @figure_names[num])
+            puts num.to_s + ' ' + @figure_pdfs[num] if report
+          end
+        end
+      end
+      return true
     end
    
     
