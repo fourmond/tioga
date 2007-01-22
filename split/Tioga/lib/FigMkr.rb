@@ -1803,47 +1803,59 @@ class FigureMaker
         make_pdf(num)
     end
 
+
     def make_preview_pdf(num) # old name
         make_pdf(num)
     end
+
     
     def make_pdf(num)
-        num = @figure_names.index(num) unless num.kind_of?(Integer)
-        ensure_safe_save_dir
-        num = num.to_i
-        num_figures = @figure_names.size
-        num += num_figures if num < 0
-        if ((num < 0) or (num >= num_figures))
-            puts "Sorry: number must be between 0 and #{num_figures-1}"
-            result = false
-        else
-            name = @figure_names[num]
-            begin
-                result = create_figure(num)
-                name = get_save_filename(name)
-            rescue Exception => er
-                report_error(er, "ERROR: make failed for #{name}")
-                result = false
-            end
-        end
+        result = start_making_pdf(num)
         return unless result
-        return @figure_pdfs[num] = finish_making_pdf(result, name)
+        return @figure_pdfs[num] = finish_making_pdf(result, @figure_names[num])
     end
     
-    def make_all(fignums=nil)
+    
+    def make_all(fignums=nil, report=false)
       if fignums == nil
-        @figure_names.length.times {|i| make_pdf(i)}
+        fignums = Array.new(@figure_names.length) {|i| i}
+      end
+      results = Array.new(fignums.length) do |i| 
+        puts @figure_names[i] if report
+        start_making_pdf(fignums[i])
+      end
+      if true # run separate threads for the pdflatex processing
+        threads = []
+        results.length.times do |which_result|
+          if results[which_result]
+            threads << Thread.new(which_result) do |i|
+              num = fignums[i]
+              @figure_pdfs[num] = finish_making_pdf(results[i], @figure_names[num])
+              puts @figure_pdfs[num] if report
+            end
+          end
+        end
+        threads.each {|thr| thr.join}
       else
-        fignums.each {|i| make_pdf(i)}
+        results.length.times do |i|
+          result = results[i]
+          if result
+            num = fignums[i]
+            @figure_pdfs[num] = finish_making_pdf(results[i], @figure_names[num])
+            puts @figure_pdfs[num] if report
+          end
+        end
       end
       return true
     end
+    
     
     def require_pdf(num)
         num = @figure_names.index(num) unless num.kind_of?(Integer)
         make_pdf(num) if @figure_pdfs[num] == nil
         return @figure_pdfs[num]
     end
+    
     
     def require_all(fignums=nil)
         if fignums == nil
@@ -1854,9 +1866,11 @@ class FigureMaker
         return true
     end
     
+    
     def make_portfolio_pdf(name,fignums=nil)
         make_portfolio(name,fignums)
     end
+    
     
     def make_portfolio(name,fignums=nil)
         require_all(fignums)
@@ -1865,7 +1879,39 @@ class FigureMaker
     end
     
     private
+ 
+     
+    def get_num_for_pdf(num)
+        num = @figure_names.index(num) unless num.kind_of?(Integer)
+        ensure_safe_save_dir
+        num = num.to_i
+        num_figures = @figure_names.size
+        num += num_figures if num < 0
+        if ((num < 0) or (num >= num_figures))
+            puts "Sorry: number must be between 0 and #{num_figures-1}"
+            num = nil
+        end
+        return num
+    end
     
+    
+    def start_making_pdf(num)
+        num = get_num_for_pdf(num)
+        if num == nil
+          result = false
+        else
+          name = @figure_names[num]
+          begin
+            result = create_figure(num)
+            name = get_save_filename(name)
+          rescue Exception => er
+            report_error(er, "ERROR: make failed for #{name}")
+            result = false
+          end
+        end
+        return result
+    end
+   
     
     def finish_making_pdf(result, name)
         pdflatex = FigureMaker.pdflatex

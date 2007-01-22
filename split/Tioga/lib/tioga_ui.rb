@@ -62,10 +62,12 @@ class TiogaUI
   
   def make_all_pdfs(view = true, fignums = nil)
     return unless check_have_loaded
+    fm.make_all(fignums,true)
+    return unless view
     if fignums == nil
-      fm.num_figures.times { |i| make_1_pdf(i, view) }
+      fm.num_figures.times { |i| view_pdf(fm.figure_pdfs[i]) }
     else
-      fignums.each { |i| make_1_pdf(i, view) }
+      fignums.each { |i| view_pdf(fm.figure_pdfs[i]) }
     end
   end
   
@@ -292,8 +294,10 @@ class TiogaUI
     $change_working_directory = true
     if Config::CONFIG["target"] =~ /darwin/i
       $pdf_viewer = "repreview"
+      #$mac_command_key = true
     else
       $pdf_viewer = "xpdf"
+      #$mac_command_key = false
     end
  
 =begin     

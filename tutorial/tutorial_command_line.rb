@@ -32,9 +32,8 @@ tutorial will be based on the description given here.
 
   Any control commands are done after ~/.tiogainit and before the figure file is loaded.
        -r file      runs the file (using Ruby's require method).
-       -C dir       changes the working directory.
-                    If there is no -C command, tioga changes the working directory to the
-                    location of the figure file .
+       -C dir       changes the working directory. If there is no -C command, 
+                    tioga changes the working directory to the location of the figure file.
        -v           prints version information.
 
   The figure command comes last and should be one of these:
@@ -90,40 +89,23 @@ giving the full file name of the pdf it has made.  In addition, the samples dire
 new subdirectory called 'figures_out'.  That was created automatically to hold the output.  Look inside it
 and you should find "Blue.pdf" -- open that in your PDF viewer just to see the lovely blue square you've just created.
 
-Now let's have tioga make the second figure and then open it for us in our PDF viewer of choice.  Enter this line
+Now let's have tioga make the second figure and then open it for us in our PDF viewer.  You can pick which
+viewer you want to use, but tioga makes a guess as a default -- on linux it guesses "xpdf" and on the Mac it
+guesses "Preview".   If you want something else, create .tiogainit in your $HOME directory and enter a line
+of the form:
+
+  $pdf_viewer = 'viewer command'
+
+The value of $pdf_viewer followed by a space and the full file name is used by tioga 
+as a command line for the shell to show the pdf file.
+
+Assuming you're happy with the default, or have setup ~/.tiogainit to do something else, enter this line
 (here we've intentionally dropped the `.rb' extension from the file name since tioga will supply it for us):
 
   tioga sample -s Red
   
-You should be looking at a newly created Red.pdf in your PDF viewer.  And in figures_out you should now find Red.pdf
-along with the previous Blue one.
-If the viewer didn't open correctly, then there's some work to be done as described in the next section.
-
-
-== Setting the PDF viewer for tioga
-
-You specify the viewer for tioga by creating a file called ".tiogainit" in your home directory.
-Each time it starts, tioga loads ~/.tiogainit if it exists.  The contents of .tiogainit
-must be a sequence of valid Ruby commands, one of which should assign a string value to the global variable $pdf_viewer.
-To show a pdf file, tioga takes the value of $pdf_viewer, appends a space followed by the file name, and then launches
-a shell to execute that command.
-
-On Linux, you may want to use xpdf.  If that isn't already set as the default, create .tiogainit with the line
-
-  $pdf_viewer = 'xpdf' # for linux
-  
-On the Mac, you'll probably want to use Preview, and since the $pdf_viewer command is going to the shell,
-you might that $pdf_viewer = 'open' would be what you'd want.  The reason this probably isn't what you'll end up wanting
-is the subject of the next section.  
-Go ahead and put that in your .tiogainit for now, and then we'll see about fixing it later.
-
-  $pdf_viewer = 'open' # first try for the Mac
-
-Now redo the command to show the Red figure:
-
-  tioga sample -s Red
-
-You should now see Red.pdf open automatically.
+You should be looking at a newly created Red.pdf in your PDF viewer.  
+And in figures_out you should now find Red.pdf along with the previous Blue one.
 
 
 
@@ -150,25 +132,11 @@ reenter the command:
 It will rebuild Red.pdf and call the viewer to redisplay it.  So, the question is "What's in the window?" -- are you looking at
 the new version with a green square or the old version with it's red square?  It all depends on how the viewer decides to
 treat a request to open a file that it already is showing.  At the time of writing, xpdf on linux reloads the file while
-Preview on the Mac doesn't.  The following comments will assume that's the case and discuss how to deal with 
-the problem on the Mac.
-
-So, you're at your beloved Mac looking at a Preview window that is still displaying the old version even though the file has been 
-modified and we've asked
-Preview to Open it again.  Just to check that the new version of the pdf is really out there, go to the File menu in Preview 
-and do the Revert command.  (If you don't have a Revert command, you need an updated version of Preview!)
-  
-  
-Now you should be looking at the new version of the file.  If you're happy opening the 
-File menu and selecting Revert each time, fine.  But since there is
-no keyboard shortcut for Revert, I find it too obnoxious to accept.  The work-around is 
-to replace 'open' in .tiogainit by
-'repreview' which is the name of a shell script installed as part of the tioga installation.  
-The repreview script gets called with the
-file name, it then passes the file name along to an AppleScript called Reload_Preview_Document.scpt 
-which is also installed as part of the tioga
-installation.  The job of this script is to do the Open/Revert in 
-Preview to get the current version displayed.
+Preview on the Mac doesn't.  But as part of the tioga installation we've installed an AppleScript that asks Preview to do 
+Revert to update the image.  The default $pdf_viewer command on the mac runs that AppleScript, and, with a little luck, it all works
+to redisplay the pdf as we want.  If that is working and you're looking at the new version of the PDF, great -- you
+can skip the rest of this section.  If not, read on for suggestions about how to deal with 
+the Preview problem on the Mac.  
 
 Before the script can do it's thing, you may need to enable AppleScripts on your machine.  
 Do the following if you're uncertain.
