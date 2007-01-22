@@ -1810,6 +1810,7 @@ class FigureMaker
 
     
     def make_pdf(num)
+        num = get_num_for_pdf(num)
         result = start_making_pdf(num)
         return unless result
         return @figure_pdfs[num] = finish_making_pdf(result, @figure_names[num])

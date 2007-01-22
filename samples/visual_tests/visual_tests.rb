@@ -1,5 +1,7 @@
 # visual_tests.rb
-# This file is intended for many visual tests for
+# This file is intended for many visual tests for the completion of
+# Tioga. It is based on the plots.rb file. You may do whatever you think is
+# suitable for this file.
 
 class MyPlots
 
@@ -15,9 +17,6 @@ class MyPlots
         @figure_maker = FigureMaker.default
         t.save_dir = 'visual_tests_out'
         t.def_eval_function { |str| eval(str) }
-        
-        @data_filename = "data/datalog.data"
-        @opacity_data = nil
         
 #         @image_right_margin = 0.07
 #         @margin = 0.1
@@ -484,6 +483,10 @@ class MyPlots
                      'tail' => [0, 0], 
                      'color' => Crimson,
                      'line_width' => 0.05)
+        t.show_text('at' => [2,1], 
+                    'text' => '\parbox{5cm}{Please check that the ' +
+                    "symbols and the lines" + 
+                    " are aligned together}")
       end
     end
     
