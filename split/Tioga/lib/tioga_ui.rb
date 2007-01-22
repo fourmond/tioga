@@ -21,6 +21,8 @@
 =end
 
 require 'Tioga/tioga.rb'
+require "rbconfig.rb"
+include Config
   
 include Tioga
 include FigureConstants
@@ -287,8 +289,12 @@ class TiogaUI
     
     # set the standard defaults
     $tioga_args = Array.new(args.length) {|i| args[i]} # copy the args
-    $pdf_viewer = "xpdf"
     $change_working_directory = true
+    if Config::CONFIG["target"] =~ /darwin/i
+      $pdf_viewer = "repreview"
+    else
+      $pdf_viewer = "xpdf"
+    end
  
 =begin     
     # Ruby/Tk defaults

@@ -14,61 +14,59 @@ After you 'cd' to the samples directory, type 'tioga' and hit +RETURN+.  If the 
 you'll see something like this.  Take a moment to read it since the rest of this section of the
 tutorial will be based on the description given here.
 
-    This program is a command line interface for the open-source tioga kernel.
-    The tioga kernel is for creating figures and plots using Ruby, PDF, and TeX.
-    Following is a brief description of the tioga command line options.
-    For more information, visit http://theory.kitp.ucsb.edu/~paxton/tioga.html.
+  This program is a command line interface for the open-source tioga kernel.
+  The tioga kernel is for creating figures and plots using Ruby, PDF, and TeX.
+  Following is a brief description of the tioga command line options.
+  For more information, visit http://theory.kitp.ucsb.edu/~paxton/tioga.html.
 
-    Before any command line information is processed, tioga runs ~/.tiogainit if it exists.
-        The primary use of this file is to set your default pdf viewer command (see below).
+  Before any command line information is processed, tioga runs ~/.tiogainit if it exists.
+      The primary use of this file is to set your default pdf viewer command (see below).
 
-    If there are no command line arguments, or the argument is -h, this help info is output.
+  If there are no command line arguments, or the argument is -h, this help info is output.
 
-    Otherwise, the command line should start with a tioga file name (with extension .rb).
-         (Since the extension is known, you can skip typing it if you like.)
+  Otherwise, the command line should start with a tioga file name (with extension .rb).
+       Since the extension is known, you can skip typing it if you like.
 
-    The remainder of the command line should consist of an optional series of control commands
-        followed by a figure command.
+  The remainder of the command line should consist of an optional series of control commands
+      followed by a figure command.
 
-    Any control commands are done after ~/.tiogainit and before the figure file is loaded.
-         -r file      runs the file (using Ruby's require method).
-         -C dir       changes the working directory.
-                      If there is no -C command, tioga changes the working directory to the
-                      location of the figure file .
-         -v           prints version information.
+  Any control commands are done after ~/.tiogainit and before the figure file is loaded.
+       -r file      runs the file (using Ruby's require method).
+       -C dir       changes the working directory.
+                    If there is no -C command, tioga changes the working directory to the
+                    location of the figure file .
+       -v           prints version information.
 
-    The figure command comes last and should be one of these:
-         -l           output a list of the defined figures by number and name.
-         -<num>       make and show figure with index equal <num> (0 <= num < num_figures).
-         -m <figs>    make PDFs without showing them in the viewer.
-         -s <figs>    make and show PDFs, each in a separate viewer window.
-         -S <figs>    show previously made PDFs, each in a separate viewer window.
-         -p <figs>    make PDFs and show the portfolio as a multi-page document.
-         -P <figs>    make portfolio from existing PDFs and show it as a multi-page document.
+  The figure command comes last and should be one of these:
+       -l           output a list of the defined figures by number and name.
+       -<num>       make and show figure with index equal <num> (0 <= num < num_figures).
+       -m <figs>    make PDFs without showing them in the viewer.
+       -s <figs>    make and show PDFs, each in a separate viewer window.
+       -p <figs>    make PDFs and show the portfolio as a multi-page document.
 
-    If the figure command is omitted, then it defaults to -0.
+  If the figure command is omitted, then it defaults to -0.
 
-    If <figs> is omitted, then tioga does all the figures defined in the file
-         ordered by their definition index numbers.
+  If <figs> is omitted, then tioga does all the figures defined in the file
+       ordered by their definition index numbers.
 
-    Otherwise, <figs> must be either
-         a defined figure name (as supplied to def_figure in the tioga file), or
-         a valid ruby array index number for a figure (can be negative), or
-         a valid ruby range specification selecting a sequence of figures, or
-         a space-less, comma-separated list of figure indices and ranges.
+  Otherwise, <figs> must be either
+       a defined figure name (as supplied to def_figure in the tioga file), or
+       a valid ruby array index number for a figure (can be negative), or
+       a valid ruby range specification selecting a sequence of figures, or
+       a space-less, comma-separated list of figure indices and ranges.
 
-         For example, -s Plot1 makes and shows the pdf for the figure named Plot1,
-         and -p 5,0..3,-1 makes a portfolio with the figure having index 5 on page 1,
-         followed by pages showing the figures with indices 0, 1, 2, 3, and -1.
+       For example, -s Plot1 makes and shows the pdf for the figure named Plot1,
+       and -p 5,0..3,-1 makes a portfolio with the figure having index 5 on page 1,
+       followed by pages showing the figures with indices 0, 1, 2, 3, and -1.
 
-    The viewer for showing PDFs is specified by the $pdf_viewer variable in tioga.
-         The default value can be set by creating a .tiogainit file in your home directory.
-         The .tiogainit file is run before any command line options are processed.
-         Your current setting for $pdf_viewer is repreview.
-         To change it, edit ~/.tiogainit to add the line $pdf_viewer = 'my viewer command'.
-         The command tioga uses to show a pdf is $pdf_viewer + ' ' + full_PDF_filename.
-         You can use the -e control command to try a different viewer setting
-         by doing the $pdf_viewer assignment from the command line.
+  The viewer for showing PDFs is specified by the $pdf_viewer variable in tioga.
+       The default value can be set by creating a .tiogainit file in your home directory.
+       The .tiogainit file is run before any command line options are processed.
+       Your current setting for $pdf_viewer is repreview.
+       To change it, edit ~/.tiogainit to add the line $pdf_viewer = 'my viewer command'.
+       The command tioga uses to show a pdf is $pdf_viewer + ' ' + full_PDF_filename.
+       You can use the -e control command to try a different viewer setting
+       by doing the $pdf_viewer assignment from the command line.
 
 Let's begin exploring these commands by making a PDF for one of the figures defined in sample.rb --
 enter this line to the shell (that's a lowercase L after the dash, not the numeral one):
@@ -116,7 +114,7 @@ On Linux, you may want to use xpdf.  If that isn't already set as the default, c
   
 On the Mac, you'll probably want to use Preview, and since the $pdf_viewer command is going to the shell,
 you might that $pdf_viewer = 'open' would be what you'd want.  The reason this probably isn't what you'll end up wanting
-is the subject of the next section.
+is the subject of the next section.  
 Go ahead and put that in your .tiogainit for now, and then we'll see about fixing it later.
 
   $pdf_viewer = 'open' # first try for the Mac
@@ -161,13 +159,19 @@ Preview to Open it again.  Just to check that the new version of the pdf is real
 and do the Revert command.  (If you don't have a Revert command, you need an updated version of Preview!)
   
   
-Now you should be looking at the new version of the file.  If you're happy opening the File menu and selecting Revert each time, fine.  But since there is
-no keyboard shortcut for Revert, I find it too obnoxious to accept.  The work-around is to replace 'open' in .tiogainit by
-'repreview' which is the name of a shell script provided in the tioga download.  The repreview script gets called with the
-file name, it then passes the file name along to an AppleScript called Reload_Preview_Document.scpt which is also a part of the tioga
-download.  The job of this script is to do the Open/Revert in Preview to get the current version displayed.
+Now you should be looking at the new version of the file.  If you're happy opening the 
+File menu and selecting Revert each time, fine.  But since there is
+no keyboard shortcut for Revert, I find it too obnoxious to accept.  The work-around is 
+to replace 'open' in .tiogainit by
+'repreview' which is the name of a shell script installed as part of the tioga installation.  
+The repreview script gets called with the
+file name, it then passes the file name along to an AppleScript called Reload_Preview_Document.scpt 
+which is also installed as part of the tioga
+installation.  The job of this script is to do the Open/Revert in 
+Preview to get the current version displayed.
 
-Before the script can do it's thing, you may need to enable AppleScripts on your machine.  Do the following if you're uncertain.
+Before the script can do it's thing, you may need to enable AppleScripts on your machine.  
+Do the following if you're uncertain.
 
   1) In Apple Menu, open System Preferences...
 
@@ -181,13 +185,6 @@ If Preview seems to be ignoring our Open/Revert script, enter this line to the s
 
   defaults write /Applications/Preview.app/Contents/Info NSAppleScriptEnabled -bool YES
 
-As one final humiliation to any loyal Mac fan, you may still need to edit the repreview shell script to give it the
-exact path to the Reload_Preview_Document AppleScript (because where repreview runs, your $PATH list is not active).
-
-Let's assume that whatever miracles were required have happened, and now
-you are getting pdfs updated in Preview so we can move along.  
-Our linux friends didn't have to do any of this, and they've been
-smirking on the sidelines while we've struggled.
 
 
 == Commands for operating on all of the figures at once
