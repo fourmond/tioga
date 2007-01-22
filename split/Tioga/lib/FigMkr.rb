@@ -1785,8 +1785,119 @@ class FigureMaker
     def figure_index(name)
         return @figure_names.index(name)
     end
+
+    def make_figure(num)
+        make_pdf(num)
+    end
+
+
+    def make_preview_pdf(num) # old name
+        make_pdf(num)
+    end
+
     
-    def create_figure(name)
+    def make_pdf(num) # returns pdf name if successful, false if failed.
+        num = get_num_for_pdf(num)
+        result = start_making_pdf(num)
+        return unless result
+        return @figure_pdfs[num] = finish_making_pdf(@figure_names[num])
+    end
+    
+    
+    def require_pdf(num)
+        num = get_num_for_pdf(num)
+        make_pdf(num) if @figure_pdfs[num] == nil
+        return @figure_pdfs[num]
+    end
+    
+    
+    def require_all(fignums=nil, report=false, always_make=false)
+      fignums = Array.new(@figure_names.length) {|i| i} if fignums == nil
+      nums = []
+      fignums.each do |num|
+        if always_make || (@figure_pdfs[num] == nil)
+          result = start_making_pdf(num)
+          if result
+            report_number_and_name(num,@figure_names[num]) if report
+            nums << num
+          else
+            puts 'ERROR: Failed to make pdf for ' + @figure_names[num]
+          end
+        end
+      end
+      finish_making_pdfs(nums,report)
+      return true
+    end
+    
+    
+    def make_all(fignums=nil, report=false)
+      require_all(fignums, report, true)
+    end
+    
+    
+    def make_portfolio_pdf(name, fignums=nil, report=false)
+        make_portfolio(name,fignums,report)
+    end
+    
+    
+    def make_portfolio(name, fignums=nil, report=false)
+        require_all(fignums,report)
+        private_make_portfolio(name, fignums, @figure_names)
+        finish_making_pdf(name)
+    end
+    
+    
+    
+    
+    
+    
+    private
+    
+    
+    def report_number_and_name(num,name)
+      if num < 10
+        puts '  ' + num.to_s + '  ' + name
+      elsif num < 100
+        puts ' ' + num.to_s + '  ' + name
+      else
+        puts num.to_s + '  ' + name
+      end
+    end
+ 
+     
+    def get_num_for_pdf(num)
+        num = @figure_names.index(num) unless num.kind_of?(Integer)
+        ensure_safe_save_dir
+        num = num.to_i
+        num_figures = @figure_names.size
+        num += num_figures if num < 0
+        if ((num < 0) or (num >= num_figures))
+            puts "Sorry: number must be between 0 and #{num_figures-1}"
+            num = nil
+        end
+        return num
+    end
+    
+    
+    def start_making_pdf(num) # returns true if successful, false if failed.
+        num = get_num_for_pdf(num)
+        if num == nil
+          result = false
+        else
+          name = @figure_names[num]
+          begin
+            result = create_figure_temp_files(num)
+            name = get_save_filename(name)
+          rescue Exception => er
+            report_error(er, "ERROR: make failed for #{name}")
+            result = false
+          end
+        end
+        return result
+    end
+
+    
+    def create_figure_temp_files(name) # returns true if successful, false if failed.
         if name.kind_of?(Integer)
             num = name
             name = @figure_names[num]
@@ -1805,171 +1916,71 @@ class FigureMaker
         end
         return false
     end
-
-    def make_figure(num)
-        make_pdf(num)
-    end
-
-
-    def make_preview_pdf(num) # old name
-        make_pdf(num)
-    end
-
-    
-    def make_pdf(num)
-        num = get_num_for_pdf(num)
-        result = start_making_pdf(num)
-        return unless result
-        return @figure_pdfs[num] = finish_making_pdf(result, @figure_names[num])
-    end
-    
-    
-    def require_pdf(num)
-        num = get_num_for_pdf(num)
-        make_pdf(num) if @figure_pdfs[num] == nil
-        return @figure_pdfs[num]
-    end
-    
-    
-    def require_all(fignums=nil, report=false, always_make=false)
-      fignums = Array.new(@figure_names.length) {|i| i} if fignums == nil
-      results = []
-      nums = []
-      fignums.each do |num|
-        if always_make || (@figure_pdfs[num] == nil)
-          result = start_making_pdf(num)
-          if result
-            puts @figure_names[num] if report
-            nums << num
-            results << result
-          else
-            puts 'ERROR: Failed to make pdf for ' + @figure_names[num]
-          end
-        end
-      end
-      finish_making_pdfs(results,fignums,report)
-      return true
-    end
-    
-    
-    def make_all(fignums=nil, report=false)
-      require_all(fignums, report, true)
-    end
-    
-    
-    def make_portfolio_pdf(name,fignums=nil)
-        make_portfolio(name,fignums)
-    end
-    
-    
-    def make_portfolio(name,fignums=nil)
-        require_all(fignums)
-        result = private_make_portfolio(name, fignums, @figure_names)
-        finish_making_pdf(result, name)
-    end
-    
-    private
- 
-     
-    def get_num_for_pdf(num)
-        num = @figure_names.index(num) unless num.kind_of?(Integer)
-        ensure_safe_save_dir
-        num = num.to_i
-        num_figures = @figure_names.size
-        num += num_figures if num < 0
-        if ((num < 0) or (num >= num_figures))
-            puts "Sorry: number must be between 0 and #{num_figures-1}"
-            num = nil
-        end
-        return num
-    end
-    
-    
-    def start_making_pdf(num)
-        num = get_num_for_pdf(num)
-        if num == nil
-          result = false
-        else
-          name = @figure_names[num]
-          begin
-            result = create_figure(num)
-            name = get_save_filename(name)
-          rescue Exception => er
-            report_error(er, "ERROR: make failed for #{name}")
-            result = false
-          end
-        end
-        return result
-    end
     
       
-    def finish_making_pdfs(results,fignums,report)
-      if @@multithreads_okay_for_tioga # run separate threads for the pdflatex processing
+    def finish_making_pdfs(fignums,report)
+      if @multithreads_okay_for_tioga # run separate threads for the pdflatex processing
         threads = []
-        results.length.times do |which_result|
-          if results[which_result]
-            threads << Thread.new(which_result) do |i|
-              num = fignums[i]
-              @figure_pdfs[num] = finish_making_pdf(results[i], @figure_names[num])
-              puts num.to_s + ' ' + @figure_pdfs[num] if report
-            end
-          end
+        fignums.each do |num|
+          threads << Thread.new(num) { |i| finish_1_pdf(i,report) }
         end
         threads.each {|thr| thr.join}
       else
-        results.length.times do |i|
-          result = results[i]
-          if result
-            num = fignums[i]
-            @figure_pdfs[num] = finish_making_pdf(results[i], @figure_names[num])
-            puts num.to_s + ' ' + @figure_pdfs[num] if report
-          end
-        end
+        fignums.each {|num| finish_1_pdf(num,report)}
       end
       return true
     end
+    
+    
+    def finish_1_pdf(num,report)
+      pdfname = finish_making_pdf(@figure_names[num])
+      if pdfname != false
+        @figure_pdfs[num] = pdfname
+        report_number_and_name(num,pdfname) if report
+      else
+        puts 'ERROR: pdflatex failed to make pdf for ' + @figure_names[num]
+      end
+    end
    
     
-    def finish_making_pdf(result, name)
+    def finish_making_pdf(name) # returns pdfname if succeeds, false if fails.
         pdflatex = FigureMaker.pdflatex
         quiet = @quiet_mode
         run_directory = @run_dir
-        if result
+        if (@save_dir == nil)
+            syscmd = "#{pdflatex} -interaction nonstopmode #{name}.tex > pdflatex.log 2>&1"
+        else
+            syscmd = "cd #{@save_dir}; #{pdflatex} -interaction nonstopmode #{name}.tex > pdflatex.log 2>&1"
+        end
+        begin
+            result = system(syscmd)
+        rescue Exception => er
+            report_error(er, "")
+            result = false
+        end            
+        if !result
             if (@save_dir == nil)
-                syscmd = "#{pdflatex} -interaction nonstopmode #{name}.tex > pdflatex.log 2>&1"
+                logname = "pdflatex.log"
             else
-                syscmd = "cd #{@save_dir}; #{pdflatex} -interaction nonstopmode #{name}.tex > pdflatex.log 2>&1"
+                logname = "#{@save_dir}/pdflatex.log"
             end
-            begin
-                result = system(syscmd)
-            rescue Exception => er
-                report_error(er, "")
-                result = false
-            end            
-            if !result
-                if (@save_dir == nil)
-                    logname = "pdflatex.log"
-                else
-                    logname = "#{@save_dir}/pdflatex.log"
-                end
-                puts "ERROR: #{pdflatex} failed."
-                file = File.open(logname)
-                if file == nil
-                    puts "cannot open #{logname}"
-                else
-                    reporting = false; linecount = 0
-                    file.each_line do |line|
-                        firstchar = line[0..0]
-                        comparison = (firstchar <=> '!')
-                        reporting = true if comparison == 0
-                        if reporting
-                            puts line
-                            linecount = linecount + 1
-                            break if linecount == @num_error_lines
-                        end
+            puts "ERROR: #{pdflatex} failed."
+            file = File.open(logname)
+            if file == nil
+                puts "cannot open #{logname}"
+            else
+                reporting = false; linecount = 0
+                file.each_line do |line|
+                    firstchar = line[0..0]
+                    comparison = (firstchar <=> '!')
+                    reporting = true if comparison == 0
+                    if reporting
+                        puts line
+                        linecount = linecount + 1
+                        break if linecount == @num_error_lines
                     end
-                    file.close
                 end
+                file.close
             end
         end
         if result
@@ -2097,7 +2108,7 @@ class FigureMaker
     end
     
 
-    def make_page(cmd)  # the C implementation uses this to call figure command
+    def make_page(cmd)  # the C implementation uses this to call the page function for the figure
         entry_function = @enter_page_function
         exit_function = @exit_page_function
         unless entry_function == nil 
