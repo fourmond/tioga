@@ -1832,7 +1832,7 @@ class FigureMaker
             threads << Thread.new(which_result) do |i|
               num = fignums[i]
               @figure_pdfs[num] = finish_making_pdf(results[i], @figure_names[num])
-              puts @figure_pdfs[num] if report
+              puts num.to_s + ' ' + @figure_pdfs[num] if report
             end
           end
         end
@@ -1843,7 +1843,7 @@ class FigureMaker
           if result
             num = fignums[i]
             @figure_pdfs[num] = finish_making_pdf(results[i], @figure_names[num])
-            puts @figure_pdfs[num] if report
+            puts num.to_s + ' ' + @figure_pdfs[num] if report
           end
         end
       end
