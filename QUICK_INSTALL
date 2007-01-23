@@ -1,6 +1,6 @@
-cd split
-ruby extconf.rb
-make
-make install
-cd ../tests
-ruby ts_Tioga.rb
+cd split &&
+ruby extconf.rb &&
+make &&
+make install &&
+cd ../tests &&
+ruby ts_Tioga.rb 
