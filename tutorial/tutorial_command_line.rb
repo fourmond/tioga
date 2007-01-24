@@ -335,6 +335,15 @@ them to see a larger version.
 {Tioga Droplet}[http://theory.kitp.ucsb.edu/~paxton/tioga.html] by me (Bill Paxton) is a tiny Mac application
 whose only function is to do the equivalent of 'tioga filename -p' for any files dropped on it.
 
+There is also an irb version of the tioga command line interface that is part of the standard
+tioga download.  To try it, start up irb, then enter:
+
+  require 'Tioga/irb_tioga.rb' ; include Tioga::IRB_Tioga ; h
+
+That should output a short description of the available commands.  If you'd like irb to load these
+tioga commands automatically, add the +require+ and +include+ commands to your ~/.irbrc file.
+If you don't have one, you can copy tioga/irbrc that is part of the download.
+
 If you create another user interface for tioga that you'd like to share, please let me know 
 and I'll add it to this list.
 
