@@ -1,0 +1,30 @@
+# A Makefile to ease the task of making the gems
+# from this mess
+
+dirs = Dvector Dtable Function Tioga Flate
+files = symbols.c symbols.h defs.h safe_double.h namespace.h
+
+gem-prepare:
+	for d in $(dirs); do \
+	  cp $(files) $$d;\
+	done;
+# Then, specific stuff:
+	for d in Dtable Function Tioga; do\
+	  cp Dvector/include/dvector.h $$d; \
+	done
+	for d in Tioga; do\
+	  cp Dtable/include/dtable.h $$d; \
+	done
+	cp Flate/include/flate.h Tioga
+gem-clean:
+	for d in $(dirs); do \
+	  cd $$d; rm -f $(files);\
+	  cd ..;\
+	done;
+	for d in Dtable Function Tioga; do\
+	  rm -f $$d/dvector.h; \
+	done
+	for d in Tioga; do\
+	  rm -f $$d/dtable.h; \
+	done
+	rm -f Tioga/dtable.h

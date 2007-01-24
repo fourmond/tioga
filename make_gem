@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# We first setup the files for the gem:
+cd split; make -f gem_makefile gem-prepare
+cd ..
+gem build tioga.gemspec
+cd split; make -f gem_makefile gem-clean
