@@ -63,7 +63,6 @@ class MyPlots
         t.def_figure("Contours") { samples_with_contours }
 
         t.model_number = -1
-        t.autocleanup = false
         
         t.def_enter_page_function { enter_page }
             

@@ -1952,12 +1952,7 @@ class FigureMaker
         else
             syscmd = "cd #{@save_dir}; #{pdflatex} -interaction nonstopmode #{name}.tex > pdflatex.log 2>&1"
         end
-        begin
-            result = system(syscmd)
-        rescue Exception => er
-            report_error(er, "")
-            result = false
-        end            
+        result = system(syscmd)
         if !result
             if (@save_dir == nil)
                 logname = "pdflatex.log"
