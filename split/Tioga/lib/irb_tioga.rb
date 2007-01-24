@@ -28,7 +28,7 @@ def do_figs(fignums,view)
   else
     $tioga_ui.do_fignums(fignums,view)
   end
-  set_figure_num(fignums[-1])
+  set_figure_num(fignums[-1]) unless fignums == nil
   return true
 end
 
@@ -59,7 +59,7 @@ def p(fignums=nil)
   else
     $tioga_ui.make_portfolio(true,fignums)
   end
-  set_figure_num(fignums[-1])
+  set_figure_num(fignums[-1]) unless fignums == nil
   return true
 end
 

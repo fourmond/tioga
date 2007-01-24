@@ -50,12 +50,30 @@ class TiogaUI
     append_to_log "Must open a file first!"
     return false
   end
+    
+    
+  def report_number_and_name(num,name)
+    if num < 10
+      puts '  ' + num.to_s + '  ' + name
+    elsif num < 100
+      puts ' ' + num.to_s + '  ' + name
+    else
+      puts num.to_s + '  ' + name
+    end
+  end
   
   
   def make_all_pdfs(view = true, fignums = nil)
     return unless check_have_loaded
-    fm.make_all(fignums,true)
-    return unless view
+    fm.make_all(fignums,false)
+    if view == false
+      if fignums == nil
+        fm.figure_pdfs.each_with_index { |name,num| report_number_and_name(num,name) }
+      else
+        fignums.each { |num| report_number_and_name(num,fm.figure_pdfs[num]) }
+      end
+      return
+    end
     if fignums == nil
       fm.num_figures.times { |i| view_pdf(fm.figure_pdfs[i]) }
     else
@@ -331,7 +349,7 @@ class TiogaUI
       if view
         view_pdf(pdf_name)
       else
-        puts pdf_name
+        report_number_and_name(n,pdf_name)
       end
     end
   end
