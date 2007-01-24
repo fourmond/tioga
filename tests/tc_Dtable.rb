@@ -11,7 +11,13 @@ class TestDtable < Test::Unit::TestCase
         return if @arr != nil
         @num_cols = 4; @num_rows = 5
         @arr = Dtable.new(@num_cols, @num_rows)
-        @arr.read("dtable_test.data", 1) # skip the first line
+        dir = File.dirname(__FILE__)
+        if dir.empty?
+          file = "dtable_test.data"
+        else
+          file = "#{dir}/dtable_test.data"
+        end
+        @arr.read(file, 1) # skip the first line
         assert_equal(@num_cols, @arr.num_cols)
         assert_equal(@num_rows, @arr.num_rows)
     end

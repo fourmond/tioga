@@ -11,6 +11,8 @@ class MyPlots
     include FigureConstants
     
     attr_reader :t
+
+
   
     def initialize
         @t = FigureMaker.default
@@ -108,12 +110,22 @@ class TestFMkr < Test::Unit::TestCase
         assert_equal(tst, expanded)
     end
 
+    # Returns the real file name of a given file.
+    def real_file_name(file_name)
+      dir = File.dirname(__FILE__)
+      if dir.empty?
+        return file_name
+      else
+        return "#{dir}/#{file_name}"
+      end
+    end
+
     def test_flate
         puts ''
         do_one_string('')
         do_one_string('A test string')
         do_one_string('A longer string might actually become a little smaller when compressed')
-        file = File.open('dvector_test.data')
+        file = File.open(real_file_name('dvector_test.data'))
         str = file.read
         do_one_string(str)
     end

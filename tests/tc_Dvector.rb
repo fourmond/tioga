@@ -6,9 +6,19 @@ require 'test/unit'
 
 class TestDvector < Test::Unit::TestCase
     include Dobjects
+
+    # Returns the real file name of a given file.
+    def real_file_name(file_name)
+      dir = File.dirname(__FILE__)
+      if dir.empty?
+        return file_name
+      else
+        return "#{dir}/#{file_name}"
+      end
+    end
     
     def test_read_nasty_fortran_data
-        row = Dvector.read_row("dvector_read_test.data")
+        row = Dvector.read_row(real_file_name("dvector_read_test.data"))
         assert_equal(4, row.size)
         assert_equal(1.0, row[-1])
     end
@@ -31,17 +41,17 @@ class TestDvector < Test::Unit::TestCase
     end
 
     def test_read_row
-        row = Dvector.read_row("dvector_test.data")
+        row = Dvector.read_row(real_file_name("dvector_test.data"))
         assert_equal(2, row.size)
         assert_equal(Dvector[23, 3], row)
-        row = Dvector.read_row("dvector_test.data", 4)
+        row = Dvector.read_row(real_file_name("dvector_test.data"), 4)
         assert_equal(4, row.size)
         assert_equal(Dvector[0, -1.1, 2.2, -3.3], row)
     end
     
     def test_read_rows
         rows = [Dvector.new, Dvector.new, Dvector.new, Dvector.new]
-        Dvector.read_rows("dvector_test.data", rows)
+        Dvector.read_rows(real_file_name("dvector_test.data"), rows)
         assert_equal(2, rows[0].size)
         assert_equal(Dvector[23, 3], rows[0])
         assert_equal(4, rows[3].size)
@@ -49,7 +59,7 @@ class TestDvector < Test::Unit::TestCase
     end
     
     def test_read
-        cols = Dvector.read("dvector_test.data",nil,2)
+        cols = Dvector.read(real_file_name("dvector_test.data"),nil,2)
         assert_equal(4, cols.size)
         col0 = cols[0]
         col1 = cols[1]
@@ -63,7 +73,8 @@ class TestDvector < Test::Unit::TestCase
         assert_equal(-1.1, col1[2])
         assert_equal(2.2, col2[2])
         assert_equal(-3.3, col3[2])
-        cols = Dvector.read("dvector_test.data",[col0,col1,nil,col3],3,3)
+        cols = Dvector.read(real_file_name("dvector_test.data"),
+                            [col0,col1,nil,col3],3,3)
         assert_equal(3, col0.size)
         assert_equal(3, col1.size)
         assert_equal(100, col2.size)

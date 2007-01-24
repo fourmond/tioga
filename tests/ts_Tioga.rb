@@ -4,6 +4,8 @@
 require 'Tioga/tioga'
 
 puts "This is the test suite for Tioga #{Tioga::FigureMaker.version}"
+# We add this directory to the current search path
+$: << File.dirname(__FILE__)
 
 
 require 'test/unit'
