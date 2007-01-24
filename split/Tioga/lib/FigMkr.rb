@@ -33,7 +33,7 @@ class FigureMaker
     
 
     # The tag used for cvs export 
-    CVS_TAG = "$Name$"
+    CVS_TAG = "rel_1_4"         # now manually cheating...
     
     # Version now uses the CVS_TAG to create the version number. CVS_TAG should
     # look like 'rel_1_1_0' for the 1.1.0 release. 
@@ -43,7 +43,7 @@ class FigureMaker
       if version.length > 0
         return version
       else
-        return "CVS_version"    # Can't do better than that.
+        return "SNV $Revision$"    # Can't do better than that.
       end
     end
 

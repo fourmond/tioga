@@ -11,7 +11,7 @@ spec = Gem::Specification.new do |s|
   s.bindir = 'split/scripts'
   s.executables << 'tioga'
   s.name = 'tioga'
-  s.version = '1.3.99'
+  s.version = '1.4'
   s.summary = 'Tioga - a powerful scientific plotting library'
-  s.home_page = 'http://www.kitp.ucsb.edu/~paxton/tioga.html'
+  s.homepage = 'http://www.kitp.ucsb.edu/~paxton/tioga.html'
 end
