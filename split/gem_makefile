@@ -16,6 +16,7 @@ gem-prepare:
 	  cp Dtable/include/dtable.h $$d; \
 	done
 	cp Flate/include/flate.h Tioga
+	cd Tioga; ruby mk_tioga_sty.rb 
 gem-clean:
 	for d in $(dirs); do \
 	  cd $$d; rm -f $(files);\
@@ -28,3 +29,4 @@ gem-clean:
 	  rm -f $$d/dtable.h; \
 	done
 	rm -f Tioga/dtable.h
+	rm -f Tioga/lib/TexPreamble.rb

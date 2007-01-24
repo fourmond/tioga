@@ -1,3 +1,4 @@
-#!/bin/bash
-ruby -e "require 'Tioga/tioga_ui.rb'" -- $*
+#!/usr/bin/env ruby
+require 'Tioga/tioga_ui.rb'
+
 
