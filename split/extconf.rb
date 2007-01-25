@@ -84,6 +84,7 @@ have_func("isnan","math.h")
 
 # Installing scripts
 declare_exec 'scripts/tioga'
+declare_exec 'scripts/irb_tioga'
 
 
 if Config::CONFIG["target"] =~ /darwin/i
