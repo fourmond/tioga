@@ -139,14 +139,32 @@ void c_set_bounds(FM *p, double left, double right, double top, double bottom)
    } else if (right < left) {
       p->xaxis_reversed = true;
       p->bounds_xmin = right; p->bounds_xmax = left;
-   } else rb_raise(rb_eArgError, "Sorry: left and right bounds cannot be the same (%g)", left);
+   } else { // left == right
+      p->xaxis_reversed = false;
+      if (left > 0.0) {
+        p->bounds_xmin = left * (1.0 - 1e-6); p->bounds_xmax = left * (1.0 + 1e-6);
+      } else if (left < 0.0) {
+        p->bounds_xmin = left * (1.0 + 1e-6); p->bounds_xmax = left * (1.0 - 1e-6);
+      } else {
+        p->bounds_xmin = -1e-6; p->bounds_xmax = 1e-6;
+      }
+   }
    if (bottom < top) {
       p->yaxis_reversed = false;
       p->bounds_ymin = bottom; p->bounds_ymax = top;
    } else if (top < bottom) {
       p->yaxis_reversed = true;
       p->bounds_ymin = top; p->bounds_ymax = bottom;
-   } else rb_raise(rb_eArgError, "Sorry: top and bottom bounds cannot be the same (%g)", top);
+   } else { // top == bottom
+      p->yaxis_reversed = false;
+      if (bottom > 0.0) {
+        p->bounds_ymin = bottom * (1.0 - 1e-6); p->bounds_ymax = bottom * (1.0 + 1e-6);
+      } else if (bottom < 0.0) {
+        p->bounds_ymin = bottom * (1.0 + 1e-6); p->bounds_ymax = bottom * (1.0 - 1e-6);
+      } else {
+        p->bounds_xmin = -1e-6; p->bounds_xmax = 1e-6;
+      }
+   }
    p->bounds_width = p->bounds_xmax - p->bounds_xmin;
    p->bounds_height = p->bounds_ymax - p->bounds_ymin;
    Recalc_Font_Hts(p);
