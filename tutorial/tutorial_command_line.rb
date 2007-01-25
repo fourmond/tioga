@@ -4,7 +4,7 @@ module Tutorial
 
 =begin rdoc
 
-= Using tioga from the command line
+= How to run and debug your tioga programs
 
 
 

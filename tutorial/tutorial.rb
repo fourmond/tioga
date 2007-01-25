@@ -37,7 +37,7 @@ Here are the sections of the tutorial, in the order they are intended to be read
 
 DocStructure -- The basic anatomy of a tioga document
 
-CommandLine -- How to run tioga from the shell
+CommandLine -- How to run and debug your tioga programs
 
 UsingRuby -- The bare essentials for using ruby for tioga
 

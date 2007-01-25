@@ -22,13 +22,15 @@ def do_figs(fignums,view)
   end
   if fignums == nil
     $tioga_ui.make_all_pdfs(view)
-  elsif fignums.kind_of?Integer
-    fignums += FigureMaker.default.num_figures if fignums < 0
-    $tioga_ui.do_fignums([fignums],view)
+    set_figure_num(0)
   else
+    if fignums.kind_of?Integer
+      fignums += FigureMaker.default.num_figures if fignums < 0
+      fignums = [fignums]
+    end
     $tioga_ui.do_fignums(fignums,view)
+    set_figure_num(fignums[-1])
   end
-  set_figure_num(fignums[-1]) unless fignums == nil
   return true
 end
 
@@ -79,6 +81,16 @@ def r
 end
 
 
+def cmds
+  l
+end
+
+
+def list_cmds
+  l
+end
+
+
 def l
   $tioga_ui.list_figures
   return true
@@ -87,13 +99,14 @@ end
 def h
     puts ''
     puts "   Command               description"
-    puts "   o 'filename'          open tioga file (with extension .rb)."
-    puts "   l                     output a list of the defined figures by number and name."
-    puts "   m <figs>              make PDFs without showing them in the viewer."
-    puts "   s <figs>              make and show PDFs, each in a separate viewer window."
-    puts "   p <figs>              make PDFs and show the portfolio as a multi-page document."
-    puts "   r                     reloads the current tioga file and reshows the current figure."
-    puts "   h                     helpfully print this list of commands."
+    puts "   o 'filename'          opens the named tioga file (with extension .rb)."
+    puts "   o                     opens the current tioga file (i.e., reload)."
+    puts "   l                     lists the defined figures by number and name."
+    puts "   m <figs>              makes PDFs without showing them in the viewer."
+    puts "   s <figs>              makes and shows PDFs, each in a separate viewer window."
+    puts "   p <figs>              makes PDFs and shows the portfolio as a multi-page document."
+    puts "   r                     reloads the current file and reshows the current figure."
+    puts "   h                     helpfully prints this list of commands."
     puts "\n   Since the filename extension is known, you can skip typing it if you like."
     puts "\n   If <figs> is omitted, then tioga does all the figures defined in the file"
     puts "        ordered by their definition index numbers."
