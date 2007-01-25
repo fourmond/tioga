@@ -169,8 +169,12 @@ class TiogaUI
     
     return filename unless $change_working_directory
     
-    # if necessary, add the current directory to the front of the filename
-    filename = Dir.getwd + '/' + filename if filename[0..0] != '/'
+    if (filename.length > 2) && (filename[0..1] == '~/')
+      filename = ENV['HOME'] + filename[1..-1]
+    elsif filename[0..0] != '/'
+      # if necessary, add the current directory to the front of the filename
+      filename = Dir.getwd + '/' + filename
+    end
     
     parts = filename.split('/')
     if parts[-1].length < 2 || parts[-1][-2..-1] != "rb"
