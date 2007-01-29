@@ -5,9 +5,17 @@ module IRB_Tioga
   
 $tioga_figure_filename = nil
 $tioga_figure_num = nil
+  
+  
+def check_have_loaded
+  return true unless ($tioga_figure_filename == nil) || ($tioga_figure_filename.length == 0)
+  puts "Must open a file first."
+  return false
+end
 
 def o(filename=nil)
   filename = $tioga_figure_filename if filename == nil
+  return if filename == nil || filename.length == 0 # this happens if just give shell command irb_tioga with no filename
   filename = $tioga_ui.fix_filename(filename)
   result = $tioga_ui.setdir_and_load(filename)
   return false if result == nil
@@ -35,11 +43,13 @@ def do_figs(fignums,view)
 end
 
 def s(fignums=nil)
+  return unless check_have_loaded
   do_figs(fignums,true)
   return true
 end
 
 def m(fignums=nil)
+  return unless check_have_loaded
   do_figs(fignums,false)
   return true
 end
@@ -50,6 +60,7 @@ def set_figure_num(num)
 end
 
 def p(fignums=nil)
+  return unless check_have_loaded
   if fignums.kind_of?String
     fignums = $tioga_ui.parse_figs(fignums)
   end
@@ -66,6 +77,7 @@ def p(fignums=nil)
 end
 
 def r
+  return unless check_have_loaded
   if $tioga_figure_num != nil
     figname = FigureMaker.default.figure_names[$tioga_figure_num] 
   else

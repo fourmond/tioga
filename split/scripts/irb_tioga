@@ -1,4 +1,4 @@
 #!/bin/bash
-echo "require 'Tioga/irb_tioga.rb' ; include Tioga::IRB_Tioga ; o '"$1"'" > ~/.irb_tioga_cmd.rb
+echo "require 'Tioga/irb_tioga.rb' ; include Tioga::IRB_Tioga ; o '"$1"'; l" > ~/.irb_tioga_cmd.rb
 irb -r ~/.irb_tioga_cmd.rb
 rm ~/.irb_tioga_cmd.rb

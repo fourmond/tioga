@@ -320,7 +320,8 @@ in plots.rb we can directly use any methods defined in MyPlotStyles.  Turns out 
 a few attributes so that TeX will use sans serif fonts.  The second method in MyPlotStyles is set_default_plot_style,
 and it gives values to all of the tioga attributes relevant to figures and plots.
 
-You may want to add special styles of your own -- if you make something that might be of interest to others, let us know.
+You may want to add special styles of your own -- if you make something that might be of interest to others, 
+let us know.
 
 There are several options for how style methods are used.  One would be to call a style method from the
 initialization routine for your plot class (such as at the start of MyPlots initialize, just after setting
@@ -338,7 +339,7 @@ And then we define out enter_page as follows:
         t.default_enter_page_function
     end
 
-A final way to use the style methods is to call them directyly from a plot definition.  This is
+A final way to use the style methods is to call them directly from a plot definition.  This is
 illustrated by the method reds.  It begins with this line:
 
     sans_serif_style unless t.in_subplot
@@ -347,6 +348,15 @@ This is doing a conditional style change.  If we use the Reds plot by itself, it
 sans serif, but if we combine it as part of "super-plot", then it uses whatever has already
 been set up.  I don't mean to suggest that you start having lots of conditional style changes;
 the point here is simply that styles can be set in various ways at various stages of creating a plot.
+
+In all of this it is important to be clear about the order in which things happen.  First is the initialization method
+that is called when the `new' method is called for the class you've defined in your file.  Next is the enter_page
+function that is called whenever a figure definition is about to be called to make a pdf.  Last of all is the actual
+figure definition itself.  Style parameters can be changed at each of these stages -- for example, most figures may use
+the style set during initialization, but some of them may make changes.  NOTE: any changes made by a figure routine
+go away when the figure is done; all the settings revert back to the values they were given at initialization.
+In our example above where the 'Reds' plot used sans serif, that choice was in effect only during the remainder of
+the creation of that plot -- no "side-effects" of building the Reds plot will carry over to the next plot to be made.
 
 ---
 
