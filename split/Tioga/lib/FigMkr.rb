@@ -1847,6 +1847,29 @@ class FigureMaker
     end
     
     
+
+    # make create_figure_temp_files public for use by applications like ctioga.
+    
+    
+    def create_figure_temp_files(name) # returns true if successful, false if failed.
+        if name.kind_of?(Integer)
+            num = name
+            name = @figure_names[num]
+        else
+            num = @figure_names.index(name)
+        end
+        return false if num == nil
+        cmd = @figure_commands[num]
+        return false unless cmd.kind_of?(Proc)
+        begin
+            reset_legend_info
+            result = private_make(name, cmd)
+            return result
+        rescue Exception => er
+            report_error(er, "ERROR while executing command: #{cmd}")
+        end
+        return false
+    end
     
     
     
@@ -1894,27 +1917,6 @@ class FigureMaker
           end
         end
         return result
-    end
-
-    
-    def create_figure_temp_files(name) # returns true if successful, false if failed.
-        if name.kind_of?(Integer)
-            num = name
-            name = @figure_names[num]
-        else
-            num = @figure_names.index(name)
-        end
-        return false if num == nil
-        cmd = @figure_commands[num]
-        return false unless cmd.kind_of?(Proc)
-        begin
-            reset_legend_info
-            result = private_make(name, cmd)
-            return result
-        rescue Exception => er
-            report_error(er, "ERROR while executing command: #{cmd}")
-        end
-        return false
     end
     
       
