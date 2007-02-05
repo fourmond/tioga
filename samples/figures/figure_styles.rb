@@ -1,5 +1,6 @@
 # figure_styles.rb
 
+require 'rubygems'
 require 'Tioga/FigureMaker'
 
 module MyFigureStyles

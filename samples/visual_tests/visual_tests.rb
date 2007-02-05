@@ -3,6 +3,11 @@
 # Tioga. It is based on the plots.rb file. You may do whatever you think is
 # suitable for this file.
 
+
+require 'rubygems'
+require 'Tioga/FigureMaker'
+
+
 class MyPlots
 
     include Math

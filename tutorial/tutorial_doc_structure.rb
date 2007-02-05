@@ -6,7 +6,8 @@ module Tutorial
 
 = The basic anatomy of a tioga document: "sample.rb"
 
-Tioga files are Ruby programs of a particular form and content.  The overall form is described in this section.  
+Source files for tioga are Ruby programs of a particular form and content.  
+The overall form is described in this section.  
 Some details of the content are discussed in the rest of the tutorial.
 
 We'll use a very simple case to illustrate the general form: a file that defines two figures, one that fills 
@@ -20,17 +21,34 @@ we have a complete definition.
     
     MyFigures.new
 
-The class MyFigures will contain the methods to create the figures.  
-It will use the FigureMaker extension defined in tioga, so we'll "require" that to make sure that it is loaded.  
-We'll also "include" the tioga and FigureConstants modules to make it easy to reference the methods and attributes 
-they define.  (+require+ tells Ruby to load the required item if it hasn't already been loaded -- +include+ makes 
-everything defined in the module available as if defined here.)
+We start adding the missing pieces by requiring rubygems
+(`require' tells Ruby to load the required item if it hasn't already been loaded).
+The {rubygems}[http://docs.rubygems.org/] package is the Ruby standard for managing
+add-on software libraries. 
+Once you've done the "require rubygems" command,
+the following require command for the tioga FigureMaker will work whether 
+tioga was downloaded as a gem or independently.
 
+ >> require 'rubygems'
+ >> require 'Tioga/FigureMaker'
 
-In this and the following, we'll use ">>" to mark the newly added lines.  At the end, we'll give a
+    class MyFigures
+    
+    end
+    
+    MyFigures.new
+
+Here we are using ">>" to mark the newly added lines.  At the end, we'll give a
 complete listing without any of those marks which are not really part of the code.
 
- >> require 'Tioga/FigureMaker'
+Next we'll  `include' the Tioga and FigureConstants modules to make it easy to reference the methods and attributes 
+they define -- include makes 
+everything defined in the module available as if defined here.
+
+
+
+    require 'rubygems'
+    require 'Tioga/FigureMaker'
 
     class MyFigures
     
@@ -43,10 +61,11 @@ complete listing without any of those marks which are not really part of the cod
 
 The default tioga FigureMaker will be doing the work for us, so our initialize method will get it and
 put it in an instance variable for us that we'll name "@figure_maker" (the "@" is Ruby's way of saying 
-that this is an attribute associated with a particular object).  The tioga front end
+that this is an attribute associated with a particular object).  The various tioga user interfaces
 will also be talking to the default FigureMaker to find out what figures we've defined and ask
-for various ones to be created in response to our requests.
+for various ones to be created in response to our commands.
 
+    require 'rubygems'
     require 'Tioga/FigureMaker'
 
     class MyFigures
@@ -62,12 +81,20 @@ for various ones to be created in response to our requests.
     
     MyFigures.new
 
-The "MyFigures.new" command is asking Ruby to create an instance of the MyFigures class which in turn involves Ruby calling the class's initialize routine.  The command does NOT automatically make the figures at the time the class object is created.  The figures get constructed in response to user requests that will be forwarded from the front end to the figure maker and then on to our routines.
+The "MyFigures.new" command is asking Ruby to create an instance of the MyFigures class which in turn involves 
+Ruby calling the class's initialize routine.  The command does NOT automatically make the figures at the time 
+the class object is created.  The figures get constructed in response to user requests that will be forwarded 
+from the user interface to the figure maker and then on to our routines.
 
-But all that comes later.  For now, our next step is to add a method called "t" that simply returns the local attribute @figure_maker.  Then we can use "t." to talk to our instance of the FigureMaker rather than having to type "@figure_maker" all the time.
+But all that comes later.  For now, our next step is to add a method called "t" that simply returns the 
+local attribute @figure_maker.  Then we can use "t." to talk to our instance of the FigureMaker rather 
+than having to type "@figure_maker" all the time.
 
-The "." in "t." is part of the "object.name" idiom in Ruby.  It refers to the named attribute or method in the given object.  In turn, the object can come from some other evaluation.  In the "t." case, our method called "t" will return the object we've saved in our local attribute called "@figure_maker".
+The "." in "t." is part of the "object.name" idiom in Ruby.  It refers to the named attribute or method 
+in the given object.  In turn, the object can come from some other evaluation.  In the "t." case, our
+method called "t" will return the object we've saved in our local attribute called "@figure_maker".
 
+    require 'rubygems'
     require 'Tioga/FigureMaker'
 
     class MyFigures
@@ -100,6 +127,7 @@ and the command bodies are given inside the curly braces.  In this case the comm
 methods with the corresponding name, but in lowercase since all method names begin with lowercase (Ruby is
 picky about that).
 
+    require 'rubygems'
     require 'Tioga/FigureMaker'
 
     class MyFigures
@@ -123,6 +151,7 @@ picky about that).
 
 The figures are defined to call routines "blue" and "red", so we'll add those next.
 
+    require 'rubygems'
     require 'Tioga/FigureMaker'
 
     class MyFigures
@@ -156,8 +185,10 @@ The figures are defined to call routines "blue" and "red", so we'll add those ne
 
 We could use the file as it is now, but I like to have the output files go in a subfolder rather than
 cluttering up the top level folder where the definition file lives.  We can specify a "save directory"
-by setting the FigureMaker "save_dir" attribute.  That will be our last addition.  Here's the final version of "sample.rb".
+by setting the FigureMaker "save_dir" attribute.  That will be our last addition.  Here's the final version 
+of "sample.rb".
     
+    require 'rubygems'
     require 'Tioga/FigureMaker'
     
     class MyFigures

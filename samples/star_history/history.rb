@@ -1,5 +1,8 @@
 # history.rb
 
+require 'rubygems'
+require 'Tioga/FigureMaker'
+
 # use load rather than require for the other files so will reload properly in Tioga
 load 'lib/history_logs.rb'
 load 'lib/tracks.rb'

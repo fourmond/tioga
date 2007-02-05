@@ -1,5 +1,8 @@
 # zams.rb
 
+require 'rubygems'
+require 'Tioga/FigureMaker'
+
 include Tioga
     
 class ZAMS_Data

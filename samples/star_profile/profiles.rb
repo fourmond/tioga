@@ -1,5 +1,8 @@
 # profiles.rb
 
+require 'rubygems'
+require 'Tioga/FigureMaker'
+
 load 'profile_data.rb'   # use load instead of require so can edit and reload
 
 class ProfilePlots

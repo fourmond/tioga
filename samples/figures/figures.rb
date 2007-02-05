@@ -1,5 +1,8 @@
 #  figures.rb
 
+require 'rubygems'
+require 'Tioga/FigureMaker'
+
 require 'figure_styles.rb'
 
 class MyFigures

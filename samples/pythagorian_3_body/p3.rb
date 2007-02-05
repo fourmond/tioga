@@ -1,6 +1,7 @@
 # p3.rb  -- for Pythagorian 3 body plots
 
-
+require 'rubygems'
+require 'Tioga/FigureMaker'
 
 class Pythagorian_3_body
 
