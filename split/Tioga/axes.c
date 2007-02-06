@@ -557,7 +557,7 @@ static void draw_minor_ticks(FM *p, PlotAxis *s)
    if (s->number_of_minor_intervals <= 0) {
       if (s->log_values) {
          double interval = s->majors[1] - s->majors[0];
-         s->number_of_minor_intervals = (abs(interval) != 1.0 || s->nmajors > 4)? 1 : 9; 
+         s->number_of_minor_intervals = (abs(interval) != 1.0 || s->nmajors > 10)? 1 : 9; 
       }  else s->number_of_minor_intervals = Pick_Number_of_Minor_Intervals(s->interval);
    }
    int i, j, nsub = s->number_of_minor_intervals;

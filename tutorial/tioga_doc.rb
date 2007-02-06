@@ -1,7 +1,7 @@
 #  tioga_doc.txt
 
 =begin
-   Copyright (C 2005  Bill Paxton
+   Copyright (C) 2005, 2006, 2007  Bill Paxton
 
    This file is part of Tioga.
 
