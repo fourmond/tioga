@@ -73,7 +73,7 @@ class MyPlots
     
     def enter_page
         set_default_plot_style
-        t.default_page_width = 72*5.5 # in big-points (1/72 inch)
+        t.default_page_width = 72*3 # in big-points (1/72 inch)
         t.default_page_height = t.default_page_width
         t.default_enter_page_function
     end

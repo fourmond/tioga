@@ -5,6 +5,7 @@
 
 require 'optparse'
 require 'ostruct'
+require 'fileutils'
 
 options = OpenStruct.new
 
@@ -23,37 +24,45 @@ opts = OptionParser.new do |opts|
 end
 
 opts.parse!
+options.dir ||= "images"
+options.link ||= options.dir
 
-files= ARGV.dup                  # The files to be processed
+files = ARGV.dup                  # The files to be processed
 
 if files.empty?
   open '.document' do |f|
     for line in f
-      files += Dir.glob(line)
+      puts line
+      files += Dir.glob(line.chomp)
     end
   end
 end
 
 p files
-return nil
+# return nil
   
 
 for file in files 
   puts file
   next if File.directory?(file)
-  open(file) do |f|
-    o = file + ".new"
+  File.rename(file, file + ".old")
+  open(file + ".old" ) do |f|
+    o = file
     output = open(o, "w")
     for line in f
       if line =~ /(http:.*(jpg|gif|jpeg|png))/
-        puts line
         image = $1
-        puts image
         image =~ /.*\/(.*)/
         file_name = $1
-        puts file_name
-        output.print line.sub(image,"link:#{link}/#{file_name}")
-        system "wget -O #{target_dir}/#{file_name} #{image}"
+        puts "Retrieving #{file_name}"
+        system "wget -c -O #{options.dir}/#{file_name} #{image}"
+        # Then, conversion to PNG; we keep the PNG file if it is smaller
+        # that the original file.
+        png = file_name.sub(/(\.[^.]+)?$/, ".png")
+        puts "Converting #{file_name} to #{png}"
+        system "convert #{options.dir}/#{file_name} #{options.dir}/#{png}"
+        FileUtils.rm "#{options.dir}/#{file_name}"
+        output.print line.sub(image,"link:#{options.link}/#{png}")
       else
         output.print line
       end
