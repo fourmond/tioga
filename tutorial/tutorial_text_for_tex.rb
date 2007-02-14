@@ -19,7 +19,7 @@ You can change the preamble used for figures by setting the 'tex_preamble' prope
 Take a look at the 'marvosym.rb' file in the 'samples/figures' folder for more about this very useful symbol font.  
 Here's a small sample of what it offers.
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/marvosym_sample.jpg
+link:images/marvosym_sample.png
 
 ---
 
@@ -30,13 +30,13 @@ The rest of the "figures.rb" file gives examples of many of the ways you can use
 and graphics by combining TeX and PDF.  Use it as a source of ideas and a jumping off
 point to get more information.  Let's take a quick look.
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/parabox.jpg
+link:images/parabox.png
 
 You may never have reason to use TeX to format a paragraph as part of a figure,
 but now you know you can if you need to.  You are much more likely to use math typesetting,
 or some of the other nice things TeX provides.
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/math.jpg
+link:images/math.png
 
 The "math_typesetting" routine in "figures.rb"
 can be a useful place to start in putting fancy TeX in one of your own figures or plots.

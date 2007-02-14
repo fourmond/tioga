@@ -68,7 +68,7 @@ class Rectangles < Doc < FigureMaker
 # The illustration shows a rounded rectangle stroked and used as a clipping path
 # for showing the image.
 #
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/append_rounded_rect.jpg
+# link:images/append_rounded_rect.png
 #
    def append_rounded_rect_to_path(x, y, width, height, dx, dy)
    end

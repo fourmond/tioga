@@ -94,7 +94,7 @@ class Using_Paths < Doc < FigureMaker
 # If the squares are drawn in opposite directions, only the area between them is inside,
 # according to the nonzero winding number rule.  See also #eofill.
 #
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Fill_Rules.jpg
+# link:images/Fill_Rules.png
     def fill
     end
 

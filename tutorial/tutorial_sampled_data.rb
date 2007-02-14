@@ -12,13 +12,13 @@ calculation.  The temperatures are in Kelvin and the densities are in grams per
 cubic centimeter. The array of data gives the calculated opacity for each
 temperature and density.  Typical stars have conditions covered by the data.)
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/plot_contours.jpg
+link:images/plot_contours.png
 
 This is a more complex example than we've done before, so the amount of code will be
 correspondingly larger.  We'll actually start with a somewhat simpler case by doing the
 plot without contours.  Then we'll look at the code for adding contour lines.
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/samples.jpg
+link:images/samples.png
 
 Here's the top-level routine for this plot:
 

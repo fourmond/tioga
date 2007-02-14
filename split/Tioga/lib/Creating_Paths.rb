@@ -30,7 +30,7 @@ class Creating_Paths < Doc < FigureMaker
 #
 # The illustration shows in dark blue the curve that is added for the control points given in red.
 #
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/append_curve.jpg
+# link:images/append_curve.png
 #
    def append_curve_to_path(x1, y1, x2, y2, x3, y3)
    end

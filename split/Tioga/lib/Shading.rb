@@ -40,7 +40,7 @@ Example
             'colormap' => t.mellow_colormap)
     end
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Axial_Shading.jpg
+link:images/Axial_Shading.png
 
 =end
     def axial_shading(dict)
@@ -90,7 +90,7 @@ Example
             'extend_start' => true)
     end
     
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Radial_Shading.jpg
+link:images/Radial_Shading.png
 =end
     def radial_shading(dict)
     end

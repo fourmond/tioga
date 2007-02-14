@@ -24,7 +24,7 @@ along the way.
 
 The starting place is the "zero age" stars, so go to the "zams" folder in "samples", and open "zams.rb" in your editor.
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/zams.jpg
+link:images/zams.png
 
 Notice that we're plotting the same stuff for several different cases corresponding to
 different "Z" values (astro jargon for the fraction of mass in things other than hydrogen
@@ -71,7 +71,7 @@ They both call the "zams_plot" routine in "zams.rb" with a title and y boundarie
     
 The final item in the definition of the arguments for zams_plot is a new one for us.  The "&cmd" refers to the block of code in the caller.  The command block is called on the last line as part of a show_plot.
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/zams_fancy.jpg
+link:images/zams_fancy.png
 
 The "ZAMS fancy" plot is mainly for fun.  But it gives examples of setting up special tick labels as well as putting different information on each of the four sides of the frame.  The background coloring is done with a call on axial_shading using a specially built color map.  The gray dashed line shows the main sequence line where the stars burn their hydrogen.  The stars off the line are at later stages of development, such as the red giant Betelgeuse and the white dwarf Procyon B.  
 
@@ -79,7 +79,7 @@ The "ZAMS fancy" plot is mainly for fun.  But it gives examples of setting up sp
 
 Let's move on to the next folder in samples, "star_history".  Load "history.rb" in IRB_tioga and take a look at the plots.  Here's the first one:
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/H_R_T_RHO.jpg
+link:images/H_R_T_RHO.png
 
 These plots show the simulated history of our own sun, from its creation to its very late stages as it starts down the path to becoming a white dwarf.  The upper plot shows the tracks for the things we can observe at the surface: the luminosity and the temperature.  The lower plot shows the tracks predicted by theory for the center temperature and density.  Both tracks are labelled with numbers at a few key points during the evolution.  To the right of the plots is a list of these points in terms of age (in units of 10^9 years!) and mass (in units of the mass of the sun at the present).  The point labelled "He Flash" marks the time of a major upheaval in the star and a gap in the simulation.  The simulation starts up again at the point labelled "After He Flash".  The dashed line through the point labelled "0" in each plot shows the zero-age main sequence.  On the lower plot, the other dashed lines are labelled with values of a parameter, "Psi", that measures changes in the stellar material as it becomes so compressed that it begins to behave more like a liquid than a gas.
 
@@ -103,7 +103,7 @@ For our edit-reload-repeat cycle, we need to make sure the subfiles are reloaded
 
 The final folder in "samples" is "star_profile".  The plots here capture the state of the star at a certain time during its evolution.  The "profile" from the center to the surface of different properties reveals the details of the internal stellar structure.  I use a summary plot to capture both lots of graphs and a listing of values for lots of significant properties.
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/full_profile.jpg
+link:images/full_profile.png
 
 The "profile_data.rb" file takes care of reading in the rather large "status.data" describing the state of the star.  It is an example of dealing with lots of structured data, and it also shows one way of dealing with the issues that come up when you're reading a file that might not be complete.  (You might expect that the file system wouldn't let you open a file to read that another task has open to write, but that seems to happen.)
 

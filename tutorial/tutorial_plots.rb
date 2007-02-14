@@ -30,7 +30,7 @@ and come back later if you want to look at a particular piece of sample code for
 
 ---
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/blues.jpg
+link:images/blues.png
 
 Let's start by loading "plots.rb" into a text editor and finding the definition for "Blues".  It looks
 like this:
@@ -148,13 +148,13 @@ take existing plot definitions that were written as complete, stand-alone plots,
 without modification as subplots in a more complex configuration.  Here's an example.  We have
 plots for "Reds" and "Greens" separately.  They look like this:
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/reds.jpg
+link:images/reds.png
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/greens.jpg
+link:images/greens.png
 
 We might want to combine them "side-by-side" like this:
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/red_green_side_side.jpg
+link:images/red_green_side_side.png
 
 Here's the side-by-side code:
 
@@ -191,7 +191,7 @@ in the upper right corner.
 Since the "Reds" and the "Greens" have the same x axis, we might also combine them in a single plot
 with different y axes on the left and right -- like this:
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/two_ys_plot.jpg
+link:images/two_ys_plot.png
 
 And here's the corresponding code from "plots.rb":
 
@@ -215,7 +215,7 @@ so that the plots will use the same frame, and "AXIS_HIDDEN" has replaced "AXIS_
 
 When there are several plots with the same x axis, a stack of rows is a common choice:
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/rgb_stack.jpg
+link:images/rgb_stack.png
 
 This is the "rows" routine from "plots.rb" that does this one.
 
@@ -258,7 +258,7 @@ line style.  There are built-in commands to collect the information, and other c
 the plot.  Here's a simple example, one version with the legend inside the frame, and another with
 the legend on the right.
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/legends.jpg
+link:images/legends.png
 
 The routines for the two versions are naturally quite similar:
 

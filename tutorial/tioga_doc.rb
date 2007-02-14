@@ -27,7 +27,7 @@
 ===Tioga
 
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Icon.jpeg
+link:images/Icon.png
 
 Tioga is a program for creating figures and plots using Ruby, PDF, and TeX.
 
@@ -76,7 +76,7 @@ Please copy, modify, and use the examples in any way that you find useful.
 The name "tioga" is not an acronym.  It is the name of a beautiful, high mountain pass at the east entrance to 
 Yosemite National Park in California (elevation 9,945 feet, 3,031 meters; location N 37.91, W 119.26).  "Tioga" is actually a term used by the Mohawk Tribe of the Iroquois Confederation in New York and Pennsylvania.   It means literally "where it forks", perhaps a prescient reference to the split sending graphics to PDF and text to TeX.
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Tioga_Pass_Yosemite.jpg
+link:images/Tioga_Pass_Yosemite.png
 
 = With special thanks to:
 

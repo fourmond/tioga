@@ -305,7 +305,7 @@ Example
         end
     end
     
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Columns.jpg
+link:images/Columns.png
 =end
     def column_margins(dict)
     end

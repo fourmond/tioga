@@ -236,7 +236,7 @@ and replace it by
 While you're at it, change the marker color to Crimson, set the line color to Teal, and then 
 redo 'tioga sine' in the shell.  The result should look like this.
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/sine.jpeg
+link:images/sine.png
 
 
 == Debugging your tioga figures

@@ -64,7 +64,7 @@ class Strokes < Doc < FigureMaker
 # For +LINE_CAP_SQUARE+, the stroke continues beyond the endpoint of the path for a distance equal to half the
 # line width and is then squared off.  See also line_join.
 #
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Caps_and_Joins.jpg
+# link:images/Caps_and_Joins.png
    def line_cap
    end
    
@@ -108,7 +108,7 @@ class Strokes < Doc < FigureMaker
 # When a path consisting of several subpaths is stroked, each subpath is treated independently -- 
 # that is, the dash pattern is restarted and the dash phase is reapplied
 # to it at the beginning of each subpath.
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Line_Types.jpg
+# link:images/Line_Types.png
    def line_type
    end
 

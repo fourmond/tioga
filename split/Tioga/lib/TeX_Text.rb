@@ -121,7 +121,7 @@ Examples
             'scale'=>1.3)
     end
     
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Math_Typesetting.jpg
+link:images/Math_Typesetting.png
 
     def strings
         t.stroke_rect(0,0,1,1)
@@ -145,7 +145,7 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Math_Typesetting.jpg
         end
     end
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Strings.jpg
+link:images/Strings.png
 
     def minipages
         centerx = t.bounds_xmin + 0.5 * t.bounds_width
@@ -171,7 +171,7 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Strings.jpg
             'y' => t.bounds_ymin + 0.30 * t.bounds_height, 'angle' => 20)
     end
     
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Minipages.jpg
+link:images/Minipages.png
 
     def framebox
         centerx = t.bounds_xmin + 0.5 * t.bounds_width
@@ -198,7 +198,7 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Minipages.jpg
             'at' => [centerx, y])
     end
          
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Framebox.jpg
+link:images/Framebox.png
 
 =end
     def show_text(dict)
@@ -233,7 +233,7 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Framebox.jpg
 # constants: +LEFT_JUSTIFIED+, +CENTERED+, and +RIGHT_JUSTIFIED+.
 # See also #alignment.
 # 
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Text_J_and_A.jpg
+# link:images/Text_J_and_A.png
    def justification
    end
 

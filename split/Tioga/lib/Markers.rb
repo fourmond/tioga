@@ -68,15 +68,15 @@ Dictionary Entries
 
 Examples
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Marker_Horizontal_Scaling.jpg
+link:images/Marker_Horizontal_Scaling.png
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Marker_Vertical_Scaling.jpg
+link:images/Marker_Vertical_Scaling.png
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Marker_Italic_Angle.jpg
+link:images/Marker_Italic_Angle.png
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Marker_Ascent_Angle.jpg
+link:images/Marker_Ascent_Angle.png
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Rendering_Modes.jpg
+link:images/Rendering_Modes.png
 
     def marker_shadow_effect
         t.landscape
@@ -103,7 +103,7 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Rendering_Modes.jpg
             'point' => [x+0.022, y-0.03])
     end
     
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Marker_Shadow_Effect.jpg
+link:images/Marker_Shadow_Effect.png
 
 =end
     def show_marker(dict)

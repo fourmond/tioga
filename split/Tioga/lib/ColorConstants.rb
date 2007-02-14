@@ -33,13 +33,13 @@ module Tioga
 #
 # - For the protanope, the brightness of red, orange, and yellow is much reduced compared to normal. This dimming can be so pronounced that reds may be confused with black or dark gray, and red traffic lights may appear to be extinguished. They may learn to distinguish reds from yellows and from greens primarily on the basis of their apparent brightness or lightness, not on any perceptible hue difference. Violet, lavender, and purple are indistinguishable from various shades of blue because their reddish components are so dimmed as to be invisible. E.g. Pink flowers, reflecting both red light and blue light, may appear just blue to the protanope.
 #
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/normalcolor72gif.gif
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/protanope72gif.gif
+# link:images/normalcolor72gif.png
+# link:images/protanope72gif.png
 #
 # - The deuteranope suffers the same hue discrimination problems as the protanope, but without the abnormal dimming. The names red, orange, yellow, and green really mean very little to him aside from being different names that every one else around him seems to be able to agree on. Similarly, violet, lavender, purple, and blue, seem to be too many names to use logically for hues that all look alike to him.
 #
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/normalcolor72gif.gif
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/deuteranope72gif.gif
+# link:images/normalcolor72gif.png
+# link:images/deuteranope72gif.png
 #
 # ---
 #
@@ -51,7 +51,7 @@ module Tioga
 # On the right are the same plots as they might appear to someone with protanopia
 # (made using VischeckURL[http://www.vischeck.com/vischeck/vischeckURL.php] -- a very useful site).
 #
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/color_choices.jpg
+# link:images/color_choices.png
 #
 # By using the first set of colors rather than the second, you get a plot that looks good for
 # those in your audience with normal color vision and is much easier on those with a color deficiency.
@@ -61,13 +61,13 @@ module Tioga
 #
 # ---
 #
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/colors1.jpg
+# link:images/colors1.png
 #
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/colors2.jpg
+# link:images/colors2.png
 #
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/colors3.jpg
+# link:images/colors3.png
 #
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/colors4.jpg
+# link:images/colors4.png
 #
 
 module ColorConstants

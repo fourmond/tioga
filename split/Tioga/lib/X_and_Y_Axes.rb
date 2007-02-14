@@ -583,7 +583,7 @@ Examples
         end
     end
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Special_Y.jpg
+link:images/Special_Y.png
 
 =end
    def yaxis_tick_labels

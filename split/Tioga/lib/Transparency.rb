@@ -32,7 +32,7 @@ class Transparency < Doc < FigureMaker
 #
 # Example: on left, fill_opacity = 1.0; on right fill_opacity = 0.6
 #
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Squares.jpg
+# link:images/Squares.png
    def fill_opacity
    end
    
@@ -72,7 +72,7 @@ class Transparency < Doc < FigureMaker
 #
 # Example: on left, fill_transparency = 0.0; on right fill_transparency = 0.4
 #
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Squares.jpg
+# link:images/Squares.png
    def fill_transparency
    end
    

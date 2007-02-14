@@ -119,7 +119,7 @@ Examples
         2) create_monochrome_image_data for checker board pattern
         3) show_image of Jupiter using the monochrome image data as a stencil_mask 
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Sample_Jpegs.jpg
+link:images/Sample_Jpegs.png
 
 The following is a more lengthy example showing the use of a "false colored" image to
 represent a 2 dimensional table of data.  In this case, the data comes from
@@ -212,7 +212,7 @@ is 'sampled_data' which shows the image in one subplot and the colorbar in anoth
         end
     end
     
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Sampled_Data.jpg
+link:images/Sampled_Data.png
 
 =end
     def show_image(dict)

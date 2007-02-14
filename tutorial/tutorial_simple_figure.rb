@@ -13,7 +13,7 @@ show it in your viewer.
   
 This is what you should see.
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/append_curve.jpg
+link:images/append_curve.png
 
 In the source file, the definition looks like this (with line numbers added for this tutorial only):
 
@@ -75,14 +75,14 @@ Let's change a few things and look at the results.  Start off by changing line 6
 y1 is 1.3 instead of 0.3 and remake the figure.   Point 1 jumps clean out of the frame!
 Here's what I get:
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/bad_append_curve.jpg
+link:images/bad_append_curve.png
 
 Why didn't that point get clipped?  Because, unlike plots, figures don't automatically
 clip to the current frame.  If we want clipping in a figure, we need to turn it on
 explicitly.  Let's add "t.clip_to_frame" after the call on "background",
 and try it again.  Now the "out-of-frame" stuff is gone.
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/append_curve_clipped.jpg
+link:images/append_curve_clipped.png
 
 ---
 
@@ -100,7 +100,7 @@ Redo the figure by doing this command again.
 
 Does the result look like this?
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/append_curve2.jpg
+link:images/append_curve2.png
 
 Okay, that's progress but the line now goes through the numbers
 for points 1 and 2, so we'll need to move them a little.  Try adjusting the "at" positions in
@@ -114,7 +114,7 @@ Here's what I ended up with after changing the positions this way:
             'at' => [x2-0.5*dx, y2],    # instead of [x2, y2+dy]
             'marker' => Circled2, 'scale' => scale);
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/append_curve3.jpg
+link:images/append_curve3.png
 
 ---
 
@@ -146,7 +146,7 @@ Back in ColorConstants we find the definition Fuchsia = [ 1, 0, 1 ], so fuchsia 
 with no green -- i.e., it is a synonym for Magenta.  Let's edit background by replacing "Tan" with
 "Fuchsia".
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/background.jpg
+link:images/background.png
 
 Maybe that wasn't such a great idea after all.
 

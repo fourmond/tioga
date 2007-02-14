@@ -55,7 +55,7 @@ for file in files
         image =~ /.*\/(.*)/
         file_name = $1
         puts "Retrieving #{file_name}"
-        system "wget -c -O #{options.dir}/#{file_name} #{image}"
+        system "wget -nv -c -O #{options.dir}/#{file_name} #{image}"
         # Then, conversion to PNG; we keep the PNG file if it is smaller
         # that the original file.
         png = file_name.sub(/(\.[^.]+)?$/, ".png")

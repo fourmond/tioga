@@ -46,7 +46,7 @@ Example
         end
     end
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Contours.jpg
+link:images/Contours.png
 
 =end
     def make_contour(dict)
@@ -99,7 +99,7 @@ Example
         end
     end
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Steps.jpg
+link:images/Steps.png
 =end
     def make_steps(dict)
     end
@@ -158,7 +158,7 @@ Example
         end
     end
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Sampled_Splines.jpg
+link:images/Sampled_Splines.png
 
 =end
     def make_spline_interpolated_points(dict)
@@ -199,7 +199,7 @@ Example
         end
     end
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Splines.jpg
+link:images/Splines.png
 =end
     def make_interpolant(dict)
     end
@@ -298,7 +298,7 @@ Example: 't' in this is the default FigureMaker.
         end
     end
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Arrows.jpg
+link:images/Arrows.png
 =end
     def show_arrow(dict)
     end

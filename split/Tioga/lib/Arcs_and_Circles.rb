@@ -11,7 +11,7 @@ class Arcs_and_Circles < Doc < FigureMaker
 #
 # The illustration shows in dark blue the arc that is added for the control points given in red.
 #
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/append_arc.jpg
+# link:images/append_arc.png
 #
    def append_arc_to_path(x_start, y_start, x_corner, y_corner, x_end, y_end, dx, dy)
    end

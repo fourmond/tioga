@@ -67,7 +67,7 @@ Example
             jpg_image_transparent }
     end
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Subfigures.jpg
+link:images/Subfigures.png
 =end
     def subfigure(margins=nil,&cmd)
     end
@@ -89,7 +89,7 @@ Examples
         t.subplot { t.yaxis_loc = t.ylabel_side = RIGHT; t.no_left_edge; greens }
     end
     
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Two_Ys.jpg
+link:images/Two_Ys.png
 
     def side_by_side
         t.do_box_labels('Side by Side', 'Position', nil)
@@ -101,7 +101,7 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Two_Ys.jpg
             t.yaxis_loc = t.ylabel_side = RIGHT; t.left_edge_type = AXIS_LINE_ONLY; reds }
     end
     
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Side_by_Side.jpg
+link:images/Side_by_Side.png
 
     def rows
         t.do_box_labels('Blues, Reds, Greens', 'Position', nil)
@@ -122,7 +122,7 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Side_by_Side.jpg
         end
     end
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Rows.jpg
+link:images/Rows.png
 
     def trio
         t.rescale(0.6)
@@ -133,7 +133,7 @@ http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Rows.jpg
         t.subplot('top_margin' => 0.55) { side_by_side }
     end
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Trio.jpg
+link:images/Trio.png
 =end
     def subplot(margins=nil,&cmd)
     end
@@ -215,7 +215,7 @@ Examples
         end
     end
     
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Legends.jpg
+link:images/Legends.png
 
 =end
     def show_plot_with_legend(dict=nil, &cmd)

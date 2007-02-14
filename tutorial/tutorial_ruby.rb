@@ -14,7 +14,7 @@ tutorial for Ruby.  I'm just going to cover enough
 so that you can use Ruby to write simple definitions for tioga figures and plots.  At the end, I'll give
 some links to places where you can get much more information.
 
-http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/append_curve.jpg
+link:images/append_curve.png
 
 Here's the "curve" procedure from "plots.rb" that creates the "append_curve_to_path" plot shown above.
 Don't worry about understanding the details of what's going on (we'll be discussing this routine later in the SimpleFigure section).  The discussion at this point is at the level of syntax and issues like what a procedure call looks like.

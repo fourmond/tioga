@@ -11,7 +11,7 @@ module Tioga
 #
 # Here are the abc's of the PDF fonts, clockwise from the top: Times_Roman, Times_Italic, Times_Bold, Times_BoldItalic, Helvetica, Helvetica_Oblique, Helvetica_Bold, Helvetica_BoldOblique, Courier, Courier_Oblique, Courier_Bold, Courier_BoldOblique, Symbol, and ZapfDingbats.
 #
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/pdf_fonts.jpg
+# link:images/pdf_fonts.png
 #
 # ---
 #
@@ -24,12 +24,12 @@ module Tioga
 # as 'Arrow', and a stroked form, such as 'ArrowOpen'.   The color of filled markers is determined by the current 
 # setting of fill_color, and, similarly, stroke_color determines the color of stroked markers.
 #
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/Marker_Names.jpg
+# link:images/Marker_Names.png
 #
 # Here is the full set of options from the ZapfDingbats font.  If you would like to use the jet plane as a marker,
 # just write [ ZapfDingbats, 40 ] where you would have used one of the predefined marker names.
 #
-# http://theory.kitp.ucsb.edu/~paxton/tioga_jpegs/dingbats.jpg
+# link:images/dingbats.png
 #
 
 module MarkerConstants
