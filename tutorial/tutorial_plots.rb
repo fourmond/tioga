@@ -258,7 +258,7 @@ line style.  There are built-in commands to collect the information, and other c
 the plot.  Here's a simple example, one version with the legend inside the frame, and another with
 the legend on the right.
 
-link:images/legends.png
+link:images/Legends.png
 
 The routines for the two versions are naturally quite similar:
 
