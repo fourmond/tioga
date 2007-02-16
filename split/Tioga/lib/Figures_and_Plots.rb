@@ -215,7 +215,7 @@ Examples
         end
     end
     
-link:images/Legends.png
+link:images/legends.png
 
 =end
     def show_plot_with_legend(dict=nil, &cmd)
