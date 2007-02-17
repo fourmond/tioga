@@ -46,8 +46,10 @@
 
 // Frame Sides
 
-#define LEFT 0
+#define LEFT -1
+	// LEFT == LEFT_JUSTIFIED
 #define RIGHT 1
+	// RIGHT == RIGHT_JUSTIFIED
 #define TOP 2
 #define BOTTOM 3
 
@@ -84,9 +86,9 @@
     
 // Text and Markers
 
-#define LEFT_JUSTIFIED -1
+#define LEFT_JUSTIFIED LEFT
 #define CENTERED 0
-#define RIGHT_JUSTIFIED 1
+#define RIGHT_JUSTIFIED RIGHT
 
 #define ALIGNED_AT_TOP 0
 #define ALIGNED_AT_MIDHEIGHT 1

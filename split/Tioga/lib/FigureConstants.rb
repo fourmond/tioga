@@ -45,8 +45,8 @@ module FigureConstants
     ALIGNED_AT_BASELINE = 2
     ALIGNED_AT_BOTTOM = 3
 
-    LEFT = 0
-    RIGHT = 1
+    LEFT = LEFT_JUSTIFIED # LEFT == LEFT_JUSTIFIED so Bill doesn't get confused!
+    RIGHT = RIGHT_JUSTIFIED # similarly, make RIGHT == RIGHT_JUSTIFIED
     TOP = 2
     BOTTOM = 3
 
