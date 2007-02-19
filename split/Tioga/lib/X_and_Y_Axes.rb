@@ -269,8 +269,10 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               xaxis_digits_max
 #               xaxis_digits_max = an_integer_value
 #
-# If non-zero and tioga is creating numeric labels for the x axis, then numeric label 
-# will be switched to exponential format if it requires more than this number of digits.
+# If non-zero (and xaxis_use_fixed_pt is not true), then x axis numeric labels
+# will be switched to exponential format if they require more than this number of digits.
+# If yaxis_digits_max is set to zero, then a system-choosen default value is used instead.
+# See also xaxis_use_fixed_pt.
    def xaxis_digits_max
    end
 
@@ -278,11 +280,11 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               xaxis_use_fixed_pt
 #               xaxis_use_fixed_pt = true_or_false
 #
-# If this flag is +true+, and tioga is creating numeric labels for the x axis,
-# and the xaxis_log_values flag is also +true+,
-# then the labels will be shown using fixed point notation rather than exponential.
-# For example, a label at x location 3.0 will display as "1000" rather than as "10^3",
-# and a label at x == -2.0 will display as "0.01" rather than as "10^-2".
+# If this flag is +true+, then numeric labels for the x axis
+# will always use fixed point notation rather than exponential.
+# If +false+, then the value of xaxis_digits_max will be used to decide between
+# fixed point or exponential notation.
+# See also xaxis_digits_max.
    def xaxis_use_fixed_pt
    end
 
@@ -515,8 +517,10 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               yaxis_digits_max
 #               yaxis_digits_max = an_integer_value
 #
-# If non-zero and tioga is creating numeric labels for the y axis, then numeric label 
-# will be switched to exponential format if it requires more than this number of digits.
+# If non-zero (and yaxis_use_fixed_pt is not true), then y axis numeric labels
+# will be switched to exponential format if they require more than this number of digits.
+# If yaxis_digits_max is set to zero, then a system-choosen default value is used instead.
+# See also yaxis_use_fixed_pt.
    def yaxis_digits_max
    end
 
@@ -524,11 +528,11 @@ class X_and_Y_Axes < Doc < FigureMaker
 #               yaxis_use_fixed_pt
 #               yaxis_use_fixed_pt = true_or_false
 #
-# If this flag is +true+, and tioga is creating numeric labels for the y axis,
-# and the yaxis_log_values flag is also +true+,
-# then the labels will be shown using fixed point notation rather than exponential.
-# For example, a label at y location 3.0 will display as "1000" rather than as "10^3",
-# and a label at y == -2.0 will display as "0.01" rather than as "10^-2".
+# If this flag is +true+, then numeric labels for the y axis
+# will always use fixed point notation rather than exponential.
+# If +false+, then the value of yaxis_digits_max will be used to decide between
+# fixed point or exponential notation.
+# See also yaxis_digits_max.
    def yaxis_use_fixed_pt
    end
 

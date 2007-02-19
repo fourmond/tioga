@@ -294,10 +294,9 @@ char *Get_String(VALUE ary, int index) {
    return StringValuePtr(string);
 }
 
-#define MIN_FLTDIG   3 
-#define MAX_FIXDIG_POS  6
-#define MAX_FIXDIG_NEG  4
-#define DIGMAX_DEF   5
+#define MAX_FIXDIG_POS  8
+#define MAX_FIXDIG_NEG  8
+#define DIGMAX_DEF   8
 
 static void Pick_Label_Precision(double vmin, double vmax, double tick, bool use_fixed_pt,
    int *mode, int *prec, int digmax, int *scale) {
@@ -391,7 +390,7 @@ static char **Get_Labels(FM *p, PlotAxis *s)
          ps = NULL;
          if (i == upper_right && !s->log_values && mode && scale)
             sprintf(ps = postfix, 
-                (s->vertical)? " (x\\tiogayaxisnumericlabel{10^{%d}})" : " (x\\tiogaxaxisnumericlabel{10^{%d}})", 
+                (s->vertical)? "$\\times$\\tiogayaxisnumericlabel{10^{%d}}" : "$\\times$\\tiogaxaxisnumericlabel{10^{%d}}", 
                 scale);
          if (i == lower_left && s->nmajors >= 2 && s->vertical && 
                 (s->majors[i] == ((s->reversed)? s->axis_max : s->axis_min)) &&
