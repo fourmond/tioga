@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# (re-)generate rdoc documentation
+if test -z "$NORDOC"; then
+    rdoc
+fi
+
+# Copy images to the doc/ subdir
+cp -r images doc/
+
+if test -z "$RUBYFORGE_USER"; then
+    RUBYFORGE_USER=""
+else
+    RUBYFORGE_USER="$RUBYFORGE_USER@";
+fi
+# Upload to rubyforge using rsync:
+rsync -rtvvz --exclude '.*' --progress doc "$RUBYFORGE_USER"rubyforge.org:/var/www/gforge-projects/tioga 
