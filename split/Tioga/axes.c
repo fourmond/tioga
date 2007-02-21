@@ -294,9 +294,9 @@ char *Get_String(VALUE ary, int index) {
    return StringValuePtr(string);
 }
 
-#define MAX_FIXDIG_POS  8
-#define MAX_FIXDIG_NEG  8
-#define DIGMAX_DEF   8
+#define MAX_FIXDIG_POS  6
+#define MAX_FIXDIG_NEG  6
+#define DIGMAX_DEF   6
 
 static void Pick_Label_Precision(double vmin, double vmax, double tick, bool use_fixed_pt,
    int *mode, int *prec, int digmax, int *scale) {
