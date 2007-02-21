@@ -865,9 +865,10 @@ static VALUE function_integrate(int argc, VALUE *argv, VALUE self)
 }
 
 /*
-   Computes the primitive of the Function and returns it as a new Function.
-   The newly created function shares the X vector with the previous one.
- */
+  Computes the primitive of the Function (whose value for the first point is 0)
+  and returns it as a new Function.
+  The newly created function shares the X vector with the previous one.
+*/
 static VALUE function_primitive(VALUE self)
 {
   long size = function_sanity_check(self);
@@ -884,6 +885,34 @@ static VALUE function_primitive(VALUE self)
     }
   Dvector_Push_Double(primitive, val);
   return Function_Create(get_x_vector(self), primitive);
+}
+
+/*
+  Computes the derivative of the Function and returns it as a new Function.
+  The newly created function shares the X vector with the previous one.
+*/
+static VALUE function_derivative(VALUE self)
+{
+  long size = function_sanity_check(self);
+  const double *x = Dvector_Data_for_Read(get_x_vector(self),NULL);
+  const double *y = Dvector_Data_for_Read(get_y_vector(self),NULL);
+  VALUE derivative = Dvector_Create();
+  long i = 0;
+  double val = 0;
+  /* First value */
+  Dvector_Push_Double(derivative, (y[i+1] - y[i]) /(x[i+1] - x[i]));
+  i++;
+  while(i < (size - 1))
+    {
+      Dvector_Push_Double(derivative, 
+			  .5 * (
+				(y[i+1] - y[i]) /(x[i+1] - x[i]) + 
+				(y[i] - y[i-1]) /(x[i] - x[i-1])
+				));
+      i++;
+    }
+  Dvector_Push_Double(derivative, (y[i] - y[i-1]) /(x[i] - x[i-1]));
+  return Function_Create(get_x_vector(self), derivative);
 }
 
 /*
@@ -908,7 +937,7 @@ static VALUE function_size(VALUE self)
   - some functions for data access : #x, #y, #point;
   - some utiliy functions: #split_monotonic, #strip_nan;
   - data inspection: #min, #max;
-  - some computationnal functions: #integrate, #primitive.
+  - some computational functions: #integrate, #primitive, #derivative.
 
   And getting bigger everyday...
  */ 
@@ -965,6 +994,8 @@ void Init_Function()
   rb_define_method(cFunction, "integrate", function_integrate, -1);
   /* primitive */
   rb_define_method(cFunction, "primitive", function_primitive, 0);
+  /* derivative */
+  rb_define_method(cFunction, "derivative", function_derivative, 0);
 
   /* distance to a point */
   rb_define_method(cFunction, "distance", function_distance, -1);
