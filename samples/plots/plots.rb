@@ -47,6 +47,7 @@ class MyPlots
         t.def_figure("Reds_and_Blues") { reds_blues }
         t.def_figure("Legend_Inside") { legend_inside }
         t.def_figure("Legend_Outside") { legend_outside }
+        t.def_figure("Inset") { inset }
         t.def_figure("Column_Triplets") { column_triplets }
         t.def_figure("Row_Triplets") { row_triplets }
         t.def_figure("Rows") { rows }
@@ -211,6 +212,17 @@ class MyPlots
         show_model_number
         t.show_plot_with_legend('legend_scale' => 1.3) { reds_blues }
     end
+
+    def inset
+      read_data
+      show_model_number
+      reds
+      t.subplot([0.25,0.45,0.5,0.1]) do
+        t.rescale(0.5)
+        blues
+      end
+    end
+    
     
     def legends
         read_data
