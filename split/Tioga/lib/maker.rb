@@ -113,6 +113,7 @@ def command_loop
                 if fname == nil
                     puts "must give file name as argument for make_portfolio command"
                 else
+                    fm.require_all
                     fm.make_portfolio_pdf(fname)
                     puts "####00" # GUI uses this
                 end
