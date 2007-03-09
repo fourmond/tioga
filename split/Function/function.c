@@ -27,6 +27,7 @@
 #include <ruby.h>
 
 #include "dvector.h"
+#include "../symbols.c"
 
 #include <math.h>
 /* compiler-dependent definitions, such as is_okay_number */
@@ -472,8 +473,8 @@ static VALUE function_make_interpolant(VALUE self)
 						     
 
 /* the function fort joint sorting...*/
-PRIVATE void joint_quicksort(double *const x_values, double * const y_values,
-			     size_t total_elems);
+INTERN void joint_quicksort(double *const x_values, double * const y_values,
+			    size_t total_elems);
 
 /* Dvector's lock */
 #define DVEC_TMPLOCK  FL_USER1

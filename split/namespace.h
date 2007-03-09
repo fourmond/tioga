@@ -34,14 +34,18 @@
 */
 
 #ifdef __APPLE__
-# define PRIVATE __private_extern__
+# define INTERN __private_extern__
 # define PUBLIC 
 #elif __GNUC__ >= 4 /* we have the visibility attribute */
-# define PRIVATE __attribute__ ((visibility ("hidden"))) 
+# define INTERN __attribute__ ((visibility ("hidden"))) 
 # define PUBLIC __attribute__ ((visibility ("default"))) 
 #else /* not really good */
-# define PRIVATE 
+# define INTERN
 # define PUBLIC 
 #endif /* __APPLE__  and __GNU_C_ >= 4*/
+
+/* In any case, PRIVATE is static */
+
+#define PRIVATE static
 
 #endif

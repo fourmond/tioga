@@ -1,7 +1,8 @@
 /* flate.c -- main file for Ruby extension
  */
 
-#include <symbols.h>
+#include "../symbols.h"
+#include "../symbols.c"
 #include "zlib.h"
 #include "flate_intern.h"
 /*

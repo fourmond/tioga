@@ -30,7 +30,8 @@
 #include "intern.h"
 #include "dvector_intern.h"
 
-#include <symbols.h>
+#include "../symbols.h"
+#include "../symbols.c"
 
 /* compiler-dependent definitions, such as is_okay_number */
 #include <defs.h>
@@ -5454,7 +5455,7 @@ void Init_Dvector() {
    rb_define_singleton_method(cDvector, "_load", dvector_load, 1);
 
    /* simple convolution */
-   rb_define_method(cDvector,"convolve", dvector_convolve, 2);
+   rb_define_method(cDvector, "convolve", dvector_convolve, 2);
 
    dvector_output_fs = Qnil;
    rb_global_variable(&dvector_output_fs);

@@ -14,22 +14,22 @@ end
 # and builds Dvector.so
 setup_dir("Dvector", "Dobjects", 
           "Dobjects/Dvector", include) do |l,b,i|
-  b.add_sources("symbols.c")
+#  b.add_sources("symbols.c")
 end
 # the same for Dtable
 setup_dir("Dtable", "Dobjects", 
           "Dobjects/Dtable", include) do |l,b,i|
-  b.add_sources("symbols.c")
+#  b.add_sources("symbols.c")
 end
 
 setup_dir("Flate", "", "Flate", include) do |l,b,i|
-  b.add_sources("symbols.c")
+#  b.add_sources("symbols.c")
 end
 
 
 setup_dir("Function", "Dobjects", 
           "Dobjects/Function", include) do |l,b,i|
-  b.add_sources("symbols.c")
+#  b.add_sources("symbols.c")
 end
 
 
@@ -49,7 +49,7 @@ declare_library("Tioga",
                 "Tioga/lib/TexPreamble.rb")
 
 declare_binary_library("Tioga/FigureMaker", 
-                       "Tioga/**/*.c", "symbols.c")
+                       "Tioga/**/*.c")
 
 # The preamble stuff:
 custom_rule("Tioga/lib/TexPreamble.rb", 

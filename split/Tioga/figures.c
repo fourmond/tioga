@@ -28,6 +28,7 @@
 #include "flate.h"
 
 #include <symbols.h>
+#include "../symbols.c"
 
 #include <stdio.h>
 

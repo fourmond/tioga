@@ -27,6 +27,9 @@
 #include <math.h>
 #include "intern.h"
 
+#include "../symbols.h"
+#include "../symbols.c"
+
 #include <defs.h>
 
 /* safe storing of doubles */

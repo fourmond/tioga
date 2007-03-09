@@ -39,11 +39,7 @@ static VALUE get_symbol_hash(VALUE module)
   VALUE hash;
   ID mv_id = rb_intern(MV_SYMBOLS);
   if(RTEST(rb_ivar_defined(module, mv_id)))
-    {
-      hash = rb_ivar_get(module, mv_id);
-      Check_Type(hash, T_HASH);
-      return hash;
-    }
+    return rb_ivar_get(module, mv_id);
   else
     {
       /* module variable uninitialized, we need to make sure it's here */
@@ -66,10 +62,6 @@ PRIVATE void * rb_import_symbol_no_raise(VALUE module,
 					 const char * symbol_name)
 {
   VALUE hash = rb_iv_get(module, MV_SYMBOLS);
-  if(TYPE(hash) != T_HASH) 
-    return NULL; /* doesn't fail, but the importing module
-		    should definitely check the return value. Beware
-		    of segfaults ! */
   VALUE symbol = rb_hash_aref(hash, rb_str_new2(symbol_name));
   
   if(TYPE(symbol) == T_FIXNUM || TYPE(symbol) == T_BIGNUM)
