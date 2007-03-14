@@ -123,7 +123,8 @@ class MyPlots
         show_model_number
         xs = @positions
         ys = @blues
-        t.show_plot(plot_boundaries(xs,ys,@margin,-1,1)) { t.show_polyline(xs,ys,Blue) }
+        t.show_plot(plot_boundaries(xs,ys,@margin,-1,1)) { 
+            t.show_polyline(xs,ys,Blue) }
     end
     
     def reds

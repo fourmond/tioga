@@ -4,7 +4,34 @@ module Tutorial
 
 =begin rdoc
 
-= What's in the other folders (and what's a "zams" anyway?)
+
+= How To's, Part 1: EPS 
+
+Some publishers insist on eps format rather than pdf.  Luckily 'pdftops' makes this easy 
+(just add -eps to the command line).  For the Mac,
+there is also a nice drag-and-drop converter called "Droppdftoeps" available at
+http://insti.physics.sunysb.edu/~siegel.
+
+
+= How To's, Part 2: Embedded Fonts
+
+Some publishers insist on having ALL fonts embedded, even the standard 14
+Adobe fonts that are required to be available in all PostScript/PDF implementations.
+Roy Mayfield provided a simple "one-liner" to take care of this using GhostScript:
+
+  gs -q -dNOPAUSE -dBATCH -dPDFSETTINGS=/prepress -sDEVICE=pdfwrite \
+      -sOutputFile=output.pdf input.pdf
+
+Vincent Fourmond also provided a similar solution that uses an eps file intermediate:
+
+   pdftops -eps Plot.pdf
+   epstopdf --nogs Plot.eps | gs -q -sDEVICE=pdfwrite -dAutoRotatePages=/None \
+      -dPDFSETTINGS=/prepress -sOutputFile=Plot_new.pdf -
+
+Don't forget the - at the end of the epstopdf command!
+ 
+
+= What's in the other tioga/samples folders (and what's a "zams" anyway?)
 
 We've now been through the "figures" folder and the "plots" folder in
 the samples.  The remaining ones are included as examples of "real"
