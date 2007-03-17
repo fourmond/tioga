@@ -1,4 +1,4 @@
-This is the README for the Tioga kernel, version 1.4, January 21, 2007.
+This is the README for the Tioga kernel, version 1.5, March 17, 2007.
 
     Copyright (C) 2005, 2006, 2007  Bill Paxton
     
@@ -19,6 +19,160 @@ This is the README for the Tioga kernel, version 1.4, January 21, 2007.
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 << What's new >>
+
+	Version 1.5 is mainly Vincent's work, so my part of this release message
+will be short.  Remember how I killed off the Mac GUI last time?  Turns out there
+was one user who couldn't live without it -- me!  So it's back, but I'm still not
+making any promises about keeping it alive if Apple does something stupid in
+coming releases.  If you're interested in playing with it in spite of that warning,
+it's available from my website (http://theory.kitp.ucsb.edu/~paxton/Tioga-1.5.dmg).
+
+	Cheers, Bill
+	
+	
+	
+
+<< Quick Installation of Tioga >>
+
+    Are you feeling lucky?  If so, try QUICK_INSTALL.  This simply does
+the steps for you that are described below.  The install needs to copy some
+files to the ruby directory.  On the Mac, this probably means you need to do
+the whole thing with a 'sudo'.  For Linux, you may have to become root.
+Once you've taken care of that, just run the QUICK_INSTALL script and
+keep your fingers crossed.
+
+    You now have the option to run HOME_INSTALL instead, which will install the files to 
+your home directory (no root privileges needed). You just need to set your RUBYLIB 
+environment variable as reminded at the end of the file.
+
+    Please check that there are 0 failures and 0 errors at the end of the test.
+Then, in your favorite PDF previewer, open the newly created 'tests/Icon_Test.pdf'
+and compare it to the prebuilt 'samples/Icon.pdf'.  They should be very similar!
+If it all seems to be working, go directly to the << Documentation >> section below.
+
+
+<< Step-by-Step Installation >>
+
+    To get Tioga running, you need to have a working Ruby, a C compiler,
+make, and pdflaxtex.  Assuming you've got all that (more later if you don't),
+connect to the Tioga directory that you just unpacked and do the following:
+
+  [ this has been changed, be careful ! ]
+
+    cd split 
+    ruby extconf.rb
+    make
+    make install
+
+This creates the Makefile, runs it, and finally does the actual
+installation.  The "make install" needs to copy some files to the ruby directory.
+On the Mac, this probably means you need to do the whole thing inside a 'sudo'.
+For Linux, you may have to become root.
+
+Note that on Linux, the make will compile all the source files.  On the Mac,
+the tar file includes precompiled versions of everything, so the make won't
+have anything to do.  That's okay.  Do the whole sequence anyway just to be safe.
+
+    You now have another option to install: if you replace the line
+    ruby extconf.rb
+with 
+    ruby extconf.rb --home
+it will install the files to your home directory, namely ~/lib/ruby. You don't need root 
+privileges to do that, but make sure that you set RUBYLIB=~/lib/ruby somewhere, so that ruby 
+can find it.
+
+
+
+
+<< Checking The Installation >>
+
+    To make sure at least something works of out the newly installed stuff,
+change directory to your new Tioga folder.  Then enter this to the shell:
+
+    cd tests
+    ruby ts_Tioga.rb
+    
+This should produce something like the following if the install worked:
+
+	Loaded suite ts_Tioga
+	Started
+	.....................................................
+	compressed from 0 to 8
+	compressed from 13 to 21
+	compressed from 70 to 69
+	compressed from 3631 to 1642
+	.pdflatex -interaction nonstopmode Icon_Test.tex > pdflatex.log
+ 
+ 
+ 
+	>>> NOTE: please look at tests/Icon_Test.pdf and compare it to samples/Icon.pdf
+	.
+	Finished in 0.501211 seconds.
+
+	55 tests, 647 assertions, 0 failures, 0 errors
+
+These tests ensure that Tioga is accessible and that some of the basic stuff is working.
+Don't skip the visual check of the newly created file 'tests/Icon_Test.pdf'.
+If that's ok, there's a good chance your installation is up and running.
+
+The next step is to do the tutorial found in the documentation.
+
+
+
+<< Tutorial >>
+
+    Once you have Tioga installed, the on-line tutorial will help you
+get started using it.
+    
+http://theory.kitp.ucsb.edu/~paxton/tioga_doc/classes/Tioga/Tutorial.html
+
+
+<< Documentation >>
+
+    Visit this website to access the documentation:
+    
+        http://theory.kitp.ucsb.edu/~paxton/tioga_doc/index.html
+
+If for some reason that link isn't working, go to my website,
+
+        http://theory.kitp.ucsb.edu/~paxton
+
+and check there for a new link to the Tioga stuff.
+
+    Try to get by with the on-line documentation, but if you really
+have a need to rebuild the documentation using Rdoc, I've
+included a .document file in the release folder.  However, all
+the figures have direct links to jpegs on my website, so you'll
+either have to live with that, or do a bunch of edits.  Send me
+an email if you'd like a tar file of the images.
+
+
+<< Open Source >>
+
+    You are welcome to take the Tioga source and do what you want with it
+(within the bounds of the GNU license of course).  But don't even think about
+asking for support from me for debugging your new stuff!  I have enough trouble
+with my own bugs to keep me busy endlessly!  But if it looks like a bug in Tioga,
+please do let me know so I can try to fix it.  Or even better, let me know
+the fix along with the bug!
+
+
+----------------------------------
+
+For more, visit my website:  http://theory.kitp.ucsb.edu/~paxton
+
+Best wishes,
+Bill Paxton
+
+
+
+
+	
+	
+	
+<< What's old >>
+
+Here are the old release messages:
 
 	Version 1.4 is a major overhaul with particular emphasis on the tioga user interface.
 Please take a moment to go through the new section of the tutorial titled, CommandLine.
@@ -50,11 +204,6 @@ Additionnally, some more classical functionalities have been added:
   the markers, see the plot samples/figures/figures.rb: Arrows_second_take
   * a function Dvector.write has been added that does exactly the
   reverse of Dvector.(fancy_)read.
-
-
-
-	
-<< What's old >>
 	
 
 	  Version 1.3.1 is as usual a bug-fix release, although bugs
@@ -236,137 +385,4 @@ he sent me an email pointing out an oversight in the legend functionality.
 Not only that, he sent along an implementation to fix the problem!  What could I do?
 I had to put it in and make a new release.  So thanks to Vincent, you can now include 
 markers on the lines in legends.  Details in the new documentation for 'save_legend_info'.
-
-
-<< Quick Installation of Tioga >>
-
-    Are you feeling lucky?  If so, try QUICK_INSTALL.  This simply does
-the steps for you that are described below.  The install needs to copy some
-files to the ruby directory.  On the Mac, this probably means you need to do
-the whole thing with a 'sudo'.  For Linux, you may have to become root.
-Once you've taken care of that, just run the QUICK_INSTALL script and
-keep your fingers crossed.
-
-    You now have the option to run HOME_INSTALL instead, which will install the files to 
-your home directory (no root privileges needed). You just need to set your RUBYLIB 
-environment variable as reminded at the end of the file.
-
-    Please check that there are 0 failures and 0 errors at the end of the test.
-Then, in your favorite PDF previewer, open the newly created 'tests/Icon_Test.pdf'
-and compare it to the prebuilt 'samples/Icon.pdf'.  They should be very similar!
-If it all seems to be working, go directly to the << Documentation >> section below.
-
-
-<< Step-by-Step Installation >>
-
-    To get Tioga running, you need to have a working Ruby, a C compiler,
-make, and pdflaxtex.  Assuming you've got all that (more later if you don't),
-connect to the Tioga directory that you just unpacked and do the following:
-
-  [ this has been changed, be careful ! ]
-
-    cd split 
-    ruby extconf.rb
-    make
-    make install
-
-This creates the Makefile, runs it, and finally does the actual
-installation.  The "make install" needs to copy some files to the ruby directory.
-On the Mac, this probably means you need to do the whole thing inside a 'sudo'.
-For Linux, you may have to become root.
-
-Note that on Linux, the make will compile all the source files.  On the Mac,
-the tar file includes precompiled versions of everything, so the make won't
-have anything to do.  That's okay.  Do the whole sequence anyway just to be safe.
-
-    You now have another option to install: if you replace the line
-    ruby extconf.rb
-with 
-    ruby extconf.rb --home
-it will install the files to your home directory, namely ~/lib/ruby. You don't need root 
-privileges to do that, but make sure that you set RUBYLIB=~/lib/ruby somewhere, so that ruby 
-can find it.
-
-
-
-
-<< Checking The Installation >>
-
-    To make sure at least something works of out the newly installed stuff,
-change directory to your new Tioga folder.  Then enter this to the shell:
-
-    cd tests
-    ruby ts_Tioga.rb
-    
-This should produce something like the following if the install worked:
-
-	Loaded suite ts_Tioga
-	Started
-	.....................................................
-	compressed from 0 to 8
-	compressed from 13 to 21
-	compressed from 70 to 69
-	compressed from 3631 to 1642
-	.pdflatex -interaction nonstopmode Icon_Test.tex > pdflatex.log
- 
- 
- 
-	>>> NOTE: please look at tests/Icon_Test.pdf and compare it to samples/Icon.pdf
-	.
-	Finished in 0.501211 seconds.
-
-	55 tests, 647 assertions, 0 failures, 0 errors
-
-These tests ensure that Tioga is accessible and that some of the basic stuff is working.
-Don't skip the visual check of the newly created file 'tests/Icon_Test.pdf'.
-If that's ok, there's a good chance your installation is up and running.
-
-The next step is to do the tutorial found in the documentation.
-
-
-
-<< Tutorial >>
-
-    Once you have Tioga installed, the on-line tutorial will help you
-get started using it.
-    
-http://theory.kitp.ucsb.edu/~paxton/tioga_doc/classes/Tioga/Tutorial.html
-
-
-<< Documentation >>
-
-    Visit this website to access the documentation:
-    
-        http://theory.kitp.ucsb.edu/~paxton/tioga_doc/index.html
-
-If for some reason that link isn't working, go to my website,
-
-        http://theory.kitp.ucsb.edu/~paxton
-
-and check there for a new link to the Tioga stuff.
-
-    Try to get by with the on-line documentation, but if you really
-have a need to rebuild the documentation using Rdoc, I've
-included a .document file in the release folder.  However, all
-the figures have direct links to jpegs on my website, so you'll
-either have to live with that, or do a bunch of edits.  Send me
-an email if you'd like a tar file of the images.
-
-
-<< Open Source >>
-
-    You are welcome to take the Tioga source and do what you want with it
-(within the bounds of the GNU license of course).  But don't even think about
-asking for support from me for debugging your new stuff!  I have enough trouble
-with my own bugs to keep me busy endlessly!  But if it looks like a bug in Tioga,
-please do let me know so I can try to fix it.  Or even better, let me know
-the fix along with the bug!
-
-
-----------------------------------
-
-For more, visit my website:  http://theory.kitp.ucsb.edu/~paxton
-
-Best wishes,
-Bill Paxton
 
