@@ -2,7 +2,7 @@
 # from this mess
 
 dirs = Dvector Dtable Function Tioga Flate
-files = symbols.c symbols.h defs.h safe_double.h namespace.h
+files = symbols.h defs.h safe_double.h namespace.h
 
 gem-prepare:
 	for d in $(dirs); do \

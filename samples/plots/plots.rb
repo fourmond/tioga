@@ -47,6 +47,7 @@ class MyPlots
         t.def_figure("Legend_Inside") { legend_inside }
         t.def_figure("Legend_Outside") { legend_outside }
         t.def_figure("Inset") { inset }
+        t.def_figure("French_Decimal_Separator") { french_decimal_separator }
         t.def_figure("Column_Triplets") { column_triplets }
         t.def_figure("Row_Triplets") { row_triplets }
         t.def_figure("Rows") { rows }
@@ -76,6 +77,22 @@ class MyPlots
         t.default_page_width = 72*3 # in big-points (1/72 inch)
         t.default_page_height = t.default_page_width
         t.default_enter_page_function
+    end
+
+    def french_decimal_separator
+      t.tex_preamble += <<'EOD'
+\def\frenchsep#1{\frenchsepma#1\endoffrenchsep} 
+\def\fseat#1{\frenchsepma}
+\def\frenchsepma{\futurelet\next\frenchsepmw}
+\def\frenchsepmw{\ifx\next\endoffrenchsep\let\endoffrenchsep=\relax%
+\else\if\next.\ifmmode\mathord,\else,\fi%
+\else\next\fi\expandafter
+\fseat\fi}
+EOD
+
+      t.yaxis_numeric_label_tex = '$\frenchsep{#1}$'
+
+      blues
     end
     
     def read_data
