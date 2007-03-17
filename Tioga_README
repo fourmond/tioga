@@ -28,9 +28,28 @@ coming releases.  If you're interested in playing with it in spite of that warni
 it's available from my website (http://theory.kitp.ucsb.edu/~paxton/Tioga-1.5.dmg).
 
 	Cheers, Bill
-	
-	
-	
+
+	[Vincent] Version 1.5 has seen a not-so-s√mall change inthe structure of the 
+tutorial, which now has local links to images. So the images are now included in the
+tarball (though the -without-images don't have them, for those who have sparse 
+disk space or bandwidth). To get a local copy of the tutorial, just run rdoc 
+and then link doc/images to images using the following commands:
+
+cd doc; ln -s ../images .
+
+There are just a few new functions this time: 
+  * FigureMaker#create_figure_temp_files has been made part of the public 
+interface of tioga, it produces only the intermediate pdf and TeX files but 
+doesn't run pdflatex (used by ctioga)
+  * a Function#derivative method has been added, that does what you think it 
+does.
+
+The C code has been heavily tweaked to prevent segfaults on some 
+architectures/distributions, and some samples were added, notably one for 
+insets (I'll let you find it !).
+
+	Cheers, Vincent
+  
 
 << Quick Installation of Tioga >>
 
@@ -110,6 +129,9 @@ This should produce something like the following if the install worked:
 	Finished in 0.501211 seconds.
 
 	55 tests, 647 assertions, 0 failures, 0 errors
+
+[the numbers here are not up-to-date, tests are added everytime a feature is added, so it 
+is likely the numbers you see are greater - it means we're actually working ;-) !]
 
 These tests ensure that Tioga is accessible and that some of the basic stuff is working.
 Don't skip the visual check of the newly created file 'tests/Icon_Test.pdf'.
