@@ -1,6 +1,5 @@
 # sample.rb
 
-require 'rubygems'
 require 'Tioga/FigureMaker'
 
 class MyFigures

@@ -1,6 +1,5 @@
 # zams.rb
 
-require 'rubygems'
 require 'Tioga/FigureMaker'
 
 include Tioga

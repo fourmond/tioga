@@ -4,7 +4,6 @@
 # suitable for this file.
 
 
-require 'rubygems'
 require 'Tioga/FigureMaker'
 
 

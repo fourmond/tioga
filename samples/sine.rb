@@ -7,7 +7,6 @@
 
 # this file demonstates the use of tioga for producing plots. 
 
-require 'rubygems'
 require 'Tioga/FigureMaker'
 
 class MyPlots

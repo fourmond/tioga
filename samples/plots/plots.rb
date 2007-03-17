@@ -1,6 +1,5 @@
 # plots.rb
 
-require 'rubygems'
 require 'Tioga/FigureMaker'
 
 require 'plot_styles'
