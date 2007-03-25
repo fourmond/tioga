@@ -65,8 +65,8 @@ PRIVATE
  */
 VALUE do_compress(VALUE klass, VALUE str) {
    str = rb_String(str);
-   unsigned char *ptr = (unsigned char *)RSTRING(str)->ptr;
-   long len = RSTRING(str)->len;
+   unsigned char *ptr = (unsigned char *)RSTRING_PTR(str);
+   long len = RSTRING_LEN(str);
    unsigned long new_len = (len * 11) / 10 + 100;
    unsigned char *new_ptr = ALLOC_N(unsigned char, new_len);
    if (flate_compress(new_ptr, &new_len, ptr, len) != Z_OK) {
@@ -94,8 +94,8 @@ PRIVATE
  
 VALUE do_expand(VALUE klass, VALUE str) {
    str = rb_String(str);
-   unsigned char *ptr = (unsigned char *)RSTRING(str)->ptr;
-   long len = RSTRING(str)->len;
+   unsigned char *ptr = (unsigned char *)RSTRING_PTR(str);
+   long len = RSTRING_LEN(str);
    unsigned long new_len = len * 4 + 100;
    unsigned char *new_ptr = ALLOC_N(unsigned char, new_len);
    if (flate_expand(&new_ptr, &new_len, ptr, len) != Z_OK) {

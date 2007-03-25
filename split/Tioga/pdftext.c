@@ -149,7 +149,7 @@ static int c_register_font(char *font_name)
 VALUE FM_register_font(VALUE fmkr, VALUE font_name)
 {
    font_name = rb_String(font_name);
-   int font_num = c_register_font(RSTRING(font_name)->ptr);
+   int font_num = c_register_font(RSTRING_PTR(font_name));
    return INT2FIX(font_num); 
 }
 
@@ -253,7 +253,7 @@ VALUE FM_marker_string_info(VALUE fmkr, VALUE font_number, VALUE string, VALUE s
    FM *p = Get_FM(fmkr);
    font_number = rb_Integer(font_number);
    string = rb_String(string);
-   unsigned char *text = (unsigned char *)(RSTRING(string)->ptr);
+   unsigned char *text = (unsigned char *)(RSTRING_PTR(string));
    scale = rb_Float(scale);
    double ft_ht = p->default_text_scale * NUM2DBL(scale) * p->default_font_size * ENLARGE;
    int ft_height = ROUND(ft_ht);
@@ -403,7 +403,7 @@ VALUE FM_private_show_marker(VALUE fmkr, VALUE integer_args, VALUE stroke_width,
       }
    } else {
       string = rb_String(string);
-      text = (unsigned char *)(RSTRING(string)->ptr);
+      text = (unsigned char *)(RSTRING_PTR(string));
    }
    fprintf(TF, "%d Tr\n", mode);
    if (stroke_color != Qnil && stroke_color != p->stroke_color &&

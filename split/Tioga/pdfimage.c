@@ -260,7 +260,7 @@ VALUE FM_private_show_jpg(VALUE fmkr, VALUE filename, VALUE width, VALUE height,
    height = rb_Integer(height);
    mask_obj_num = rb_Integer(mask_obj_num);
    filename = rb_String(filename);
-   c_show_jpg(p, RSTRING(filename)->ptr, NUM2INT(width), NUM2INT(height), dest, NUM2INT(mask_obj_num));
+   c_show_jpg(p, RSTRING_PTR(filename), NUM2INT(width), NUM2INT(height), dest, NUM2INT(mask_obj_num));
    return fmkr;
 }
 
@@ -487,8 +487,8 @@ static VALUE private_show_image(int image_type, VALUE fmkr, VALUE llx, VALUE lly
       hival = rb_Integer(hival);
       hivalue = NUM2INT(hival);
       lookup = rb_String(lookup);
-      lookup_str = (unsigned char *)(RSTRING(lookup)->ptr);
-      lookup_len = RSTRING(lookup)->len;
+      lookup_str = (unsigned char *)(RSTRING_PTR(lookup));
+      lookup_len = RSTRING_LEN(lookup);
    }
    dest[0] = convert_figure_to_output_x(p,NUM2DBL(llx));
    dest[1] = convert_figure_to_output_y(p,NUM2DBL(lly));
@@ -497,7 +497,7 @@ static VALUE private_show_image(int image_type, VALUE fmkr, VALUE llx, VALUE lly
    dest[4] = convert_figure_to_output_x(p,NUM2DBL(ulx));
    dest[5] = convert_figure_to_output_y(p,NUM2DBL(uly));
    int obj_num = c_private_show_image(p, image_type, dest, (interpolate != Qfalse), (reversed == Qtrue), NUM2INT(w), NUM2INT(h), 
-      (unsigned char *)RSTRING(data)->ptr, RSTRING(data)->len, mask_min, mask_max, hivalue, lookup_str, lookup_len, NUM2INT(mask_obj_num));
+      (unsigned char *)RSTRING_PTR(data), RSTRING_LEN(data), mask_min, mask_max, hivalue, lookup_str, lookup_len, NUM2INT(mask_obj_num));
    return INT2FIX(obj_num);
 }
 

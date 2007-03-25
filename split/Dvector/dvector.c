@@ -78,6 +78,17 @@ static void dvector_free(Dvector *d);
 
 PRIVATE bool Is_Dvector(VALUE obj) { return is_a_dvector(obj); }
 
+PRIVATE 
+/* Checks if the given object is a Dvector. Mainly here for testing
+   purposes, as it corresponds to the internal +is_a_dvector+.
+*/
+VALUE dvector_is_a_dvector(VALUE self, VALUE obj)
+{
+  if(Is_Dvector(obj))
+    return Qtrue;
+  return Qfalse;
+}
+
 static inline void dvector_mem_clear(double *mem, int size) {
    while (size--) {
       *mem++ = 0.0;
@@ -662,7 +673,8 @@ PRIVATE
  *     a.first   -> 1
  *     a.first(1)   -> Dvector[ 1 ]
  *     a.first(3)   -> Dvector[ 1, 2, 3 ]
- */ VALUE dvector_first(int argc, VALUE *argv, VALUE ary) {
+ */ 
+VALUE dvector_first(int argc, VALUE *argv, VALUE ary) {
    VALUE nv, result;
    long n, i;
    Dvector *d = Get_Dvector(ary);
@@ -1414,7 +1426,7 @@ PRIVATE VALUE dvector_join(VALUE ary, VALUE sep) {
    len += d->len * 10;
    if (!NIL_P(sep)) {
       StringValue(sep);
-      len += RSTRING(sep)->len * (d->len - 1);
+      len += RSTRING_LEN(sep) * (d->len - 1); /* So it works for ruby 1.9 */
    }
    result = rb_str_buf_new(len);
    for (i=0; i < d->len; i++) {
@@ -1437,7 +1449,8 @@ PRIVATE
  *     
  *     Dvector[ 1, 2, 3 ].join        -> "1 2 3"
  *     Dvector[ 1, 2, 3 ].join("-")   -> "1-2-3"
- */ VALUE dvector_join_m(int argc, VALUE *argv, VALUE ary) {
+ */ 
+VALUE dvector_join_m(int argc, VALUE *argv, VALUE ary) {
    VALUE sep;
    rb_scan_args(argc, argv, "01", &sep);
    if (NIL_P(sep)) sep = dvector_output_fs;
@@ -4991,11 +5004,13 @@ VALUE dvector_dump(VALUE ary, VALUE limit)
     + len * 8 ;
   unsigned u_len = (unsigned) len; /* this is bad, I know, but it
 				      won't hurt before it is common
-				      that computers have 64 GB of RAM...
+				      that computers have 32 GB of RAM...
 				   */
-  VALUE str = rb_str_buf_new(target_len);
+
+  VALUE str = rb_str_new2("");
+  rb_str_resize(str,target_len); /* This seems to do the trick */
   /* \begin{playing with ruby's internals} */
-  unsigned char * ptr = (unsigned char *) RSTRING(str)->ptr;
+  unsigned char * ptr = (unsigned char *) RSTRING_PTR(str);
   /* signature byte */
   (*ptr++) = DVECTOR_DUMP_VERSION;
   STORE_UNSIGNED(u_len, ptr); /* destroys u_len */
@@ -5004,7 +5019,7 @@ VALUE dvector_dump(VALUE ary, VALUE limit)
       store_double(*(data++), ptr);
       ptr += 8;
     }
-  RSTRING(str)->len = target_len;
+  /*   RSTRING_LEN(str) = target_len; */
   return str;
   /* \end{playing with ruby's internals} */
 }
@@ -5019,7 +5034,7 @@ VALUE dvector_load(VALUE klass, VALUE str)
   VALUE ret = Qnil;
   VALUE s = StringValue(str);
   unsigned char * buf = (unsigned char *) StringValuePtr(s);
-  unsigned char * dest = buf + RSTRING(s)->len;
+  unsigned char * dest = buf + RSTRING_LEN(s);
   unsigned i; /* for GET_UNSIGNED */
   unsigned tmp = 0;
   double * data;
@@ -5217,6 +5232,9 @@ void Init_Dvector() {
    rb_define_singleton_method(cDvector, "linear_interpolate", dvector_linear_interpolate, -1);
    rb_define_singleton_method(cDvector, "min_of_many", dvector_min_of_many, 1);
    rb_define_singleton_method(cDvector, "max_of_many", dvector_max_of_many, 1);
+
+   rb_define_singleton_method(cDvector, "is_a_dvector", dvector_is_a_dvector, 1);
+
    
    rb_define_method(cDvector, "make_bezier_control_points_for_cubic_in_x", dvector_make_bezier_control_points_for_cubic_in_x, 6);
    

@@ -1,8 +1,9 @@
-#  tc_Dtable.rb
+#  tc_Flate.rb
 
 require 'test/unit'
+require 'Flate'
 
-class TestDtable < Test::Unit::TestCase
+class TestFlate < Test::Unit::TestCase
 
   def make_data(size = 10000) 
     srand # intitialize the random seed...

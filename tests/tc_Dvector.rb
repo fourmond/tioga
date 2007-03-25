@@ -16,6 +16,13 @@ class TestDvector < Test::Unit::TestCase
         return "#{dir}/#{file_name}"
       end
     end
+
+    # Checks if the internal Is_Dvector is working properly,
+    # as it seems problematic in Ruby 1.9
+    def test_isa_dvector
+      a = Dvector.new
+      assert(Dvector.is_a_dvector(a))
+    end
     
     def test_read_nasty_fortran_data
         row = Dvector.read_row(real_file_name("dvector_read_test.data"))
@@ -771,6 +778,19 @@ EOT
       assert_equal(v, v_bis)
     end
 
+    NB_NUMBERS = 10000
+    def test_stress_marshall
+      1.times do 
+        v = Dvector.new
+        1.upto(NB_NUMBERS) do 
+          v << rand * 10 ** (100 - 100 * rand)
+        end
+        s = Marshal.dump(v)
+        v_bis = Marshal.restore(s)
+        assert_equal(v, v_bis)
+      end
+    end
+
     def test_bounds
       v = Dvector[0.0/0.0, 0.0/0.0, 1,2,4,5,9,0.0/0.0,0.1]
       assert_equal(v.bounds, [0.1, 9])
@@ -787,5 +807,6 @@ EOT
       assert_equal(a,c)
       assert_equal(b,d)
     end
+
     
 end

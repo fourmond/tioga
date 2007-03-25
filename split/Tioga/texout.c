@@ -151,7 +151,7 @@ VALUE FM_show_rotated_text(VALUE fmkr, VALUE text, VALUE frame_side, VALUE shift
    angle = rb_Float(angle);
    justification = rb_Integer(justification);
    alignment = rb_Integer(alignment);
-   c_show_rotated_text(p, RSTRING(text)->ptr, NUM2INT(frame_side), NUM2DBL(shift),
+   c_show_rotated_text(p, RSTRING_PTR(text), NUM2INT(frame_side), NUM2DBL(shift),
       NUM2DBL(fraction), NUM2DBL(scale), NUM2DBL(angle), NUM2INT(justification), NUM2INT(alignment));
    return fmkr;
 }
@@ -174,7 +174,7 @@ VALUE FM_show_rotated_label(VALUE fmkr, VALUE text,
    angle = rb_Float(angle);
    justification = rb_Integer(justification);
    alignment = rb_Integer(alignment);
-   c_show_rotated_label(p, RSTRING(text)->ptr, NUM2DBL(xloc), NUM2DBL(yloc),
+   c_show_rotated_label(p, RSTRING_PTR(text), NUM2DBL(xloc), NUM2DBL(yloc),
       NUM2DBL(scale), NUM2DBL(angle), NUM2INT(justification), NUM2INT(alignment));
    return fmkr;
 }

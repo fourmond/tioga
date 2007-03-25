@@ -233,7 +233,7 @@ VALUE FM_private_axial_shading(VALUE fmkr, VALUE x0, VALUE y0, VALUE x1, VALUE y
    lookup = rb_String(lookup);
    c_axial_shading(p, convert_figure_to_output_x(p,NUM2DBL(x0)), convert_figure_to_output_y(p,NUM2DBL(y0)),
       convert_figure_to_output_x(p,NUM2DBL(x1)), convert_figure_to_output_y(p,NUM2DBL(y1)),
-      NUM2INT(hival), RSTRING(lookup)->len, (unsigned char *)(RSTRING(lookup)->ptr),
+      NUM2INT(hival), RSTRING_LEN(lookup), (unsigned char *)(RSTRING_PTR(lookup)),
       extend_start == Qtrue, extend_end == Qtrue);
    return fmkr;
 }
@@ -291,7 +291,7 @@ VALUE FM_private_radial_shading(VALUE fmkr,
    c_radial_shading(p,
       NUM2DBL(x0), NUM2DBL(y0), NUM2DBL(r0),
       NUM2DBL(x1), NUM2DBL(y1), NUM2DBL(r1), 
-      NUM2INT(hival), RSTRING(lookup)->len, (unsigned char *)(RSTRING(lookup)->ptr),
+      NUM2INT(hival), RSTRING_LEN(lookup), (unsigned char *)(RSTRING_PTR(lookup)),
       convert_figure_to_output_dx(p,NUM2DBL(a)), convert_figure_to_output_dy(p,NUM2DBL(b)),
       convert_figure_to_output_dx(p,NUM2DBL(c)), convert_figure_to_output_dy(p,NUM2DBL(d)),
       convert_figure_to_output_x(p,0.0), convert_figure_to_output_y(p,0.0),
@@ -356,8 +356,8 @@ VALUE FM_get_color_from_colormap(VALUE fmkr, VALUE color_map, VALUE color_positi
    color_position = rb_Float(color_position);
    double x = NUM2DBL(color_position);
    color_map = rb_String(color_map);
-   unsigned char *buff = (unsigned char *)(RSTRING(color_map)->ptr), r, g, b, i;
-   int len = RSTRING(color_map)->len;
+   unsigned char *buff = (unsigned char *)(RSTRING_PTR(color_map)), r, g, b, i;
+   int len = RSTRING_LEN(color_map);
    if (len % 3 != 0) rb_raise(rb_eArgError, "Sorry: color_map length must be a multiple of 3 (for R G B components)");
    i = 3 * ROUND(x * ((len/3)-1));
    r = buff[i]; g = buff[i+1]; b = buff[i+2];

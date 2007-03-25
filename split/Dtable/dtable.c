@@ -1664,9 +1664,10 @@ VALUE dtable_dump(VALUE ary, VALUE limit)
     + 8 /* 2 * length */
     + cols * rows * 8 ;
   unsigned u_len;
-  VALUE str = rb_str_buf_new(target_len);
+  VALUE str = rb_str_new2("");
+  rb_str_resize(str,target_len); /* This seems to do the trick */
   /* \begin{playing with ruby's internals} */
-  unsigned char * ptr = (unsigned char *) RSTRING(str)->ptr;
+  unsigned char * ptr = (unsigned char *) RSTRING_PTR(str);
   /* signature byte */
   (*ptr++) = DTABLE_DUMP_VERSION;
   u_len = (unsigned) rows; /* limits to 4 billions rows */
@@ -1682,7 +1683,7 @@ VALUE dtable_dump(VALUE ary, VALUE limit)
 	  ptr += 8;
 	}
     }
-  RSTRING(str)->len = target_len;
+  /*  RSTRING_LEN(str) = target_len;*/
   return str;
   /* \end{playing with ruby's internals} */
 }
@@ -1697,7 +1698,7 @@ VALUE dtable_load(VALUE klass, VALUE str)
   VALUE ret = Qnil;
   VALUE s = StringValue(str);
   unsigned char * buf = (unsigned char *) StringValuePtr(s);
-  unsigned char * dest = buf + RSTRING(s)->len;
+  unsigned char * dest = buf + RSTRING_LEN(s);
   unsigned i; /* for GET_UNSIGNED */
   unsigned tmp = 0;
   long rows, cols;
