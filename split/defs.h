@@ -31,3 +31,9 @@
 #define isnan(x) ((x) != (x))
 /* yes, as funny as it may look  NaN != NaN, and that's the only one */
 #endif
+
+/* Fix old versions of ruby.h */
+#ifndef RSTRING_PTR
+# define RSTRING_PTR(x) (RSTRING(x)->ptr)
+# define RSTRING_LEN(x) (RSTRING(x)->len)
+#endif

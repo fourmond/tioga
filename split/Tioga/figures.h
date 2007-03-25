@@ -32,6 +32,8 @@
 #include "ruby.h"
 #include "intern.h"
 
+#include <defs.h>
+
 // Axes
 
 #define NO_TICKS 0
