@@ -5,6 +5,8 @@
 #include "../symbols.c"
 #include "zlib.h"
 #include "flate_intern.h"
+
+#include <defs.h>
 /*
    Copyright (C) 2005  Bill Paxton
 
