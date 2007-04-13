@@ -54,6 +54,7 @@ class MyPlots
         t.def_figure("Array") { array }
         t.def_figure("Trio") { trio }
         t.def_figure("Collage") { collage }
+        t.def_figure("Blues_with_grid") { blues_with_grid }
         t.def_figure("Labels") { labels }
         t.def_figure("Error_Bars") { error_bars }
         t.def_figure("Error_Bars2") { error_bars2 }
@@ -139,6 +140,23 @@ EOD
         xs = @positions
         ys = @blues
         t.show_plot(plot_boundaries(xs,ys,@margin,-1,1)) { 
+            t.show_polyline(xs,ys,Blue) }
+    end
+    
+    def blues_with_grid
+        read_data
+        t.do_box_labels('Blues Plot', 'Position', '\textcolor[rgb]{0,0,1}{Blues}')
+        show_model_number
+        xs = @positions
+        ys = @blues
+        t.show_plot(plot_boundaries(xs,ys,@margin,-1,1)) {
+            t.context {
+               t.line_width = 0.5
+               t.line_type = Line_Type_Dot
+               t.line_color = Gray
+               [0,2,4,6].each {|x| t.stroke_line(x,t.bounds_top,x,t.bounds_bottom) }
+               [-1,-0.5,0,0.5,1].each {|y| t.stroke_line(t.bounds_left,y,t.bounds_right,y) }
+            }
             t.show_polyline(xs,ys,Blue) }
     end
     
