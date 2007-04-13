@@ -737,8 +737,8 @@ link:images/Special_Y.png
    end
 
 # :call-seq:
-#               yaxis_tick_interval
-#               yaxis_tick_interval = a_float
+#               xaxis_tick_interval
+#               xaxis_tick_interval = a_float
 #
 # If 0, then tioga will pick the interval between major tick marks on the x axis.
 # Otherwise, this will be used as the interval in x coordinates for the spacing between major ticks.
