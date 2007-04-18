@@ -55,6 +55,7 @@ class MyPlots
         t.def_figure("Trio") { trio }
         t.def_figure("Collage") { collage }
         t.def_figure("Blues_with_grid") { blues_with_grid }
+        t.def_figure("Blues_reversed_axes") { blues_reversed_axes }
         t.def_figure("Labels") { labels }
         t.def_figure("Error_Bars") { error_bars }
         t.def_figure("Error_Bars2") { error_bars2 }
@@ -119,7 +120,7 @@ EOD
         end
     end
     
-    def plot_boundaries(xs,ys,margin,ymin=nil,ymax=nil)
+    def plot_boundaries(xs,ys,margin,ymin=nil,ymax=nil,reverse_xaxis=false,reverse_yaxis=false)
         xmin = xs.min
         xmax = xs.max
         ymin = ys.min if ymin == nil
@@ -130,6 +131,12 @@ EOD
         right_boundary = xmax + margin * width
         top_boundary = ymax + margin * height
         bottom_boundary = ymin - margin * height
+        if reverse_xaxis
+           tmp = left_boundary; left_boundary = right_boundary; right_boundary = tmp
+        end
+        if reverse_yaxis
+           tmp = top_boundary; top_boundary = bottom_boundary; bottom_boundary = tmp
+        end
         return [ left_boundary, right_boundary, top_boundary, bottom_boundary ]
     end
     
@@ -140,6 +147,16 @@ EOD
         xs = @positions
         ys = @blues
         t.show_plot(plot_boundaries(xs,ys,@margin,-1,1)) { 
+            t.show_polyline(xs,ys,Blue) }
+    end
+    
+    def blues_reversed_axes # reverse both axes
+        read_data
+        t.do_box_labels('Blues Plot', 'Position', '\textcolor[rgb]{0,0,1}{Blues}')
+        show_model_number
+        xs = @positions
+        ys = @blues
+        t.show_plot(plot_boundaries(xs,ys,@margin,-1,1,true,true)) { 
             t.show_polyline(xs,ys,Blue) }
     end
     
