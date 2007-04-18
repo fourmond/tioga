@@ -91,7 +91,6 @@ The 'plot_number' argument says which plot to do from ProfilePlots.  The last tw
   
 Once we've got movie_batch.rb set up, the movie pdfs can be created simply by having ruby run it.
 
-
 The next job is to convert all those pdfs into a movie.  On my Mac, I'm currently using GraphicConverter, Version 5.9.
 (If you don't have it, or only have an earlier version, cough up the $30 or so and get it.  The site
 is lemkesoft[http://www.lemkesoft.com/en/graphcon.htm].)
@@ -107,10 +106,16 @@ Hit the "Choose" button and pick a name for the movie and a folder to hold it.  
 the "Additional Movie Settings" panel appears, check the button that says "Use dimension of first image".
 You might also want to adjust the "Delay between frames/images" -- I've used 0.1 seconds in the example.
 Select the "Compression..." button to set the parameters for the MPG output.  Set "MPEG-4 Video" for compression type,
-uncheck the "Limit data rate" choice, and set "Quality" to "Best".
-Click "OK" for "Compression Settings", and then click "OK" again for "Additional Movie Settings".  That should do it.  
+uncheck the "Limit data rate" choice, and set "Quality" to "Best".  Click "OK" for "Compression Settings", and then click "OK" again for "Additional Movie Settings".  
+
+That should do it.  
 Open your new movie and enjoy.
 
+One final hint regarding movies: you should make every frame a "key frame" if you want to be able to 
+manually move back and forth to arbitrary spots in the movie.  Only key frames have a complete image -- non-key 
+frames are represented by changes from the previous key frame.  For "normal" movies, it can save a 
+lot of storage by having lots of non-key frames, but for our use, it is much better to have all the 
+frames be complete.
 
 ---
 
