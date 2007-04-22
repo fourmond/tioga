@@ -465,9 +465,11 @@ EOD
         t.do_box_labels('Special Y Axis', 'Position', "Y Values")
         t.yaxis_numeric_label_angle = -90
         t.yaxis_locations_for_major_ticks = [ -10.0, -6.0, -PI, 0.0, PI, 6.0, 10.0 ]
-        t.yaxis_tick_labels = [
-            "-IX", "-VI", "$-\\pi$", 
-            "$\\mathcal{ZERO}$", "$\\pi$", "VI", "IX" ]
+        yzero =
+         '\begin{minipage}[t][1cm][c]{1cm}\begin{flushright}' +
+         '\footnotesize Name this Point' +
+         ' \end{flushright} \end{minipage}' 
+        t.yaxis_tick_labels = [ '-IX', '-VI', '$-\pi$', yzero, '$\pi$', 'VI', 'IX' ]
         t.yaxis_type = AXIS_WITH_MAJOR_TICKS_AND_NUMERIC_LABELS
         t.stroke_color = Blue
         t.yaxis_numeric_label_justification = RIGHT_JUSTIFIED

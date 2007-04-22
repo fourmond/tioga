@@ -91,7 +91,10 @@ The 'plot_number' argument says which plot to do from ProfilePlots.  The last tw
   
 Once we've got movie_batch.rb set up, the movie pdfs can be created simply by having ruby run it.
 
-The next job is to convert all those pdfs into a movie.  On my Mac, I'm currently using GraphicConverter, Version 5.9.
+The next job is to convert all those pdfs into a movie.  I'll describe how I do it on a Mac; for linux
+one good choice is to use the convert tool from ImageMagick and mencoder from mplayer.
+
+On my Mac, I'm currently using GraphicConverter, Version 5.9.
 (If you don't have it, or only have an earlier version, cough up the $30 or so and get it.  The site
 is lemkesoft[http://www.lemkesoft.com/en/graphcon.htm].)
 GraphicConverter has an operation that does just what we need.  It's called "Export Slide Show to Movie...", and it's found

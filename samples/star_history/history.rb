@@ -187,37 +187,19 @@ class StarHistory
             t.show_ylabel(ylabel); t.no_ylabel
         end
     end
-    
-    def initial_mark_spot(x, y)
-        t.show_marker(
-          'x' => x, 
-          'y' => y, 
-          'marker' => Bullet, 
-          'scale' => 0.5, 
-          'color' => Red);
-    end
-    
-    def final_mark_spot(x, y)
-        t.show_marker(
-          'x' => x, 
-          'y' => y, 
-          'marker' => [ZapfDingbats, 103], 
-          'scale' => 2, 
-          'color' => GrayBlue);
-    end
-    
+        
     def background
         t.fill_color = FloralWhite
         t.fill_frame
     end
     
     def mark_spot(x, y)
-        t.show_mark(
+        t.show_marker(
           'x' => x, 
           'y' => y, 
-          'marker' => [ZapfDingbats, 103],
-          'scale' => 2, 
-          'color' => GrayBlue)
+          'marker' => Bullet, 
+          'scale' => 0.5, 
+          'color' => Red);
     end
     
 end

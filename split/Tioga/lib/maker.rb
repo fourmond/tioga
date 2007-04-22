@@ -113,8 +113,8 @@ def command_loop
                 if fname == nil
                     puts "must give file name as argument for make_portfolio command"
                 else
-                    fm.require_all
-                    fm.make_portfolio_pdf(fname)
+                    result = fm.make_portfolio(fname,nil,true)
+                    puts result
                     puts "####00" # GUI uses this
                 end
             end
@@ -142,8 +142,8 @@ def command_loop
             if !have_loaded
                 puts "must load a file before make_all"
             else
-                puts "make_all"
-                fm.num_figures.times {|i| fm.make_preview_pdf(i) }
+                fm.require_all(nil, true)
+                #fm.num_figures.times {|i| fm.make_preview_pdf(i) }
             end
             puts "####00" # GUI uses this
         elsif cmd == "name"
