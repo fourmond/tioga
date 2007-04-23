@@ -157,6 +157,8 @@ static VALUE function_initialize(VALUE self, VALUE x, VALUE y)
 	set_x_vector(self, x);
 	set_y_vector(self, y);
 	/* fine, this could have been written in pure Ruby...*/
+	set_spline_vector(self,Qnil);
+	/* We initialize the @spline_cache var */
       }
       else
 	rb_raise(rb_eArgError,"both vectors must have the same size");
