@@ -78,7 +78,7 @@ module Mkmf2
   include Config
 
   # The CVS tag used for the release.
-  CVS_TAG = '$Name$'
+  CVS_TAG = '$Name:  $'
 
   # The module version; it is computed from CVS_TAG
   VERSION = CVS_TAG.match(/\D+(.*?)\s*\$?$/)[1].tr('_-','..')
@@ -616,7 +616,7 @@ module Mkmf2
       MAKEFILE_CONFIG["INCLUDE_INSTALL_DIR"] = 
         "$(DESTDIR)$(includedir)"
       MAKEFILE_CONFIG["EXEC_INSTALL_DIR"] = 
-        File.join("$(prefix)", "bin")
+        File.join("$(DESTDIR)$(prefix)", "bin")
 
     when "local"
       MAKEFILE_CONFIG["RUBYLIB_INSTALL_DIR"] = 

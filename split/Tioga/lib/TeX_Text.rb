@@ -434,8 +434,12 @@ link:images/Framebox.png
 #               tex_xaxis_numeric_label = a_string
 #
 # The string for a numeric label is put in this TeX command string to be formatted.
-# For example, `$#1$' will give the numbers in math mode, while `$\mathsf{#1}$' will 
-# show the label using the math sans-serif font.   Alias for xaxis_numeric_label_tex.
+# For example,
+#   $#1$
+# will give the numbers in math mode, while
+#   $\mathsf{#1}$
+# will  show the label using the math sans-serif font.
+# Alias for xaxis_numeric_label_tex.
    def tex_xaxis_numeric_label
    end
 
@@ -444,8 +448,12 @@ link:images/Framebox.png
 #               tex_yaxis_numeric_label = a_string
 #
 # The string for a numeric label is put in this TeX command string to be formatted.
-# For example, `$#1$' will give the numbers in math mode, while `$\mathsf{#1}$' will 
-# show the label using the math sans-serif font.   Alias for yaxis_numeric_label_tex.
+# For example, 
+#   $#1$
+# will give the numbers in math mode, while 
+#   $\mathsf{#1}$
+# will show the label using the math sans-serif font.
+# Alias for yaxis_numeric_label_tex.
    def tex_yaxis_numeric_label
    end
 
