@@ -335,7 +335,6 @@ class FigureMaker
     def figure_pdf(name)
         if name.kind_of?(Integer)
             num = name
-            name = @figure_names[num]
         else
             num = @figure_names.index(name)
         end

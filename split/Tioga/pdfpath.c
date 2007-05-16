@@ -34,7 +34,6 @@ static void croak_on_nonok(FM *p, const char * function)
 }
 
 /* small macro to check if a number is ok to be output */
-#define is_okay_number(x) ((x) - (x) == 0.0)
 
 #define CROAK_ON_NONOK(p) croak_on_nonok(p, __FUNCTION__)
 #define ARE_OK_NUMBERS(x,y) if(! is_okay_number(x) || ! is_okay_number(y)) {\

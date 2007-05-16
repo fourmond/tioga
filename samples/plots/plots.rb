@@ -195,6 +195,7 @@ EOD
         ys = @reds
         t.xaxis_log_values = true
         t.yaxis_log_values = true
+        t.xaxis_numeric_label_frequency = 3
         t.show_plot(plot_boundaries(xs,ys,@margin,-1,1)) { t.show_polyline(xs,ys,Red) }
     end
     

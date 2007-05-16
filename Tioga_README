@@ -1,4 +1,4 @@
-This is the README for the Tioga kernel, version 1.5, March 17, 2007.
+This is the README for the Tioga kernel, version 1.6, March 17, 2007.
 
     Copyright (C) 2005, 2006, 2007  Bill Paxton
     
@@ -20,35 +20,15 @@ This is the README for the Tioga kernel, version 1.5, March 17, 2007.
 
 << What's new >>
 
-	Version 1.5 is mainly Vincent's work, so my part of this release message
-will be short.  Remember how I killed off the Mac GUI last time?  Turns out there
-was one user who couldn't live without it -- me!  So it's back, but I'm still not
-making any promises about keeping it alive if Apple does something stupid in
-coming releases.  If you're interested in playing with it in spite of that warning,
-it's available from my website (http://theory.kitp.ucsb.edu/~paxton/Tioga-1.5.dmg).
+   Version 1.6 adds numeric label "frequency" and "phase" attributes for
+both axes.  Previously Tioga assumed that every major tick mark got a numeric
+label.  Now the i'th major tick on the axis gets a label only if
+mod(i+j,k)==0 where j is the phase and k is the frequency.  The default
+frequency is naturally 1 so that every major tick gets a label.
+The full names for these attributes are xaxis_numeric_label_frequency,
+xaxis_numeric_label_phase, and similar for yaxis.
 
-	Cheers, Bill
 
-	[Vincent] Version 1.5 has seen a not-so-s√mall change inthe structure of the 
-tutorial, which now has local links to images. So the images are now included in the
-tarball (though the -without-images don't have them, for those who have sparse 
-disk space or bandwidth). To get a local copy of the tutorial, just run rdoc 
-and then link doc/images to images using the following commands:
-
-cd doc; ln -s ../images .
-
-There are just a few new functions this time: 
-  * FigureMaker#create_figure_temp_files has been made part of the public 
-interface of tioga, it produces only the intermediate pdf and TeX files but 
-doesn't run pdflatex (used by ctioga)
-  * a Function#derivative method has been added, that does what you think it 
-does.
-
-The C code has been heavily tweaked to prevent segfaults on some 
-architectures/distributions, and some samples were added, notably one for 
-insets (I'll let you find it !).
-
-	Cheers, Vincent
   
 
 << Quick Installation of Tioga >>
@@ -196,6 +176,41 @@ Bill Paxton
 
 Here are the old release messages:
 
+
+--------------------------
+
+	Version 1.5 is mainly Vincent's work, so my part of this release message
+will be short.  Remember how I killed off the Mac GUI last time?  Turns out there
+was one user who couldn't live without it -- me!  So it's back, but I'm still not
+making any promises about keeping it alive if Apple does something stupid in
+coming releases.  If you're interested in playing with it in spite of that warning,
+it's available from my website (http://theory.kitp.ucsb.edu/~paxton/Tioga-1.5.dmg).
+
+	Cheers, Bill
+
+	[Vincent] Version 1.5 has seen a not-so-s√mall change inthe structure of the 
+tutorial, which now has local links to images. So the images are now included in the
+tarball (though the -without-images don't have them, for those who have sparse 
+disk space or bandwidth). To get a local copy of the tutorial, just run rdoc 
+and then link doc/images to images using the following commands:
+
+cd doc; ln -s ../images .
+
+There are just a few new functions this time: 
+  * FigureMaker#create_figure_temp_files has been made part of the public 
+interface of tioga, it produces only the intermediate pdf and TeX files but 
+doesn't run pdflatex (used by ctioga)
+  * a Function#derivative method has been added, that does what you think it 
+does.
+
+The C code has been heavily tweaked to prevent segfaults on some 
+architectures/distributions, and some samples were added, notably one for 
+insets (I'll let you find it !).
+
+	Cheers, Vincent
+
+--------------------------
+
 	Version 1.4 is a major overhaul with particular emphasis on the tioga user interface.
 Please take a moment to go through the new section of the tutorial titled, CommandLine.
 It gives a detailed discussion of the new tioga command line interface that replaces
@@ -226,7 +241,8 @@ Additionnally, some more classical functionalities have been added:
   the markers, see the plot samples/figures/figures.rb: Arrows_second_take
   * a function Dvector.write has been added that does exactly the
   reverse of Dvector.(fancy_)read.
-	
+
+--------------------------	
 
 	  Version 1.3.1 is as usual a bug-fix release, although bugs
 were not that obvious this time. Among other things,
@@ -255,6 +271,8 @@ uses that as its default;  the previous algorithm, CONREC, is still available as
 However, the new one seems superior -- especially if you'd like to be able to fill the contour
 rather than simply stroke it.  In addition, you can optionally provide it with a "mask" of flags
 indicating which entries in the table are valid for use in forming the contours.  Neat stuff.
+
+--------------------------
 	
 		Version 1.3.0 will automatically remove the tex temporary files it creates
 (unless the autocleanup attribute is set false).  Commands that used to have
@@ -312,9 +330,11 @@ about the change in my model of what Tioga is really doing:
 
 	--Bill
 
-	
+--------------------------
 
 	Version 1.2.1 is as usual a bug-fix release fixing some installation problems...
+
+--------------------------
 
 	Version 1.2.0 brings in a lot of new features. First and most important, we came up with a
 proper design for a real-size scheme. Now, you can use the page_setup function to ask Tioga to
@@ -323,18 +343,28 @@ your documents (not only LaTeX, then). A whole bunch of debugging tools have bee
 now set tracing tools with the (enter|exit)_(show_plot|subplot|subfigure) functions. As usual,
 there is a whole bunch of small improvements and new functions to Dvector and Function.
 
+--------------------------
+
 	Version 1.1.7 fixes a nasty runtime bug on MacOS X.
+
+--------------------------
 
 	Version 1.1.6 provides marshalling for Dtable and Dvector. You can now use Marshal.dump and
 Marshal.load with Dvectors. Dvectors and Function now have a bounds function, which return both the
 minima and the maxima. Ruby is no longer complaining about Tioga when used with the -w switch.
 
+--------------------------
+
 	Version 1.1.5 is a bug-fix release - updated to the latest mkmf2.rb to make sure all
 necessary files are generated during make.
+
+--------------------------
 
 	Version 1.1.4 is a bug-fix release - a nasty symbol clash was preventing Tioga from running
 on MacOS X.3. This should now be fixed. Moreover, the load time should improve a little bit on few 
 architectures.
+
+--------------------------
 
 	Version 1.1.3 provides a better integration of output within LaTeX
 documents. A tioga.sty file is now available, with many macros for figure
@@ -352,6 +382,8 @@ X,Y data. Not many features for now, but there's room for plenty more work.
 	FigureMaker has now functions for coordinate conversions:
 		convert_inches_to_output, convert_output_to_inches,
 		convert_mm_to_output, convert_output_to_mm
+
+--------------------------
 
 	Version 1.1.2 provides more complete control over page layout and font
 selection.  Here's a list of new features:
@@ -380,6 +412,8 @@ selection.  Here's a list of new features:
 			tex_preview_fontseries
 			tex_preview_fontshape
 
+--------------------------
+
 	Version 1.1.1 is the first Tioga to be called a "beta" release.  You can
 interpret that anyway you'd like, but to me it means Tioga has been around long
 enough and had enough use to justify inviting more folks to give it a try.
@@ -387,20 +421,26 @@ The "alpha" label is a warning to "proceed at your own risk", and only brave
 souls go ahead when they see that.  I think Tioga has gotten stable enough
 that we can drop the "threat level" down a notch.  (Fingers crossed of course!)
 
+--------------------------
 
 	Version 1.1.0 splits off the Dvector & Dtable modules from the FigureMaker so
 that they can be used in other packages (Vincent Fourmond both suggested this and
 did the work to make it happen).
 
+--------------------------
 
     Version 1.0.M no longer raises error for calls on 'stroke', 'fill', and such with an empty path.
 It has also been reconfigured to support the new Mac GUI which now works with both PowerPC and Intel
 processors.
 
+--------------------------
+
     Version 1.0.L adds 'transparency' as a synonym for (1.0 - opacity).  So
 now you can set 'fill_transparency' to 0.3 instead of setting 'fill_opacity'
 to 0.7.  I'm sure that makes your day.  The documentation has also been
 updated of course.
+
+--------------------------
 
     Version 1.0.K was Vincent Fourmond's fault!  The same day that J was released,
 he sent me an email pointing out an oversight in the legend functionality.

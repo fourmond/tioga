@@ -4418,7 +4418,7 @@ VALUE Read_Dvectors(char *filename, VALUE destinations, int first_row_of_file, i
          
          if (!is_okay_number(v)) {
             fclose(file);
-            rb_raise(rb_eArgError, "ERROR: read found non-numeric value in line %i of %s -- %s", i, filename, num_str);
+            rb_raise(rb_eArgError, "ERROR: bad value %g in line %i of %s -- %s", v, i, filename, num_str);
          }
          if (row >= d->capa) 
             Dvector_Store_Double(col_obj, row, v);
@@ -4529,7 +4529,7 @@ VALUE Read_Rows_of_Dvectors(char *filename, VALUE destinations, int first_row_of
 
          if (!is_okay_number(v)) {
             fclose(file);
-            rb_raise(rb_eArgError, "ERROR: non-finite value in file %s", filename);
+            rb_raise(rb_eArgError, "ERROR: bad value %g in line i% of file %s", v, i, filename);
          }
          if (col < d->capa) { row_data[col] = v; d->len = col+1; }
          else {
@@ -4622,7 +4622,7 @@ VALUE Read_Row(char *filename, int row, VALUE row_ary) {
 
       if (!is_okay_number(v)) {
          fclose(file);
-         rb_raise(rb_eArgError, "ERROR: non-finite value in file %s", filename);
+         rb_raise(rb_eArgError, "ERROR: bad value %g in line %i of file %s", v, i, filename);
       }
       Dvector_Store_Double(row_ary, col, v);
    }

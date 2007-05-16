@@ -468,6 +468,63 @@ class X_and_Y_Axes < Doc < FigureMaker
    def xaxis_numeric_label_justification
    end
 
+
+
+
+# :call-seq:
+#               xaxis_numeric_label_frequency
+#               xaxis_numeric_label_frequency = an_integer
+#
+# The #frequency setting for numeric labels on the x axis.
+# Major ticks are numbered from 0 at the small x end of the axis.  Tick number k gets a
+# label only if mod(i+j,k)==0 where j=xaxis_numeric_label_phase
+# and k=xaxis_numeric_label_frequency.
+# The default for xaxis_numeric_label_frequency is 1 so that
+# every major tick gets a label.
+# See also xaxis_numeric_label_phase.
+   def xaxis_numeric_label_frequency
+   end
+
+# :call-seq:
+#               xaxis_numeric_label_phase
+#               xaxis_numeric_label_phase = an_integer
+#
+# The #phase setting for numeric labels on the x axis.
+# The default phase is 0.
+# See xaxis_numeric_label_frequency for details.
+   def xaxis_numeric_label_phase
+   end
+
+
+
+
+# :call-seq:
+#               yaxis_numeric_label_frequency
+#               yaxis_numeric_label_frequency = an_integer
+#
+# The #frequency setting for numeric labels on the y axis.
+# Major ticks are numbered from 0 at the small y end of the axis.  Tick number k gets a
+# label only if mod(i+j,k)==0 where j=yaxis_numeric_label_phase
+# and k=yaxis_numeric_label_frequency.
+# The default for yaxis_numeric_label_frequency is 1 so that
+# every major tick gets a label.
+# See also yaxis_numeric_label_phase.
+   def yaxis_numeric_label_frequency
+   end
+
+# :call-seq:
+#               yaxis_numeric_label_phase
+#               yaxis_numeric_label_phase = an_integer
+#
+# The #phase setting for numeric labels on the y axis.
+# The default phase is 0.
+# See yaxis_numeric_label_frequency for details.
+   def yaxis_numeric_label_phase
+   end
+
+
+
+
 # :call-seq:
 #               yaxis_visible
 #               yaxis_visible = false

@@ -50,11 +50,10 @@ The following small file takes care of creating the pdfs for the movie.
                       @have_data = false
                       puts "\n" + fname
                       t.make_pdf(plot_number)
-                      pdf_name = t.figure_pdfs(plot_number)
+                      pdf_name = t.figure_pdf(plot_number)
                       name = pdf_name[0..-5] # remove the '.pdf'
                       name = append_sequence_number_to_name(name, n)
                       syscmd = 'mv ' + pdf_name + ' ' + name + '.pdf'
-                      puts syscmd
                       system(syscmd)
                   rescue
                       # end up here if the File.open failed
@@ -80,7 +79,7 @@ The following small file takes care of creating the pdfs for the movie.
  
       end
 
-      ProfilePlots.new.run('movie_out', '../run/models/model_', '.log')
+      ProfilePlots.new('../run/EZ_status.log').run('movie_out', '../run/models/model_', '.log')
 
 This file adds a 'run' method to my ProfilePlots class that goes through the run/models
 directory and creates a pdf file for each model.  The first argument to run, 'movie_save_dir',

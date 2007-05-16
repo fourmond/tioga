@@ -46,6 +46,8 @@ typedef struct {
    double numeric_label_angle;
    int numeric_label_alignment;
    int numeric_label_justification;
+   int numeric_label_frequency;
+   int numeric_label_phase;
    int numeric_label_decimal_digits; // set to 0 to use default
    double *majors; /* if not NULL, then points to array of places where major ticks should appear (in figure coords) */
    int nmajors; /* if majors != NULL, then this tells how many entries it contains */
@@ -125,6 +127,8 @@ static void Get_xaxis_Specs(FM *p, PlotAxis *s)
    s->numeric_label_angle = p->xaxis_numeric_label_angle;
    s->numeric_label_alignment = p->xaxis_numeric_label_alignment;
    s->numeric_label_justification = p->xaxis_numeric_label_justification;
+   s->numeric_label_frequency = p->xaxis_numeric_label_frequency;
+   s->numeric_label_phase = p->xaxis_numeric_label_phase;
 }
 
 static void Get_yaxis_Specs(FM *p, PlotAxis *s)
@@ -154,6 +158,8 @@ static void Get_yaxis_Specs(FM *p, PlotAxis *s)
    s->numeric_label_angle = p->yaxis_numeric_label_angle;
    s->numeric_label_alignment = p->yaxis_numeric_label_alignment;
    s->numeric_label_justification = p->yaxis_numeric_label_justification;
+   s->numeric_label_frequency = p->yaxis_numeric_label_frequency;
+   s->numeric_label_phase = p->yaxis_numeric_label_phase;
 }
 
 /*======================================================================*/
@@ -381,18 +387,24 @@ static char **Get_Labels(FM *p, PlotAxis *s)
 {
    char **labels = (char **)ALLOC_N(char *, s->nmajors);
    char postfix[50], *ps;
-   int i;
+   int i, k, j;
+   k = s->numeric_label_frequency;
+   j = s->numeric_label_phase;
    if (s->tick_labels==Qnil) { // create label strings
       int mode, prec, scale;
       Pick_Label_Precision(s->axis_min, s->axis_max, s->interval, s->use_fixed_pt, &mode, &prec, s->digits_max, &scale);
-      int i, upper_right = (s->reversed)? 0 : s->nmajors-1, lower_left = (s->reversed)? s->nmajors-1 : 0;
+      int i;
+      int upper_right = (s->reversed)? 0 : s->nmajors-1;
+      int lower_left = (s->reversed)? s->nmajors-1 : 0;
       for (i = 0; i < s->nmajors; i++) {
          ps = NULL;
          if (i == upper_right && !s->log_values && mode && scale)
             sprintf(ps = postfix, 
                 (s->vertical)? "$\\times$\\tiogayaxisnumericlabel{10^{%d}}" : "$\\times$\\tiogaxaxisnumericlabel{10^{%d}}", 
                 scale);
-         if (i == lower_left && s->nmajors >= 2 && s->vertical && 
+         if ((i+j) % k != 0) {
+            labels[i] = NULL;
+         } else if (i == lower_left && s->nmajors >= 2 && s->vertical && 
                 (s->majors[i] == ((s->reversed)? s->axis_max : s->axis_min)) &&
                 (s->other_axis_type == AXIS_WITH_MAJOR_TICKS_AND_NUMERIC_LABELS ||
                  s->other_axis_type == AXIS_WITH_TICKS_AND_NUMERIC_LABELS)) {

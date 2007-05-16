@@ -228,6 +228,8 @@ void Initialize_Figure(VALUE fmkr) {
    p->xaxis_numeric_label_angle = 0.0;
    p->xaxis_numeric_label_alignment = ALIGNED_AT_MIDHEIGHT;
    p->xaxis_numeric_label_justification = CENTERED;
+   p->xaxis_numeric_label_frequency = 1;
+   p->xaxis_numeric_label_phase = 0;
    p->top_edge_type = EDGE_WITH_TICKS;
    p->top_edge_visible = true;
    p->bottom_edge_type = EDGE_WITH_TICKS;
@@ -263,6 +265,8 @@ void Initialize_Figure(VALUE fmkr) {
    p->yaxis_numeric_label_angle = 0.0;
    p->yaxis_numeric_label_alignment = ALIGNED_AT_MIDHEIGHT;
    p->yaxis_numeric_label_justification = CENTERED;
+   p->yaxis_numeric_label_frequency = 1;
+   p->yaxis_numeric_label_phase = 0;
    p->left_edge_type = EDGE_WITH_TICKS;
    p->left_edge_visible = true;
    p->right_edge_type = EDGE_WITH_TICKS;

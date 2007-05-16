@@ -1531,9 +1531,10 @@ PRIVATE
 /*======================================================================*/ VALUE Read_Dtable(VALUE dest, char *filename, int skip_lines) {
    FILE *file = NULL;
    long num_cols, num_rows;
-   int i, j, k;
+   int i, j, k, len;
    const int buff_len = 10000;
-   char c, buff[buff_len], *p, *pend;
+   const int err_len = 100;
+   char c, buff[buff_len], *p, *pend, err_str[err_len];
    double *data, **ptr = Dtable_Ptr(dest, &num_cols, &num_rows);
    if ((file=fopen(filename,"r")) == NULL)
       rb_raise(rb_eArgError, "failed to open %s", filename);
@@ -1571,9 +1572,12 @@ PRIVATE
          }
          if (!is_okay_number(data[j])) {
             fclose(file);
+            len = (pend-buff < err_len-1)? pend-buff : err_len-1;
+            printf("len %i\n", len);
+            strncpy(err_str,buff,len);
             rb_raise(rb_eArgError,
-               "reached end of file before reading requested amount of data in %s (asked for %i xs and %i ys; found only %i and %i)",
-               filename, num_cols, num_rows, i+1, j);
+               "failed to read requested amount of data in %s (asked for %i xs and %i ys; found only %i and %i). last attempt to read got %g from string starting with: %s",
+               filename, num_cols, num_rows, i+1, j, data[j], err_str);
          }
       }
    }

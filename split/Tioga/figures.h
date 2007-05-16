@@ -233,6 +233,8 @@ typedef struct {
     double xaxis_numeric_label_angle;
     int xaxis_numeric_label_alignment;
     int xaxis_numeric_label_justification;
+    int xaxis_numeric_label_frequency;
+    int xaxis_numeric_label_phase;
     // note that the top and bottom edges and drawn in addition to the x axis.
     // if the edge type specifies ticks, the ticks match those of the x axis.
     bool top_edge_visible;
@@ -270,6 +272,8 @@ typedef struct {
     double yaxis_numeric_label_angle;
     int yaxis_numeric_label_alignment;
     int yaxis_numeric_label_justification;
+    int yaxis_numeric_label_frequency;
+    int yaxis_numeric_label_phase;
     // note that the left and right edges and drawn in addition to the y axis.
     // if the edge type specifies ticks, the ticks match those of the y axis.
     int left_edge_type;
