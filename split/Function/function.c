@@ -640,7 +640,7 @@ static VALUE function_strip_nan(VALUE self)
 }
 
 /*
-  Splits the function into monotonic sub-functions.
+  Splits the function into strictly monotonic sub-functions.
   Returns the array of the subfunctions. The returned values are
   necessarily new values.
 */
@@ -680,7 +680,7 @@ static VALUE function_split_monotonic(VALUE self)
 
   for(i = 2; i < size; i++) 
     {
-      if(direction * (x[i] - last_x) < 0) 
+      if(direction * (x[i] - last_x) <= 0) 
 	{
 	  /* we need to add a new set of Dvectors */
 	  f = Function_Create(cur_x, cur_y);
