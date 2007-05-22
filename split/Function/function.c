@@ -687,8 +687,13 @@ static VALUE function_split_monotonic(VALUE self)
 	  rb_ary_push(ret, f);
 	  cur_x = Dvector_Create();
 	  cur_y = Dvector_Create();
-	  Dvector_Push_Double(cur_x, x[i-1]);
-	  Dvector_Push_Double(cur_y, y[i-1]);
+	  /* We don't store the previous point if 
+	   the X value is the same*/
+	  if(x[i] != last_x) 
+	    {
+	      Dvector_Push_Double(cur_x, x[i-1]);
+	      Dvector_Push_Double(cur_y, y[i-1]);
+	    }
 	  direction *= -1;
 	}
       /* store the current point */
@@ -927,6 +932,40 @@ static VALUE function_size(VALUE self)
   return LONG2NUM(size);
 }
 
+/* 
+   Fuzzy substraction of two curves. Substracts the Y values of _op_ to
+   the current Function, by making sure that the Y value substracted to
+   a given point corresponds to the closest X_ value of the point in _op_.
+   This function somehow assumes that the data is reasonably organised,
+   and will never go backwards to find a matching X value in _op_.
+
+   In any case, you really should consider using split_monotonic on it first.
+ */
+
+static VALUE function_fuzzy_substract(VALUE self, VALUE op)
+{
+  long ss = function_sanity_check(self);
+  const double *xs = Dvector_Data_for_Read(get_x_vector(self),NULL);
+  double *ys = Dvector_Data_for_Write(get_y_vector(self),NULL);
+  long so = function_sanity_check(op);
+  const double *xo = Dvector_Data_for_Read(get_x_vector(op),NULL);
+  const double *yo = Dvector_Data_for_Read(get_y_vector(op),NULL);
+  long i,j = 0;
+  double diff;
+  double fuzz = 0; 		/* The actual sum of the terms */
+  
+  for(i = 0; i < ss; i++) 
+    {
+      /* We first look for the closest point */
+      diff = fabs(xs[i] - xo[j]);
+      while((j < (so - 1)) && (fabs(xs[i] - xo[j+1]) <  diff))
+	diff = fabs(xs[i] - xo[++j]);
+      fuzz += diff;
+      ys[i] -= yo[j];
+    }
+  return rb_float_new(fuzz);
+}
+
 /*
   Document-class: Dobjects::Function
 
@@ -941,6 +980,9 @@ static VALUE function_size(VALUE self)
   - some utiliy functions: #split_monotonic, #strip_nan;
   - data inspection: #min, #max;
   - some computational functions: #integrate, #primitive, #derivative.
+  - utility for fuzzy operations, when the X values of two functions
+    differ, but only slightly, of when points are missing: 
+    #fuzzy_sub!
 
   And getting bigger everyday...
  */ 
@@ -1002,6 +1044,11 @@ void Init_Function()
 
   /* distance to a point */
   rb_define_method(cFunction, "distance", function_distance, -1);
+
+  /* Fuzzy operations */
+  rb_define_method(cFunction, "fuzzy_sub!", 
+		   function_fuzzy_substract, 1); /* Substraction */
+  
 
 
   /* a few more methods better written in pure Ruby */

@@ -107,5 +107,13 @@ class TestFunction < Test::Unit::TestCase
     assert_equal(f.distance(1,0), 1.0)
   end
 
+  def test_fuzzy_ops
+    f = Function.new(Dvector[1,2,3,4],Dvector[1,2,3,4])
+    g = Function.new(Dvector[1,2,4],Dvector[1,2,3])
+    a = g.fuzzy_sub!(f)
+    assert_equal(a,0.0)
+    assert_equal(g.y,  Dvector[0,0,-1])
+  end
+
   # There is unfortunately no simple way to test the interpolations...
 end
