@@ -102,7 +102,7 @@ static bool Is_monochrome(int obj_num)
 static void Write_Image_From_File(char *filename, int width, int height, char *out_info, int mask_obj_num)
 {
    FILE *jpg = fopen(filename, "r");
-   if (jpg == NULL) rb_raise(rb_eArgError, "Sorry: cannot open file for showing image (%s)\n", filename);
+   if (jpg == NULL) RAISE_ERROR_s("Sorry: cannot open file for showing image (%s)\n", filename);
    unsigned char *buff;
    int len, rd_len;
    int buff_len = 256000;
@@ -177,7 +177,7 @@ void Write_Sampled(Sampled_Info *xo)
    }
    if (xo->mask_obj_num > 0) {
       if (xo->image_type == MONO_IMAGE)
-         rb_raise(rb_eArgError, "Sorry: monochrome images must not have masks");
+         RAISE_ERROR("Sorry: monochrome images must not have masks");
       if (!Is_monochrome(xo->mask_obj_num)) fprintf(OF, "\t/SMask %i 0 R\n", xo->mask_obj_num);
       else fprintf(OF, "\t/Mask %i 0 R\n", xo->mask_obj_num);
    }
@@ -188,12 +188,12 @@ void Write_Sampled(Sampled_Info *xo)
    buffer = ALLOC_N(unsigned char, new_len);
    if (flate_compress(buffer, &new_len, xo->image_data, xo->length) != FLATE_OK) {
       free(buffer);
-      rb_raise(rb_eArgError, "Error compressing image data");
+      RAISE_ERROR("Error compressing image data");
    }
    fprintf(OF, "\t/Length %li\n", new_len);
    fprintf(OF, "\t>>\nstream\n");
    if (fwrite(buffer, 1, new_len, OF) < new_len)
-      rb_raise(rb_eArgError, "Error writing image data");
+      RAISE_ERROR("Error writing image data");
    free(buffer);
    fprintf(OF, "\nendstream\nendobj\n");
 }
@@ -208,13 +208,11 @@ void Create_Transform_from_Points( // transform maps (0,0), (1,0), and (0,1) to 
 
 void Get_Image_Dest(FM *p, VALUE image_destination, double *dest)
 {
-   image_destination = rb_Array(image_destination);
-   if (RARRAY(image_destination)->len != 6)
-      rb_raise(rb_eArgError, "Sorry: invalid image destination array: must have 6 entries");
+   if (Array_Len(image_destination) != 6)
+      RAISE_ERROR("Sorry: invalid image destination array: must have 6 entries");
    int i;
    for (i = 0; i < 6; i++) {
-      VALUE entry = rb_ary_entry(image_destination, i);
-      entry = rb_Float(entry);
+      VALUE entry = Array_Entry(image_destination, i);
       if (i % 2 == 0)
          dest[i] = convert_figure_to_output_x(p,NUM2DBL(entry));
       else
@@ -254,13 +252,9 @@ VALUE FM_private_show_jpg(VALUE fmkr, VALUE filename, VALUE width, VALUE height,
 {
    double dest[6];
    FM *p = Get_FM(fmkr);
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling show_jpg");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling show_jpg");
    Get_Image_Dest(p, image_destination, dest);
-   width = rb_Integer(width);
-   height = rb_Integer(height);
-   mask_obj_num = rb_Integer(mask_obj_num);
-   filename = rb_String(filename);
-   c_show_jpg(p, RSTRING_PTR(filename), NUM2INT(width), NUM2INT(height), dest, NUM2INT(mask_obj_num));
+   c_show_jpg(p, String_Ptr(filename), NUM2INT(width), NUM2INT(height), dest, NUM2INT(mask_obj_num));
    return fmkr;
 }
 
@@ -270,27 +264,27 @@ VALUE c_private_create_image_data(FM *p, double **data, long num_cols, long num_
 {
    if (first_column < 0) first_column += num_cols;
    if (first_column < 0 || first_column >= num_cols)
-      rb_raise(rb_eArgError, "Sorry: invalid first_column specification (%i)", first_column);
+      RAISE_ERROR_i("Sorry: invalid first_column specification (%i)", first_column);
    if (last_column < 0) last_column += num_cols;
    if (last_column < 0 || last_column >= num_cols)
-      rb_raise(rb_eArgError, "Sorry: invalid last_column specification (%i)", last_column);
+      RAISE_ERROR_i("Sorry: invalid last_column specification (%i)", last_column);
    if (first_row < 0) first_row += num_rows;
    if (first_row < 0 || first_row >= num_rows)
-      rb_raise(rb_eArgError, "Sorry: invalid first_row specification (%i)", first_row);
+      RAISE_ERROR_i("Sorry: invalid first_row specification (%i)", first_row);
    if (last_row < 0) last_row += num_rows;
    if (last_row < 0 || last_row >= num_rows)
-      rb_raise(rb_eArgError, "Sorry: invalid last_row specification (%i)", last_row);
+      RAISE_ERROR_i("Sorry: invalid last_row specification (%i)", last_row);
    if (min_value >= max_value)
-      rb_raise(rb_eArgError, "Sorry: invalid range specification: min %g max %g", min_value, max_value);
+      RAISE_ERROR_gg("Sorry: invalid range specification: min %g max %g", min_value, max_value);
    if (max_code <= 0 || max_code > 255)
-      rb_raise(rb_eArgError, "Sorry: invalid max_code specification (%i)", max_code);
+      RAISE_ERROR_i("Sorry: invalid max_code specification (%i)", max_code);
    if (if_below_range < 0 || if_below_range > 255)
-      rb_raise(rb_eArgError, "Sorry: invalid if_below_range specification (%i)", if_below_range);
+      RAISE_ERROR_i("Sorry: invalid if_below_range specification (%i)", if_below_range);
    if (if_above_range < 0 || if_above_range > 255)
-      rb_raise(rb_eArgError, "Sorry: invalid if_above_range specification (%i)", if_above_range);
+      RAISE_ERROR_i("Sorry: invalid if_above_range specification (%i)", if_above_range);
    int i, j, k, width = last_column - first_column + 1, height = last_row - first_row + 1;
    int sz = width * height;
-   if (sz <= 0) rb_raise(rb_eArgError, "Sorry: invalid data specification: width (%i) height (%i)", width, height);
+   if (sz <= 0) RAISE_ERROR_ii("Sorry: invalid data specification: width (%i) height (%i)", width, height);
    char *buff = ALLOC_N(char, sz);
    for (k = 0, i = first_row; i <= last_row; i++) {
       double *row = data[i];
@@ -304,7 +298,7 @@ VALUE c_private_create_image_data(FM *p, double **data, long num_cols, long num_
          }
       }
    }
-   VALUE result = rb_str_new(buff, sz);
+   VALUE result = String_New(buff, sz);
    free(buff);
    return result;
 }
@@ -315,16 +309,7 @@ VALUE FM_private_create_image_data(VALUE fmkr, VALUE data,
 {
    FM *p = Get_FM(fmkr);
    long num_cols, num_rows;
-   double **ary = Dtable_Ptr(data, &num_cols, &num_rows);
-   first_row = rb_Integer(first_row);
-   last_row = rb_Integer(last_row);
-   first_column = rb_Integer(first_column);
-   last_column = rb_Integer(last_column);
-   max_code = rb_Integer(max_code);
-   if_below_range = rb_Integer(if_below_range);
-   if_above_range = rb_Integer(if_above_range);
-   min_value = rb_Float(min_value);
-   max_value = rb_Float(max_value);
+   double **ary = Table_Info(data, &num_cols, &num_rows);
    return c_private_create_image_data(p, ary, num_cols, num_rows, 
       NUM2INT(first_row), NUM2INT(last_row), NUM2INT(first_column), NUM2INT(last_column),
       NUM2DBL(min_value), NUM2DBL(max_value), NUM2INT(max_code), NUM2INT(if_below_range), NUM2INT(if_above_range));
@@ -336,19 +321,19 @@ static VALUE c_private_create_monochrome_image_data(FM *p, double **data, long n
 {
    if (first_column < 0) first_column += num_cols;
    if (first_column < 0 || first_column >= num_cols)
-      rb_raise(rb_eArgError, "Sorry: invalid first_column specification (%i)", first_column);
+      RAISE_ERROR_i("Sorry: invalid first_column specification (%i)", first_column);
    if (last_column < 0) last_column += num_cols;
    if (last_column < 0 || last_column >= num_cols)
-      rb_raise(rb_eArgError, "Sorry: invalid last_column specification (%i)", last_column);
+      RAISE_ERROR_i("Sorry: invalid last_column specification (%i)", last_column);
    if (first_row < 0) first_row += num_rows;
    if (first_row < 0 || first_row >= num_rows)
-      rb_raise(rb_eArgError, "Sorry: invalid first_row specification (%i)", first_row);
+      RAISE_ERROR_i("Sorry: invalid first_row specification (%i)", first_row);
    if (last_row < 0) last_row += num_rows;
    if (last_row < 0 || last_row >= num_rows)
-      rb_raise(rb_eArgError, "Sorry: invalid last_row specification (%i)", last_row);
+      RAISE_ERROR_i("Sorry: invalid last_row specification (%i)", last_row);
    int i, j, k, width = last_column - first_column + 1, height = last_row - first_row + 1, bytes_per_row = (width+7)/8;
    int sz = bytes_per_row * 8 * height;
-   if (sz <= 0) rb_raise(rb_eArgError, "Sorry: invalid data specification: width (%i) height (%i)", width, height);
+   if (sz <= 0) RAISE_ERROR_ii("Sorry: invalid data specification: width (%i) height (%i)", width, height);
    // to simplify the process, do it in two stages: first get the values and then pack the bits
    char *buff = ALLOC_N(char, sz);
    for (k = 0, i = first_row; i <= last_row; i++) {
@@ -374,7 +359,7 @@ static VALUE c_private_create_monochrome_image_data(FM *p, double **data, long n
       }
    }
    bits[k] = c;
-   VALUE result = rb_str_new(bits, num_bytes);
+   VALUE result = String_New(bits, num_bytes);
    free(bits); free(buff);
    return result;
 }
@@ -385,12 +370,7 @@ VALUE FM_private_create_monochrome_image_data(VALUE fmkr, VALUE data,
 {
    FM *p = Get_FM(fmkr);
    long num_cols, num_rows;
-   double **ary = Dtable_Ptr(data, &num_cols, &num_rows);
-   first_row = rb_Integer(first_row);
-   last_row = rb_Integer(last_row);
-   first_column = rb_Integer(first_column);
-   last_column = rb_Integer(last_column);
-   boundary = rb_Float(boundary);
+   double **ary = Table_Info(data, &num_cols, &num_rows);
    return c_private_create_monochrome_image_data(p, ary, num_cols, num_rows, 
       NUM2INT(first_row), NUM2INT(last_row), NUM2INT(first_column), NUM2INT(last_column),
       NUM2DBL(boundary), reverse != Qfalse);
@@ -417,7 +397,7 @@ int c_private_show_image(FM *p, int image_type, double *dest, bool interpolate, 
    if (image_type != COLORMAP_IMAGE) xo->lookup = NULL;
    else {
       if ((hival+1)*3 > lookup_len)
-         rb_raise(rb_eArgError, "Sorry: color space hival (%i) is too large for length of lookup table (%i)", hival, lookup_len);
+         RAISE_ERROR_ii("Sorry: color space hival (%i) is too large for length of lookup table (%i)", hival, lookup_len);
       xo->hival = hival;
       lookup_len = (hival+1) * 3;
       xo->lookup = ALLOC_N(unsigned char, lookup_len);
@@ -470,25 +450,13 @@ static VALUE private_show_image(int image_type, VALUE fmkr, VALUE llx, VALUE lly
    unsigned char *lookup_str=NULL;
    int mask_min = 256, mask_max = 256, lookup_len=0, hivalue=0;
    FM *p = Get_FM(fmkr);
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling show_image");
-   data = rb_String(data);
-   llx = rb_Float(llx);
-   lly = rb_Float(lly);
-   lrx = rb_Float(lrx);
-   lry = rb_Float(lry);
-   ulx = rb_Float(ulx);
-   uly = rb_Float(uly);
-   w = rb_Integer(w);
-   h = rb_Integer(h);
-   mask_obj_num = rb_Integer(mask_obj_num);
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling show_image");
    if (image_type == COLORMAP_IMAGE) {
-      value_mask_min = rb_Integer(value_mask_min); mask_min = NUM2INT(value_mask_min);
-      value_mask_max = rb_Integer(value_mask_max); mask_max = NUM2INT(value_mask_max);
-      hival = rb_Integer(hival);
+      mask_min = NUM2INT(value_mask_min);
+      mask_max = NUM2INT(value_mask_max);
       hivalue = NUM2INT(hival);
-      lookup = rb_String(lookup);
-      lookup_str = (unsigned char *)(RSTRING_PTR(lookup));
-      lookup_len = RSTRING_LEN(lookup);
+      lookup_str = (unsigned char *)(String_Ptr(lookup));
+      lookup_len = String_Len(lookup);
    }
    dest[0] = convert_figure_to_output_x(p,NUM2DBL(llx));
    dest[1] = convert_figure_to_output_y(p,NUM2DBL(lly));
@@ -497,7 +465,7 @@ static VALUE private_show_image(int image_type, VALUE fmkr, VALUE llx, VALUE lly
    dest[4] = convert_figure_to_output_x(p,NUM2DBL(ulx));
    dest[5] = convert_figure_to_output_y(p,NUM2DBL(uly));
    int obj_num = c_private_show_image(p, image_type, dest, (interpolate != Qfalse), (reversed == Qtrue), NUM2INT(w), NUM2INT(h), 
-      (unsigned char *)RSTRING_PTR(data), RSTRING_LEN(data), mask_min, mask_max, hivalue, lookup_str, lookup_len, NUM2INT(mask_obj_num));
+      (unsigned char *)String_Ptr(data), String_Len(data), mask_min, mask_max, hivalue, lookup_str, lookup_len, NUM2INT(mask_obj_num));
    return INT2FIX(obj_num);
 }
 

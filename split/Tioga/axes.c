@@ -25,7 +25,9 @@ typedef struct {
    int type;
    int other_axis_type;
    double line_width;
-   VALUE stroke_color;
+   double stroke_color_R;
+   double stroke_color_G;
+   double stroke_color_B;
    double major_tick_width; // same units as line_width
    double minor_tick_width; // same units as line_width
    double major_tick_length; // in units of numeric label char heights
@@ -67,7 +69,8 @@ typedef struct {
 
 static void Init_PlotAxis_struct(PlotAxis *s) {
    s->free_majors = s->free_strings_for_labels = false;
-   s->stroke_color = s->locations_for_major_ticks = s->locations_for_minor_ticks = s->tick_labels = Qnil;
+   s->locations_for_major_ticks = s->locations_for_minor_ticks = s->tick_labels = Qnil;
+   s->stroke_color_R = 0.0; s->stroke_color_G = 0.0; s->stroke_color_B = 0.0; 
    s->majors = NULL;
    s->labels = NULL;
 }
@@ -105,7 +108,9 @@ static void Get_xaxis_Specs(FM *p, PlotAxis *s)
    s->type = p->xaxis_type;
    s->other_axis_type = p->yaxis_type;
    s->line_width = p->xaxis_line_width; // for axis line
-   s->stroke_color = p->xaxis_stroke_color; // for axis line and tick marks
+   s->stroke_color_R = p->xaxis_stroke_color_R; // for axis line and tick marks
+   s->stroke_color_G = p->xaxis_stroke_color_G;
+   s->stroke_color_B = p->xaxis_stroke_color_B;
    s->major_tick_width = p->xaxis_major_tick_width; // same units as line_width
    s->minor_tick_width = p->xaxis_minor_tick_width; // same units as line_width
    s->major_tick_length = p->xaxis_major_tick_length; // in units of numeric label char heights
@@ -116,11 +121,13 @@ static void Get_xaxis_Specs(FM *p, PlotAxis *s)
    s->tick_interval = p->xaxis_tick_interval; // set to 0 to use default
    s->min_between_major_ticks = p->xaxis_min_between_major_ticks; // in units of numeric label char heights
    s->number_of_minor_intervals = p->xaxis_number_of_minor_intervals; // set to 0 to use default
-   s->locations_for_major_ticks = p->xaxis_locations_for_major_ticks; // set to nil to use defaults
-   s->locations_for_minor_ticks = p->xaxis_locations_for_minor_ticks; // set to nil to use defaults
+   
+   s->locations_for_major_ticks = Get_xaxis_locations_for_major_ticks(p->fm);
+   s->locations_for_minor_ticks = Get_xaxis_locations_for_minor_ticks(p->fm);
+
    s->use_fixed_pt = p->xaxis_use_fixed_pt;
    s->digits_max = p->xaxis_digits_max;
-   s->tick_labels = p->xaxis_tick_labels; // set to nil to use defaults. else must have a label for each major tick
+   s->tick_labels = Get_xaxis_tick_labels(p->fm);
    s->numeric_label_decimal_digits = p->xaxis_numeric_label_decimal_digits; // set to negative to use default
    s->numeric_label_scale = p->xaxis_numeric_label_scale;
    s->numeric_label_shift = p->xaxis_numeric_label_shift; // in char heights, positive for out from edge (or toward larger x or y value)
@@ -136,7 +143,9 @@ static void Get_yaxis_Specs(FM *p, PlotAxis *s)
    s->type = p->yaxis_type;
    s->other_axis_type = p->xaxis_type;
    s->line_width = p->yaxis_line_width; // for axis line
-   s->stroke_color = p->yaxis_stroke_color; // for axis line and tick marks
+   s->stroke_color_R = p->yaxis_stroke_color_R; // for axis line and tick marks
+   s->stroke_color_G = p->yaxis_stroke_color_G;
+   s->stroke_color_B = p->yaxis_stroke_color_B;
    s->major_tick_width = p->yaxis_major_tick_width; // same units as line_width
    s->minor_tick_width = p->yaxis_minor_tick_width; // same units as line_width
    s->major_tick_length = p->yaxis_major_tick_length; // in units of numeric label char heights
@@ -147,11 +156,14 @@ static void Get_yaxis_Specs(FM *p, PlotAxis *s)
    s->tick_interval = p->yaxis_tick_interval; // set to 0 to use default
    s->min_between_major_ticks = p->yaxis_min_between_major_ticks; // in units of numeric label char heights
    s->number_of_minor_intervals = p->yaxis_number_of_minor_intervals; // set to 0 to use default
-   s->locations_for_major_ticks = p->yaxis_locations_for_major_ticks; // set to nil to use defaults
-   s->locations_for_minor_ticks = p->yaxis_locations_for_minor_ticks; // set to nil to use defaults
+   
+   s->locations_for_major_ticks = Get_yaxis_locations_for_major_ticks(p->fm);
+   s->locations_for_minor_ticks = Get_yaxis_locations_for_minor_ticks(p->fm);
+   //s->tick_labels = Get_yaxis_tick_labels(p->fm);
+   
    s->use_fixed_pt = p->yaxis_use_fixed_pt;
    s->digits_max = p->yaxis_digits_max;
-   s->tick_labels = p->yaxis_tick_labels; // set to nil to use defaults. else must have a label for each major tick
+   s->tick_labels = Get_yaxis_tick_labels(p->fm);
    s->numeric_label_decimal_digits = p->yaxis_numeric_label_decimal_digits; // set to negative to use default
    s->numeric_label_scale = p->yaxis_numeric_label_scale;
    s->numeric_label_shift = p->yaxis_numeric_label_shift; // in char heights, positive for out from edge (or toward larger x or y value)
@@ -296,8 +308,8 @@ static char *Create_Label(double value, int scale, int prec, bool log_values, bo
 }
 
 char *Get_String(VALUE ary, int index) {
-   VALUE string = rb_ary_entry(ary, index);
-   return StringValuePtr(string);
+   VALUE strobj = Array_Entry(ary,index);
+   return StringValuePtr(strobj);
 }
 
 #define MAX_FIXDIG_POS  6
@@ -415,11 +427,10 @@ static char **Get_Labels(FM *p, PlotAxis *s)
       }
       s->free_strings_for_labels = true;
    } else { // use the given label strings
-      VALUE ary = rb_Array(s->tick_labels);
-      if (RARRAY(ary)->len != s->nmajors)
-         rb_raise(rb_eArgError, "Sorry: must have same number of labels as major ticks");
+      if (Array_Len(s->tick_labels) != s->nmajors)
+         RAISE_ERROR("Sorry: must have same number of labels as major ticks");
       for (i = 0; i < s->nmajors; i++) {
-         labels[i] = Get_String(ary, i);
+         labels[i] = Get_String(s->tick_labels, i);
       }
       s->free_strings_for_labels = false;
    }
@@ -513,7 +524,7 @@ static void Pick_Major_Tick_Interval(FM *p, double tick_min, double tick_gap, do
    else { // check the given interval compared to the default
       *tick = ABS(*tick);
       if(*tick < 1.e-4*tick_reasonable) {
-         rb_raise(rb_eArgError, "Sorry: magnitude of specified tick interval (%g) is too small", *tick);
+         RAISE_ERROR_g("Sorry: magnitude of specified tick interval (%g) is too small", *tick);
       }
    }
 }
@@ -523,7 +534,7 @@ static void draw_major_ticks(FM *p, PlotAxis *s)
    s->num_minors = s->number_of_minor_intervals; 
    if (s->locations_for_major_ticks != Qnil) {
       long len;
-      s->majors = Dvector_Data_for_Read(s->locations_for_major_ticks, &len);
+      s->majors = Vector_Data_for_Read(s->locations_for_major_ticks, &len);
       s->nmajors = len;
       if (len > 1) {
         s->interval = s->majors[1] - s->majors[0];
@@ -583,7 +594,7 @@ static void draw_minor_ticks(FM *p, PlotAxis *s)
       c_line_width_set(p, s->line_width = s->minor_tick_width);
    if (s->locations_for_minor_ticks != Qnil) {
       long cnt;
-      double *locs = Dvector_Data_for_Read(s->locations_for_minor_ticks, &cnt);
+      double *locs = Vector_Data_for_Read(s->locations_for_minor_ticks, &cnt);
       for (i=0; i < cnt; i++) {
          if (s->vertical)
             figure_join(p, s->x0+inside, locs[i], s->x0+outside, locs[i]);
@@ -633,7 +644,9 @@ static void draw_numeric_labels(FM *p , VALUE fmkr, int location, PlotAxis *s)
 static void c_show_side(VALUE fmkr, FM *p, PlotAxis *s) {
    int i;
    if (s->type == AXIS_HIDDEN) return;
-   Start_Axis_Standard_State(p, s->stroke_color, s->line_width * p->default_line_scale);
+   Start_Axis_Standard_State(p, 
+      s->stroke_color_R, s->stroke_color_G, s->stroke_color_B, 
+      s->line_width * p->default_line_scale);
       // gsave, set line type and stroke color
    draw_axis_line(p, s->location, s);
    if (s->type == AXIS_LINE_ONLY) goto done;
@@ -664,7 +677,6 @@ VALUE FM_show_axis(VALUE fmkr, VALUE loc)
    PlotAxis axis;
    int location;
    Init_PlotAxis_struct(&axis);
-   loc = rb_Integer(loc);
    location = NUM2INT(loc);
    if (location == LEFT || location == RIGHT || location == AT_X_ORIGIN) {
       if (!p->yaxis_visible) goto done;
@@ -672,7 +684,7 @@ VALUE FM_show_axis(VALUE fmkr, VALUE loc)
    } else if (location == TOP || location == BOTTOM || location == AT_Y_ORIGIN) {
       if (!p->xaxis_visible) goto done;
       Get_xaxis_Specs(p, &axis);
-   } else rb_raise(rb_eArgError,
+   } else RAISE_ERROR_i(
          "Sorry: invalid 'loc' for axis: must be one of LEFT, RIGHT, TOP, BOTTOM, AT_X_ORIGIN, or AT_Y_ORIGIN: is (%i)", location);
    axis.location = location;
    c_show_side(fmkr, p, &axis);
@@ -685,7 +697,6 @@ VALUE FM_show_edge(VALUE fmkr, VALUE loc) {
    PlotAxis axis;
    int location;
    Init_PlotAxis_struct(&axis);
-   loc = rb_Integer(loc);
    location = NUM2INT(loc);
    switch (location) {
       case LEFT:
@@ -704,7 +715,7 @@ VALUE FM_show_edge(VALUE fmkr, VALUE loc) {
          if (!p->top_edge_visible) goto done;
          Get_xaxis_Specs(p, &axis); axis.type = p->top_edge_type;
          break;
-      default: rb_raise(rb_eArgError,
+      default: RAISE_ERROR_i(
          "Sorry: invalid 'loc' for edge: must be one of LEFT, RIGHT, TOP, or BOTTOM: is (%i)", location);
    }
    axis.location = location;

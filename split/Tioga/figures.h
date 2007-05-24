@@ -31,6 +31,7 @@
 #include "dtable.h"
 #include "ruby.h"
 #include "intern.h"
+#include "generic.h"
 
 #include <defs.h>
 
@@ -149,8 +150,12 @@ typedef struct {
 /* graphics attributes */
 
     /* color attributes */
-    VALUE stroke_color; // [r, g, b]
-    VALUE fill_color; // [r, g, b]
+    double stroke_color_R;
+    double stroke_color_G;
+    double stroke_color_B;
+    double fill_color_R;
+    double fill_color_G;
+    double fill_color_B;
     
     /* stroke attributes */
     double default_line_scale; // multipler for line_width
@@ -158,14 +163,12 @@ typedef struct {
     int line_cap;
     int line_join;
     double miter_limit;
-    VALUE line_type;  // [ dashArray dashPhase ] in points
     
     /* transparency */
     double stroke_opacity;
     double fill_opacity;
     
     /* Title */
-    VALUE title; // text
     bool title_visible;
     int title_side;
     double title_position;
@@ -175,10 +178,11 @@ typedef struct {
     double title_angle;
     int title_alignment;
     int title_justification;
-    VALUE title_color;
+    double title_color_R;
+    double title_color_G;
+    double title_color_B;
     
     /* X label */
-    VALUE xlabel; // text
     bool xlabel_visible;
     double xlabel_position; // xlabel side is given by xaxis_loc
     
@@ -188,10 +192,11 @@ typedef struct {
     int xlabel_side;
     int xlabel_alignment;
     int xlabel_justification;
-    VALUE xlabel_color;
+    double xlabel_color_R;
+    double xlabel_color_G;
+    double xlabel_color_B;
     
     /* Y label */
-    VALUE ylabel; // text
     bool ylabel_visible;
     double ylabel_position; // ylabel side is given by yaxis_loc
     
@@ -201,7 +206,9 @@ typedef struct {
     int ylabel_side;
     int ylabel_alignment;
     int ylabel_justification;
-    VALUE ylabel_color;
+    double ylabel_color_R;
+    double ylabel_color_G;
+    double ylabel_color_B;
     
     /* X axis */
     bool xaxis_visible;
@@ -209,7 +216,9 @@ typedef struct {
     int xaxis_loc;
     // line
     double xaxis_line_width; // for axis line
-    VALUE xaxis_stroke_color; // for axis line and tick marks
+    double xaxis_stroke_color_R; // for axis line and tick marks
+    double xaxis_stroke_color_G;
+    double xaxis_stroke_color_B;
     // tick marks
     double xaxis_major_tick_width; // same units as line_width
     double xaxis_minor_tick_width; // same units as line_width
@@ -221,12 +230,9 @@ typedef struct {
     double xaxis_tick_interval; // set to 0 to use default
     double xaxis_min_between_major_ticks; // in units of numeric label char heights
     int xaxis_number_of_minor_intervals; // set to 0 to use default
-    VALUE xaxis_locations_for_major_ticks; // set to nil to use defaults
-    VALUE xaxis_locations_for_minor_ticks; // set to nil to use defaults
     // numeric labels on major ticks
     bool xaxis_use_fixed_pt;
     int xaxis_digits_max;
-    VALUE xaxis_tick_labels; // set to nil to use defaults. else must have a label for each major tick
     int xaxis_numeric_label_decimal_digits; // set to negative to use default
     double xaxis_numeric_label_scale;
     double xaxis_numeric_label_shift; // in char heights, positive for out from edge (or toward larger x or y value)
@@ -248,7 +254,9 @@ typedef struct {
     int yaxis_loc;
     // line
     double yaxis_line_width; // for axis line
-    VALUE yaxis_stroke_color; // for axis line and tick marks
+    double yaxis_stroke_color_R; // for axis line and tick marks
+    double yaxis_stroke_color_G;
+    double yaxis_stroke_color_B;
     // tick marks
     double yaxis_major_tick_width; // same units as line_width
     double yaxis_minor_tick_width; // same units as line_width
@@ -260,12 +268,9 @@ typedef struct {
     double yaxis_tick_interval; // set to 0 to use default
     double yaxis_min_between_major_ticks; // in units of numeric label char heights
     int yaxis_number_of_minor_intervals; // set to 0 to use default
-    VALUE yaxis_locations_for_major_ticks; // set to nil to use defaults
-    VALUE yaxis_locations_for_minor_ticks; // set to nil to use defaults
     // numeric labels on major ticks
     bool yaxis_use_fixed_pt;
     int yaxis_digits_max;
-    VALUE yaxis_tick_labels; // set to nil to use defaults. else must have a label for each major tick
     int yaxis_numeric_label_decimal_digits; // set to negative to use default
     double yaxis_numeric_label_scale;
     double yaxis_numeric_label_shift; // in char heights, positive for out from edge (or toward larger x or y value)
@@ -313,9 +318,6 @@ extern char *data_dir;
 
 extern FM *Get_FM(VALUE fmkr);
 extern bool Is_FM(VALUE fmkr);
-
-#define SAVE_STATE FM saved = *p;
-#define RESTORE_STATE *p = saved;
 
 /*======================================================================*/
 
@@ -509,8 +511,12 @@ extern VALUE FM_check_label_clip(VALUE fmkr, VALUE xloc, VALUE yloc);
 /* PDF graphics */
 
     /* graphics attributes */
+
+extern VALUE FM_stroke_color_get(VALUE fmkr);
 extern VALUE FM_stroke_color_set(VALUE fmkr, VALUE value);
+extern VALUE FM_fill_color_get(VALUE fmkr);
 extern VALUE FM_fill_color_set(VALUE fmkr, VALUE value);
+
 extern VALUE FM_line_width_set(VALUE fmkr, VALUE value);
 extern VALUE FM_stroke_scale_set(VALUE fmkr, VALUE value);
 extern VALUE FM_line_cap_set(VALUE fmkr, VALUE value);
@@ -520,6 +526,23 @@ extern VALUE FM_line_type_set(VALUE fmkr, VALUE line_type);
 extern VALUE FM_stroke_opacity_set(VALUE fmkr, VALUE value);
 extern VALUE FM_fill_opacity_set(VALUE fmkr, VALUE value);
 extern VALUE FM_marker_horizontal_scaling_set(VALUE fmkr, VALUE value); // as fraction of normal width
+
+   /* colors */
+
+extern VALUE FM_title_color_get(VALUE fmkr);
+extern VALUE FM_title_color_set(VALUE fmkr, VALUE value);
+
+extern VALUE FM_xlabel_color_get(VALUE fmkr);
+extern VALUE FM_xlabel_color_set(VALUE fmkr, VALUE value);
+
+extern VALUE FM_ylabel_color_get(VALUE fmkr);
+extern VALUE FM_ylabel_color_set(VALUE fmkr, VALUE value);
+
+extern VALUE FM_xaxis_stroke_color_get(VALUE fmkr);
+extern VALUE FM_xaxis_stroke_color_set(VALUE fmkr, VALUE value);
+
+extern VALUE FM_yaxis_stroke_color_get(VALUE fmkr);
+extern VALUE FM_yaxis_stroke_color_set(VALUE fmkr, VALUE value);
 
     /*
         Once start a path, must finish with it before going on to anything else.
@@ -727,6 +750,7 @@ extern VALUE FM_private_create_monochrome_image_data(VALUE fmkr, VALUE data,
 
 /*======================================================================*/
 
+
 /* Some miscellaneous stuff */
 
 extern void figure_moveto(FM *p, double x, double y); // figure coords
@@ -775,6 +799,31 @@ extern void draw_box_top_and_bottom(FM *p, char *xopt, double xtick, int nxsub);
 extern void draw_box_left_and_right(FM *p, char *yopt, double ytick, int nysub);
 
 extern VALUE do_cmd(VALUE fmkr, VALUE cmd);
+
+/* access routines for some fmkr attributes */
+
+extern VALUE Get_line_type(VALUE fmkr);
+extern void Set_line_type(VALUE fmkr, VALUE v);
+
+
+extern VALUE Get_xaxis_tick_labels(VALUE fmkr);
+extern void Set_xaxis_tick_labels(VALUE fmkr, VALUE v);
+
+extern VALUE Get_xaxis_locations_for_major_ticks(VALUE fmkr);
+extern void Set_xaxis_locations_for_major_ticks(VALUE fmkr, VALUE v);
+
+extern VALUE Get_xaxis_locations_for_minor_ticks(VALUE fmkr);
+extern void Set_xaxis_locations_for_minor_ticks(VALUE fmkr, VALUE v);
+
+extern VALUE Get_yaxis_tick_labels(VALUE fmkr);
+extern void Set_yaxis_tick_labels(VALUE fmkr, VALUE v);
+
+extern VALUE Get_yaxis_locations_for_major_ticks(VALUE fmkr);
+extern void Set_yaxis_locations_for_major_ticks(VALUE fmkr, VALUE v);
+
+extern VALUE Get_yaxis_locations_for_minor_ticks(VALUE fmkr);
+extern void Set_yaxis_locations_for_minor_ticks(VALUE fmkr, VALUE v);
+
 
 extern char *Get_tex_preview_documentclass(VALUE fmkr);
 extern char *Get_tex_preamble(VALUE fmkr);

@@ -47,26 +47,25 @@ CROAK_ON_NONOK(p); return;}
 void Unpack_RGB(VALUE rgb, double *rp, double *gp, double *bp)
 {
    if (rgb == Qnil) { *rp = *gp = *bp = 0.0; return; }
-   rgb = rb_Array(rgb);
-   if (RARRAY(rgb)->len != 3) rb_raise(rb_eArgError, "Sorry: invalid rgb array for setting color: must have 3 entries");
-   VALUE entry = rb_ary_entry(rgb, 0);
-   entry = rb_Float(entry);
+   if (Array_Len(rgb) != 3) RAISE_ERROR("Sorry: invalid rgb array for setting color: must have 3 entries");
+   VALUE entry = Array_Entry(rgb, 0);
    double r = NUM2DBL(entry);
-   entry = rb_ary_entry(rgb, 1);
-   entry = rb_Float(entry);
+   entry = Array_Entry(rgb, 1);
    double g = NUM2DBL(entry);
-   entry = rb_ary_entry(rgb, 2);
-   entry = rb_Float(entry);
+   entry = Array_Entry(rgb, 2);
    double b = NUM2DBL(entry);
-   if (r < 0.0 || r > 1.0) rb_raise(rb_eArgError, "Sorry: invalid red (%g) for color: must be between 0 and 1", r);
-   if (g < 0.0 || g > 1.0) rb_raise(rb_eArgError, "Sorry: invalid green (%g) for color: must be between 0 and 1", g);
-   if (b < 0.0 || b > 1.0) rb_raise(rb_eArgError, "Sorry: invalid blue (%g) for color: must be between 0 and 1", b);
+   if (r < 0.0 || r > 1.0) RAISE_ERROR_g("Sorry: invalid red (%g) for color: must be between 0 and 1", r);
+   if (g < 0.0 || g > 1.0) RAISE_ERROR_g("Sorry: invalid green (%g) for color: must be between 0 and 1", g);
+   if (b < 0.0 || b > 1.0) RAISE_ERROR_g("Sorry: invalid blue (%g) for color: must be between 0 and 1", b);
    *rp = r; *gp = g; *bp = b;
 }
 
 void c_stroke_color_set(FM *p, double r, double g, double b)
 {
    if (writing_file) fprintf(TF, "%0.3f %0.3f %0.3f RG\n", r, g, b);
+   p->stroke_color_R = r;
+   p->stroke_color_G = g;
+   p->stroke_color_B = b;
 }
 
 VALUE FM_stroke_color_set(VALUE fmkr, VALUE value) // value is array of [r, g, b] intensities from 0 to 1
@@ -75,8 +74,29 @@ VALUE FM_stroke_color_set(VALUE fmkr, VALUE value) // value is array of [r, g, b
    double r, g, b;
    Unpack_RGB(value, &r, &g, &b);
    c_stroke_color_set(p, r, g, b);
-   p->stroke_color = value;
    return value;
+}
+
+VALUE FM_stroke_color_get(VALUE fmkr) // value is array of [r, g, b] intensities from 0 to 1
+{  // r g b RG
+   FM *p = Get_FM(fmkr);
+   double r, g, b;
+   r = p->stroke_color_R;
+   g = p->stroke_color_G;
+   b = p->stroke_color_B;
+   VALUE result = Array_New(3);
+   Array_Store(result, 0, Float_New(r));
+   Array_Store(result, 1, Float_New(g));
+   Array_Store(result, 2, Float_New(b));
+   return result;
+}
+
+void c_fill_color_set(FM *p, double r, double g, double b)
+{
+   if (writing_file) fprintf(TF, "%0.3f %0.3f %0.3f rg\n", r, g, b);
+   p->fill_color_R = r;
+   p->fill_color_G = g;
+   p->fill_color_B = b;
 }
 
 VALUE FM_fill_color_set(VALUE fmkr, VALUE value) // value is array of [r, g, b] intensities from 0 to 1
@@ -84,15 +104,28 @@ VALUE FM_fill_color_set(VALUE fmkr, VALUE value) // value is array of [r, g, b] 
    FM *p = Get_FM(fmkr);
    double r, g, b;
    Unpack_RGB(value, &r, &g, &b);
-   if (writing_file) fprintf(TF, "%0.3f %0.3f %0.3f rg\n", r, g, b);
-   p->fill_color = value;
+   c_fill_color_set(p, r, g, b);
    return value;
+}
+
+VALUE FM_fill_color_get(VALUE fmkr) // value is array of [r, g, b] intensities from 0 to 1
+{  // r g b RG
+   FM *p = Get_FM(fmkr);
+   double r, g, b;
+   r = p->fill_color_R;
+   g = p->fill_color_G;
+   b = p->fill_color_B;
+   VALUE result = Array_New(3);
+   Array_Store(result, 0, Float_New(r));
+   Array_Store(result, 1, Float_New(g));
+   Array_Store(result, 2, Float_New(b));
+   return result;
 }
 
 void c_line_width_set(FM *p, double line_width)
 {
-   if (line_width < 0.0) rb_raise(rb_eArgError, "Sorry: invalid line width (%g points): must be positive", line_width);
-   if (line_width > 1e3) rb_raise(rb_eArgError, "Sorry: too large line width (%g points)", line_width);
+   if (line_width < 0.0) RAISE_ERROR_g("Sorry: invalid line width (%g points): must be positive", line_width);
+   if (line_width > 1e3) RAISE_ERROR_g("Sorry: too large line width (%g points)", line_width);
    if (writing_file) fprintf(TF, "%0.3f w\n", line_width * ENLARGE * p->default_line_scale);
    p->line_width = line_width;
 }
@@ -100,14 +133,13 @@ void c_line_width_set(FM *p, double line_width)
 VALUE FM_line_width_set(VALUE fmkr, VALUE value)  // value is thickness in points
 { // w
    FM *p = Get_FM(fmkr);
-   value = rb_Float(value);
    c_line_width_set(p, NUM2DBL(value));
    return value;
 }
 
 void c_line_scale_set(FM *p, double new_scale)
 {
-   if (new_scale <= 0) rb_raise(rb_eArgError, "Sorry: line scale must be positive");
+   if (new_scale <= 0) RAISE_ERROR("Sorry: line scale must be positive");
    p->default_line_scale = new_scale;
    c_line_width_set(p, p->line_width);
 }
@@ -115,14 +147,13 @@ void c_line_scale_set(FM *p, double new_scale)
 VALUE FM_rescale_lines(VALUE fmkr, VALUE scaling_factor)
 {
    FM *p = Get_FM(fmkr);
-   scaling_factor = rb_Float(scaling_factor);
    c_line_scale_set(p, NUM2DBL(scaling_factor) * p->default_line_scale);
    return fmkr;
 }
 
 void c_line_cap_set(FM *p, int line_cap)
 {
-   if (line_cap < 0 || line_cap > 3) rb_raise(rb_eArgError, "Sorry: invalid arg for setting line_cap (%i)", line_cap);
+   if (line_cap < 0 || line_cap > 3) RAISE_ERROR_i("Sorry: invalid arg for setting line_cap (%i)", line_cap);
    if (writing_file) fprintf(TF, "%d J\n", line_cap);
    p->line_cap = line_cap;
 }
@@ -130,14 +161,13 @@ void c_line_cap_set(FM *p, int line_cap)
 VALUE FM_line_cap_set(VALUE fmkr, VALUE value)
 { // J
    FM *p = Get_FM(fmkr);
-   value = rb_Integer(value);
    c_line_cap_set(p, NUM2INT(value));
    return value;
 }
 
 void c_line_join_set(FM *p, int line_join)
 {
-   if (line_join < 0 || line_join > 3) rb_raise(rb_eArgError, "Sorry: invalid arg for setting line_join (%i)", line_join);
+   if (line_join < 0 || line_join > 3) RAISE_ERROR_i("Sorry: invalid arg for setting line_join (%i)", line_join);
    if (writing_file) fprintf(TF, "%d j\n", line_join);
    p->line_join = line_join;
 }
@@ -145,7 +175,6 @@ void c_line_join_set(FM *p, int line_join)
 VALUE FM_line_join_set(VALUE fmkr, VALUE value)
 {  // j
    FM *p = Get_FM(fmkr);
-   value = rb_Integer(value);
    c_line_join_set(p, NUM2INT(value));
    return value;
 }
@@ -153,7 +182,7 @@ VALUE FM_line_join_set(VALUE fmkr, VALUE value)
 void c_miter_limit_set(FM *p, double miter_limit)
 {
    if (miter_limit < 0.0)
-      rb_raise(rb_eArgError,
+      RAISE_ERROR_g(
          "Sorry: invalid miter limit (%g): must be positive ratio for max miter length to line width", miter_limit);
    if (writing_file) fprintf(TF, "%0.3f M\n", miter_limit);
    p->miter_limit = miter_limit;
@@ -162,8 +191,7 @@ void c_miter_limit_set(FM *p, double miter_limit)
 VALUE FM_miter_limit_set(VALUE fmkr, VALUE value) // value is max ratio of miter length to line width
 { // M
    FM *p = Get_FM(fmkr);
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must not be constructing a path when change miter limit");
-   value = rb_Float(value);
+   if (constructing_path) RAISE_ERROR("Sorry: must not be constructing a path when change miter limit");
    c_miter_limit_set(p, NUM2DBL(value));
    return value;
 }
@@ -172,34 +200,30 @@ VALUE FM_line_type_set(VALUE fmkr, VALUE line_type)
 { // array phase d  (distances given in points)
    FM *p = Get_FM(fmkr);
    double sz;
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must not be constructing a path when change line_type");
+   if (constructing_path) RAISE_ERROR("Sorry: must not be constructing a path when change line_type");
    if (line_type == Qnil) {
       fprintf(TF, "[] 0 d\n");
    } else {
-      line_type = rb_Array(line_type);
       if (writing_file) {
-         if (RARRAY(line_type)->len != 2)
-            rb_raise(rb_eArgError, "Sorry: invalid line_type.  Must be [ [dash pattern] dash phase ]");
-         VALUE dashArray = rb_ary_entry(line_type, 0), dashPhase = rb_ary_entry(line_type, 1);
+         if (Array_Len(line_type) != 2)
+            RAISE_ERROR("Sorry: invalid line_type.  Must be [ [dash pattern] dash phase ]");
+         VALUE dashArray = Array_Entry(line_type, 0), dashPhase = Array_Entry(line_type, 1);
          fprintf(TF, "[ ");
          if (dashArray != Qnil) {
-            dashArray = rb_Array(dashArray);
-            long i, len = RARRAY(dashArray)->len;
+            long i, len = Array_Len(dashArray);
             for (i=0; i < len; i++) {
-               VALUE entry = rb_ary_entry(dashArray, i);
-               entry = rb_Float(entry);
+               VALUE entry = Array_Entry(dashArray, i);
                sz = NUM2DBL(entry);
-               if (sz < 0.0) rb_raise(rb_eArgError, "Sorry: invalid dash array entry (%g): must be positive", sz);
+               if (sz < 0.0) RAISE_ERROR_g("Sorry: invalid dash array entry (%g): must be positive", sz);
                fprintf(TF, "%0.3f ", sz * ENLARGE);
             }
          }
-         dashPhase = rb_Float(dashPhase);
          sz = NUM2DBL(dashPhase);
-         if (sz < 0.0) rb_raise(rb_eArgError, "Sorry: invalid dash phase (%g): must be positive", sz);
+         if (sz < 0.0) RAISE_ERROR_g("Sorry: invalid dash phase (%g): must be positive", sz);
          fprintf(TF, "] %0.3f d\n", sz * ENLARGE);
       }
    }
-   p->line_type = line_type;
+   Set_line_type(fmkr, line_type);
    return fmkr;
 }
 
@@ -231,8 +255,6 @@ void update_bbox(FM *p, double x, double y)
 VALUE FM_update_bbox(VALUE fmkr, VALUE x, VALUE y)
 {
    FM *p = Get_FM(fmkr);
-   x = rb_Float(x);
-   y = rb_Float(y);
    update_bbox(p, convert_figure_to_output_x(p,NUM2DBL(x)), convert_figure_to_output_y(p,NUM2DBL(y)));
    return fmkr;
 }
@@ -240,22 +262,22 @@ VALUE FM_update_bbox(VALUE fmkr, VALUE x, VALUE y)
 
 VALUE FM_bbox_left(VALUE fmkr)
 {
-   return rb_float_new(bbox_llx); 
+   return Float_New(bbox_llx); 
 }
 
 VALUE FM_bbox_right(VALUE fmkr)
 {
-   return rb_float_new(bbox_urx); 
+   return Float_New(bbox_urx); 
 }
 
 VALUE FM_bbox_top(VALUE fmkr)
 {
-   return rb_float_new(bbox_ury); 
+   return Float_New(bbox_ury); 
 }
 
 VALUE FM_bbox_bottom(VALUE fmkr)
 {
-   return rb_float_new(bbox_lly); 
+   return Float_New(bbox_lly); 
 }
 
 
@@ -271,8 +293,6 @@ void c_moveto(FM *p, double x, double y)
 VALUE FM_move_to_point(VALUE fmkr, VALUE x, VALUE y)
 {
    FM *p = Get_FM(fmkr);
-   x = rb_Float(x);
-   y = rb_Float(y);
    double dev_x = convert_figure_to_output_x(p,NUM2DBL(x)), dev_y = convert_figure_to_output_y(p,NUM2DBL(y));
    c_moveto(p, dev_x, dev_y);
    return fmkr;
@@ -281,7 +301,7 @@ VALUE FM_move_to_point(VALUE fmkr, VALUE x, VALUE y)
 void c_lineto(FM *p, double x, double y)
 {
    ARE_OK_NUMBERS(x,y);
-   if (!constructing_path) rb_raise(rb_eArgError, "Sorry: must start path with moveto before call lineto");
+   if (!constructing_path) RAISE_ERROR("Sorry: must start path with moveto before call lineto");
    if (writing_file) fprintf(TF, "%ld %ld l\n", c_round_dev(p,x), c_round_dev(p,y));
    update_bbox(p, x, y);
 }
@@ -289,8 +309,6 @@ void c_lineto(FM *p, double x, double y)
 VALUE FM_append_point_to_path(VALUE fmkr, VALUE x, VALUE y)
 {
    FM *p = Get_FM(fmkr);
-   x = rb_Float(x);
-   y = rb_Float(y);
    double dev_x = convert_figure_to_output_x(p,NUM2DBL(x)), dev_y = convert_figure_to_output_y(p,NUM2DBL(y));
    c_lineto(p, dev_x, dev_y);
    return fmkr;
@@ -301,7 +319,7 @@ void c_curveto(FM *p, double x1, double y1, double x2, double y2, double x3, dou
    ARE_OK_NUMBERS(x1,y1);
    ARE_OK_NUMBERS(x2,y2);
    ARE_OK_NUMBERS(x3,y3);
-   if (!constructing_path) rb_raise(rb_eArgError, "Sorry: must start path with moveto before call curveto");
+   if (!constructing_path) RAISE_ERROR("Sorry: must start path with moveto before call curveto");
    if (writing_file) fprintf(TF, "%ld %ld %ld %ld %ld %ld c\n", 
             c_round_dev(p,x1), c_round_dev(p,y1), c_round_dev(p,x2), c_round_dev(p,y2), c_round_dev(p,x3), c_round_dev(p,y3));
    update_bbox(p, x1, y1);
@@ -312,12 +330,6 @@ void c_curveto(FM *p, double x1, double y1, double x2, double y2, double x3, dou
 VALUE FM_append_curve_to_path(VALUE fmkr, VALUE x1, VALUE y1, VALUE x2, VALUE y2, VALUE x3, VALUE y3)
 {
    FM *p = Get_FM(fmkr);
-   x1 = rb_Float(x1);
-   y1 = rb_Float(y1);
-   x2 = rb_Float(x2);
-   y2 = rb_Float(y2);
-   x3 = rb_Float(x3);
-   y3 = rb_Float(y3);
    double dev_x1 = convert_figure_to_output_x(p,NUM2DBL(x1)), dev_y1 = convert_figure_to_output_y(p,NUM2DBL(y1));
    double dev_x2 = convert_figure_to_output_x(p,NUM2DBL(x2)), dev_y2 = convert_figure_to_output_y(p,NUM2DBL(y2));
    double dev_x3 = convert_figure_to_output_x(p,NUM2DBL(x3)), dev_y3 = convert_figure_to_output_y(p,NUM2DBL(y3));
@@ -327,7 +339,7 @@ VALUE FM_append_curve_to_path(VALUE fmkr, VALUE x1, VALUE y1, VALUE x2, VALUE y2
 
 void c_closepath(FM *p)
 {
-   if (!constructing_path) rb_raise(rb_eArgError, "Sorry: must be constructing path when call closepath");
+   if (!constructing_path) RAISE_ERROR("Sorry: must be constructing path when call closepath");
    if (writing_file) fprintf(TF, "h\n");
    have_current_point = false;
    p = NULL;
@@ -357,7 +369,7 @@ void c_append_arc(FM *p, double x_start, double y_start, double x_corner, double
    if (psi > PI) psi = 2*PI - psi;
    theta = PI - psi; // theta is opening angle for the arc
    while (theta < 0) theta += 2*PI;
-   if (theta >= PI) rb_raise(rb_eArgError, "Sorry: invalid control point for arc");
+   if (theta >= PI) RAISE_ERROR("Sorry: invalid control point for arc");
    // first compute control points for arc of opening theta with unit radius, bisected by positive x axis
    // based on note by Richard DeVeneza, "How to determine the control points of a Bezier curve that
    // approximates a small circular arc", Nov 2004.
@@ -389,8 +401,6 @@ void c_append_arc(FM *p, double x_start, double y_start, double x_corner, double
 
 double Get_Arc_Radius(FM *p, VALUE dx, VALUE dy)
 {
-   dx = rb_Float(dx);
-   dy = rb_Float(dy);
    double rx = NUM2DBL(dx), ry = NUM2DBL(dy);
    rx = convert_figure_to_output_dx(p,rx);
    ry = convert_figure_to_output_dy(p,ry);
@@ -403,12 +413,6 @@ VALUE FM_append_arc_to_path(VALUE fmkr, VALUE x_start, VALUE y_start, VALUE x_co
    VALUE x_end, VALUE y_end, VALUE dx, VALUE dy)
 {
    FM *p = Get_FM(fmkr);
-   x_start = rb_Float(x_start);
-   y_start = rb_Float(y_start);
-   x_corner = rb_Float(x_corner);
-   y_corner = rb_Float(y_corner);
-   x_end = rb_Float(x_end);
-   y_end = rb_Float(y_end);
    c_append_arc(p,
       convert_figure_to_output_x(p,NUM2DBL(x_start)), convert_figure_to_output_y(p,NUM2DBL(y_start)),
       convert_figure_to_output_x(p,NUM2DBL(x_corner)), convert_figure_to_output_y(p,NUM2DBL(y_corner)),
@@ -429,10 +433,6 @@ void c_append_rect(FM *p, double x, double y, double width, double height)
 VALUE FM_append_rect_to_path(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height)
 {
    FM *p = Get_FM(fmkr);
-   x = rb_Float(x);
-   y = rb_Float(y);
-   width = rb_Float(width);
-   height = rb_Float(height);
    c_append_rect(p,
       convert_figure_to_output_x(p,NUM2DBL(x)), convert_figure_to_output_y(p,NUM2DBL(y)),
       convert_figure_to_output_dx(p,NUM2DBL(width)), convert_figure_to_output_dy(p,NUM2DBL(height)));
@@ -453,10 +453,6 @@ void c_append_rounded_rect(FM *p, double x, double y, double width, double heigh
 VALUE FM_append_rounded_rect_to_path(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height, VALUE dx, VALUE dy)
 {
    FM *p = Get_FM(fmkr);
-   x = rb_Float(x);
-   y = rb_Float(y);
-   width = rb_Float(width);
-   height = rb_Float(height);
    c_append_rounded_rect(p,
       convert_figure_to_output_x(p,NUM2DBL(x)), convert_figure_to_output_y(p,NUM2DBL(y)),
       convert_figure_to_output_dx(p,NUM2DBL(width)), convert_figure_to_output_dy(p,NUM2DBL(height)), 
@@ -498,11 +494,6 @@ void c_append_oval(FM *p, double x, double y, double dx, double dy, double angle
 VALUE FM_append_oval_to_path(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE angle)
 {
    FM *p = Get_FM(fmkr);
-   x = rb_Float(x);
-   y = rb_Float(y);
-   dx = rb_Float(dx);
-   dy = rb_Float(dy);
-   angle = rb_Float(angle);
    c_append_oval(p,
       convert_figure_to_output_x(p,NUM2DBL(x)), convert_figure_to_output_y(p,NUM2DBL(y)),
       convert_figure_to_output_dx(p,NUM2DBL(dx)), convert_figure_to_output_dy(p,NUM2DBL(dy)), 
@@ -513,9 +504,6 @@ VALUE FM_append_oval_to_path(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, V
 VALUE FM_append_circle_to_path(VALUE fmkr, VALUE x, VALUE y, VALUE dx)
 {
    FM *p = Get_FM(fmkr);
-   x = rb_Float(x);
-   y = rb_Float(y);
-   dx = rb_Float(dx);
    double s = convert_figure_to_output_dx(p,NUM2DBL(dx));
    c_append_oval(p,
       convert_figure_to_output_x(p,NUM2DBL(x)), convert_figure_to_output_y(p,NUM2DBL(y)),
@@ -528,9 +516,9 @@ VALUE FM_append_points_to_path(VALUE fmkr, VALUE x_vec, VALUE y_vec)
    FM *p = Get_FM(fmkr);
    long xlen, ylen, i;
    double x0, y0;
-   double *xs = Dvector_Data_for_Read(x_vec, &xlen);
-   double *ys = Dvector_Data_for_Read(y_vec, &ylen);
-   if (xlen != ylen) rb_raise(rb_eArgError, "Sorry: must have same number xs and ys for append_points");
+   double *xs = Vector_Data_for_Read(x_vec, &xlen);
+   double *ys = Vector_Data_for_Read(y_vec, &ylen);
+   if (xlen != ylen) RAISE_ERROR("Sorry: must have same number xs and ys for append_points");
    if (xlen <= 0) return fmkr;
    x0 = convert_figure_to_output_x(p,xs[0]); y0 = convert_figure_to_output_y(p,ys[0]);
    if (have_current_point) c_lineto(p,x0,y0);
@@ -547,11 +535,11 @@ VALUE FM_private_append_points_with_gaps_to_path(VALUE fmkr, VALUE x_vec, VALUE 
    FM *p = Get_FM(fmkr);
    long xlen, ylen, glen, i, j;
    double x0, y0;
-   double *xs = Dvector_Data_for_Read(x_vec, &xlen);
-   double *ys = Dvector_Data_for_Read(y_vec, &ylen);
-   double *gs = Dvector_Data_for_Read(gaps, &glen);
+   double *xs = Vector_Data_for_Read(x_vec, &xlen);
+   double *ys = Vector_Data_for_Read(y_vec, &ylen);
+   double *gs = Vector_Data_for_Read(gaps, &glen);
    bool do_close = (close_gaps == Qtrue);
-   if (xlen != ylen) rb_raise(rb_eArgError, "Sorry: must have same number xs and ys for append_points_with_gaps");
+   if (xlen != ylen) RAISE_ERROR("Sorry: must have same number xs and ys for append_points_with_gaps");
    if (xlen <= 0) return fmkr;
    x0 = convert_figure_to_output_x(p,xs[0]); y0 = convert_figure_to_output_y(p,ys[0]);
    if (have_current_point) c_lineto(p,x0,y0);
@@ -560,7 +548,7 @@ VALUE FM_private_append_points_with_gaps_to_path(VALUE fmkr, VALUE x_vec, VALUE 
       int gap_start = ROUND(gs[j]);
       if (gap_start == xlen) break;
       if (gap_start > xlen)
-         rb_raise(rb_eArgError, "Sorry: gap value (%i) too large for vectors of length (%i)", gap_start, xlen);
+         RAISE_ERROR_ii("Sorry: gap value (%i) too large for vectors of length (%i)", gap_start, xlen);
       while (i < gap_start) {
          c_lineto(p,convert_figure_to_output_x(p,xs[i]), convert_figure_to_output_y(p,ys[i]));
          i++;
@@ -701,7 +689,7 @@ VALUE FM_fill_stroke_and_clip(VALUE fmkr)
 
 VALUE FM_stroke_line(VALUE fmkr, VALUE x1, VALUE y1, VALUE x2, VALUE y2)
 {
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling stroke_line");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling stroke_line");
    FM_move_to_point(fmkr, x1, y1);
    FM_append_point_to_path(fmkr, x2, y2);
    FM_stroke(fmkr);
@@ -710,7 +698,7 @@ VALUE FM_stroke_line(VALUE fmkr, VALUE x1, VALUE y1, VALUE x2, VALUE y2)
 
 VALUE FM_fill_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height)
 {
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling fill_rect");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling fill_rect");
    FM_append_rect_to_path(fmkr, x, y, width, height);
    FM_fill(fmkr);
    return fmkr;
@@ -718,7 +706,7 @@ VALUE FM_fill_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height)
 
 VALUE FM_stroke_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height)
 {
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling stroke_rect");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling stroke_rect");
    FM_append_rect_to_path(fmkr, x, y, width, height);
    FM_stroke(fmkr);
    return fmkr;
@@ -726,7 +714,7 @@ VALUE FM_stroke_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height)
 
 VALUE FM_fill_and_stroke_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height)
 {
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling fill_and_stroke_rect");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling fill_and_stroke_rect");
    FM_append_rect_to_path(fmkr, x, y, width, height);
    FM_fill_and_stroke(fmkr);
    return fmkr;
@@ -749,12 +737,8 @@ void c_clip_rect(FM *p, double x, double y, double width, double height) // in o
 
 VALUE FM_clip_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height)
 {
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling clip_rect");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling clip_rect");
    FM *p = Get_FM(fmkr);
-   x = rb_Float(x);
-   y = rb_Float(y);
-   width = rb_Float(width);
-   height = rb_Float(height);
    c_clip_rect(p,
       convert_figure_to_output_x(p,NUM2DBL(x)), convert_figure_to_output_y(p,NUM2DBL(y)),
       convert_figure_to_output_dx(p,NUM2DBL(width)), convert_figure_to_output_dy(p,NUM2DBL(height)));
@@ -763,7 +747,7 @@ VALUE FM_clip_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height)
 
 VALUE FM_clip_oval(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE angle)
 {
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling clip_oval");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling clip_oval");
    FM_append_oval_to_path(fmkr, x, y, dx, dy, angle);
    FM_clip(fmkr);
    return fmkr;
@@ -771,7 +755,7 @@ VALUE FM_clip_oval(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE angle
 
 VALUE FM_fill_oval(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE angle)
 {
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling fill_oval");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling fill_oval");
    FM_append_oval_to_path(fmkr, x, y, dx, dy, angle);
    FM_fill(fmkr);
    return fmkr;
@@ -779,7 +763,7 @@ VALUE FM_fill_oval(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE angle
 
 VALUE FM_stroke_oval(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE angle)
 {
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling stroke_oval");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling stroke_oval");
    FM_append_oval_to_path(fmkr, x, y, dx, dy, angle);
    FM_stroke(fmkr);
    return fmkr;
@@ -787,7 +771,7 @@ VALUE FM_stroke_oval(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE ang
 
 VALUE FM_fill_and_stroke_oval(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE angle)
 {
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling fill_and_stroke_oval");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling fill_and_stroke_oval");
    FM_append_oval_to_path(fmkr, x, y, dx, dy, angle);
    FM_fill_and_stroke(fmkr);
    return fmkr;
@@ -795,7 +779,7 @@ VALUE FM_fill_and_stroke_oval(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, 
 
 VALUE FM_clip_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height, VALUE dx, VALUE dy)
 {
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling clip_rounded_rect");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling clip_rounded_rect");
    FM_append_rounded_rect_to_path(fmkr, x, y, width, height, dx, dy);
    FM_clip(fmkr);
    return fmkr;
@@ -803,7 +787,7 @@ VALUE FM_clip_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE heig
 
 VALUE FM_fill_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height, VALUE dx, VALUE dy)
 {
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling fill_rounded_rect");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling fill_rounded_rect");
    FM_append_rounded_rect_to_path(fmkr, x, y, width, height, dx, dy);
    FM_fill(fmkr);
    return fmkr;
@@ -811,7 +795,7 @@ VALUE FM_fill_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE heig
 
 VALUE FM_stroke_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height, VALUE dx, VALUE dy)
 {
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling stroke_rounded_rect");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling stroke_rounded_rect");
    FM_append_rounded_rect_to_path(fmkr, x, y, width, height, dx, dy);
    FM_stroke(fmkr);
    return fmkr;
@@ -819,7 +803,7 @@ VALUE FM_stroke_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE he
 
 VALUE FM_fill_and_stroke_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height, VALUE dx, VALUE dy)
 {
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling fill_and_stroke_rounded_rect");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling fill_and_stroke_rounded_rect");
    FM_append_rounded_rect_to_path(fmkr, x, y, width, height, dx, dy);
    FM_fill_and_stroke(fmkr);
    return fmkr;
@@ -827,7 +811,7 @@ VALUE FM_fill_and_stroke_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width,
 
 VALUE FM_clip_circle(VALUE fmkr, VALUE x, VALUE y, VALUE dx)
 {
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling clip_circle");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling clip_circle");
    FM_append_circle_to_path(fmkr, x, y, dx);
    FM_clip(fmkr);
    return fmkr;
@@ -835,7 +819,7 @@ VALUE FM_clip_circle(VALUE fmkr, VALUE x, VALUE y, VALUE dx)
 
 VALUE FM_fill_circle(VALUE fmkr, VALUE x, VALUE y, VALUE dx)
 {
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling fill_circle");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling fill_circle");
    FM_append_circle_to_path(fmkr, x, y, dx);
    FM_fill(fmkr);
    return fmkr;
@@ -843,7 +827,7 @@ VALUE FM_fill_circle(VALUE fmkr, VALUE x, VALUE y, VALUE dx)
 
 VALUE FM_stroke_circle(VALUE fmkr, VALUE x, VALUE y, VALUE dx)
 {
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling stroke_circle");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling stroke_circle");
    FM_append_circle_to_path(fmkr, x, y, dx);
    FM_stroke(fmkr);
    return fmkr;
@@ -851,7 +835,7 @@ VALUE FM_stroke_circle(VALUE fmkr, VALUE x, VALUE y, VALUE dx)
 
 VALUE FM_fill_and_stroke_circle(VALUE fmkr, VALUE x, VALUE y, VALUE dx)
 {
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling fill_and_stroke_circle");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling fill_and_stroke_circle");
    FM_append_circle_to_path(fmkr, x, y, dx);
    FM_fill_and_stroke(fmkr);
    return fmkr;
@@ -883,7 +867,7 @@ VALUE FM_append_frame_to_path(VALUE fmkr)
 VALUE FM_fill_frame(VALUE fmkr)
 {
    FM *p = Get_FM(fmkr);
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling fill_frame");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling fill_frame");
    c_append_frame(p, false); FM_fill(fmkr);
    return fmkr;
 }
@@ -891,7 +875,7 @@ VALUE FM_fill_frame(VALUE fmkr)
 VALUE FM_stroke_frame(VALUE fmkr)
 {
    FM *p = Get_FM(fmkr);
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling stroke_frame");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling stroke_frame");
    c_append_frame(p, false); FM_stroke(fmkr);
    return fmkr;
 }
@@ -899,7 +883,7 @@ VALUE FM_stroke_frame(VALUE fmkr)
 VALUE FM_fill_and_stroke_frame(VALUE fmkr)
 {
    FM *p = Get_FM(fmkr);
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling fill_and_stroke_frame");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling fill_and_stroke_frame");
    c_append_frame(p, false); FM_fill_and_stroke(fmkr);
    return fmkr;
 }
@@ -907,7 +891,7 @@ VALUE FM_fill_and_stroke_frame(VALUE fmkr)
 VALUE FM_clip_to_frame(VALUE fmkr)
 {
    FM *p = Get_FM(fmkr);
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before calling clip_to_frame");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling clip_to_frame");
    c_append_frame(p, true); FM_clip(fmkr);
    return fmkr;
 }

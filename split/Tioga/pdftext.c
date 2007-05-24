@@ -112,7 +112,7 @@ static Font_Dictionary *GetFontDict(char *font_name, int font_number) {
          return font_info;
       }
    }
-   rb_raise(rb_eArgError, "Sorry: invalid font name (%s)", font_name);
+   RAISE_ERROR_s("Sorry: invalid font name (%s)", font_name);
    return NULL;
 }
 
@@ -137,19 +137,18 @@ static int c_register_font(char *font_name)
    for (i = 1; i <= num_predefined_fonts; i++) {
       if (strcmp(predefined_Fonts[i], font_name)==0) {
          f = GetFontDict(font_name, i);
-         if (f == NULL) rb_raise(rb_eArgError, "Error in reading font metrics for %s", font_name);
+         if (f == NULL) RAISE_ERROR_s("Error in reading font metrics for %s", font_name);
          return i;
       }
    }
    f = GetFontDict(font_name, next_available_font_number);
-   if (f == NULL) rb_raise(rb_eArgError, "Error in reading font metrics for %s", font_name);
+   if (f == NULL) RAISE_ERROR_s("Error in reading font metrics for %s", font_name);
    return next_available_font_number++;
 }
 
 VALUE FM_register_font(VALUE fmkr, VALUE font_name)
 {
-   font_name = rb_String(font_name);
-   int font_num = c_register_font(RSTRING_PTR(font_name));
+   int font_num = c_register_font(String_Ptr(font_name));
    return INT2FIX(font_num); 
 }
 
@@ -224,7 +223,7 @@ static void GetStringInfo(FM *p, int font_number, unsigned char *text, double ft
       double *llx_ptr, double *lly_ptr, double *urx_ptr, double *ury_ptr, double *width_ptr) {
    Font_Dictionary *fontinfo = GetFontInfo(font_number);
    if (fontinfo == NULL)
-      rb_raise(rb_eArgError, "Sorry: invalid font number (%i): must register font before use it.", font_number);
+      RAISE_ERROR_i("Sorry: invalid font number (%i): must register font before use it.", font_number);
    unsigned char *c_ptr = text, c;
    double width = 0, llx, lly, urx, ury;
    if (fontinfo == NULL || text == NULL || text[0] == '\0') {
@@ -251,27 +250,24 @@ static void GetStringInfo(FM *p, int font_number, unsigned char *text, double ft
 VALUE FM_marker_string_info(VALUE fmkr, VALUE font_number, VALUE string, VALUE scale)
 { // [ width, llx, lly, urx, ury ] in figure coords
    FM *p = Get_FM(fmkr);
-   font_number = rb_Integer(font_number);
-   string = rb_String(string);
-   unsigned char *text = (unsigned char *)(RSTRING_PTR(string));
-   scale = rb_Float(scale);
+   unsigned char *text = (unsigned char *)(String_Ptr(string));
    double ft_ht = p->default_text_scale * NUM2DBL(scale) * p->default_font_size * ENLARGE;
    int ft_height = ROUND(ft_ht);
    ft_ht = ft_height;
    double llx, lly, urx, ury, width;
    int fnt = NUM2INT(font_number);
    GetStringInfo(p, fnt, text, ft_ht, &llx, &lly, &urx, &ury, &width);
-   VALUE result = rb_ary_new2(5);
+   VALUE result = Array_New(5);
    width = convert_output_to_figure_dx(p,width);
    llx = convert_output_to_figure_dx(p,llx);
    urx = convert_output_to_figure_dx(p,urx);
    lly = convert_output_to_figure_dy(p,lly);
    ury = convert_output_to_figure_dy(p,ury);
-   rb_ary_store(result, 0, rb_float_new(width));
-   rb_ary_store(result, 1, rb_float_new(llx));
-   rb_ary_store(result, 2, rb_float_new(lly));
-   rb_ary_store(result, 3, rb_float_new(urx));
-   rb_ary_store(result, 4, rb_float_new(ury));
+   Array_Store(result, 0, Float_New(width));
+   Array_Store(result, 1, Float_New(llx));
+   Array_Store(result, 2, Float_New(lly));
+   Array_Store(result, 3, Float_New(urx));
+   Array_Store(result, 4, Float_New(ury));
    return result; 
 }
 
@@ -284,7 +280,7 @@ void c_rotated_string_at_points(FM *p, double rotation, int font_number, unsigne
    double ft_ht = p->default_text_scale * scale * p->default_font_size * ENLARGE;
    int i, ft_height = ROUND(ft_ht);
    ft_ht = ft_height;
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must not be constructing a path when show marker");
+   if (constructing_path) RAISE_ERROR("Sorry: must not be constructing a path when show marker");
    double llx, lly, urx, ury, width, shiftx, shifty, tmp;
    double a=horizontal_scaling, b=0.0, c=0.0, d=vertical_scaling; // the initial transform
    GetStringInfo(p, font_number, text, ft_ht, &llx, &lly, &urx, &ury, &width);
@@ -315,14 +311,14 @@ void c_rotated_string_at_points(FM *p, double rotation, int font_number, unsigne
             shiftx *= 0.9;
          }
          break;
-      default: rb_raise(rb_eArgError, "Sorry: invalid setting for marker justification (%i)", justification);
+      default: RAISE_ERROR_i("Sorry: invalid setting for marker justification (%i)", justification);
    }
    switch (alignment) {
       case ALIGNED_AT_TOP: shifty = -ury; break;
       case ALIGNED_AT_MIDHEIGHT: shifty = -(ury+lly)/2; break;
       case ALIGNED_AT_BASELINE: shifty = 0; break;
       case ALIGNED_AT_BOTTOM: shifty = -lly; break;
-      default: rb_raise(rb_eArgError, "Sorry: invalid setting for marker alignment (%i)", alignment);
+      default: RAISE_ERROR_i("Sorry: invalid setting for marker alignment (%i)", alignment);
    }
    // transform the bbox
    double llx2 = llx, lly2 = lly, urx2 = urx, ury2 = ury; // if we're rotated we'll need all 4 corners of bbox
@@ -380,8 +376,10 @@ VALUE FM_private_show_marker(VALUE fmkr, VALUE integer_args, VALUE stroke_width,
    unsigned char *text = NULL, buff[2];
    double *xs, *ys, xloc, yloc, prev_line_width = -1;
    bool restore_fill_color = false, restore_stroke_color = false;
-   VALUE prev_fill_color = Qnil, prev_stroke_color = Qnil;
-   integer_args = rb_Integer(integer_args);
+   double stroke_color_R=0.0, stroke_color_G=0.0, stroke_color_B=0.0;
+   double prev_stroke_color_R, prev_stroke_color_G, prev_stroke_color_B;
+   double fill_color_R=0.0, fill_color_G=0.0, fill_color_B=0.0;
+   double prev_fill_color_R, prev_fill_color_G, prev_fill_color_B;
    int_args = NUM2INT(integer_args);
    c = int_args / 100000; int_args -= c * 100000;
    fnt_num = int_args / 1000; int_args -= fnt_num * 1000;
@@ -390,51 +388,63 @@ VALUE FM_private_show_marker(VALUE fmkr, VALUE integer_args, VALUE stroke_width,
    justification = int_args;
    if (string == Qnil) {
       if (c < 0 || c > 255)
-         rb_raise(rb_eArgError, "Sorry: invalid character code (%i) : must be between 0 and 255", c);
+         RAISE_ERROR_i("Sorry: invalid character code (%i) : must be between 0 and 255", c);
       text = buff; text[0] = c;  text[1] = '\0';
       if (stroke_width != Qnil) {
-         stroke_width = rb_Float(stroke_width);
          double width = NUM2DBL(stroke_width);
          prev_line_width = p->line_width; // restore it later
          fprintf(TF, "%0.6f w\n", width * ENLARGE);
       }
    } else {
-      string = rb_String(string);
-      text = (unsigned char *)(RSTRING_PTR(string));
+      text = (unsigned char *)(String_Ptr(string));
    }
    fprintf(TF, "%d Tr\n", mode);
-   if (stroke_color != Qnil && stroke_color != p->stroke_color &&
-         (mode == STROKE || mode == FILL_AND_STROKE || mode == STROKE_AND_CLIP || mode == FILL_STROKE_AND_CLIP)) {
-      prev_stroke_color = p->stroke_color; restore_stroke_color = true;
-      FM_stroke_color_set(fmkr, stroke_color);
+   if (stroke_color != Qnil &&
+         (mode == STROKE || mode == FILL_AND_STROKE || 
+            mode == STROKE_AND_CLIP || mode == FILL_STROKE_AND_CLIP)) {
+       Unpack_RGB(stroke_color, &stroke_color_R, &stroke_color_G, &stroke_color_B);
+       if (stroke_color_R != p->stroke_color_R ||
+           stroke_color_G != p->stroke_color_G ||
+           stroke_color_B != p->stroke_color_B) {
+          prev_stroke_color_R = p->stroke_color_R;
+          prev_stroke_color_G = p->stroke_color_G;
+          prev_stroke_color_B = p->stroke_color_B;
+          restore_stroke_color = true;
+          c_stroke_color_set(fmkr, stroke_color_R, stroke_color_G, stroke_color_B);
+       }
    }
-   if (fill_color != Qnil && fill_color != p->fill_color && 
-         (mode == FILL || mode == FILL_AND_STROKE || mode == FILL_AND_CLIP || mode == FILL_STROKE_AND_CLIP)) {
-      prev_fill_color = p->fill_color; restore_fill_color = true;
-      FM_fill_color_set(fmkr, fill_color);
+   if (fill_color != Qnil &&
+         (mode == FILL || mode == FILL_AND_STROKE || 
+            mode == FILL_AND_CLIP || mode == FILL_STROKE_AND_CLIP)) {
+       Unpack_RGB(fill_color, &fill_color_R, &fill_color_G, &fill_color_B);
+       if (fill_color_R != p->fill_color_R ||
+           fill_color_G != p->fill_color_G ||
+           fill_color_B != p->fill_color_B) {
+          prev_fill_color_R = p->fill_color_R;
+          prev_fill_color_G = p->fill_color_G;
+          prev_fill_color_B = p->fill_color_B;
+          restore_fill_color = true;
+          c_fill_color_set(fmkr, fill_color_R, fill_color_G, fill_color_B);
+       }
    }
-   h_scale = rb_Float(h_scale);
-   v_scale = rb_Float(v_scale);
-   scale = rb_Float(scale);
-   it_angle = rb_Float(it_angle);
-   ascent_angle = rb_Float(ascent_angle);
-   angle = rb_Float(angle);
    if (x == Qnil) {
       long xlen, ylen;
-      xs = Dvector_Data_for_Read(x_vec, &xlen);
-      ys = Dvector_Data_for_Read(y_vec, &ylen);
-      if (xlen != ylen) rb_raise(rb_eArgError, "Sorry: must have same number xs and ys for showing markers");
+      xs = Vector_Data_for_Read(x_vec, &xlen);
+      ys = Vector_Data_for_Read(y_vec, &ylen);
+      if (xlen != ylen) RAISE_ERROR("Sorry: must have same number xs and ys for showing markers");
       if (xlen <= 0) return fmkr;
       n = xlen;
    } else {
-      x = rb_Float(x); xloc = NUM2DBL(x); xs = &xloc;
-      y = rb_Float(y); yloc = NUM2DBL(y); ys = &yloc;
+      xloc = NUM2DBL(x); xs = &xloc;
+      yloc = NUM2DBL(y); ys = &yloc;
       n = 1;
    }
    c_rotated_string_at_points(p, NUM2DBL(angle), fnt_num, text, NUM2DBL(scale), n, xs, ys,
       alignment, justification, NUM2DBL(h_scale), NUM2DBL(v_scale), NUM2DBL(it_angle), NUM2DBL(ascent_angle));
    if (prev_line_width >= 0) c_line_width_set(p, prev_line_width);
-   if (restore_fill_color) FM_fill_color_set(fmkr, prev_fill_color);
-   if (restore_stroke_color) FM_stroke_color_set(fmkr, prev_stroke_color);
+   if (restore_fill_color)
+       c_fill_color_set(p, prev_fill_color_R, prev_fill_color_G, prev_fill_color_B);
+   if (restore_stroke_color) 
+       c_stroke_color_set(p, prev_stroke_color_R, prev_stroke_color_G, prev_stroke_color_B);
    return fmkr;
 }

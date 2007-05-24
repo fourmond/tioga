@@ -29,12 +29,12 @@
       int i, n_pts_data;
       double *As, *Bs, *Cs, *Ds;
       long xlen, ylen, xdlen, ydlen;
-      double *Xs = Dvector_Data_for_Write(Xvec, &xlen);
-      double *Ys = Dvector_Data_for_Write(Yvec, &ylen);
-      double *X_data = Dvector_Data_for_Read(Xvec_data, &xdlen);
-      double *Y_data = Dvector_Data_for_Read(Yvec_data, &ydlen);
+      double *Xs = Vector_Data_for_Write(Xvec, &xlen);
+      double *Ys = Vector_Data_for_Write(Yvec, &ylen);
+      double *X_data = Vector_Data_for_Read(Xvec_data, &xdlen);
+      double *Y_data = Vector_Data_for_Read(Yvec_data, &ydlen);
       if (Xs == NULL || Ys == NULL || X_data == NULL || Y_data == NULL || xdlen != ydlen) {
-         rb_raise(rb_eArgError, "Sorry: bad args for make_curves");
+         RAISE_ERROR("Sorry: bad args for make_curves");
       }
       if (xlen == 0) return;
       n_pts_data = xdlen;
@@ -44,7 +44,7 @@
       Ds = (double *)ALLOC_N(double, n_pts_data);
       c_dvector_create_spline_interpolant(n_pts_data, X_data, Y_data,
          start_clamped, start_slope, end_clamped, end_slope, Bs, Cs, Ds);
-      Ys = Dvector_Data_Resize(Yvec, xlen);
+      Ys = Vector_Data_Resize(Yvec, xlen);
       for (i = 0; i < xlen; i++)
          Ys[i] = c_dvector_spline_interpolate(Xs[i], n_pts_data, X_data, As, Bs, Cs, Ds);
       free(Ds); free(Cs); free(Bs);
@@ -57,11 +57,9 @@
       bool start_clamped = (start_slope != Qnil), end_clamped = (end_slope != Qnil);
       double start=0, end=0;
       if (start_clamped) {
-         start_slope = rb_Float(start_slope);
          start = NUM2DBL(start_slope);
       }
       if (end_clamped) {
-         end_slope = rb_Float(end_slope);
          end = NUM2DBL(end_slope);
       }
       c_private_make_spline_interpolated_points(p, Xvec, Yvec, Xvec_data, Yvec_data,
@@ -75,20 +73,20 @@
       int n_pts_to_add;
       int i, j, n, old_length, new_length;
       long xlen, ylen, xdlen, ydlen;
-      double *Xs = Dvector_Data_for_Write(Xvec, &xlen);
-      double *Ys = Dvector_Data_for_Write(Yvec, &ylen);
-      double *X_data = Dvector_Data_for_Read(Xvec_data, &xdlen);
-      double *Y_data = Dvector_Data_for_Read(Yvec_data, &ydlen);
+      double *Xs = Vector_Data_for_Write(Xvec, &xlen);
+      double *Ys = Vector_Data_for_Write(Yvec, &ylen);
+      double *X_data = Vector_Data_for_Read(Xvec_data, &xdlen);
+      double *Y_data = Vector_Data_for_Read(Yvec_data, &ydlen);
       if (Xs == NULL || Ys == NULL || X_data == NULL || Y_data == NULL
             || xdlen != ydlen || xlen != ylen) {
-         rb_raise(rb_eArgError, "Sorry: bad args for make_steps");
+         RAISE_ERROR("Sorry: bad args for make_steps");
       }
       n = xdlen;
       n_pts_to_add = 2*(n+1);
       old_length = xlen;
       new_length = old_length + n_pts_to_add;
-      Xs = Dvector_Data_Resize(Xvec, new_length);
-      Ys = Dvector_Data_Resize(Yvec, new_length);
+      Xs = Vector_Data_Resize(Xvec, new_length);
+      Ys = Vector_Data_Resize(Yvec, new_length);
       for (i = 0, j = 0; i <= n; i++, j += 2) {
          xprev = (i==0)? xfirst : X_data[i-1];
          xnext = (i==n)? xlast : X_data[i];
@@ -106,10 +104,6 @@
    VALUE FM_private_make_steps(VALUE fmkr, VALUE Xvec, VALUE Yvec, VALUE Xvec_data, VALUE Yvec_data,
         VALUE xfirst, VALUE yfirst, VALUE xlast, VALUE ylast) {
       FM *p = Get_FM(fmkr);
-      xfirst = rb_Float(xfirst);
-      yfirst = rb_Float(yfirst);
-      xlast = rb_Float(xlast);
-      ylast = rb_Float(ylast);
       c_make_steps(p, Xvec, Yvec, Xvec_data, Yvec_data,
          NUM2DBL(xfirst), NUM2DBL(yfirst), NUM2DBL(xlast), NUM2DBL(ylast));
       return fmkr;
@@ -173,8 +167,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define max(x,y) (x>y?x:y)
 
 #define PUSH_POINT(x,y,j) { \
-   Dvector_Store_Double(dest_xs, j, x); \
-   Dvector_Store_Double(dest_ys, j, y); \
+   Vector_Store(dest_xs, j, x); \
+   Vector_Store(dest_ys, j, y); \
    j++; }
 
 int conrec(double **d,
@@ -390,7 +384,7 @@ double x_prev=0.0, y_prev=0.0;
 		double dx = x1 - x_prev, dy = y1 - y_prev;
 		if (dx < 0) dx = -dx; if (dy < 0) dy = -dy;
 		if (num_pts == 0 || dx > x_limit || dy > y_limit) {
-         if (num_pts > 0) rb_ary_push(gaps, INT2FIX(num_pts));
+         if (num_pts > 0) Array_Push(gaps, INT2FIX(num_pts));
          PUSH_POINT(x1,y1,num_pts);
 		}
 		PUSH_POINT(x2,y2,num_pts);
@@ -473,7 +467,7 @@ get_space_for_curve()
 {
 	max_in_curve = INITIAL_CURVE_SIZE;
 	if(curve_storage_exists) {
-		rb_raise(rb_eArgError, "storage is messed up (internal error)");
+		RAISE_ERROR("storage is messed up (internal error)");
 		return;			// will not execute
 	}
 	xcurve = ALLOC_N(double, max_in_curve);
@@ -514,8 +508,8 @@ gr_contour(
 {
 	register int    i, j;
 	// Test for errors
-	if (nx <= 0) rb_raise(rb_eArgError, "nx<=0 (internal error)");
-	if (ny <= 0) rb_raise(rb_eArgError, "ny<=0 (internal error)");
+	if (nx <= 0) RAISE_ERROR("nx<=0 (internal error)");
+	if (ny <= 0) RAISE_ERROR("ny<=0 (internal error)");
 	// Save some globals
 	nx_1 = nx - 1;
 	ny_1 = ny - 1;
@@ -633,7 +627,7 @@ gr_contour(
 			// trace a contour if it hits here
 			flag_is_set = FLAG(i, j, 0);
 			if (flag_is_set < 0)
-				rb_raise(rb_eArgError, "ran out of storage (internal error)");
+				RAISE_ERROR("ran out of storage (internal error)");
 			if (!flag_is_set
 			    && (legit == NULL || legit[i][j] != 0.0)
 			    && z[i][j] > z0
@@ -716,7 +710,7 @@ trace_contour(double z0,
 		if (locate == 5) {
 			int             already_set = FLAG(iGT, jGT, 1);
 			if (already_set < 0) {
-				rb_raise(rb_eArgError, "ran out of storage (internal error)");
+				RAISE_ERROR("ran out of storage (internal error)");
 				return false;
 			}
 			if (already_set) {
@@ -806,10 +800,10 @@ append_segment(double xr, double yr, double zr, double OKr,
 	       double xs, double ys, double zs, double OKs,
 	       double z0)
 {
-	if (zr == zs) rb_raise(rb_eArgError, "Contouring problem: zr = zs, which is illegal");
+	if (zr == zs) RAISE_ERROR("Contouring problem: zr = zs, which is illegal");
 	double frac = (zr - z0) / (zr - zs);
-	if (frac < 0.0) rb_raise(rb_eArgError, "Contouring problem: frac < 0");
-	if (frac > 1.0) rb_raise(rb_eArgError, "Contouring problem: frac > 1");
+	if (frac < 0.0) RAISE_ERROR("Contouring problem: frac < 0");
+	if (frac > 1.0) RAISE_ERROR("Contouring problem: frac > 1");
 	double xplot = xr - frac * (xr - xs);
 	double yplot = yr - frac * (yr - ys);
 	// Avoid replot, which I suppose must be possible, given this code
@@ -870,11 +864,11 @@ draw_the_contour(
             // PUSH_POINT does num_in_path++
             PUSH_POINT(xcurve[i],ycurve[i],num_in_path);
         } else {
-            if (num_in_path > 0 && num_in_path != k) rb_ary_push(gaps, INT2FIX(num_in_path));
+            if (num_in_path > 0 && num_in_path != k) Array_Push(gaps, INT2FIX(num_in_path));
             k = num_in_path;
             }
     }
-    rb_ary_push(gaps, INT2FIX(num_in_path));
+    Array_Push(gaps, INT2FIX(num_in_path));
     num_in_curve = 0;
 }
 
@@ -900,7 +894,7 @@ FLAG(int ni, int nj, int ind)
 	case -1:
 		// Allocate storage for flag array
 		if (flag_storage_exists)
-			rb_raise(rb_eArgError, "storage is messed up (internal error)");
+			RAISE_ERROR("storage is messed up (internal error)");
 		size = 1 + ni * nj / NBITS;	// total storage array length
 		flag = ALLOC_N(unsigned long, size);
 		// Create mask
@@ -914,13 +908,13 @@ FLAG(int ni, int nj, int ind)
 		return 0;
 	case 2:
 		if (!flag_storage_exists)
-			rb_raise(rb_eArgError, "No flag storage exists");
+			RAISE_ERROR("No flag storage exists");
 		free(flag);
 		flag_storage_exists = false;
 		return 0;
 	default:
 		if (!flag_storage_exists)
-			rb_raise(rb_eArgError, "No flag storage exists");
+			RAISE_ERROR("No flag storage exists");
 		break;
 	}
 	// ind was not -1 or 2
@@ -949,15 +943,15 @@ FLAG(int ni, int nj, int ind)
    void c_make_contour(FM *p, VALUE dest_xs, VALUE dest_ys, VALUE gaps,
          VALUE xs, VALUE ys,  VALUE zs_data, double z_level,  VALUE legit_data, int use_conrec) {
       long xlen, ylen, num_columns, num_rows;
-      double *x_coords = Dvector_Data_for_Read(xs, &xlen);
-      double *y_coords = Dvector_Data_for_Read(ys, &ylen);
-      double **zs = Dtable_Ptr(zs_data, &num_columns, &num_rows);
-      double **legit = Dtable_Ptr(legit_data, &num_columns, &num_rows);
+      double *x_coords = Vector_Data_for_Read(xs, &xlen);
+      double *y_coords = Vector_Data_for_Read(ys, &ylen);
+      double **zs = Table_Info(zs_data, &num_columns, &num_rows);
+      double **legit = Table_Info(legit_data, &num_columns, &num_rows);
       if (x_coords == NULL || gaps == Qnil || zs == NULL || y_coords == NULL) {
-         rb_raise(rb_eArgError, "Sorry: bad args for make_contour.  Need to provide xs, ys, gaps, and zs.");
+         RAISE_ERROR("Sorry: bad args for make_contour.  Need to provide xs, ys, gaps, and zs.");
       }
       if (xlen != num_columns || ylen != num_rows) {
-         rb_raise(rb_eArgError, "Sorry: bad args for make_contour.  Needs xs.size == num columns and ys.size == num rows.");
+         RAISE_ERROR("Sorry: bad args for make_contour.  Needs xs.size == num columns and ys.size == num rows.");
       }
       double x_limit, y_limit;
       x_limit = 0.001*(x_coords[xlen-1] - x_coords[0])/xlen;
@@ -974,14 +968,13 @@ FLAG(int ni, int nj, int ind)
    }
    
    VALUE FM_private_make_contour(VALUE fmkr,
-         VALUE dest_xs, VALUE dest_ys, VALUE gaps, // these Dvectors get the results
+         VALUE dest_xs, VALUE dest_ys, VALUE gaps, // these vectors get the results
          VALUE xs, VALUE ys, // data x coordinates and y coordinates
-         VALUE zs, VALUE z_level, // the Dtable of values and the desired contour level
-         VALUE legit, // the Dtable of flags (nonzero means okay)
+         VALUE zs, VALUE z_level, // the table of values and the desired contour level
+         VALUE legit, // the table of flags (nonzero means okay)
          VALUE method // int == 1 means CONREC
          ) {
       FM *p = Get_FM(fmkr);
-      z_level = rb_Float(z_level);
       c_make_contour(p, dest_xs, dest_ys, gaps, xs, ys, zs, NUM2DBL(z_level), legit, NUM2INT(method));
       return fmkr;
    }

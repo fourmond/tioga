@@ -142,6 +142,7 @@ EOD
     
     def blues
         read_data
+        t.title_color = Crimson
         t.do_box_labels('Blues Plot', 'Position', '\textcolor[rgb]{0,0,1}{Blues}')
         show_model_number
         xs = @positions

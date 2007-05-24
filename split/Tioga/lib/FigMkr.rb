@@ -73,6 +73,20 @@ class FigureMaker
         return dict
     end
 
+
+
+    attr_accessor :title
+    attr_accessor :xlabel
+    attr_accessor :ylabel
+    attr_accessor :line_type
+    
+    attr_accessor :xaxis_locations_for_major_ticks
+    attr_accessor :xaxis_locations_for_minor_ticks
+    attr_accessor :xaxis_tick_labels
+    attr_accessor :yaxis_locations_for_major_ticks
+    attr_accessor :yaxis_locations_for_minor_ticks
+    attr_accessor :yaxis_tick_labels
+
     attr_accessor :style_filename
 
     attr_accessor :legend_info
@@ -189,6 +203,17 @@ class FigureMaker
         @tex_preview_figure_height = '\paperheight - 2in'
         
         @num_error_lines = 10
+
+        @line_type = nil # means solid line
+        @title = nil
+        @xlabel = nil
+        @ylabel = nil
+        @xaxis_locations_for_major_ticks = nil
+        @xaxis_locations_for_minor_ticks = nil
+        @xaxis_tick_labels = nil
+        @yaxis_locations_for_major_ticks = nil
+        @yaxis_locations_for_minor_ticks = nil
+        @yaxis_tick_labels = nil
         
         @tex_xoffset = 0
         @tex_yoffset = 0
@@ -874,8 +899,33 @@ class FigureMaker
 
 
     def context(&cmd)
-        trace_cmd_no_arg(@enter_context_function, @exit_context_function) {        
-            private_context(cmd) }      
+        trace_cmd_no_arg(@enter_context_function, @exit_context_function) {       
+             
+           save_title = self.title
+           save_xlabel = self.xlabel
+           save_ylabel = self.ylabel
+           save_line_type = self.line_type
+           save_xaxis_locations_for_major_ticks = self.xaxis_locations_for_major_ticks
+           save_xaxis_locations_for_minor_ticks = self.xaxis_locations_for_minor_ticks
+           save_xaxis_tick_labels = self.xaxis_tick_labels
+           save_yaxis_locations_for_major_ticks = self.yaxis_locations_for_major_ticks
+           save_yaxis_locations_for_minor_ticks = self.yaxis_locations_for_minor_ticks
+           save_yaxis_tick_labels = self.yaxis_tick_labels
+            
+           private_context(cmd)
+            
+           self.title = save_title
+           self.xlabel = save_xlabel
+           self.ylabel = save_ylabel
+           self.line_type = save_line_type
+           self.xaxis_locations_for_major_ticks = save_xaxis_locations_for_major_ticks
+           self.xaxis_locations_for_minor_ticks = save_xaxis_locations_for_minor_ticks
+           self.xaxis_tick_labels = save_xaxis_tick_labels
+           self.yaxis_locations_for_major_ticks = save_yaxis_locations_for_major_ticks
+           self.yaxis_locations_for_minor_ticks = save_yaxis_locations_for_minor_ticks
+           self.yaxis_tick_labels = save_yaxis_tick_labels
+            
+        }      
     end
 
     

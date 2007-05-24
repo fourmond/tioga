@@ -220,7 +220,7 @@ class MyFigures
         t.stroke
         t.append_rounded_rect_to_path(x, y, width, height, dx, dy)
         t.clip
-        jpg_image
+        jpg_image_transparent
     end
     
     def arc
@@ -780,7 +780,7 @@ class MyFigures
     def jpg_image_transparent
         t.show_image(
             'jpg' => "data/cassini.jpg", 'width' => 999, 'height' => 959,
-            'll' => [0.01, 0.01], 'lr' => [0.99, 0.01], 'ul' => [0.01, 0.99]) 
+            'll' => [0.01, 0.01], 'lr' => [0.99, 0.01], 'ul' => [0.01, 0.99])
         t.fill_opacity = 0.6
         t.show_image( # Lucy amazed by Io
             'jpg' => "data/lucy.jpg", 'width' => 148, 'height' => 164,

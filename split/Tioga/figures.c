@@ -36,22 +36,44 @@ char *data_dir = NULL;
 
 VALUE cFM; /* the Tioga/FigureMaker class object */
 
+
+void RAISE_ERROR_s(char *fmt, char *s) {
+   char buff[1024];
+   sprintf(buff, fmt, s);
+   RAISE_ERROR(buff);
+}
+
+void RAISE_ERROR_ss(char *fmt, char *s1, char *s2) {
+   char buff[1024];
+   sprintf(buff, fmt, s1, s2);
+   RAISE_ERROR(buff);
+}
+
+void RAISE_ERROR_i(char *fmt, int x) {
+   char buff[1024];
+   sprintf(buff, fmt, x);
+   RAISE_ERROR(buff);
+}
+
+void RAISE_ERROR_ii(char *fmt, int x1, int x2) {
+   char buff[1024];
+   sprintf(buff, fmt, x1, x2);
+   RAISE_ERROR(buff);
+}
+
+void RAISE_ERROR_g(char *fmt, double x) {
+   char buff[1024];
+   sprintf(buff, fmt, x);
+   RAISE_ERROR(buff);
+}
+
+void RAISE_ERROR_gg(char *fmt, double x1, double x2) {
+   char buff[1024];
+   sprintf(buff, fmt, x1, x2);
+   RAISE_ERROR(buff);
+}
+
 static void FM_mark(FM *p) { /* all of the VALUEs in the FM struct should be marked */
-   rb_gc_mark(p->stroke_color);
-   rb_gc_mark(p->fill_color);
-   rb_gc_mark(p->line_type);
-   rb_gc_mark(p->title);
-   rb_gc_mark(p->title_color);
-   rb_gc_mark(p->xlabel);
-   rb_gc_mark(p->xlabel_color);
-   rb_gc_mark(p->ylabel);
-   rb_gc_mark(p->ylabel_color);
-   rb_gc_mark(p->xaxis_stroke_color);
-   rb_gc_mark(p->xaxis_locations_for_major_ticks);
-   rb_gc_mark(p->xaxis_locations_for_minor_ticks);
-   rb_gc_mark(p->yaxis_stroke_color);
-   rb_gc_mark(p->yaxis_locations_for_major_ticks);
-   rb_gc_mark(p->yaxis_locations_for_minor_ticks);
    rb_gc_mark(p->fm);
 }
 
@@ -129,19 +151,15 @@ FM *Get_FM(VALUE fmkr) {
    
 /* graphics attribute accessors */
    RO_DBL_ATTR(default_line_scale)        
-   RO_VAL_ATTR(stroke_color)
-   RO_VAL_ATTR(fill_color)
    RO_DBL_ATTR(line_width)        
    RO_INT_ATTR(line_cap)
    RO_INT_ATTR(line_join)
    RO_DBL_ATTR(miter_limit)
    RO_DBL_ATTR(stroke_opacity)
    RO_DBL_ATTR(fill_opacity)
-   RO_VAL_ATTR(line_type)
    
 /* Title */
    RO_BOOL_ATTR(title_visible)
-   VAL_ATTR(title)
    INT_ATTR(title_side)
    DBL_ATTR(title_position)
    DBL_ATTR(title_scale)
@@ -149,11 +167,10 @@ FM *Get_FM(VALUE fmkr) {
    DBL_ATTR(title_angle)
    INT_ATTR(title_alignment)
    INT_ATTR(title_justification)
-   VAL_ATTR(title_color)
+   //VAL_ATTR(title_color)
     
 /* X label */
    RO_BOOL_ATTR(xlabel_visible)
-   VAL_ATTR(xlabel)
    DBL_ATTR(xlabel_position)
    DBL_ATTR(xlabel_scale)
    DBL_ATTR(xlabel_shift)
@@ -161,11 +178,9 @@ FM *Get_FM(VALUE fmkr) {
    INT_ATTR(xlabel_side)
    INT_ATTR(xlabel_alignment)
    INT_ATTR(xlabel_justification)
-   VAL_ATTR(xlabel_color)
     
 /* Y label */
    RO_BOOL_ATTR(ylabel_visible)
-   VAL_ATTR(ylabel)
    DBL_ATTR(ylabel_position)
    DBL_ATTR(ylabel_scale)
    DBL_ATTR(ylabel_shift)
@@ -173,14 +188,12 @@ FM *Get_FM(VALUE fmkr) {
    INT_ATTR(ylabel_side)
    INT_ATTR(ylabel_alignment)
    INT_ATTR(ylabel_justification)
-   VAL_ATTR(ylabel_color)
     
 /* X axis */
    RO_BOOL_ATTR(xaxis_visible)
    INT_ATTR(xaxis_loc)
    INT_ATTR(xaxis_type)
    DBL_ATTR(xaxis_line_width)
-   VAL_ATTR(xaxis_stroke_color)
    DBL_ATTR(xaxis_major_tick_width)
    DBL_ATTR(xaxis_minor_tick_width)
    DBL_ATTR(xaxis_major_tick_length)
@@ -191,11 +204,8 @@ FM *Get_FM(VALUE fmkr) {
    DBL_ATTR(xaxis_tick_interval)
    DBL_ATTR(xaxis_min_between_major_ticks)
    INT_ATTR(xaxis_number_of_minor_intervals)
-   VAL_ATTR(xaxis_locations_for_major_ticks)
-   VAL_ATTR(xaxis_locations_for_minor_ticks)
    BOOL_ATTR(xaxis_use_fixed_pt)
    INT_ATTR(xaxis_digits_max)
-   VAL_ATTR(xaxis_tick_labels)
    INT_ATTR(xaxis_numeric_label_decimal_digits)
    DBL_ATTR(xaxis_numeric_label_scale)
    DBL_ATTR(xaxis_numeric_label_shift)
@@ -214,7 +224,6 @@ FM *Get_FM(VALUE fmkr) {
    INT_ATTR(yaxis_loc)
    INT_ATTR(yaxis_type)
    DBL_ATTR(yaxis_line_width)
-   VAL_ATTR(yaxis_stroke_color)
    DBL_ATTR(yaxis_major_tick_width)
    DBL_ATTR(yaxis_minor_tick_width)
    DBL_ATTR(yaxis_major_tick_length)
@@ -225,11 +234,8 @@ FM *Get_FM(VALUE fmkr) {
    DBL_ATTR(yaxis_tick_interval)
    DBL_ATTR(yaxis_min_between_major_ticks)
    INT_ATTR(yaxis_number_of_minor_intervals)
-   VAL_ATTR(yaxis_locations_for_major_ticks)
-   VAL_ATTR(yaxis_locations_for_minor_ticks)
    BOOL_ATTR(yaxis_use_fixed_pt)
    INT_ATTR(yaxis_digits_max)
-   VAL_ATTR(yaxis_tick_labels)
    INT_ATTR(yaxis_numeric_label_decimal_digits)
    DBL_ATTR(yaxis_numeric_label_scale)
    DBL_ATTR(yaxis_numeric_label_shift)
@@ -367,7 +373,6 @@ void Init_FigureMaker(void) {
    attr_accessors(miter_limit)
    attr_accessors(stroke_opacity)
    attr_accessors(fill_opacity)
-   attr_accessors(line_type)
 /* croak on non ok */
    attr_accessors(croak_on_nonok_numbers)
 
@@ -518,7 +523,6 @@ void Init_FigureMaker(void) {
    
 /* Title */
    attr_reader(title_visible)
-   attr_accessors(title)
    attr_accessors(title_side)
    attr_accessors(title_position)
    attr_accessors(title_scale)
@@ -530,7 +534,6 @@ void Init_FigureMaker(void) {
     
 /* X label */
    attr_reader(xlabel_visible)
-   attr_accessors(xlabel)
    attr_accessors(xlabel_position)
    attr_accessors(xlabel_scale)
    attr_accessors(xlabel_shift)
@@ -542,7 +545,6 @@ void Init_FigureMaker(void) {
     
 /* Y label */
    attr_reader(ylabel_visible)
-   attr_accessors(ylabel)
    attr_accessors(ylabel_position)
    attr_accessors(ylabel_scale)
    attr_accessors(ylabel_shift)
@@ -568,11 +570,8 @@ void Init_FigureMaker(void) {
    attr_accessors(xaxis_tick_interval)
    attr_accessors(xaxis_min_between_major_ticks)
    attr_accessors(xaxis_number_of_minor_intervals)
-   attr_accessors(xaxis_locations_for_major_ticks)
-   attr_accessors(xaxis_locations_for_minor_ticks)
    attr_accessors(xaxis_use_fixed_pt)
    attr_accessors(xaxis_digits_max)
-   attr_accessors(xaxis_tick_labels)
    attr_accessors(xaxis_numeric_label_decimal_digits)
    attr_accessors(xaxis_numeric_label_scale)
    attr_accessors(xaxis_numeric_label_shift)
@@ -602,11 +601,8 @@ void Init_FigureMaker(void) {
    attr_accessors(yaxis_tick_interval)
    attr_accessors(yaxis_min_between_major_ticks)
    attr_accessors(yaxis_number_of_minor_intervals)
-   attr_accessors(yaxis_locations_for_major_ticks)
-   attr_accessors(yaxis_locations_for_minor_ticks)
    attr_accessors(yaxis_use_fixed_pt)
    attr_accessors(yaxis_digits_max)
-   attr_accessors(yaxis_tick_labels)
    attr_accessors(yaxis_numeric_label_decimal_digits)
    attr_accessors(yaxis_numeric_label_scale)
    attr_accessors(yaxis_numeric_label_shift)

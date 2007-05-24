@@ -72,7 +72,7 @@ void Free_XObjects(void)
       switch (xo->xobj_subtype) {
          case JPG_SUBTYPE: Free_JPG((JPG_Info *)xo); break;
          case SAMPLED_SUBTYPE: Free_Sampled((Sampled_Info *)xo); break;
-         default: rb_raise(rb_eArgError, "Invalid XObject subtype (%i)", xo->xobj_subtype);
+         default: RAISE_ERROR_i("Invalid XObject subtype (%i)", xo->xobj_subtype);
       }
       free(xo);
    }
@@ -110,7 +110,7 @@ static void Write_XObjects(void)
       switch (xo->xobj_subtype) {
          case JPG_SUBTYPE: Write_JPG((JPG_Info *)xo); break;
          case SAMPLED_SUBTYPE: Write_Sampled((Sampled_Info *)xo); break;
-         default: rb_raise(rb_eArgError, "Invalid XObject subtype (%i)", xo->xobj_subtype);
+         default: RAISE_ERROR_i("Invalid XObject subtype (%i)", xo->xobj_subtype);
       }
       fprintf(OF, ">> endobj\n");
    }
@@ -141,7 +141,7 @@ void Open_pdf(VALUE fmkr, char *filename, bool quiet_mode)
 {
    FM *p = Get_FM(fmkr);
    int i;
-   if (writing_file) rb_raise(rb_eArgError, "Sorry: cannot start a new output file until finish current one.");
+   if (writing_file) RAISE_ERROR("Sorry: cannot start a new output file until finish current one.");
    Clear_Fonts_In_Use_Flags();
    Free_Records(); 
    next_available_object_number = FIRST_OTHER_OBJ;
@@ -154,9 +154,9 @@ void Open_pdf(VALUE fmkr, char *filename, bool quiet_mode)
    char ofile[300], timestring[100];
    Get_pdf_name(ofile, filename, 300);
    if ((OF = fopen(ofile, "w")) == NULL)
-       rb_raise(rb_eArgError, "Sorry: can't open %s.\n", filename);
+       RAISE_ERROR_s("Sorry: can't open %s.\n", filename);
    if ((TF = tmpfile()) == NULL)
-       rb_raise(rb_eArgError, "Sorry: can't create temp file for writing PDF file %s.\n", filename);
+       RAISE_ERROR_s("Sorry: can't create temp file for writing PDF file %s.\n", filename);
    /* open PDF file and write header */
    fprintf(OF, "%%PDF-1.4\n");
    strcpy(timestring, ctime(&now));
@@ -182,21 +182,18 @@ void Open_pdf(VALUE fmkr, char *filename, bool quiet_mode)
    c_line_cap_set(p, p->line_cap);
    c_line_join_set(p, p->line_join);
    c_miter_limit_set(p, p->miter_limit);
-   FM_line_type_set(fmkr, p->line_type);
-   FM_stroke_color_set(fmkr, p->stroke_color);
-   FM_fill_color_set(fmkr, p->fill_color);
+   FM_line_type_set(fmkr, Get_line_type(fmkr));
+   c_stroke_color_set(p, p->stroke_color_R, p->stroke_color_G, p->stroke_color_B);
+   c_fill_color_set(p, p->fill_color_R, p->fill_color_G, p->fill_color_B);
    // initialize clip region
    bbox_llx = bbox_lly = 1e5;
    bbox_urx = bbox_ury = -1e5;
 }
 
-void Start_Axis_Standard_State(FM *p, VALUE color, double line_width) {
+void Start_Axis_Standard_State(FM *p, double r, double g, double b, double line_width) {
    fprintf(TF, "q 2 J [] 0 d\n");
    c_line_width_set(p, line_width);
-   if (color != Qnil)
-      FM_stroke_color_set(p->fm, color);
-   else
-      fprintf(TF, "0 0 0 RG\n"); // black
+   c_stroke_color_set(p, r, g, b);
    /* 2 J sets the line cap style to square cap */
    /* set stroke and fill colors to black.  set line type to solid */
 }
@@ -235,7 +232,7 @@ static void Write_Stream(void)
    if (FLATE_ENCODE) {
       if (flate_compress(dest_buffer, &new_len, buffer, len) != FLATE_OK) {
          free(buffer); free(dest_buffer);
-         rb_raise(rb_eArgError, "Error compressing PDF stream data");
+         RAISE_ERROR("Error compressing PDF stream data");
       }
       fwrite(dest_buffer, 1, new_len, OF);
    } else {
@@ -249,9 +246,9 @@ void Close_pdf(VALUE fmkr, bool quiet_mode)
    FM *p = Get_FM(fmkr);
    int i;
    double llx, lly, urx, ury, xoff, yoff;
-   if (!writing_file) rb_raise(rb_eArgError, "Sorry: cannot End_Output if not writing file.");
+   if (!writing_file) RAISE_ERROR("Sorry: cannot End_Output if not writing file.");
    writing_file = false;
-   if (constructing_path) rb_raise(rb_eArgError, "Sorry: must finish with current path before ending file");
+   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before ending file");
    Write_Stream();
    stream_end = ftell(OF);
    fprintf(OF, "endstream\nendobj\n");
@@ -269,7 +266,7 @@ void Close_pdf(VALUE fmkr, bool quiet_mode)
    lly = bbox_lly / ENLARGE + yoff - MARGIN;
    urx = bbox_urx / ENLARGE + xoff + MARGIN;
    ury = bbox_ury / ENLARGE + yoff + MARGIN;
-   if (urx < llx || ury < lly) rb_raise(rb_eArgError, "Sorry: Empty plot!");
+   if (urx < llx || ury < lly) RAISE_ERROR("Sorry: Empty plot!");
    fprintf(OF, "%d %d %d %d", ROUND(llx), ROUND(lly), ROUND(urx), ROUND(ury));
    fprintf(OF, " ]\n/Contents %i 0 R\n/Resources << /ProcSet [/PDF /Text /ImageB /ImageC /ImageI]\n", STREAM_OBJ);
    if (Used_Any_Fonts()) {

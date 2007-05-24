@@ -30,7 +30,7 @@ static FILE *fp; // for the TeX file
 void c_text_scale_set(FM *p, double scale)
 {
    double factor = scale / p->default_text_scale;
-   if (factor <= 0) rb_raise(rb_eArgError, "Sorry: text scaling must be positive");
+   if (factor <= 0) RAISE_ERROR("Sorry: text scaling must be positive");
    p->default_text_height_dx *= factor;
    p->default_text_height_dy *= factor;
    p->default_text_scale = scale;
@@ -39,7 +39,6 @@ void c_text_scale_set(FM *p, double scale)
 VALUE FM_rescale_text(VALUE fmkr, VALUE scaling_factor) // updates default text heights too
 {
    FM *p = Get_FM(fmkr);
-   scaling_factor = rb_Float(scaling_factor);
    c_text_scale_set(p, NUM2DBL(scaling_factor) * p->default_text_scale);
    return fmkr;
 }
@@ -100,7 +99,7 @@ static void Convert_Frame_Text_Position_To_Output_Location(FM *p, int frame_side
          break;
       case AT_X_ORIGIN:
          if (0.0 > p->bounds_xmax || 0.0 < p->bounds_xmin)
-            rb_raise(rb_eArgError, "Sorry: x origin is not part of plot for (%s)", text);
+            RAISE_ERROR_s("Sorry: x origin is not part of plot for (%s)", text);
          page_x = convert_figure_to_output_x(p, 0.0);
          if (p->xaxis_reversed) offset = -offset;
          page_x += offset;
@@ -119,14 +118,14 @@ static void Convert_Frame_Text_Position_To_Output_Location(FM *p, int frame_side
          break;
       case AT_Y_ORIGIN:
          if (0.0 > p->bounds_ymax || 0.0 < p->bounds_ymin)
-            rb_raise(rb_eArgError, "Sorry: y origin is not part of plot for (%s)", text);
+            RAISE_ERROR_s("Sorry: y origin is not part of plot for (%s)", text);
          page_y = convert_figure_to_output_y(p, 0.0);
          if (p->yaxis_reversed) offset = -offset;
          page_y += offset;
          page_x = p->page_width * (p->frame_left + fraction * p->frame_width);
          *base_angle = 0;
          break;
-      default: rb_raise(rb_eArgError, "Sorry: invalid parameter for frame side in show text (%s)", text);
+      default: RAISE_ERROR_s("Sorry: invalid parameter for frame side in show text (%s)", text);
    }
    *xp = p->page_left + page_x; *yp = p->page_bottom + page_y;
 }
@@ -143,15 +142,7 @@ VALUE FM_show_rotated_text(VALUE fmkr, VALUE text, VALUE frame_side, VALUE shift
    VALUE fraction, VALUE scale, VALUE angle, VALUE justification, VALUE alignment)
 {
    FM *p = Get_FM(fmkr);
-   text = rb_String(text);
-   frame_side = rb_Integer(frame_side);
-   shift = rb_Float(shift);
-   fraction = rb_Float(fraction);
-   scale = rb_Float(scale);
-   angle = rb_Float(angle);
-   justification = rb_Integer(justification);
-   alignment = rb_Integer(alignment);
-   c_show_rotated_text(p, RSTRING_PTR(text), NUM2INT(frame_side), NUM2DBL(shift),
+   c_show_rotated_text(p, String_Ptr(text), NUM2INT(frame_side), NUM2DBL(shift),
       NUM2DBL(fraction), NUM2DBL(scale), NUM2DBL(angle), NUM2INT(justification), NUM2INT(alignment));
    return fmkr;
 }
@@ -167,14 +158,7 @@ VALUE FM_show_rotated_label(VALUE fmkr, VALUE text,
    VALUE xloc, VALUE yloc, VALUE scale, VALUE angle, VALUE justification, VALUE alignment)
 {
    FM *p = Get_FM(fmkr);
-   text = rb_String(text);
-   xloc = rb_Float(xloc);
-   yloc = rb_Float(yloc);
-   scale = rb_Float(scale);
-   angle = rb_Float(angle);
-   justification = rb_Integer(justification);
-   alignment = rb_Integer(alignment);
-   c_show_rotated_label(p, RSTRING_PTR(text), NUM2DBL(xloc), NUM2DBL(yloc),
+   c_show_rotated_label(p, String_Ptr(text), NUM2DBL(xloc), NUM2DBL(yloc),
       NUM2DBL(scale), NUM2DBL(angle), NUM2INT(justification), NUM2INT(alignment));
    return fmkr;
 }
@@ -182,8 +166,6 @@ VALUE FM_show_rotated_label(VALUE fmkr, VALUE text,
 VALUE FM_check_label_clip(VALUE fmkr, VALUE xloc, VALUE yloc)
 {
    FM *p = Get_FM(fmkr);
-   xloc = rb_Float(xloc);
-   yloc = rb_Float(yloc);
    double x = NUM2DBL(xloc), y = NUM2DBL(yloc);
    x = convert_figure_to_frame_x(p,x);
    y = convert_figure_to_frame_y(p,y);
@@ -246,7 +228,7 @@ void Write_preview_header(VALUE fmkr, FILE *file) {
    fprintf(file, "%% Command to format numeric labels on yaxis\n");
    fprintf(file, "\\newcommand{\\tiogayaxisnumericlabel}[1]{%s}\n\n", Get_yaxis_numeric_label_tex(fmkr));
    fprintf(file, "%% Color constants definitions\n");
-   tmp = rb_const_get(CLASS_OF(fmkr), rb_intern("COLOR_PREAMBLE"));
+   tmp = rb_const_get(CLASS_OF(fmkr), ID_Get("COLOR_PREAMBLE"));
    fprintf(file, "%s\n\n", StringValueCStr(tmp));
    fprintf(file, "%% Set page margins, page size and orientation.\n");
    fprintf(file, "\t\\usepackage[pdftex,tmargin=0pt,lmargin=0pt,"
@@ -349,27 +331,25 @@ void private_make_portfolio(char *name, VALUE fignums, VALUE fignames)
     sprintf(tex_fname, "%s.tex", name);
     file = fopen(tex_fname, "w");
     if (file == NULL)
-       rb_raise(rb_eArgError, "Sorry: can't open %s.\n", tex_fname);
+       RAISE_ERROR_s("Sorry: can't open %s.\n", tex_fname);
     fprintf(file, "%% Tioga Portfolio %s\n\n", name);
     fprintf(file, "\\documentclass{article}\n");
     fprintf(file, "\\usepackage{pdfpages}\n");
     fprintf(file, "\\begin{document}\n");
     fprintf(file, "%% Start of figures, one per page\n\n");
-    fignames = rb_Array(fignames);
-    len = RARRAY(fignames)->len;
+    len = Array_Len(fignames);
     if (fignums == Qnil) {
         for (i=0; i < len; i++) {
             fprintf(file, "\\includepdf{%s.pdf}\n", Get_String(fignames, i));
         }
     } else {
-        fignums = rb_Array(fignums);
-        numfigs = RARRAY(fignums)->len;
+        numfigs = Array_Len(fignums);
         for (i=0; i < numfigs; i++) {
-            j = NUM2INT(RARRAY(fignums)->ptr[i]);
+            j = NUM2INT(Array_Entry(fignums,i));
             if (j >= 0 && j < len) fprintf(file, "\\includepdf{%s.pdf}\n", Get_String(fignames, j));
             else {
                 fclose(file);
-                rb_raise(rb_eArgError, "Requested figure numbers must be >= 0 and < num_figures.");
+                RAISE_ERROR("Requested figure numbers must be >= 0 and < num_figures.");
             }
         }
     }

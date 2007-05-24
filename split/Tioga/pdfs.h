@@ -32,6 +32,7 @@ extern ID tex_preview_documentclass_ID, tex_preview_preamble_ID, tex_preview_pag
 extern ID tex_preview_left_margin_ID, tex_preview_right_margin_ID, tex_preview_top_margin_ID;
 extern ID tex_preview_bottom_margin_ID, tex_preview_left_fudge_ID, tex_preview_top_fudge_ID;
 extern ID do_cmd_ID, data_dir_ID, initialized_ID, tex_xoffset_ID, tex_yoffset_ID;
+extern ID line_type_ID;
 
 extern long int *obj_offsets, capacity_obj_offsets, stream_start, stream_end, length_offset, xref_offset;
 extern int num_objects, next_available_object_number, next_available_gs_number, next_available_xo_number;
@@ -215,7 +216,7 @@ extern FILE *TF; // for the temp file holding the uncompressed stream
 
 extern void Unpack_RGB(VALUE rgb, double *rp, double *gp, double *bp);
 
-extern void Start_Axis_Standard_State(FM *p, VALUE color, double line_width);
+extern void Start_Axis_Standard_State(FM *p, double r, double g, double b, double line_width);
 extern void End_Axis_Standard_State(void);
 
 extern void Write_gsave(void);
