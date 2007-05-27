@@ -615,11 +615,12 @@ class FigureMaker
                     'alignment' => self.legend_alignment)
             end
             line_width = dict['line_width']
-            if line_width >= 0
+            line_type = dict['line_type']
+            unless (line_width < 0) || ((line_type.kind_of?String) && (line_type.casecmp('none') == 0))
                 self.line_color = dict['line_color']
                 self.line_width = dict['line_width']
                 self.line_cap = dict['line_cap']
-                self.line_type = dict['line_type']
+                self.line_type = line_type
                 stroke_line(line_x0, y+line_dy, line_x1, y+line_dy)
             end
             # place any marker right in the middle of the line

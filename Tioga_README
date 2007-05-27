@@ -20,13 +20,9 @@ This is the README for the Tioga kernel, version 1.6, March 17, 2007.
 
 << What's new >>
 
-   Version 1.6 adds numeric label "frequency" and "phase" attributes for
-both axes.  Previously Tioga assumed that every major tick mark got a numeric
-label.  Now the i'th major tick on the axis gets a label only if
-mod(i+j,k)==0 where j is the phase and k is the frequency.  The default
-frequency is naturally 1 so that every major tick gets a label.
-The full names for these attributes are xaxis_numeric_label_frequency,
-xaxis_numeric_label_phase, and similar for yaxis.
+   Version 1.7 adds an option in legends for markers without any line;
+just call save_legend_info with 'line_type' => 'None' in addition to
+the marker information.
 
 
   
@@ -176,6 +172,17 @@ Bill Paxton
 
 Here are the old release messages:
 
+
+
+--------------------------
+
+   Version 1.6 adds numeric label "frequency" and "phase" attributes for
+both axes.  Previously Tioga assumed that every major tick mark got a numeric
+label.  Now the i'th major tick on the axis gets a label only if
+mod(i+j,k)==0 where j is the phase and k is the frequency.  The default
+frequency is naturally 1 so that every major tick gets a label.
+The full names for these attributes are xaxis_numeric_label_frequency,
+xaxis_numeric_label_phase, and similar for yaxis.
 
 --------------------------
 

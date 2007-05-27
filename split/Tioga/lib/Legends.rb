@@ -44,7 +44,7 @@ Dictionary Entries
     'line_color'    => a_color       # defaults to self.line_color
     'line_width'    => a_float       # defaults to self.line_width
     'line_cap'      => a_line_cap    # defaults to self.line_cap
-    'line_type'     => a_line_type   # defaults to self.line_type
+    'line_type'     => a_line_type or 'None'   # defaults to self.line_type
     'dy'            => a_float       # defaults to self.legend_text_dy
     'marker'        => a_marker      # defaults to nil
     'marker_color'  => a_color       # defaults to self.line_color
@@ -55,7 +55,9 @@ The dictionary holding the information is appended to the legend_info array.  If
 then the marker with the given 'marker_color' and 'marker_scale' will be shown in the middle of the
 legend line.  If the 'marker_dict' entry is present, it will have the values for 'x' and 'y' set to the location
 of the middle of the legend line and then it will be passed to the show_marker method.  This gives you the option of using
-the full range of marker functionality in legends -- perhaps you'd like to use a line marker that is rotated, stretched, filled in one color, and stroked in another!
+the full range of marker functionality in legends -- perhaps you'd like to use a line marker that is rotated, 
+stretched, filled in one color, and stroked in another!  Sometimes you just want to have a marker in
+the legend without a line; do this by setting line_type to 'None'.
 
 =end
     def save_legend_info(arg)

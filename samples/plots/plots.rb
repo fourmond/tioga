@@ -263,7 +263,21 @@ EOD
     def legend_outside
         read_data
         show_model_number
-        t.show_plot_with_legend('legend_scale' => 1.3) { reds_blues }
+        t.show_plot_with_legend('legend_scale' => 1.3) {
+            reds_blues
+            t.save_legend_info(
+                'marker' => Circle,
+                'text' => 'Circle',
+                'line_type' => 'None',
+                'marker_color' => Crimson)
+        }
+    end
+
+    def xlegend_outside
+        read_data
+        show_model_number
+        t.show_plot_with_legend('legend_scale' => 1.3) { reds_blues
+                }
     end
 
     def inset
