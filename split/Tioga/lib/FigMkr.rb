@@ -1510,7 +1510,7 @@ class FigureMaker
     end
     
     @@keys_for_show_marker = FigureMaker.make_name_lookup_hash([
-        'marker', 'x', 'y', 'at', 'point', 'Xs', 'Ys', 'xs', 'ys', 'mode', 'rendering_mode',
+        'marker', 'x', 'y', 'at', 'point', 'Xs', 'Ys', 'xs', 'ys', 'mode', 'rendering_mode', 'legend',
         'angle', 'scale', 'font', 'string', 'text', 'color', 'fill_color', 'stroke_color', 'stroke_width',
         'horizontal_scale', 'vertical_scale', 'italic_angle', 'ascent_angle', 'alignment', 'justification'])
     def show_marker(dict)
@@ -1582,6 +1582,26 @@ class FigureMaker
             # Ruby limits us to 15 args, so pack some small integers together
         private_show_marker(int_args, stroke_width, string, x, y, xs, ys,
             h_scale, v_scale, scale, it_angle, ascent_angle, angle, fill_color, stroke_color)
+        legend_arg = dict['legend']
+        if legend_arg != nil
+            if legend_arg.kind_of?Hash
+                legend = legend_arg.dup
+                legend["line_type"] = 'None' if legend["line_type"] == nil
+                legend["marker"] = marker if legend["marker"] == nil
+                legend["marker_scale"] = scale if legend["marker_scale"] == nil
+                legend["marker_color"] = fill_color if legend["marker_color"] == nil
+                save_legend_info(legend)
+            elsif legend_arg.kind_of?String
+                save_legend_info(
+                    'line_type' => 'None', 
+                    'marker' => marker, 
+                    'marker_scale' => scale,
+                    'marker_color' => fill_color, 
+                    'text' => legend_arg)
+            else
+                save_legend_info(legend_arg)
+            end
+        end
     end
     
     def show_label(dict)
