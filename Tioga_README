@@ -22,7 +22,11 @@ This is the README for the Tioga kernel, version 1.6, March 17, 2007.
 
    Version 1.7 adds an option in legends for markers without any line;
 just call save_legend_info with 'line_type' => 'None' in addition to
-the marker information.
+the marker information.  It is also now possible to give a 'legend' argument
+to show_marker.  The value of the arg can be either a legend dictionary
+or simply the legend text in which case defaults will be supplied for
+the rest.  There is an example of this in samples/plots.rb
+in the Legend_Outside figure.
 
 
   

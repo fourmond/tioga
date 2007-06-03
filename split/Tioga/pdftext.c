@@ -146,10 +146,10 @@ static int c_register_font(char *font_name)
    return next_available_font_number++;
 }
 
-VALUE FM_register_font(VALUE fmkr, VALUE font_name)
+OBJ_PTR FM_register_font(OBJ_PTR fmkr, OBJ_PTR font_name)
 {
    int font_num = c_register_font(String_Ptr(font_name));
-   return INT2FIX(font_num); 
+   return Integer_New(font_num); 
 }
 
 bool Used_Any_Fonts(void)
@@ -247,17 +247,17 @@ static void GetStringInfo(FM *p, int font_number, unsigned char *text, double ft
    *ury_ptr = ury * ft_ht * 1e-3;
 }
 
-VALUE FM_marker_string_info(VALUE fmkr, VALUE font_number, VALUE string, VALUE scale)
+OBJ_PTR FM_marker_string_info(OBJ_PTR fmkr, OBJ_PTR font_number, OBJ_PTR string, OBJ_PTR scale)
 { // [ width, llx, lly, urx, ury ] in figure coords
    FM *p = Get_FM(fmkr);
    unsigned char *text = (unsigned char *)(String_Ptr(string));
-   double ft_ht = p->default_text_scale * NUM2DBL(scale) * p->default_font_size * ENLARGE;
+   double ft_ht = p->default_text_scale * Number_to_double(scale) * p->default_font_size * ENLARGE;
    int ft_height = ROUND(ft_ht);
    ft_ht = ft_height;
    double llx, lly, urx, ury, width;
-   int fnt = NUM2INT(font_number);
+   int fnt = Number_to_int(font_number);
    GetStringInfo(p, fnt, text, ft_ht, &llx, &lly, &urx, &ury, &width);
-   VALUE result = Array_New(5);
+   OBJ_PTR result = Array_New(5);
    width = convert_output_to_figure_dx(p,width);
    llx = convert_output_to_figure_dx(p,llx);
    urx = convert_output_to_figure_dx(p,urx);
@@ -366,10 +366,10 @@ void c_rotated_string_at_points(FM *p, double rotation, int font_number, unsigne
    fprintf(TF, "ET\n");
 }
 
-VALUE FM_private_show_marker(VALUE fmkr, VALUE integer_args, VALUE stroke_width, VALUE string,
-   VALUE x, VALUE y, VALUE x_vec, VALUE y_vec,
-   VALUE h_scale, VALUE v_scale, VALUE scale, VALUE it_angle, VALUE ascent_angle, VALUE angle,
-   VALUE fill_color, VALUE stroke_color)
+OBJ_PTR FM_private_show_marker(OBJ_PTR fmkr, OBJ_PTR integer_args, OBJ_PTR stroke_width, OBJ_PTR string,
+   OBJ_PTR x, OBJ_PTR y, OBJ_PTR x_vec, OBJ_PTR y_vec,
+   OBJ_PTR h_scale, OBJ_PTR v_scale, OBJ_PTR scale, OBJ_PTR it_angle, OBJ_PTR ascent_angle, OBJ_PTR angle,
+   OBJ_PTR fill_color, OBJ_PTR stroke_color)
 {
    FM *p = Get_FM(fmkr);
    int int_args, c, alignment, justification, fnt_num, n, mode;
@@ -380,7 +380,7 @@ VALUE FM_private_show_marker(VALUE fmkr, VALUE integer_args, VALUE stroke_width,
    double prev_stroke_color_R, prev_stroke_color_G, prev_stroke_color_B;
    double fill_color_R=0.0, fill_color_G=0.0, fill_color_B=0.0;
    double prev_fill_color_R, prev_fill_color_G, prev_fill_color_B;
-   int_args = NUM2INT(integer_args);
+   int_args = Number_to_int(integer_args);
    c = int_args / 100000; int_args -= c * 100000;
    fnt_num = int_args / 1000; int_args -= fnt_num * 1000;
    mode = int_args / 100; int_args -= mode * 100;
@@ -391,7 +391,7 @@ VALUE FM_private_show_marker(VALUE fmkr, VALUE integer_args, VALUE stroke_width,
          RAISE_ERROR_i("Sorry: invalid character code (%i) : must be between 0 and 255", c);
       text = buff; text[0] = c;  text[1] = '\0';
       if (stroke_width != Qnil) {
-         double width = NUM2DBL(stroke_width);
+         double width = Number_to_double(stroke_width);
          prev_line_width = p->line_width; // restore it later
          fprintf(TF, "%0.6f w\n", width * ENLARGE);
       }
@@ -435,12 +435,12 @@ VALUE FM_private_show_marker(VALUE fmkr, VALUE integer_args, VALUE stroke_width,
       if (xlen <= 0) return fmkr;
       n = xlen;
    } else {
-      xloc = NUM2DBL(x); xs = &xloc;
-      yloc = NUM2DBL(y); ys = &yloc;
+      xloc = Number_to_double(x); xs = &xloc;
+      yloc = Number_to_double(y); ys = &yloc;
       n = 1;
    }
-   c_rotated_string_at_points(p, NUM2DBL(angle), fnt_num, text, NUM2DBL(scale), n, xs, ys,
-      alignment, justification, NUM2DBL(h_scale), NUM2DBL(v_scale), NUM2DBL(it_angle), NUM2DBL(ascent_angle));
+   c_rotated_string_at_points(p, Number_to_double(angle), fnt_num, text, Number_to_double(scale), n, xs, ys,
+      alignment, justification, Number_to_double(h_scale), Number_to_double(v_scale), Number_to_double(it_angle), Number_to_double(ascent_angle));
    if (prev_line_width >= 0) c_line_width_set(p, prev_line_width);
    if (restore_fill_color)
        c_fill_color_set(p, prev_fill_color_R, prev_fill_color_G, prev_fill_color_B);

@@ -34,7 +34,7 @@
 
 char *data_dir = NULL;
 
-VALUE cFM; /* the Tioga/FigureMaker class object */
+OBJ_PTR cFM; /* the Tioga/FigureMaker class object */
 
 
 void RAISE_ERROR_s(char *fmt, char *s) {
@@ -73,7 +73,7 @@ void RAISE_ERROR_gg(char *fmt, double x1, double x2) {
    RAISE_ERROR(buff);
 }
 
-static void FM_mark(FM *p) { /* all of the VALUEs in the FM struct should be marked */
+static void FM_mark(FM *p) { /* all of the OBJ_PTRs in the FM struct should be marked */
    rb_gc_mark(p->fm);
 }
 
@@ -81,17 +81,17 @@ static void FM_free(FM *p) {
    free(p);
 }
 
-static VALUE FM_alloc(VALUE klass) {
+static OBJ_PTR FM_alloc(OBJ_PTR klass) {
    FM *p;
-   VALUE ary = Data_Make_Struct(klass, FM, FM_mark, FM_free, p);
+   OBJ_PTR ary = Data_Make_Struct(klass, FM, FM_mark, FM_free, p);
    Initialize_Figure(ary);
    p->fm = ary;
    return ary;
 }
 
-bool Is_FM(VALUE fmkr) { return ( TYPE(fmkr) == T_DATA && RDATA(fmkr)->dfree == (RUBY_DATA_FUNC)FM_free ); }
+bool Is_FM(OBJ_PTR fmkr) { return ( TYPE(fmkr) == T_DATA && RDATA(fmkr)->dfree == (RUBY_DATA_FUNC)FM_free ); }
 
-FM *Get_FM(VALUE fmkr) {
+FM *Get_FM(OBJ_PTR fmkr) {
    FM *p;
    Data_Get_Struct(fmkr, FM, p);
    return p;
@@ -292,12 +292,12 @@ void Init_FigureMaker(void) {
    rb_require("Flate");
 
    
-   VALUE mTioga = rb_define_module("Tioga");
+   OBJ_PTR mTioga = rb_define_module("Tioga");
 
 
    /* and now, we need to import Dobjects and Flate modules*/
-   VALUE mDobjects = rb_define_module("Dobjects");
-   VALUE mFlate = rb_define_module("Flate");
+   OBJ_PTR mDobjects = rb_define_module("Dobjects");
+   OBJ_PTR mFlate = rb_define_module("Flate");
    rb_include_module(mTioga, mDobjects);
    rb_include_module(mTioga, mFlate);
 
@@ -636,7 +636,7 @@ void Init_FigureMaker(void) {
    /* We now need to import the symbols */
 
    /* imports from Dvector */
-   VALUE cDvector = rb_define_class_under(mDobjects, "Dvector", rb_cObject);
+   OBJ_PTR cDvector = rb_define_class_under(mDobjects, "Dvector", rb_cObject);
    RB_IMPORT_SYMBOL(cDvector, Dvector_Create);
    RB_IMPORT_SYMBOL(cDvector, Dvector_Data_Resize);
    RB_IMPORT_SYMBOL(cDvector, Dvector_Data_Replace);
@@ -652,7 +652,7 @@ void Init_FigureMaker(void) {
    RB_IMPORT_SYMBOL(mFlate, flate_expand);
 
    /* imports from Dtable */
-   VALUE cDtable = rb_define_class_under(mDobjects, "Dtable", rb_cObject);
+   OBJ_PTR cDtable = rb_define_class_under(mDobjects, "Dtable", rb_cObject);
    RB_IMPORT_SYMBOL(cDtable, Dtable_Ptr);
    RB_IMPORT_SYMBOL(cDtable, Read_Dtable);
 }

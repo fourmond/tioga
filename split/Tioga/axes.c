@@ -32,17 +32,17 @@ typedef struct {
    double minor_tick_width; // same units as line_width
    double major_tick_length; // in units of numeric label char heights
    double minor_tick_length; // in units of numeric label char heights
-   bool log_values;
+   bool log_vals;
    bool ticks_inside; // inside frame or toward larger x or y value for specific location
    bool ticks_outside; // inside frame or toward smaller x or y value for specific location
    double tick_interval; // set to 0 to use default
    double min_between_major_ticks; // in units of numeric label char heights
    int number_of_minor_intervals; // set to 0 to use default
-   VALUE locations_for_major_ticks; // set to nil to use defaults
-   VALUE locations_for_minor_ticks; // set to nil to use defaults
+   OBJ_PTR locations_for_major_ticks; // set to nil to use defaults
+   OBJ_PTR locations_for_minor_ticks; // set to nil to use defaults
    bool use_fixed_pt;
    int digits_max;
-   VALUE tick_labels; // set to nil to use defaults
+   OBJ_PTR tick_labels; // set to nil to use defaults
    double numeric_label_scale;
    double numeric_label_shift; // in char heights, positive for out from edge (or toward larger x or y value)
    double numeric_label_angle;
@@ -115,7 +115,7 @@ static void Get_xaxis_Specs(FM *p, PlotAxis *s)
    s->minor_tick_width = p->xaxis_minor_tick_width; // same units as line_width
    s->major_tick_length = p->xaxis_major_tick_length; // in units of numeric label char heights
    s->minor_tick_length = p->xaxis_minor_tick_length; // in units of numeric label char heights
-   s->log_values = p->xaxis_log_values;
+   s->log_vals = p->xaxis_log_values;
    s->ticks_inside = p->xaxis_ticks_inside; // inside frame or toward larger x or y value for specific location
    s->ticks_outside = p->xaxis_ticks_outside; // inside frame or toward smaller x or y value for specific location
    s->tick_interval = p->xaxis_tick_interval; // set to 0 to use default
@@ -150,7 +150,7 @@ static void Get_yaxis_Specs(FM *p, PlotAxis *s)
    s->minor_tick_width = p->yaxis_minor_tick_width; // same units as line_width
    s->major_tick_length = p->yaxis_major_tick_length; // in units of numeric label char heights
    s->minor_tick_length = p->yaxis_minor_tick_length; // in units of numeric label char heights
-   s->log_values = p->yaxis_log_values;
+   s->log_vals = p->yaxis_log_values;
    s->ticks_inside = p->yaxis_ticks_inside; // inside frame or toward larger x or y value for specific location
    s->ticks_outside = p->yaxis_ticks_outside; // inside frame or toward smaller x or y value for specific location
    s->tick_interval = p->yaxis_tick_interval; // set to 0 to use default
@@ -262,29 +262,29 @@ static void draw_axis_line(FM *p, int location, PlotAxis *s)
    figure_join_and_stroke(p, s->x0, s->y0, s->x1, s->y1);
 }
 
-static char *Create_Label(double value, int scale, int prec, bool log_values, bool use_fixed_pt, char *postfix, PlotAxis *s)
-{ // value in figure coords
+static char *Create_Label(double val, int scale, int prec, bool log_vals, bool use_fixed_pt, char *postfix, PlotAxis *s)
+{ // val in figure coords
    char buff[100], *string;
-   int exponent = ROUND(value);
+   int exponent = ROUND(val);
    buff[0] = 0;
-   if (log_values && use_fixed_pt) {   /* Logarithmic */
-     double sav_val = value, pow_val;
-     value = pow(10.0, exponent);
+   if (log_vals && use_fixed_pt) {   /* Logarithmic */
+     double sav_val = val, pow_val;
+     val = pow(10.0, exponent);
      pow_val = pow(10.0, sav_val);
      if (exponent < 0) {
         char form[60];
         int numdig = ABS(exponent)+1; 
         sprintf(form, (s->vertical)? "\\tiogayaxisnumericlabel{%%.%df}" : "\\tiogaxaxisnumericlabel{%%.%df}", numdig);
         sprintf(buff, form, pow_val);
-     } else if (abs(value - pow_val) > 0.1) {
+     } else if (abs(val - pow_val) > 0.1) {
         sprintf(buff, (s->vertical)? "\\tiogayaxisnumericlabel{%0.2f}" : "\\tiogaxaxisnumericlabel{%0.2f}", pow_val);
      } else {
-        sprintf(buff,  (s->vertical)? "\\tiogayaxisnumericlabel{%d}" : "\\tiogaxaxisnumericlabel{%d}", (int) value);
+        sprintf(buff,  (s->vertical)? "\\tiogayaxisnumericlabel{%d}" : "\\tiogaxaxisnumericlabel{%d}", (int) val);
      }
-   } else if (log_values) {
+   } else if (log_vals) {
      /* Exponential, i.e. 10^-1, 1, 10, 10^2, etc */
-     double abs_diff = fabs(value - exponent);
-     if (abs_diff > 0.1) sprintf(buff,  (s->vertical)? "\\tiogayaxisnumericlabel{10^{%0.1f}}" : "\\tiogaxaxisnumericlabel{10^{%0.1f}}", value);
+     double abs_diff = fabs(val - exponent);
+     if (abs_diff > 0.1) sprintf(buff,  (s->vertical)? "\\tiogayaxisnumericlabel{10^{%0.1f}}" : "\\tiogaxaxisnumericlabel{10^{%0.1f}}", val);
      else if (exponent == 0) strcpy(buff, "1");
      else if (exponent == 1) strcpy(buff, "10");
      else sprintf(buff,  (s->vertical)? "\\tiogayaxisnumericlabel{10^{%d}}" : "\\tiogaxaxisnumericlabel{10^{%d}}", exponent);
@@ -293,12 +293,12 @@ static char *Create_Label(double value, int scale, int prec, bool log_values, bo
       double scale2;
       int precis = s->numeric_label_decimal_digits; //  use this precision if it is >= 0
       if (precis >= 0) prec = precis;
-      if (scale) value /= pow(10.,(double)scale);
+      if (scale) val /= pow(10.,(double)scale);
       /* This is necessary to prevent labels like "-0.0" on some systems */
       scale2 = pow(10., prec);
-      value = floor((value * scale2) + .5) / scale2;
+      val = floor((val * scale2) + .5) / scale2;
       sprintf(form, (s->vertical)?  "\\tiogayaxisnumericlabel{%%.%df}" : "\\tiogaxaxisnumericlabel{%%.%df}", (int) prec);
-      sprintf(buff, form, value);
+      sprintf(buff, form, val);
    }
    int len = strlen(buff);
    if (postfix != NULL) { strcpy(buff+len, postfix); len = strlen(buff); }
@@ -307,8 +307,8 @@ static char *Create_Label(double value, int scale, int prec, bool log_values, bo
    return string;
 }
 
-char *Get_String(VALUE ary, int index) {
-   VALUE strobj = Array_Entry(ary,index);
+char *Get_String(OBJ_PTR ary, int index) {
+   OBJ_PTR strobj = Array_Entry(ary,index);
    return StringValuePtr(strobj);
 }
 
@@ -410,7 +410,7 @@ static char **Get_Labels(FM *p, PlotAxis *s)
       int lower_left = (s->reversed)? s->nmajors-1 : 0;
       for (i = 0; i < s->nmajors; i++) {
          ps = NULL;
-         if (i == upper_right && !s->log_values && mode && scale)
+         if (i == upper_right && !s->log_vals && mode && scale)
             sprintf(ps = postfix, 
                 (s->vertical)? "$\\times$\\tiogayaxisnumericlabel{10^{%d}}" : "$\\times$\\tiogaxaxisnumericlabel{10^{%d}}", 
                 scale);
@@ -422,7 +422,7 @@ static char **Get_Labels(FM *p, PlotAxis *s)
                  s->other_axis_type == AXIS_WITH_TICKS_AND_NUMERIC_LABELS)) {
             labels[i] = NULL;
          } else {
-            labels[i] = Create_Label(s->majors[i], scale, prec, s->log_values, s->use_fixed_pt, ps, s);
+            labels[i] = Create_Label(s->majors[i], scale, prec, s->log_vals, s->use_fixed_pt, ps, s);
         }
       }
       s->free_strings_for_labels = true;
@@ -493,7 +493,7 @@ static int Pick_Number_of_Minor_Intervals(double length)
    return num_subintervals;
 }
 
-static void Pick_Major_Tick_Interval(FM *p, double tick_min, double tick_gap, double length, bool log_values, double *tick)
+static void Pick_Major_Tick_Interval(FM *p, double tick_min, double tick_gap, double length, bool log_vals, double *tick)
 {
    double t1, t2, tick_reasonable, base_interval;
    int np, i;
@@ -508,7 +508,7 @@ static void Pick_Major_Tick_Interval(FM *p, double tick_min, double tick_gap, do
    else if (t1 > 1.5) { t2 = 5.0; np--; }
    else { t2 = 2.0; np--; }
    /* Now compute reasonable tick spacing */
-   if (log_values) {
+   if (log_vals) {
     tick_reasonable = 1.0; 
    } else {
        base_interval = pow(10.0, (double) np);
@@ -545,7 +545,7 @@ static void draw_major_ticks(FM *p, PlotAxis *s)
       double height = ((s->vertical)? p->default_text_height_dy : p->default_text_height_dx);
       double tick_min = s->min_between_major_ticks * height;
       double tick_gap = 10.0 * height;
-      Pick_Major_Tick_Interval(p, tick_min, tick_gap, s->length, s->log_values, &s->interval);
+      Pick_Major_Tick_Interval(p, tick_min, tick_gap, s->length, s->log_vals, &s->interval);
       s->majors = Pick_Locations_for_Major_Ticks(s->interval, s->axis_min, s->axis_max, &s->nmajors);
       s->free_majors = true;
    }
@@ -568,16 +568,10 @@ static void draw_major_ticks(FM *p, PlotAxis *s)
    if (did_line) axis_stroke(p);
 }
 
-static double log_subintervals[8] =
-{
-    0.301030, 0.477121, 0.602060, 0.698970,
-    0.778151, 0.845098, 0.903090, 0.954243
-};
-
 static void draw_minor_ticks(FM *p, PlotAxis *s)
 {
    if (s->number_of_minor_intervals <= 0) {
-      if (s->log_values) {
+      if (s->log_vals) {
          double interval = s->majors[1] - s->majors[0];
          s->number_of_minor_intervals = (abs(interval) != 1.0 || s->nmajors > 10)? 1 : 9; 
       }  else s->number_of_minor_intervals = Pick_Number_of_Minor_Intervals(s->interval);
@@ -585,7 +579,16 @@ static void draw_minor_ticks(FM *p, PlotAxis *s)
    int i, j, nsub = s->number_of_minor_intervals;
    double inside=0.0, outside=0.0, length;
    bool did_line = false;
-   if (s->log_values && nsub > 9) nsub = 9;
+   double log_subintervals[8];
+   log_subintervals[0] = 0.301030;
+   log_subintervals[1] = 0.477121;
+   log_subintervals[2] = 0.602060;
+   log_subintervals[3] = 0.698970;
+   log_subintervals[4] = 0.778151;
+   log_subintervals[5] = 0.845098;
+   log_subintervals[6] = 0.903090;
+   log_subintervals[7] = 0.954243;
+   if (s->log_vals && nsub > 9) nsub = 9;
    length = s->minor_tick_length * ((s->vertical)? p->default_text_height_dx : p->default_text_height_dy);
    if (s->ticks_inside) inside = length;
    if (s->ticks_outside) outside = length;
@@ -609,7 +612,7 @@ static void draw_minor_ticks(FM *p, PlotAxis *s)
          double subinterval = (next_loc - loc) / nsub;
          if (subinterval <= 0.0) continue;
          for (j = 1; j < nsub; j++) {
-            double subloc = loc + ((!s->log_values) ? (j * subinterval) : log_subintervals[j-1]);
+            double subloc = loc + ((!s->log_vals) ? (j * subinterval) : log_subintervals[j-1]);
             if (subloc >= next_loc) break;
             if (subloc <= s->axis_min || subloc >= s->axis_max) continue;
             if (s->vertical)
@@ -623,14 +626,14 @@ static void draw_minor_ticks(FM *p, PlotAxis *s)
    if (did_line) axis_stroke(p);
 }
 
-static void show_numeric_label(FM *p , VALUE fmkr, PlotAxis *s, char *text, int location, double position, double shift)
+static void show_numeric_label(FM *p , OBJ_PTR fmkr, PlotAxis *s, char *text, int location, double position, double shift)
 { // position is in figure coords and must be converted to frame coords
    double pos = ((!s->reversed)? (position - s->axis_min) : (s->axis_max - position)) / s->length;
    c_show_rotated_text(p, text, location, shift, pos, 
       s->numeric_label_scale, s->numeric_label_angle, s->numeric_label_justification, s->numeric_label_alignment);
 }
 
-static void draw_numeric_labels(FM *p , VALUE fmkr, int location, PlotAxis *s)
+static void draw_numeric_labels(FM *p , OBJ_PTR fmkr, int location, PlotAxis *s)
 {
    int i;
    double shift = (s->ticks_outside) ? s->major_tick_length : 0.5; // default shift
@@ -641,7 +644,7 @@ static void draw_numeric_labels(FM *p , VALUE fmkr, int location, PlotAxis *s)
    }
 }
 
-static void c_show_side(VALUE fmkr, FM *p, PlotAxis *s) {
+static void c_show_side(OBJ_PTR fmkr, FM *p, PlotAxis *s) {
    int i;
    if (s->type == AXIS_HIDDEN) return;
    Start_Axis_Standard_State(p, 
@@ -671,13 +674,13 @@ static void c_show_side(VALUE fmkr, FM *p, PlotAxis *s) {
    }
 }
 
-VALUE FM_show_axis(VALUE fmkr, VALUE loc)
+OBJ_PTR FM_show_axis(OBJ_PTR fmkr, OBJ_PTR loc)
 {
    FM *p = Get_FM(fmkr);
    PlotAxis axis;
    int location;
    Init_PlotAxis_struct(&axis);
-   location = NUM2INT(loc);
+   location = Number_to_int(loc);
    if (location == LEFT || location == RIGHT || location == AT_X_ORIGIN) {
       if (!p->yaxis_visible) goto done;
       Get_yaxis_Specs(p, &axis);
@@ -692,12 +695,12 @@ VALUE FM_show_axis(VALUE fmkr, VALUE loc)
    return fmkr;
 }
       
-VALUE FM_show_edge(VALUE fmkr, VALUE loc) {
+OBJ_PTR FM_show_edge(OBJ_PTR fmkr, OBJ_PTR loc) {
    FM *p = Get_FM(fmkr);
    PlotAxis axis;
    int location;
    Init_PlotAxis_struct(&axis);
-   location = NUM2INT(loc);
+   location = Number_to_int(loc);
    switch (location) {
       case LEFT:
          if (!p->left_edge_visible) goto done;
@@ -725,14 +728,14 @@ VALUE FM_show_edge(VALUE fmkr, VALUE loc) {
 }
 
 
-VALUE FM_no_title(VALUE fmkr)
+OBJ_PTR FM_no_title(OBJ_PTR fmkr)
 {
    FM *p = Get_FM(fmkr);
    p->title_visible = false;
    return fmkr;
 }
 
-VALUE FM_no_xlabel(VALUE fmkr)
+OBJ_PTR FM_no_xlabel(OBJ_PTR fmkr)
 {
    FM *p = Get_FM(fmkr);
    p->xlabel_visible = false;
@@ -740,7 +743,7 @@ VALUE FM_no_xlabel(VALUE fmkr)
 }
 
 
-VALUE FM_no_ylabel(VALUE fmkr)
+OBJ_PTR FM_no_ylabel(OBJ_PTR fmkr)
 {
    FM *p = Get_FM(fmkr);
    p->ylabel_visible = false;
@@ -748,7 +751,7 @@ VALUE FM_no_ylabel(VALUE fmkr)
 }
 
 
-VALUE FM_no_xaxis(VALUE fmkr)
+OBJ_PTR FM_no_xaxis(OBJ_PTR fmkr)
 {
    FM *p = Get_FM(fmkr);
    p->xaxis_visible = false;
@@ -756,7 +759,7 @@ VALUE FM_no_xaxis(VALUE fmkr)
 }
 
 
-VALUE FM_no_yaxis(VALUE fmkr)
+OBJ_PTR FM_no_yaxis(OBJ_PTR fmkr)
 {
    FM *p = Get_FM(fmkr);
    p->yaxis_visible = false;
@@ -764,7 +767,7 @@ VALUE FM_no_yaxis(VALUE fmkr)
 }
 
 
-VALUE FM_no_left_edge(VALUE fmkr)
+OBJ_PTR FM_no_left_edge(OBJ_PTR fmkr)
 {
    FM *p = Get_FM(fmkr);
    p->left_edge_visible = false;
@@ -772,7 +775,7 @@ VALUE FM_no_left_edge(VALUE fmkr)
 }
 
 
-VALUE FM_no_right_edge(VALUE fmkr)
+OBJ_PTR FM_no_right_edge(OBJ_PTR fmkr)
 {
    FM *p = Get_FM(fmkr);
    p->right_edge_visible = false;
@@ -780,14 +783,14 @@ VALUE FM_no_right_edge(VALUE fmkr)
 }
 
 
-VALUE FM_no_top_edge(VALUE fmkr)
+OBJ_PTR FM_no_top_edge(OBJ_PTR fmkr)
 {
    FM *p = Get_FM(fmkr);
    p->top_edge_visible = false;
    return fmkr;
 }
 
-VALUE FM_no_bottom_edge(VALUE fmkr)
+OBJ_PTR FM_no_bottom_edge(OBJ_PTR fmkr)
 {
    FM *p = Get_FM(fmkr);
    p->bottom_edge_visible = false;

@@ -64,7 +64,7 @@ Dictionary Entries
     'rendering_mode'    => a_rendering_mode      # see below
     'stroke_width'      => a_float               # to be used for stroked markers
     'mode'                                       # alias for 'rendering_mode'
-    'legend'            => a_dictionary          # for adding marker to legend
+    'legend'            => a_dict or a_string    # for adding marker to legend
 
 
 Examples

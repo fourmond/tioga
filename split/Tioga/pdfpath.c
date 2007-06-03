@@ -44,16 +44,16 @@ CROAK_ON_NONOK(p); return;}
    
 /* graphics attributes */
 
-void Unpack_RGB(VALUE rgb, double *rp, double *gp, double *bp)
+void Unpack_RGB(OBJ_PTR rgb, double *rp, double *gp, double *bp)
 {
    if (rgb == Qnil) { *rp = *gp = *bp = 0.0; return; }
    if (Array_Len(rgb) != 3) RAISE_ERROR("Sorry: invalid rgb array for setting color: must have 3 entries");
-   VALUE entry = Array_Entry(rgb, 0);
-   double r = NUM2DBL(entry);
+   OBJ_PTR entry = Array_Entry(rgb, 0);
+   double r = Number_to_double(entry);
    entry = Array_Entry(rgb, 1);
-   double g = NUM2DBL(entry);
+   double g = Number_to_double(entry);
    entry = Array_Entry(rgb, 2);
-   double b = NUM2DBL(entry);
+   double b = Number_to_double(entry);
    if (r < 0.0 || r > 1.0) RAISE_ERROR_g("Sorry: invalid red (%g) for color: must be between 0 and 1", r);
    if (g < 0.0 || g > 1.0) RAISE_ERROR_g("Sorry: invalid green (%g) for color: must be between 0 and 1", g);
    if (b < 0.0 || b > 1.0) RAISE_ERROR_g("Sorry: invalid blue (%g) for color: must be between 0 and 1", b);
@@ -68,7 +68,7 @@ void c_stroke_color_set(FM *p, double r, double g, double b)
    p->stroke_color_B = b;
 }
 
-VALUE FM_stroke_color_set(VALUE fmkr, VALUE value) // value is array of [r, g, b] intensities from 0 to 1
+OBJ_PTR FM_stroke_color_set(OBJ_PTR fmkr, OBJ_PTR value) // value is array of [r, g, b] intensities from 0 to 1
 {  // r g b RG
    FM *p = Get_FM(fmkr);
    double r, g, b;
@@ -77,14 +77,14 @@ VALUE FM_stroke_color_set(VALUE fmkr, VALUE value) // value is array of [r, g, b
    return value;
 }
 
-VALUE FM_stroke_color_get(VALUE fmkr) // value is array of [r, g, b] intensities from 0 to 1
+OBJ_PTR FM_stroke_color_get(OBJ_PTR fmkr) // OBJ_PTR is array of [r, g, b] intensities from 0 to 1
 {  // r g b RG
    FM *p = Get_FM(fmkr);
    double r, g, b;
    r = p->stroke_color_R;
    g = p->stroke_color_G;
    b = p->stroke_color_B;
-   VALUE result = Array_New(3);
+   OBJ_PTR result = Array_New(3);
    Array_Store(result, 0, Float_New(r));
    Array_Store(result, 1, Float_New(g));
    Array_Store(result, 2, Float_New(b));
@@ -99,7 +99,7 @@ void c_fill_color_set(FM *p, double r, double g, double b)
    p->fill_color_B = b;
 }
 
-VALUE FM_fill_color_set(VALUE fmkr, VALUE value) // value is array of [r, g, b] intensities from 0 to 1
+OBJ_PTR FM_fill_color_set(OBJ_PTR fmkr, OBJ_PTR value) // value is array of [r, g, b] intensities from 0 to 1
 { // r g b rg
    FM *p = Get_FM(fmkr);
    double r, g, b;
@@ -108,14 +108,14 @@ VALUE FM_fill_color_set(VALUE fmkr, VALUE value) // value is array of [r, g, b] 
    return value;
 }
 
-VALUE FM_fill_color_get(VALUE fmkr) // value is array of [r, g, b] intensities from 0 to 1
+OBJ_PTR FM_fill_color_get(OBJ_PTR fmkr) // OBJ_PTR is array of [r, g, b] intensities from 0 to 1
 {  // r g b RG
    FM *p = Get_FM(fmkr);
    double r, g, b;
    r = p->fill_color_R;
    g = p->fill_color_G;
    b = p->fill_color_B;
-   VALUE result = Array_New(3);
+   OBJ_PTR result = Array_New(3);
    Array_Store(result, 0, Float_New(r));
    Array_Store(result, 1, Float_New(g));
    Array_Store(result, 2, Float_New(b));
@@ -130,11 +130,11 @@ void c_line_width_set(FM *p, double line_width)
    p->line_width = line_width;
 }
 
-VALUE FM_line_width_set(VALUE fmkr, VALUE value)  // value is thickness in points
+OBJ_PTR FM_line_width_set(OBJ_PTR fmkr, OBJ_PTR val)  // val is thickness in points
 { // w
    FM *p = Get_FM(fmkr);
-   c_line_width_set(p, NUM2DBL(value));
-   return value;
+   c_line_width_set(p, Number_to_double(val));
+   return val;
 }
 
 void c_line_scale_set(FM *p, double new_scale)
@@ -144,10 +144,10 @@ void c_line_scale_set(FM *p, double new_scale)
    c_line_width_set(p, p->line_width);
 }
 
-VALUE FM_rescale_lines(VALUE fmkr, VALUE scaling_factor)
+OBJ_PTR FM_rescale_lines(OBJ_PTR fmkr, OBJ_PTR scaling_factor)
 {
    FM *p = Get_FM(fmkr);
-   c_line_scale_set(p, NUM2DBL(scaling_factor) * p->default_line_scale);
+   c_line_scale_set(p, Number_to_double(scaling_factor) * p->default_line_scale);
    return fmkr;
 }
 
@@ -158,11 +158,11 @@ void c_line_cap_set(FM *p, int line_cap)
    p->line_cap = line_cap;
 }
 
-VALUE FM_line_cap_set(VALUE fmkr, VALUE value)
+OBJ_PTR FM_line_cap_set(OBJ_PTR fmkr, OBJ_PTR val)
 { // J
    FM *p = Get_FM(fmkr);
-   c_line_cap_set(p, NUM2INT(value));
-   return value;
+   c_line_cap_set(p, Number_to_int(val));
+   return val;
 }
 
 void c_line_join_set(FM *p, int line_join)
@@ -172,11 +172,11 @@ void c_line_join_set(FM *p, int line_join)
    p->line_join = line_join;
 }
 
-VALUE FM_line_join_set(VALUE fmkr, VALUE value)
+OBJ_PTR FM_line_join_set(OBJ_PTR fmkr, OBJ_PTR val)
 {  // j
    FM *p = Get_FM(fmkr);
-   c_line_join_set(p, NUM2INT(value));
-   return value;
+   c_line_join_set(p, Number_to_int(val));
+   return val;
 }
 
 void c_miter_limit_set(FM *p, double miter_limit)
@@ -188,15 +188,15 @@ void c_miter_limit_set(FM *p, double miter_limit)
    p->miter_limit = miter_limit;
 }
 
-VALUE FM_miter_limit_set(VALUE fmkr, VALUE value) // value is max ratio of miter length to line width
+OBJ_PTR FM_miter_limit_set(OBJ_PTR fmkr, OBJ_PTR val) // val is max ratio of miter length to line width
 { // M
    FM *p = Get_FM(fmkr);
    if (constructing_path) RAISE_ERROR("Sorry: must not be constructing a path when change miter limit");
-   c_miter_limit_set(p, NUM2DBL(value));
-   return value;
+   c_miter_limit_set(p, Number_to_double(val));
+   return val;
 }
 
-VALUE FM_line_type_set(VALUE fmkr, VALUE line_type)
+OBJ_PTR FM_line_type_set(OBJ_PTR fmkr, OBJ_PTR line_type)
 { // array phase d  (distances given in points)
    FM *p = Get_FM(fmkr);
    double sz;
@@ -207,18 +207,18 @@ VALUE FM_line_type_set(VALUE fmkr, VALUE line_type)
       if (writing_file) {
          if (Array_Len(line_type) != 2)
             RAISE_ERROR("Sorry: invalid line_type.  Must be [ [dash pattern] dash phase ]");
-         VALUE dashArray = Array_Entry(line_type, 0), dashPhase = Array_Entry(line_type, 1);
+         OBJ_PTR dashArray = Array_Entry(line_type, 0), dashPhase = Array_Entry(line_type, 1);
          fprintf(TF, "[ ");
          if (dashArray != Qnil) {
             long i, len = Array_Len(dashArray);
             for (i=0; i < len; i++) {
-               VALUE entry = Array_Entry(dashArray, i);
-               sz = NUM2DBL(entry);
+               OBJ_PTR entry = Array_Entry(dashArray, i);
+               sz = Number_to_double(entry);
                if (sz < 0.0) RAISE_ERROR_g("Sorry: invalid dash array entry (%g): must be positive", sz);
                fprintf(TF, "%0.3f ", sz * ENLARGE);
             }
          }
-         sz = NUM2DBL(dashPhase);
+         sz = Number_to_double(dashPhase);
          if (sz < 0.0) RAISE_ERROR_g("Sorry: invalid dash phase (%g): must be positive", sz);
          fprintf(TF, "] %0.3f d\n", sz * ENLARGE);
       }
@@ -252,30 +252,30 @@ void update_bbox(FM *p, double x, double y)
    if (y <= p->clip_top && y > bbox_ury) bbox_ury = y;
 }
 
-VALUE FM_update_bbox(VALUE fmkr, VALUE x, VALUE y)
+OBJ_PTR FM_update_bbox(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y)
 {
    FM *p = Get_FM(fmkr);
-   update_bbox(p, convert_figure_to_output_x(p,NUM2DBL(x)), convert_figure_to_output_y(p,NUM2DBL(y)));
+   update_bbox(p, convert_figure_to_output_x(p,Number_to_double(x)), convert_figure_to_output_y(p,Number_to_double(y)));
    return fmkr;
 }
 
 
-VALUE FM_bbox_left(VALUE fmkr)
+OBJ_PTR FM_bbox_left(OBJ_PTR fmkr)
 {
    return Float_New(bbox_llx); 
 }
 
-VALUE FM_bbox_right(VALUE fmkr)
+OBJ_PTR FM_bbox_right(OBJ_PTR fmkr)
 {
    return Float_New(bbox_urx); 
 }
 
-VALUE FM_bbox_top(VALUE fmkr)
+OBJ_PTR FM_bbox_top(OBJ_PTR fmkr)
 {
    return Float_New(bbox_ury); 
 }
 
-VALUE FM_bbox_bottom(VALUE fmkr)
+OBJ_PTR FM_bbox_bottom(OBJ_PTR fmkr)
 {
    return Float_New(bbox_lly); 
 }
@@ -290,10 +290,10 @@ void c_moveto(FM *p, double x, double y)
    have_current_point = constructing_path = true;
 }
 
-VALUE FM_move_to_point(VALUE fmkr, VALUE x, VALUE y)
+OBJ_PTR FM_move_to_point(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y)
 {
    FM *p = Get_FM(fmkr);
-   double dev_x = convert_figure_to_output_x(p,NUM2DBL(x)), dev_y = convert_figure_to_output_y(p,NUM2DBL(y));
+   double dev_x = convert_figure_to_output_x(p,Number_to_double(x)), dev_y = convert_figure_to_output_y(p,Number_to_double(y));
    c_moveto(p, dev_x, dev_y);
    return fmkr;
 }
@@ -306,10 +306,10 @@ void c_lineto(FM *p, double x, double y)
    update_bbox(p, x, y);
 }
 
-VALUE FM_append_point_to_path(VALUE fmkr, VALUE x, VALUE y)
+OBJ_PTR FM_append_point_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y)
 {
    FM *p = Get_FM(fmkr);
-   double dev_x = convert_figure_to_output_x(p,NUM2DBL(x)), dev_y = convert_figure_to_output_y(p,NUM2DBL(y));
+   double dev_x = convert_figure_to_output_x(p,Number_to_double(x)), dev_y = convert_figure_to_output_y(p,Number_to_double(y));
    c_lineto(p, dev_x, dev_y);
    return fmkr;
 }
@@ -327,12 +327,12 @@ void c_curveto(FM *p, double x1, double y1, double x2, double y2, double x3, dou
    update_bbox(p, x3, y3);
 }
 
-VALUE FM_append_curve_to_path(VALUE fmkr, VALUE x1, VALUE y1, VALUE x2, VALUE y2, VALUE x3, VALUE y3)
+OBJ_PTR FM_append_curve_to_path(OBJ_PTR fmkr, OBJ_PTR x1, OBJ_PTR y1, OBJ_PTR x2, OBJ_PTR y2, OBJ_PTR x3, OBJ_PTR y3)
 {
    FM *p = Get_FM(fmkr);
-   double dev_x1 = convert_figure_to_output_x(p,NUM2DBL(x1)), dev_y1 = convert_figure_to_output_y(p,NUM2DBL(y1));
-   double dev_x2 = convert_figure_to_output_x(p,NUM2DBL(x2)), dev_y2 = convert_figure_to_output_y(p,NUM2DBL(y2));
-   double dev_x3 = convert_figure_to_output_x(p,NUM2DBL(x3)), dev_y3 = convert_figure_to_output_y(p,NUM2DBL(y3));
+   double dev_x1 = convert_figure_to_output_x(p,Number_to_double(x1)), dev_y1 = convert_figure_to_output_y(p,Number_to_double(y1));
+   double dev_x2 = convert_figure_to_output_x(p,Number_to_double(x2)), dev_y2 = convert_figure_to_output_y(p,Number_to_double(y2));
+   double dev_x3 = convert_figure_to_output_x(p,Number_to_double(x3)), dev_y3 = convert_figure_to_output_y(p,Number_to_double(y3));
    c_curveto(p, dev_x1, dev_y1, dev_x2, dev_y2, dev_x3, dev_y3);
    return fmkr;
 }
@@ -345,7 +345,7 @@ void c_closepath(FM *p)
    p = NULL;
 }
 
-VALUE FM_close_path(VALUE fmkr)
+OBJ_PTR FM_close_path(OBJ_PTR fmkr)
 {
    c_closepath(Get_FM(fmkr));
    return fmkr;
@@ -399,9 +399,9 @@ void c_append_arc(FM *p, double x_start, double y_start, double x_corner, double
    c_curveto(p,x1,y1,x2,y2,x3,y3);
 }
 
-double Get_Arc_Radius(FM *p, VALUE dx, VALUE dy)
+double Get_Arc_Radius(FM *p, OBJ_PTR dx, OBJ_PTR dy)
 {
-   double rx = NUM2DBL(dx), ry = NUM2DBL(dy);
+   double rx = Number_to_double(dx), ry = Number_to_double(dy);
    rx = convert_figure_to_output_dx(p,rx);
    ry = convert_figure_to_output_dy(p,ry);
    if (rx < 0) rx = -rx;
@@ -409,14 +409,14 @@ double Get_Arc_Radius(FM *p, VALUE dx, VALUE dy)
    return MIN(rx,ry);
 }
 
-VALUE FM_append_arc_to_path(VALUE fmkr, VALUE x_start, VALUE y_start, VALUE x_corner, VALUE y_corner,
-   VALUE x_end, VALUE y_end, VALUE dx, VALUE dy)
+OBJ_PTR FM_append_arc_to_path(OBJ_PTR fmkr, OBJ_PTR x_start, OBJ_PTR y_start, OBJ_PTR x_corner, OBJ_PTR y_corner,
+   OBJ_PTR x_end, OBJ_PTR y_end, OBJ_PTR dx, OBJ_PTR dy)
 {
    FM *p = Get_FM(fmkr);
    c_append_arc(p,
-      convert_figure_to_output_x(p,NUM2DBL(x_start)), convert_figure_to_output_y(p,NUM2DBL(y_start)),
-      convert_figure_to_output_x(p,NUM2DBL(x_corner)), convert_figure_to_output_y(p,NUM2DBL(y_corner)),
-      convert_figure_to_output_x(p,NUM2DBL(x_end)), convert_figure_to_output_y(p,NUM2DBL(y_end)),
+      convert_figure_to_output_x(p,Number_to_double(x_start)), convert_figure_to_output_y(p,Number_to_double(y_start)),
+      convert_figure_to_output_x(p,Number_to_double(x_corner)), convert_figure_to_output_y(p,Number_to_double(y_corner)),
+      convert_figure_to_output_x(p,Number_to_double(x_end)), convert_figure_to_output_y(p,Number_to_double(y_end)),
       Get_Arc_Radius(p,dx,dy));
    return fmkr;
 }
@@ -430,12 +430,12 @@ void c_append_rect(FM *p, double x, double y, double width, double height)
    c_closepath(p);
 }
 
-VALUE FM_append_rect_to_path(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height)
+OBJ_PTR FM_append_rect_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height)
 {
    FM *p = Get_FM(fmkr);
    c_append_rect(p,
-      convert_figure_to_output_x(p,NUM2DBL(x)), convert_figure_to_output_y(p,NUM2DBL(y)),
-      convert_figure_to_output_dx(p,NUM2DBL(width)), convert_figure_to_output_dy(p,NUM2DBL(height)));
+      convert_figure_to_output_x(p,Number_to_double(x)), convert_figure_to_output_y(p,Number_to_double(y)),
+      convert_figure_to_output_dx(p,Number_to_double(width)), convert_figure_to_output_dy(p,Number_to_double(height)));
    return fmkr;
 }
 
@@ -450,12 +450,12 @@ void c_append_rounded_rect(FM *p, double x, double y, double width, double heigh
    c_closepath(p);
 }
 
-VALUE FM_append_rounded_rect_to_path(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height, VALUE dx, VALUE dy)
+OBJ_PTR FM_append_rounded_rect_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height, OBJ_PTR dx, OBJ_PTR dy)
 {
    FM *p = Get_FM(fmkr);
    c_append_rounded_rect(p,
-      convert_figure_to_output_x(p,NUM2DBL(x)), convert_figure_to_output_y(p,NUM2DBL(y)),
-      convert_figure_to_output_dx(p,NUM2DBL(width)), convert_figure_to_output_dy(p,NUM2DBL(height)), 
+      convert_figure_to_output_x(p,Number_to_double(x)), convert_figure_to_output_y(p,Number_to_double(y)),
+      convert_figure_to_output_dx(p,Number_to_double(width)), convert_figure_to_output_dy(p,Number_to_double(height)), 
       Get_Arc_Radius(p,dx,dy));
    return fmkr;
 }
@@ -491,27 +491,27 @@ void c_append_oval(FM *p, double x, double y, double dx, double dy, double angle
    c_closepath(p);
 }
 
-VALUE FM_append_oval_to_path(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE angle)
+OBJ_PTR FM_append_oval_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx, OBJ_PTR dy, OBJ_PTR angle)
 {
    FM *p = Get_FM(fmkr);
    c_append_oval(p,
-      convert_figure_to_output_x(p,NUM2DBL(x)), convert_figure_to_output_y(p,NUM2DBL(y)),
-      convert_figure_to_output_dx(p,NUM2DBL(dx)), convert_figure_to_output_dy(p,NUM2DBL(dy)), 
-      NUM2DBL(angle));
+      convert_figure_to_output_x(p,Number_to_double(x)), convert_figure_to_output_y(p,Number_to_double(y)),
+      convert_figure_to_output_dx(p,Number_to_double(dx)), convert_figure_to_output_dy(p,Number_to_double(dy)), 
+      Number_to_double(angle));
    return fmkr;
 }
 
-VALUE FM_append_circle_to_path(VALUE fmkr, VALUE x, VALUE y, VALUE dx)
+OBJ_PTR FM_append_circle_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx)
 {
    FM *p = Get_FM(fmkr);
-   double s = convert_figure_to_output_dx(p,NUM2DBL(dx));
+   double s = convert_figure_to_output_dx(p,Number_to_double(dx));
    c_append_oval(p,
-      convert_figure_to_output_x(p,NUM2DBL(x)), convert_figure_to_output_y(p,NUM2DBL(y)),
+      convert_figure_to_output_x(p,Number_to_double(x)), convert_figure_to_output_y(p,Number_to_double(y)),
       s, s, 0.0);
    return fmkr;
 }
 
-VALUE FM_append_points_to_path(VALUE fmkr, VALUE x_vec, VALUE y_vec)
+OBJ_PTR FM_append_points_to_path(OBJ_PTR fmkr, OBJ_PTR x_vec, OBJ_PTR y_vec)
 {
    FM *p = Get_FM(fmkr);
    long xlen, ylen, i;
@@ -528,7 +528,7 @@ VALUE FM_append_points_to_path(VALUE fmkr, VALUE x_vec, VALUE y_vec)
    return fmkr;
 }
 
-VALUE FM_private_append_points_with_gaps_to_path(VALUE fmkr, VALUE x_vec, VALUE y_vec, VALUE gaps, VALUE close_gaps)
+OBJ_PTR FM_private_append_points_with_gaps_to_path(OBJ_PTR fmkr, OBJ_PTR x_vec, OBJ_PTR y_vec, OBJ_PTR gaps, OBJ_PTR close_gaps)
     // where there's a gap, do a moveto instead of a lineto
 {
    if (gaps == Qnil) return FM_append_points_to_path(fmkr, x_vec, y_vec);
@@ -567,7 +567,7 @@ VALUE FM_private_append_points_with_gaps_to_path(VALUE fmkr, VALUE x_vec, VALUE 
 
 /* Path painting operators */
 
-VALUE FM_stroke(VALUE fmkr)
+OBJ_PTR FM_stroke(OBJ_PTR fmkr)
 {
    if (!constructing_path) return fmkr;
    if (writing_file) fprintf(TF, "S\n");
@@ -575,7 +575,7 @@ VALUE FM_stroke(VALUE fmkr)
    return fmkr;
 }
 
-VALUE FM_close_and_stroke(VALUE fmkr)
+OBJ_PTR FM_close_and_stroke(OBJ_PTR fmkr)
 {
    if (!constructing_path) return fmkr;
    if (writing_file) fprintf(TF, "s\n");
@@ -583,7 +583,7 @@ VALUE FM_close_and_stroke(VALUE fmkr)
    return fmkr;
 }
 
-VALUE FM_fill(VALUE fmkr)
+OBJ_PTR FM_fill(OBJ_PTR fmkr)
 {
    if (!constructing_path) return fmkr;
    if (writing_file) fprintf(TF, "f\n");
@@ -591,7 +591,7 @@ VALUE FM_fill(VALUE fmkr)
    return fmkr;
 }
 
-VALUE FM_discard_path(VALUE fmkr)
+OBJ_PTR FM_discard_path(OBJ_PTR fmkr)
 {
    if (!constructing_path) return fmkr;
    if (writing_file) fprintf(TF, "n\n");
@@ -599,7 +599,7 @@ VALUE FM_discard_path(VALUE fmkr)
    return fmkr;
 }
 
-VALUE FM_eofill(VALUE fmkr)
+OBJ_PTR FM_eofill(OBJ_PTR fmkr)
 {
    if (!constructing_path) return fmkr;
    if (writing_file) fprintf(TF, "f*\n");
@@ -607,7 +607,7 @@ VALUE FM_eofill(VALUE fmkr)
    return fmkr;
 }
 
-VALUE FM_fill_and_stroke(VALUE fmkr)
+OBJ_PTR FM_fill_and_stroke(OBJ_PTR fmkr)
 {
    if (!constructing_path) return fmkr;
    if (writing_file) fprintf(TF, "B\n");
@@ -615,7 +615,7 @@ VALUE FM_fill_and_stroke(VALUE fmkr)
    return fmkr;
 }
 
-VALUE FM_eofill_and_stroke(VALUE fmkr)
+OBJ_PTR FM_eofill_and_stroke(OBJ_PTR fmkr)
 {
    if (!constructing_path) return fmkr;
    if (writing_file) fprintf(TF, "B*\n");
@@ -623,7 +623,7 @@ VALUE FM_eofill_and_stroke(VALUE fmkr)
    return fmkr;
 }
 
-VALUE FM_close_fill_and_stroke(VALUE fmkr)
+OBJ_PTR FM_close_fill_and_stroke(OBJ_PTR fmkr)
 {
    if (!constructing_path) return fmkr;
    if (writing_file) fprintf(TF, "b\n");
@@ -631,7 +631,7 @@ VALUE FM_close_fill_and_stroke(VALUE fmkr)
    return fmkr;
 }
 
-VALUE FM_close_eofill_and_stroke(VALUE fmkr)
+OBJ_PTR FM_close_eofill_and_stroke(OBJ_PTR fmkr)
 {
    if (!constructing_path) return fmkr;
    if (writing_file) fprintf(TF, "b*\n");
@@ -647,13 +647,13 @@ void c_clip(FM *p)
    p = NULL;
 }
 
-VALUE FM_clip(VALUE fmkr)
+OBJ_PTR FM_clip(OBJ_PTR fmkr)
 {
    c_clip(Get_FM(fmkr));
    return fmkr;
 }
 
-VALUE FM_eoclip(VALUE fmkr)
+OBJ_PTR FM_eoclip(OBJ_PTR fmkr)
 {
    if (!constructing_path) return fmkr;
    if (writing_file) fprintf(TF, "W* n\n");
@@ -661,7 +661,7 @@ VALUE FM_eoclip(VALUE fmkr)
    return fmkr;
 }
 
-VALUE FM_fill_and_clip(VALUE fmkr)
+OBJ_PTR FM_fill_and_clip(OBJ_PTR fmkr)
 {
    if (!constructing_path) return fmkr;
    if (writing_file) fprintf(TF, "q f Q\n");
@@ -669,7 +669,7 @@ VALUE FM_fill_and_clip(VALUE fmkr)
    return fmkr;
 }
 
-VALUE FM_stroke_and_clip(VALUE fmkr)
+OBJ_PTR FM_stroke_and_clip(OBJ_PTR fmkr)
 {
    if (!constructing_path) return fmkr;
    if (writing_file) fprintf(TF, "q S Q\n");
@@ -677,7 +677,7 @@ VALUE FM_stroke_and_clip(VALUE fmkr)
    return fmkr;
 }
 
-VALUE FM_fill_stroke_and_clip(VALUE fmkr)
+OBJ_PTR FM_fill_stroke_and_clip(OBJ_PTR fmkr)
 {
    if (!constructing_path) return fmkr;
    if (writing_file) fprintf(TF, "q B Q\n");
@@ -687,7 +687,7 @@ VALUE FM_fill_stroke_and_clip(VALUE fmkr)
 
 /* Combination Path Constructing and Using */
 
-VALUE FM_stroke_line(VALUE fmkr, VALUE x1, VALUE y1, VALUE x2, VALUE y2)
+OBJ_PTR FM_stroke_line(OBJ_PTR fmkr, OBJ_PTR x1, OBJ_PTR y1, OBJ_PTR x2, OBJ_PTR y2)
 {
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling stroke_line");
    FM_move_to_point(fmkr, x1, y1);
@@ -696,7 +696,7 @@ VALUE FM_stroke_line(VALUE fmkr, VALUE x1, VALUE y1, VALUE x2, VALUE y2)
    return fmkr;
 }
 
-VALUE FM_fill_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height)
+OBJ_PTR FM_fill_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height)
 {
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling fill_rect");
    FM_append_rect_to_path(fmkr, x, y, width, height);
@@ -704,7 +704,7 @@ VALUE FM_fill_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height)
    return fmkr;
 }
 
-VALUE FM_stroke_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height)
+OBJ_PTR FM_stroke_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height)
 {
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling stroke_rect");
    FM_append_rect_to_path(fmkr, x, y, width, height);
@@ -712,7 +712,7 @@ VALUE FM_stroke_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height)
    return fmkr;
 }
 
-VALUE FM_fill_and_stroke_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height)
+OBJ_PTR FM_fill_and_stroke_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height)
 {
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling fill_and_stroke_rect");
    FM_append_rect_to_path(fmkr, x, y, width, height);
@@ -735,17 +735,17 @@ void c_clip_rect(FM *p, double x, double y, double width, double height) // in o
    if (clip_top < p->clip_top) p->clip_top = clip_top;
 }
 
-VALUE FM_clip_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height)
+OBJ_PTR FM_clip_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height)
 {
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling clip_rect");
    FM *p = Get_FM(fmkr);
    c_clip_rect(p,
-      convert_figure_to_output_x(p,NUM2DBL(x)), convert_figure_to_output_y(p,NUM2DBL(y)),
-      convert_figure_to_output_dx(p,NUM2DBL(width)), convert_figure_to_output_dy(p,NUM2DBL(height)));
+      convert_figure_to_output_x(p,Number_to_double(x)), convert_figure_to_output_y(p,Number_to_double(y)),
+      convert_figure_to_output_dx(p,Number_to_double(width)), convert_figure_to_output_dy(p,Number_to_double(height)));
    return fmkr;
 }
 
-VALUE FM_clip_oval(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE angle)
+OBJ_PTR FM_clip_oval(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx, OBJ_PTR dy, OBJ_PTR angle)
 {
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling clip_oval");
    FM_append_oval_to_path(fmkr, x, y, dx, dy, angle);
@@ -753,7 +753,7 @@ VALUE FM_clip_oval(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE angle
    return fmkr;
 }
 
-VALUE FM_fill_oval(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE angle)
+OBJ_PTR FM_fill_oval(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx, OBJ_PTR dy, OBJ_PTR angle)
 {
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling fill_oval");
    FM_append_oval_to_path(fmkr, x, y, dx, dy, angle);
@@ -761,7 +761,7 @@ VALUE FM_fill_oval(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE angle
    return fmkr;
 }
 
-VALUE FM_stroke_oval(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE angle)
+OBJ_PTR FM_stroke_oval(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx, OBJ_PTR dy, OBJ_PTR angle)
 {
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling stroke_oval");
    FM_append_oval_to_path(fmkr, x, y, dx, dy, angle);
@@ -769,7 +769,7 @@ VALUE FM_stroke_oval(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE ang
    return fmkr;
 }
 
-VALUE FM_fill_and_stroke_oval(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE angle)
+OBJ_PTR FM_fill_and_stroke_oval(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx, OBJ_PTR dy, OBJ_PTR angle)
 {
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling fill_and_stroke_oval");
    FM_append_oval_to_path(fmkr, x, y, dx, dy, angle);
@@ -777,7 +777,7 @@ VALUE FM_fill_and_stroke_oval(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, 
    return fmkr;
 }
 
-VALUE FM_clip_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height, VALUE dx, VALUE dy)
+OBJ_PTR FM_clip_rounded_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height, OBJ_PTR dx, OBJ_PTR dy)
 {
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling clip_rounded_rect");
    FM_append_rounded_rect_to_path(fmkr, x, y, width, height, dx, dy);
@@ -785,7 +785,7 @@ VALUE FM_clip_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE heig
    return fmkr;
 }
 
-VALUE FM_fill_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height, VALUE dx, VALUE dy)
+OBJ_PTR FM_fill_rounded_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height, OBJ_PTR dx, OBJ_PTR dy)
 {
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling fill_rounded_rect");
    FM_append_rounded_rect_to_path(fmkr, x, y, width, height, dx, dy);
@@ -793,7 +793,7 @@ VALUE FM_fill_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE heig
    return fmkr;
 }
 
-VALUE FM_stroke_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height, VALUE dx, VALUE dy)
+OBJ_PTR FM_stroke_rounded_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height, OBJ_PTR dx, OBJ_PTR dy)
 {
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling stroke_rounded_rect");
    FM_append_rounded_rect_to_path(fmkr, x, y, width, height, dx, dy);
@@ -801,7 +801,7 @@ VALUE FM_stroke_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE he
    return fmkr;
 }
 
-VALUE FM_fill_and_stroke_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height, VALUE dx, VALUE dy)
+OBJ_PTR FM_fill_and_stroke_rounded_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height, OBJ_PTR dx, OBJ_PTR dy)
 {
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling fill_and_stroke_rounded_rect");
    FM_append_rounded_rect_to_path(fmkr, x, y, width, height, dx, dy);
@@ -809,7 +809,7 @@ VALUE FM_fill_and_stroke_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width,
    return fmkr;
 }
 
-VALUE FM_clip_circle(VALUE fmkr, VALUE x, VALUE y, VALUE dx)
+OBJ_PTR FM_clip_circle(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx)
 {
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling clip_circle");
    FM_append_circle_to_path(fmkr, x, y, dx);
@@ -817,7 +817,7 @@ VALUE FM_clip_circle(VALUE fmkr, VALUE x, VALUE y, VALUE dx)
    return fmkr;
 }
 
-VALUE FM_fill_circle(VALUE fmkr, VALUE x, VALUE y, VALUE dx)
+OBJ_PTR FM_fill_circle(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx)
 {
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling fill_circle");
    FM_append_circle_to_path(fmkr, x, y, dx);
@@ -825,7 +825,7 @@ VALUE FM_fill_circle(VALUE fmkr, VALUE x, VALUE y, VALUE dx)
    return fmkr;
 }
 
-VALUE FM_stroke_circle(VALUE fmkr, VALUE x, VALUE y, VALUE dx)
+OBJ_PTR FM_stroke_circle(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx)
 {
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling stroke_circle");
    FM_append_circle_to_path(fmkr, x, y, dx);
@@ -833,7 +833,7 @@ VALUE FM_stroke_circle(VALUE fmkr, VALUE x, VALUE y, VALUE dx)
    return fmkr;
 }
 
-VALUE FM_fill_and_stroke_circle(VALUE fmkr, VALUE x, VALUE y, VALUE dx)
+OBJ_PTR FM_fill_and_stroke_circle(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx)
 {
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling fill_and_stroke_circle");
    FM_append_circle_to_path(fmkr, x, y, dx);
@@ -857,14 +857,14 @@ static void c_append_frame(FM *p, bool clip)
    if (frame_top < p->clip_top) p->clip_top = frame_top;
 }
 
-VALUE FM_append_frame_to_path(VALUE fmkr)
+OBJ_PTR FM_append_frame_to_path(OBJ_PTR fmkr)
 {
    FM *p = Get_FM(fmkr);
    c_append_frame(p, false);
    return fmkr;
 }
 
-VALUE FM_fill_frame(VALUE fmkr)
+OBJ_PTR FM_fill_frame(OBJ_PTR fmkr)
 {
    FM *p = Get_FM(fmkr);
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling fill_frame");
@@ -872,7 +872,7 @@ VALUE FM_fill_frame(VALUE fmkr)
    return fmkr;
 }
 
-VALUE FM_stroke_frame(VALUE fmkr)
+OBJ_PTR FM_stroke_frame(OBJ_PTR fmkr)
 {
    FM *p = Get_FM(fmkr);
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling stroke_frame");
@@ -880,7 +880,7 @@ VALUE FM_stroke_frame(VALUE fmkr)
    return fmkr;
 }
 
-VALUE FM_fill_and_stroke_frame(VALUE fmkr)
+OBJ_PTR FM_fill_and_stroke_frame(OBJ_PTR fmkr)
 {
    FM *p = Get_FM(fmkr);
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling fill_and_stroke_frame");
@@ -888,7 +888,7 @@ VALUE FM_fill_and_stroke_frame(VALUE fmkr)
    return fmkr;
 }
 
-VALUE FM_clip_to_frame(VALUE fmkr)
+OBJ_PTR FM_clip_to_frame(OBJ_PTR fmkr)
 {
    FM *p = Get_FM(fmkr);
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling clip_to_frame");

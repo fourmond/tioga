@@ -36,10 +36,10 @@ void c_text_scale_set(FM *p, double scale)
    p->default_text_scale = scale;
 }
 
-VALUE FM_rescale_text(VALUE fmkr, VALUE scaling_factor) // updates default text heights too
+OBJ_PTR FM_rescale_text(OBJ_PTR fmkr, OBJ_PTR scaling_factor) // updates default text heights too
 {
    FM *p = Get_FM(fmkr);
-   c_text_scale_set(p, NUM2DBL(scaling_factor) * p->default_text_scale);
+   c_text_scale_set(p, Number_to_double(scaling_factor) * p->default_text_scale);
    return fmkr;
 }
 
@@ -138,12 +138,12 @@ void c_show_rotated_text(FM *p, char *text, int frame_side, double shift, double
    tex_show_rotated_text(p, text, x, y, scale, angle + base_angle, justification, alignment);
 }
    
-VALUE FM_show_rotated_text(VALUE fmkr, VALUE text, VALUE frame_side, VALUE shift,
-   VALUE fraction, VALUE scale, VALUE angle, VALUE justification, VALUE alignment)
+OBJ_PTR FM_show_rotated_text(OBJ_PTR fmkr, OBJ_PTR text, OBJ_PTR frame_side, OBJ_PTR shift,
+   OBJ_PTR fraction, OBJ_PTR scale, OBJ_PTR angle, OBJ_PTR justification, OBJ_PTR alignment)
 {
    FM *p = Get_FM(fmkr);
-   c_show_rotated_text(p, String_Ptr(text), NUM2INT(frame_side), NUM2DBL(shift),
-      NUM2DBL(fraction), NUM2DBL(scale), NUM2DBL(angle), NUM2INT(justification), NUM2INT(alignment));
+   c_show_rotated_text(p, String_Ptr(text), Number_to_int(frame_side), Number_to_double(shift),
+      Number_to_double(fraction), Number_to_double(scale), Number_to_double(angle), Number_to_int(justification), Number_to_int(alignment));
    return fmkr;
 }
          
@@ -154,19 +154,19 @@ void c_show_rotated_label(FM *p, char *text,
       scale, angle, justification, alignment);
 }
    
-VALUE FM_show_rotated_label(VALUE fmkr, VALUE text,
-   VALUE xloc, VALUE yloc, VALUE scale, VALUE angle, VALUE justification, VALUE alignment)
+OBJ_PTR FM_show_rotated_label(OBJ_PTR fmkr, OBJ_PTR text,
+   OBJ_PTR xloc, OBJ_PTR yloc, OBJ_PTR scale, OBJ_PTR angle, OBJ_PTR justification, OBJ_PTR alignment)
 {
    FM *p = Get_FM(fmkr);
-   c_show_rotated_label(p, String_Ptr(text), NUM2DBL(xloc), NUM2DBL(yloc),
-      NUM2DBL(scale), NUM2DBL(angle), NUM2INT(justification), NUM2INT(alignment));
+   c_show_rotated_label(p, String_Ptr(text), Number_to_double(xloc), Number_to_double(yloc),
+      Number_to_double(scale), Number_to_double(angle), Number_to_int(justification), Number_to_int(alignment));
    return fmkr;
 }
 
-VALUE FM_check_label_clip(VALUE fmkr, VALUE xloc, VALUE yloc)
+OBJ_PTR FM_check_label_clip(OBJ_PTR fmkr, OBJ_PTR xloc, OBJ_PTR yloc)
 {
    FM *p = Get_FM(fmkr);
-   double x = NUM2DBL(xloc), y = NUM2DBL(yloc);
+   double x = Number_to_double(xloc), y = Number_to_double(yloc);
    x = convert_figure_to_frame_x(p,x);
    y = convert_figure_to_frame_y(p,y);
    if (x < p->label_left_margin || y < p->label_bottom_margin ||
@@ -187,7 +187,7 @@ static void Get_tex_name(char *ofile, char *filename, int maxlen)
    strcat(ofile, "_figure.txt");
 }
 
-void Open_tex(VALUE fmkr, char *filename, bool quiet_mode) 
+void Open_tex(OBJ_PTR fmkr, char *filename, bool quiet_mode) 
 {
    char ofile[300];
    Get_tex_name(ofile, filename, 300);
@@ -201,7 +201,7 @@ void Open_tex(VALUE fmkr, char *filename, bool quiet_mode)
    fmkr = Qnil; // unused
 }
 
-void Close_tex(VALUE fmkr, bool quiet_mode)
+void Close_tex(OBJ_PTR fmkr, bool quiet_mode)
 {
    double x, y, xoff, yoff;
    x = bbox_urx - bbox_llx; if (x < 0) x = bbox_urx = bbox_llx = 0;
@@ -215,8 +215,8 @@ void Close_tex(VALUE fmkr, bool quiet_mode)
 }   
 
 
-void Write_preview_header(VALUE fmkr, FILE *file) {
-   VALUE tmp;
+void Write_preview_header(OBJ_PTR fmkr, FILE *file) {
+   OBJ_PTR tmp;
    fprintf(file, "\\documentclass{%s}\n\n", Get_tex_preview_documentclass(fmkr));   
    /* we print out the preamble generated from tioga.sty.in */
    fprintf(file, "%% Tioga preamble generated from tioga.sty.in\n");
@@ -255,7 +255,7 @@ void Write_preview_header(VALUE fmkr, FILE *file) {
 }
 
 
-void Write_figure_command(VALUE fmkr, char *simple_name, FILE *file) {
+void Write_figure_command(OBJ_PTR fmkr, char *simple_name, FILE *file) {
    char *minwhitespace;
    
    if (Get_tex_preview_fullpage(fmkr)) {
@@ -277,7 +277,7 @@ void Write_figure_command(VALUE fmkr, char *simple_name, FILE *file) {
 }
 
    
-void Create_wrapper(VALUE fmkr, char *fname, bool quiet_mode)
+void Create_wrapper(OBJ_PTR fmkr, char *fname, bool quiet_mode)
 {  // create the wrapper TeX file to combine the text and graphics to make a figure
    char *dot;
    char tex_fname[100], base_name[100], simple_name[100];
@@ -323,7 +323,7 @@ void Rename_tex(char *oldname, char *newname)
    rename(old_ofile, new_ofile); // from stdio.h
 }
 
-void private_make_portfolio(char *name, VALUE fignums, VALUE fignames)
+void private_make_portfolio(char *name, OBJ_PTR fignums, OBJ_PTR fignames)
 {
     FILE *file;
     int i, len, numfigs, j;
@@ -345,7 +345,7 @@ void private_make_portfolio(char *name, VALUE fignums, VALUE fignames)
     } else {
         numfigs = Array_Len(fignums);
         for (i=0; i < numfigs; i++) {
-            j = NUM2INT(Array_Entry(fignums,i));
+            j = Number_to_int(Array_Entry(fignums,i));
             if (j >= 0 && j < len) fprintf(file, "\\includepdf{%s.pdf}\n", Get_String(fignames, j));
             else {
                 fclose(file);

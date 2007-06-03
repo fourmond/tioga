@@ -24,7 +24,7 @@
 
 /* Lines */
 
-   void c_private_make_spline_interpolated_points(FM *p, VALUE Xvec, VALUE Yvec, VALUE Xvec_data, VALUE Yvec_data,
+   void c_private_make_spline_interpolated_points(FM *p, OBJ_PTR Xvec, OBJ_PTR Yvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
         int start_clamped, double start_slope, int end_clamped, double end_slope) {
       int i, n_pts_data;
       double *As, *Bs, *Cs, *Ds;
@@ -51,23 +51,23 @@
       USE_P
       }
       
-   VALUE FM_private_make_spline_interpolated_points(VALUE fmkr, VALUE Xvec, VALUE Yvec, VALUE Xvec_data, VALUE Yvec_data,
-        VALUE start_slope, VALUE end_slope) {
+   OBJ_PTR FM_private_make_spline_interpolated_points(OBJ_PTR fmkr, OBJ_PTR Xvec, OBJ_PTR Yvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
+        OBJ_PTR start_slope, OBJ_PTR end_slope) {
       FM *p = Get_FM(fmkr);
       bool start_clamped = (start_slope != Qnil), end_clamped = (end_slope != Qnil);
       double start=0, end=0;
       if (start_clamped) {
-         start = NUM2DBL(start_slope);
+         start = Number_to_double(start_slope);
       }
       if (end_clamped) {
-         end = NUM2DBL(end_slope);
+         end = Number_to_double(end_slope);
       }
       c_private_make_spline_interpolated_points(p, Xvec, Yvec, Xvec_data, Yvec_data,
          start_clamped, start, end_clamped, end);
       return fmkr;
    }
 
-   void c_make_steps(FM *p, VALUE Xvec, VALUE Yvec, VALUE Xvec_data, VALUE Yvec_data,
+   void c_make_steps(FM *p, OBJ_PTR Xvec, OBJ_PTR Yvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
         double xfirst, double yfirst, double xlast, double ylast){
       double xnext, xprev, x;
       int n_pts_to_add;
@@ -101,11 +101,11 @@
       USE_P
       }
       
-   VALUE FM_private_make_steps(VALUE fmkr, VALUE Xvec, VALUE Yvec, VALUE Xvec_data, VALUE Yvec_data,
-        VALUE xfirst, VALUE yfirst, VALUE xlast, VALUE ylast) {
+OBJ_PTR FM_private_make_steps(OBJ_PTR fmkr, OBJ_PTR Xvec, OBJ_PTR Yvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
+        OBJ_PTR xfirst, OBJ_PTR yfirst, OBJ_PTR xlast, OBJ_PTR ylast) {
       FM *p = Get_FM(fmkr);
       c_make_steps(p, Xvec, Yvec, Xvec_data, Yvec_data,
-         NUM2DBL(xfirst), NUM2DBL(yfirst), NUM2DBL(xlast), NUM2DBL(ylast));
+         Number_to_double(xfirst), Number_to_double(yfirst), Number_to_double(xlast), Number_to_double(ylast));
       return fmkr;
    }
 
@@ -180,9 +180,9 @@ int conrec(double **d,
 	   double *y,
 	   int nc,
 	   double *z,
-	   VALUE dest_xs,
-	   VALUE dest_ys,
-	   VALUE gaps,
+	   OBJ_PTR dest_xs,
+	   OBJ_PTR dest_ys,
+	   OBJ_PTR gaps,
 	   double x_limit,
 	   double y_limit)
 // d               ! matrix of data to contour
@@ -384,7 +384,7 @@ double x_prev=0.0, y_prev=0.0;
 		double dx = x1 - x_prev, dy = y1 - y_prev;
 		if (dx < 0) dx = -dx; if (dy < 0) dy = -dy;
 		if (num_pts == 0 || dx > x_limit || dy > y_limit) {
-         if (num_pts > 0) Array_Push(gaps, INT2FIX(num_pts));
+         if (num_pts > 0) Array_Push(gaps, Integer_New(num_pts));
          PUSH_POINT(x1,y1,num_pts);
 		}
 		PUSH_POINT(x2,y2,num_pts);
@@ -423,18 +423,18 @@ static int      nx_1, ny_1, iGT, jGT, iLE, jLE;
 static void     free_space_for_curve();
 static void     get_space_for_curve();
 static void     draw_the_contour(
-	   VALUE dest_xs,
-	   VALUE dest_ys,
-	   VALUE gaps);
+	   OBJ_PTR dest_xs,
+	   OBJ_PTR dest_ys,
+	   OBJ_PTR gaps);
 
 static bool     trace_contour(double z0,
 			      double *x,
 			      double *y,
                   double **z,
 			      double **legit,
-			      VALUE dest_xs,
-			      VALUE dest_ys,
-			      VALUE gaps);
+			      OBJ_PTR dest_xs,
+			      OBJ_PTR dest_ys,
+			      OBJ_PTR gaps);
                   
 static int      FLAG(int ni, int nj, int ind);
 static int      append_segment(double xr, double yr, double zr, double OKr,
@@ -492,7 +492,6 @@ get_space_for_curve()
 //  contour_space_later centimeters, starting with a space of
 //  contour_space_first from the beginning of the trace.
 //  
-//  CONTOUR_VALUE MISSING_VALUE
 static void
 gr_contour(
 	   double *x,
@@ -502,9 +501,9 @@ gr_contour(
 	   int nx,
 	   int ny, 
 	   double z0,
-	   VALUE dest_xs,
-	   VALUE dest_ys,
-	   VALUE gaps)
+	   OBJ_PTR dest_xs,
+	   OBJ_PTR dest_ys,
+	   OBJ_PTR gaps)
 {
 	register int    i, j;
 	// Test for errors
@@ -656,9 +655,9 @@ trace_contour(double z0,
 	      double *y,
 	      double **z,
 	      double **legit,
-	      VALUE dest_xs,
-	      VALUE dest_ys,
-	      VALUE gaps
+	      OBJ_PTR dest_xs,
+	      OBJ_PTR dest_ys,
+	      OBJ_PTR gaps
 )
 {
 	int             i, ii, j, jj;
@@ -846,13 +845,12 @@ append_segment(double xr, double yr, double zr, double OKr,
 // Draw contour stored in (xcurve[],ycurve[],legitcurve[]), possibly with
 // labels (depending on global Label_contours).
 // 
-// CONTOUR_VALUE MISSING_VALUE
 #define FACTOR 3.0 // contour must be FACTOR*len long to be labelled
 static void
 draw_the_contour(
-	   VALUE dest_xs,
-	   VALUE dest_ys,
-	   VALUE gaps)
+	   OBJ_PTR dest_xs,
+	   OBJ_PTR dest_ys,
+	   OBJ_PTR gaps)
 {
 	if (num_in_curve == 1) {
 		num_in_curve = 0;
@@ -864,11 +862,11 @@ draw_the_contour(
             // PUSH_POINT does num_in_path++
             PUSH_POINT(xcurve[i],ycurve[i],num_in_path);
         } else {
-            if (num_in_path > 0 && num_in_path != k) Array_Push(gaps, INT2FIX(num_in_path));
+            if (num_in_path > 0 && num_in_path != k) Array_Push(gaps, Integer_New(num_in_path));
             k = num_in_path;
             }
     }
-    Array_Push(gaps, INT2FIX(num_in_path));
+    Array_Push(gaps, Integer_New(num_in_path));
     num_in_curve = 0;
 }
 
@@ -879,7 +877,7 @@ draw_the_contour(
 // if (ind == 1), check flag and then set it
 // if (ind == 2), clear the flag storage space
 // if (ind == 0), check flag, return value
-// RETURN VALUE: Normally, the flag value (0 or 1).  If the storage is
+// RETURN value: Normally, the flag value (0 or 1).  If the storage is
 // exhausted, return a number <0.
 #define	NBITS		32
 static int
@@ -940,8 +938,8 @@ FLAG(int ni, int nj, int ind)
 
 
 
-   void c_make_contour(FM *p, VALUE dest_xs, VALUE dest_ys, VALUE gaps,
-         VALUE xs, VALUE ys,  VALUE zs_data, double z_level,  VALUE legit_data, int use_conrec) {
+   void c_make_contour(FM *p, OBJ_PTR dest_xs, OBJ_PTR dest_ys, OBJ_PTR gaps,
+         OBJ_PTR xs, OBJ_PTR ys,  OBJ_PTR zs_data, double z_level,  OBJ_PTR legit_data, int use_conrec) {
       long xlen, ylen, num_columns, num_rows;
       double *x_coords = Vector_Data_for_Read(xs, &xlen);
       double *y_coords = Vector_Data_for_Read(ys, &ylen);
@@ -967,15 +965,15 @@ FLAG(int ni, int nj, int ind)
       
    }
    
-   VALUE FM_private_make_contour(VALUE fmkr,
-         VALUE dest_xs, VALUE dest_ys, VALUE gaps, // these vectors get the results
-         VALUE xs, VALUE ys, // data x coordinates and y coordinates
-         VALUE zs, VALUE z_level, // the table of values and the desired contour level
-         VALUE legit, // the table of flags (nonzero means okay)
-         VALUE method // int == 1 means CONREC
+   OBJ_PTR FM_private_make_contour(OBJ_PTR fmkr,
+         OBJ_PTR dest_xs, OBJ_PTR dest_ys, OBJ_PTR gaps, // these vectors get the results
+         OBJ_PTR xs, OBJ_PTR ys, // data x coordinates and y coordinates
+         OBJ_PTR zs, OBJ_PTR z_level, // the table of values and the desired contour level
+         OBJ_PTR legit, // the table of flags (nonzero means okay)
+         OBJ_PTR method // int == 1 means CONREC
          ) {
       FM *p = Get_FM(fmkr);
-      c_make_contour(p, dest_xs, dest_ys, gaps, xs, ys, zs, NUM2DBL(z_level), legit, NUM2INT(method));
+      c_make_contour(p, dest_xs, dest_ys, gaps, xs, ys, zs, Number_to_double(z_level), legit, Number_to_int(method));
       return fmkr;
    }
 

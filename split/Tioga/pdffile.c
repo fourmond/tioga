@@ -137,7 +137,7 @@ static void Get_pdf_name(char *ofile, char *filename, int maxlen)
    strcat(ofile, "_figure.pdf");
 }
 
-void Open_pdf(VALUE fmkr, char *filename, bool quiet_mode)
+void Open_pdf(OBJ_PTR fmkr, char *filename, bool quiet_mode)
 {
    FM *p = Get_FM(fmkr);
    int i;
@@ -241,7 +241,7 @@ static void Write_Stream(void)
    free(buffer); free(dest_buffer);
 }
 
-void Close_pdf(VALUE fmkr, bool quiet_mode)
+void Close_pdf(OBJ_PTR fmkr, bool quiet_mode)
 {
    FM *p = Get_FM(fmkr);
    int i;

@@ -30,7 +30,21 @@
    instead of directly using Dvector or Dtable */
 
 
-/* generic interpreter interface */
+/* Ruby definitions for the generic interpreter interface */
+
+#define OBJ_PTR VALUE
+
+#define Number_to_double(obj) NUM2DBL(obj)
+    // returns a C double
+    // raises error if obj not a kind of number
+#define Number_to_int(obj) NUM2INT(obj)
+    // returns a C int
+    // raises error if obj not a kind of integer
+
+#define Integer_New(val) INT2FIX(val)
+    // returns a new integer object with given val
+#define Float_New(val) rb_float_new(val)
+    // returns a new float object with given val
 
 #define String_New(src,len) rb_str_new(src,len)
     // returns a new string object initialized with len chars from src
@@ -62,9 +76,6 @@
     // pushes val onto the end of array obj
     // raises error if obj not a kind of array
 
-#define Float_New(val) rb_float_new(val)
-    // returns a new float object with given val
-
 #define ID_Get(name) rb_intern(name)
     // returns internal ID for the given name
 #define Obj_Attr_Get(obj,attr_ID) rb_ivar_get(obj,attr_ID)
@@ -76,7 +87,8 @@
 //#define Obj_Attr_Set_by_StringName(obj,attr_name_string,val) rb_iv_set(obj,attr_name_string,val)
     // sets the specified attr of the obj to val (name_string is char *)
 
-#define RAISE_ERROR(str) rb_raise(rb_eArgError, (str))
+#define RAISE_ERROR(str) rb_raise(rb_eArgError,str)
+// The following do sprintf and then call RAISE_ERROR.
 extern void RAISE_ERROR_s(char *fmt, char *s);
 extern void RAISE_ERROR_ss(char *fmt, char *s1, char *s2);
 extern void RAISE_ERROR_i(char *fmt, int x);
@@ -85,7 +97,7 @@ extern void RAISE_ERROR_g(char *fmt, double x);
 extern void RAISE_ERROR_gg(char *fmt, double x1, double x2);
 
 
-/* generic double array interface */
+/* Dvector+Dtable version of generic double array interface */
 
 #define Vector_Data_for_Read(obj,len_ptr) Dvector_Data_for_Read(obj,len_ptr) 
     //returns double *

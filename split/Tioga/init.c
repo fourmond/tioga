@@ -101,18 +101,18 @@ void c_set_device_pagesize(FM *p, double width, double height) { // sizes in uni
 VALUE FM_set_device_pagesize(VALUE fmkr, VALUE width, VALUE height)
 {
    FM *p = Get_FM(fmkr);
-   c_set_device_pagesize(p, NUM2DBL(width), NUM2DBL(height));
+   c_set_device_pagesize(p, Number_to_double(width), Number_to_double(height));
    return fmkr;
 }
 
 
 void c_set_frame_sides(FM *p, double left, double right, double top, double bottom) { // sizes in page coords [0..1]
-   if (left > 1.0 || left < 0.0) RAISE_ERROR("Sorry: value of left must be between 0 and 1 for set_frame_sides");
-   if (right > 1.0 || right < 0.0) RAISE_ERROR("Sorry: value of right must be between 0 and 1 for set_frame_sides");
-   if (top > 1.0 || top < 0.0) RAISE_ERROR("Sorry: value of top must be between 0 and 1 for set_frame_sides");
-   if (bottom > 1.0 || bottom < 0.0) RAISE_ERROR("Sorry: value of bottom must be between 0 and 1 for set_frame_sides");
-   if (left >= right) RAISE_ERROR("Sorry: value of left must be smaller than value of right for set_frame_sides");
-   if (bottom >= top) RAISE_ERROR("Sorry: value of bottom must be smaller than value of top for set_frame_sides");
+   if (left > 1.0 || left < 0.0) RAISE_ERROR("Sorry: VALUE of left must be between 0 and 1 for set_frame_sides");
+   if (right > 1.0 || right < 0.0) RAISE_ERROR("Sorry: VALUE of right must be between 0 and 1 for set_frame_sides");
+   if (top > 1.0 || top < 0.0) RAISE_ERROR("Sorry: VALUE of top must be between 0 and 1 for set_frame_sides");
+   if (bottom > 1.0 || bottom < 0.0) RAISE_ERROR("Sorry: VALUE of bottom must be between 0 and 1 for set_frame_sides");
+   if (left >= right) RAISE_ERROR("Sorry: VALUE of left must be smaller than VALUE of right for set_frame_sides");
+   if (bottom >= top) RAISE_ERROR("Sorry: VALUE of bottom must be smaller than VALUE of top for set_frame_sides");
    p->frame_left = left;
    p->frame_right = right;
    p->frame_bottom = bottom;
@@ -124,7 +124,7 @@ void c_set_frame_sides(FM *p, double left, double right, double top, double bott
 VALUE FM_set_frame_sides(VALUE fmkr, VALUE left, VALUE right, VALUE top, VALUE bottom)
 {
    FM *p = Get_FM(fmkr);
-   c_set_frame_sides(p, NUM2DBL(left), NUM2DBL(right), NUM2DBL(top), NUM2DBL(bottom));
+   c_set_frame_sides(p, Number_to_double(left), Number_to_double(right), Number_to_double(top), Number_to_double(bottom));
    return fmkr;
 }
 
@@ -179,7 +179,7 @@ void Initialize_Figure(VALUE fmkr) {
    p->title_side = TOP;
    p->title_position = 0.5;
    p->title_scale = 1.1;
-   p->title_shift = 0.7; // in char heights, positive for out from edge (or toward larger x or y value)
+   p->title_shift = 0.7; // in char heights, positive for out from edge (or toward larger x or y VALUE)
    p->title_angle = 0.0;
    p->title_alignment = ALIGNED_AT_BASELINE;
    p->title_justification = CENTERED;
@@ -194,7 +194,7 @@ void Initialize_Figure(VALUE fmkr) {
    p->xlabel_side = BOTTOM;
    p->xlabel_position = 0.5;
    p->xlabel_scale = 1.0;
-   p->xlabel_shift = 2.0; // in char heights, positive for out from edge (or toward larger x or y value)
+   p->xlabel_shift = 2.0; // in char heights, positive for out from edge (or toward larger x or y VALUE)
    p->xlabel_angle = 0.0;
    p->xlabel_alignment = ALIGNED_AT_BASELINE;
    p->xlabel_justification = CENTERED;
@@ -208,7 +208,7 @@ void Initialize_Figure(VALUE fmkr) {
    p->ylabel_side = LEFT;
    p->ylabel_position = 0.5;
    p->ylabel_scale = 1.0;
-   p->ylabel_shift = 1.8; // in char heights, positive for out from edge (or toward larger x or y value)
+   p->ylabel_shift = 1.8; // in char heights, positive for out from edge (or toward larger x or y VALUE)
    p->ylabel_angle = 0.0;
    p->ylabel_alignment = ALIGNED_AT_BASELINE;
    p->ylabel_justification = CENTERED;
@@ -231,8 +231,8 @@ void Initialize_Figure(VALUE fmkr) {
    p->xaxis_major_tick_length = 0.6; // in units of numeric label char heights
    p->xaxis_minor_tick_length = 0.3; // in units of numeric label char heights
    p->xaxis_log_values = false;
-   p->xaxis_ticks_inside = true; // inside frame or toward larger x or y value for specific location
-   p->xaxis_ticks_outside = false; // inside frame or toward smaller x or y value for specific location
+   p->xaxis_ticks_inside = true; // inside frame or toward larger x or y VALUE for specific location
+   p->xaxis_ticks_outside = false; // inside frame or toward smaller x or y VALUE for specific location
    p->xaxis_tick_interval = 0.0; // set to 0 to use default
    p->xaxis_min_between_major_ticks = 2; // in units of numeric label char heights
    p->xaxis_number_of_minor_intervals = 0; // set to 0 to use default
@@ -241,7 +241,7 @@ void Initialize_Figure(VALUE fmkr) {
    p->xaxis_digits_max = 0;
    p->xaxis_numeric_label_decimal_digits = -1; // set to negative to use default
    p->xaxis_numeric_label_scale = 0.7;
-   p->xaxis_numeric_label_shift = 0.3; // in char heights, positive for out from edge (or toward larger x or y value)
+   p->xaxis_numeric_label_shift = 0.3; // in char heights, positive for out from edge (or toward larger x or y VALUE)
    p->xaxis_numeric_label_angle = 0.0;
    p->xaxis_numeric_label_alignment = ALIGNED_AT_MIDHEIGHT;
    p->xaxis_numeric_label_justification = CENTERED;
@@ -267,8 +267,8 @@ void Initialize_Figure(VALUE fmkr) {
    p->yaxis_major_tick_length = 0.6; // in units of numeric label char heights
    p->yaxis_minor_tick_length = 0.3; // in units of numeric label char heights
    p->yaxis_log_values = false;
-   p->yaxis_ticks_inside = true; // inside frame or toward larger x or y value for specific location
-   p->yaxis_ticks_outside = false; // inside frame or toward smaller x or y value for specific location
+   p->yaxis_ticks_inside = true; // inside frame or toward larger x or y VALUE for specific location
+   p->yaxis_ticks_outside = false; // inside frame or toward smaller x or y VALUE for specific location
    p->yaxis_tick_interval = 0.0; // set to 0 to use default
    p->yaxis_min_between_major_ticks = 2; // in units of numeric label char heights
    p->yaxis_number_of_minor_intervals = 0; // set to 0 to use default
@@ -277,7 +277,7 @@ void Initialize_Figure(VALUE fmkr) {
    p->yaxis_digits_max = 0;
    p->yaxis_numeric_label_decimal_digits = -1; // set to negative to use default
    p->yaxis_numeric_label_scale = 0.7;
-   p->yaxis_numeric_label_shift = 0.5; // in char heights, positive for out from edge (or toward larger x or y value)
+   p->yaxis_numeric_label_shift = 0.5; // in char heights, positive for out from edge (or toward larger x or y VALUE)
    p->yaxis_numeric_label_angle = 0.0;
    p->yaxis_numeric_label_alignment = ALIGNED_AT_MIDHEIGHT;
    p->yaxis_numeric_label_justification = CENTERED;
@@ -311,7 +311,7 @@ static void Type_Error(VALUE obj, ID name_ID, char *expected)
 {
    char *name = rb_id2name(name_ID);
    while (name[0] == '@') name++;
-   RAISE_ERROR_ss("Require %s value for '%s'", expected, name);
+   RAISE_ERROR_ss("Require %s VALUE for '%s'", expected, name);
 }
 
 bool Get_bool(VALUE obj, ID name_ID) {
@@ -325,14 +325,14 @@ int Get_int(VALUE obj, ID name_ID) {
    VALUE v = Obj_Attr_Get(obj, name_ID);
    if (!rb_obj_is_kind_of(v,rb_Integer_class))
       Type_Error(v, name_ID, "Integer");
-   return NUM2INT(v);
+   return Number_to_int(v);
 }
 
 double Get_double(VALUE obj, ID name_ID) {
    VALUE v = Obj_Attr_Get(obj, name_ID);
    if (!rb_obj_is_kind_of(v,rb_Numeric_class))
       Type_Error(v, name_ID, "Numeric");
-   return NUM2DBL(v);
+   return Number_to_double(v);
 }
 
 
