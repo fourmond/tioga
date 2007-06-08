@@ -78,7 +78,6 @@ class FigureMaker
     attr_accessor :title
     attr_accessor :xlabel
     attr_accessor :ylabel
-    attr_accessor :line_type
     
     attr_accessor :xaxis_locations_for_major_ticks
     attr_accessor :xaxis_locations_for_minor_ticks
@@ -90,6 +89,8 @@ class FigureMaker
     attr_accessor :style_filename
 
     attr_accessor :legend_info
+    
+    attr_reader   :line_type
     
     attr_reader   :num_figures
     
@@ -374,6 +375,10 @@ class FigureMaker
     
     def line_color=(color)
         self.stroke_color=(color)
+    end
+    
+    def line_type=(val)
+        self.line_type_set(val)
     end
     
     def stroke_width

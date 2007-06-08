@@ -370,6 +370,7 @@ void Init_FigureMaker(void) {
    attr_accessors(line_width)
    attr_accessors(line_cap)
    attr_accessors(line_join)
+   rb_define_method(cFM, "line_type_set", FM_line_type_set, 1);
    attr_accessors(miter_limit)
    attr_accessors(stroke_opacity)
    attr_accessors(fill_opacity)
