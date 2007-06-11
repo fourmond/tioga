@@ -35,7 +35,8 @@ class MyPlots
 #         @big_blues_scale = 11.0
         
         t.def_figure("Arrows") { arrows }
-#         t.def_figure("Reds") { reds }
+        t.def_figure("Markers") { marker_position }
+        t.def_figure("Lines") { lines_position }
 #         t.def_figure("Greens") { greens }
 #         t.def_figure("Log_Reds") { log_reds }
 #         t.def_figure("Side_by_Side") { side_by_side }
@@ -491,6 +492,79 @@ class MyPlots
                     'text' => '\parbox{5cm}{Please check that the ' +
                     "symbols and the lines" + 
                     " are aligned together}")
+      end
+    end
+
+
+
+    def marker_position
+      x = Dvector[0,1,2,3,2,0,1,2,3,4,1,1]
+      y = Dvector[2,0,3,5,4,0,1,2,3,4,4,-0.5]
+      #t.do_box_labels("Arrows tests", "Position", "Blues")
+      t.show_plot([-1,4,6,-1]) do
+        t.show_marker('Xs' => x, 'Ys' => y,
+                      'marker' => Circle,
+                      'color' => Green)
+
+        t.line_width = 0.3
+        t.stroke_color = Red
+        t.append_points_to_path(x, y)
+        t.stroke
+
+        t.show_text('at' => [1,5], 
+                    'text' => '\parbox{5cm}{Please check that the ' +
+                    "symbols are centered on the lines}")
+      end
+    end
+
+    def lines_position
+      x = Dvector[0,1,2,3,4]
+      y = Dvector[0,1,2,3,4]
+      #t.do_box_labels("Arrows tests", "Position", "Blues")
+      t.show_plot([-1,4,8,-1]) do
+        t.show_marker('Xs' => x, 'Ys' => y,
+                      'marker' => Circle,
+                      'color' => Green)
+
+
+        t.line_width = 3
+        t.stroke_color = Red
+        t.append_points_to_path(x, y)
+        t.stroke
+
+
+        y.add!(1)
+        t.show_marker('Xs' => x, 'Ys' => y,
+                      'marker' => Circle,
+                      'color' => Green)
+
+        t.line_width = 0.2
+        t.stroke_color = Red
+        t.append_points_to_path(x, y)
+        t.stroke
+
+        y.add!(1)
+        y.reverse!
+        x.reverse!
+        t.show_marker('Xs' => x, 'Ys' => y,
+                      'marker' => Circle,
+                      'color' => Green)
+
+        t.line_width = 3
+        t.stroke_color = Red
+        t.append_points_to_path(x, y)
+        t.stroke
+
+        t.line_width = 0.1
+        t.stroke_color = Black
+        for val in x
+          t.append_points_to_path(Dvector[val,val], Dvector[0,5])
+          t.stroke
+        end
+
+        t.show_text('at' => [1,7], 
+                    'text' => '\parbox{5cm}{Please check that the ' +
+                    "symbols are centered on the lines}")
       end
     end
     
