@@ -82,6 +82,7 @@ class FigureMaker
     attr_accessor :xaxis_locations_for_major_ticks
     attr_accessor :xaxis_locations_for_minor_ticks
     attr_accessor :xaxis_tick_labels
+    
     attr_accessor :yaxis_locations_for_major_ticks
     attr_accessor :yaxis_locations_for_minor_ticks
     attr_accessor :yaxis_tick_labels
@@ -159,7 +160,6 @@ class FigureMaker
             #attr_accessor :tex_preview_figure_height
             #attr_accessor :tex_preview_minwhitespace
             #attr_accessor :tex_preview_fullpage
-
     
     def reset_figures # set the state to default values
         @figure_commands = []
@@ -204,17 +204,8 @@ class FigureMaker
         @tex_preview_figure_height = '\paperheight - 2in'
         
         @num_error_lines = 10
-
-        @line_type = nil # means solid line
-        @title = nil
-        @xlabel = nil
-        @ylabel = nil
-        @xaxis_locations_for_major_ticks = nil
-        @xaxis_locations_for_minor_ticks = nil
-        @xaxis_tick_labels = nil
-        @yaxis_locations_for_major_ticks = nil
-        @yaxis_locations_for_minor_ticks = nil
-        @yaxis_tick_labels = nil
+        
+        reset_plot_attrs
         
         @tex_xoffset = 0
         @tex_yoffset = 0
@@ -280,11 +271,26 @@ class FigureMaker
         @multithreads_okay_for_tioga = true
         
     end
+    
+
+    def reset_plot_attrs
+        @title = nil
+        @xlabel = nil
+        @ylabel = nil
+        @line_type = nil
+        @xaxis_locations_for_major_ticks = nil
+        @xaxis_locations_for_minor_ticks = nil
+        @xaxis_tick_labels = nil
+        @yaxis_locations_for_major_ticks = nil
+        @yaxis_locations_for_minor_ticks = nil
+        @yaxis_tick_labels = nil
+    end
+    
 
     def initialize        
         reset_figures
     end
-
+    
 
     def reset_state        
         reset_figures
@@ -1584,9 +1590,9 @@ class FigureMaker
         ascent_angle = get_if_given_else_use_default_dict(dict, 'ascent_angle', @marker_defaults)
         glyph = 0 if glyph == nil
         int_args = glyph*100000 + font*1000 + mode*100 + align*10 + just
-            # Ruby limits us to 15 args, so pack some small integers together
+            # Ruby limits us to 15 args, so pack some small integers together                
         private_show_marker(int_args, stroke_width, string, x, y, xs, ys,
-            h_scale, v_scale, scale, it_angle, ascent_angle, angle, fill_color, stroke_color)
+            h_scale, v_scale, scale, it_angle, ascent_angle, angle, fill_color, stroke_color)                
         legend_arg = dict['legend']
         if legend_arg != nil
             if legend_arg.kind_of?Hash
@@ -1938,6 +1944,7 @@ class FigureMaker
         cmd = @figure_commands[num]
         return false unless cmd.kind_of?(Proc)
         begin
+            reset_plot_attrs
             reset_legend_info
             result = private_make(name, cmd)
             return result

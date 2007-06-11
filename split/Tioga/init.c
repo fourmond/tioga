@@ -175,7 +175,6 @@ void Initialize_Figure(VALUE fmkr) {
    
    /* Title */
    p->title_visible = true;
-   //p->title = Qnil;
    p->title_side = TOP;
    p->title_position = 0.5;
    p->title_scale = 1.1;
@@ -183,14 +182,12 @@ void Initialize_Figure(VALUE fmkr) {
    p->title_angle = 0.0;
    p->title_alignment = ALIGNED_AT_BASELINE;
    p->title_justification = CENTERED;
-   //p->title_color = Qnil;
    p->title_color_R = 0.0;
    p->title_color_G = 0.0;
    p->title_color_B = 0.0;
    
    /* X label */
    p->xlabel_visible = true;
-   //p->xlabel = Qnil;
    p->xlabel_side = BOTTOM;
    p->xlabel_position = 0.5;
    p->xlabel_scale = 1.0;
@@ -204,7 +201,6 @@ void Initialize_Figure(VALUE fmkr) {
    
    /* Y label */
    p->ylabel_visible = true;
-   //p->ylabel = Qnil;
    p->ylabel_side = LEFT;
    p->ylabel_position = 0.5;
    p->ylabel_scale = 1.0;
@@ -479,22 +475,12 @@ VALUE Get_line_type(VALUE fmkr) { return Obj_Attr_Get(fmkr, line_type_ID); }
 void Set_line_type(VALUE fmkr, VALUE v) { Obj_Attr_Set(fmkr, line_type_ID, v); }
 
 VALUE Get_xaxis_locations_for_major_ticks(VALUE fmkr) { return Obj_Attr_Get(fmkr, xaxis_locations_for_major_ticks_ID); }
-void Set_xaxis_locations_for_major_ticks(VALUE fmkr, VALUE v) { Obj_Attr_Set(fmkr, xaxis_locations_for_major_ticks_ID, v); }
-
 VALUE Get_xaxis_locations_for_minor_ticks(VALUE fmkr) { return Obj_Attr_Get(fmkr, xaxis_locations_for_minor_ticks_ID); }
-void Set_xaxis_locations_for_minor_ticks(VALUE fmkr, VALUE v) { Obj_Attr_Set(fmkr, xaxis_locations_for_minor_ticks_ID, v); }
-
 VALUE Get_xaxis_tick_labels(VALUE fmkr) { return Obj_Attr_Get(fmkr, xaxis_tick_labels_ID); }
-void Set_xaxis_tick_labels(VALUE fmkr, VALUE v) { Obj_Attr_Set(fmkr, xaxis_tick_labels_ID, v); }
 
 VALUE Get_yaxis_locations_for_major_ticks(VALUE fmkr) { return Obj_Attr_Get(fmkr, yaxis_locations_for_major_ticks_ID); }
-void Set_yaxis_locations_for_major_ticks(VALUE fmkr, VALUE v) { Obj_Attr_Set(fmkr, yaxis_locations_for_major_ticks_ID, v); }
-
 VALUE Get_yaxis_locations_for_minor_ticks(VALUE fmkr) { return Obj_Attr_Get(fmkr, yaxis_locations_for_minor_ticks_ID); };
-void Set_yaxis_locations_for_minor_ticks(VALUE fmkr, VALUE v) { Obj_Attr_Set(fmkr, yaxis_locations_for_minor_ticks_ID, v); }
-
 VALUE Get_yaxis_tick_labels(VALUE fmkr) { return Obj_Attr_Get(fmkr, yaxis_tick_labels_ID); }
-void Set_yaxis_tick_labels(VALUE fmkr, VALUE v) { Obj_Attr_Set(fmkr, yaxis_tick_labels_ID, v); }
 
 static void Make_Save_Fname(VALUE fmkr, char *full_name, char *f_name,
    bool with_save_dir, bool with_pdf_extension) {

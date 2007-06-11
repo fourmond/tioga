@@ -159,7 +159,7 @@ static void Get_yaxis_Specs(FM *p, PlotAxis *s)
    
    s->locations_for_major_ticks = Get_yaxis_locations_for_major_ticks(p->fm);
    s->locations_for_minor_ticks = Get_yaxis_locations_for_minor_ticks(p->fm);
-   //s->tick_labels = Get_yaxis_tick_labels(p->fm);
+   s->tick_labels = Get_yaxis_tick_labels(p->fm);
    
    s->use_fixed_pt = p->yaxis_use_fixed_pt;
    s->digits_max = p->yaxis_digits_max;

@@ -366,9 +366,11 @@ void c_rotated_string_at_points(FM *p, double rotation, int font_number, unsigne
    fprintf(TF, "ET\n");
 }
 
-OBJ_PTR FM_private_show_marker(OBJ_PTR fmkr, OBJ_PTR integer_args, OBJ_PTR stroke_width, OBJ_PTR string,
+OBJ_PTR FM_private_show_marker(
+   OBJ_PTR fmkr, OBJ_PTR integer_args, OBJ_PTR stroke_width, OBJ_PTR string,
    OBJ_PTR x, OBJ_PTR y, OBJ_PTR x_vec, OBJ_PTR y_vec,
-   OBJ_PTR h_scale, OBJ_PTR v_scale, OBJ_PTR scale, OBJ_PTR it_angle, OBJ_PTR ascent_angle, OBJ_PTR angle,
+   OBJ_PTR h_scale, OBJ_PTR v_scale, OBJ_PTR scale, OBJ_PTR it_angle, 
+   OBJ_PTR ascent_angle, OBJ_PTR angle,
    OBJ_PTR fill_color, OBJ_PTR stroke_color)
 {
    FM *p = Get_FM(fmkr);
@@ -410,7 +412,7 @@ OBJ_PTR FM_private_show_marker(OBJ_PTR fmkr, OBJ_PTR integer_args, OBJ_PTR strok
           prev_stroke_color_G = p->stroke_color_G;
           prev_stroke_color_B = p->stroke_color_B;
           restore_stroke_color = true;
-          c_stroke_color_set(fmkr, stroke_color_R, stroke_color_G, stroke_color_B);
+          c_stroke_color_set(p, stroke_color_R, stroke_color_G, stroke_color_B);
        }
    }
    if (fill_color != Qnil &&
@@ -424,7 +426,7 @@ OBJ_PTR FM_private_show_marker(OBJ_PTR fmkr, OBJ_PTR integer_args, OBJ_PTR strok
           prev_fill_color_G = p->fill_color_G;
           prev_fill_color_B = p->fill_color_B;
           restore_fill_color = true;
-          c_fill_color_set(fmkr, fill_color_R, fill_color_G, fill_color_B);
+          c_fill_color_set(p, fill_color_R, fill_color_G, fill_color_B);
        }
    }
    if (x == Qnil) {

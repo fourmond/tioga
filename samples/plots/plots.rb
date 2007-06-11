@@ -453,13 +453,14 @@ EOD
         t.rescale(0.5)
         t.no_xlabel
         t.line_width = 0.5
+        t.title_shift = 0.5
         t.subplot(
             'left_margin' => 0.1, 'right_margin' => 0.5, 
-            'bottom_margin' => 0.75) { t.ylabel_angle = -90; side_by_side }
+            'bottom_margin' => 0.75) { side_by_side }
         t.yaxis_loc = RIGHT
         t.subplot(
             'left_margin' => 0.75, 'right_margin' => 0.07, 
-            'top_margin' => 0.2, 'bottom_margin' => 0.55) { reds }
+            'top_margin' => 0.2, 'bottom_margin' => 0.55) { t.ylabel_shift = 0.3; reds }
         t.yaxis_loc = LEFT
         t.subplot(
             'right_margin' => 0.7, 'top_margin' => 0.4) { rows }

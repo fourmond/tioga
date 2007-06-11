@@ -86,6 +86,26 @@ module MyPlotStyles
     t.title_shift = 0.7
     t.title_side = TOP
 
+  # Xaxis Labels
+    t.xlabel_alignment = ALIGNED_AT_BASELINE
+    t.xlabel_angle = 0
+    t.xlabel_color = Black
+    t.xlabel_justification = CENTERED
+    t.xlabel_position = 0.5
+    t.xlabel_scale = 1.0
+    t.xlabel_shift = 1.7
+    t.xlabel_side = BOTTOM
+
+  # Yaxis Labels
+    t.ylabel_alignment = ALIGNED_AT_BASELINE
+    t.ylabel_angle = 0
+    t.ylabel_color = Black
+    t.ylabel_justification = CENTERED
+    t.ylabel_position = 0.5
+    t.ylabel_scale = 1.0
+    t.ylabel_shift = 1.5
+    t.ylabel_side = LEFT
+
   # Xaxis
     t.xaxis_digits_max = 0 
     t.xaxis_line_width = 1
@@ -141,26 +161,6 @@ module MyPlotStyles
     t.bottom_edge_type = EDGE_WITH_TICKS
     t.left_edge_type = EDGE_WITH_TICKS
     t.right_edge_type = EDGE_WITH_TICKS
-
-  # Xaxis Labels
-    t.xlabel_alignment = ALIGNED_AT_BASELINE
-    t.xlabel_angle = 0
-    t.xlabel_color = Black
-    t.xlabel_justification = CENTERED
-    t.xlabel_position = 0.5
-    t.xlabel_scale = 1.0
-    t.xlabel_shift = 2.0
-    t.xlabel_side = BOTTOM
-
-  # Yaxis Labels
-    t.ylabel_alignment = ALIGNED_AT_BASELINE
-    t.ylabel_angle = 0
-    t.ylabel_color = Black
-    t.ylabel_justification = CENTERED
-    t.ylabel_position = 0.5
-    t.ylabel_scale = 1.0
-    t.ylabel_shift = 1.8
-    t.ylabel_side = LEFT
 
   # Legends
     t.legend_alignment = ALIGNED_AT_BASELINE
