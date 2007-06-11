@@ -27,7 +27,7 @@ static FILE *fp; // for the TeX file
 
 /* TeX text */
 
-void c_text_scale_set(FM *p, double scale)
+static void c_text_scale_set(FM *p, double scale)
 {
    double factor = scale / p->default_text_scale;
    if (factor <= 0) RAISE_ERROR("Sorry: text scaling must be positive");
@@ -43,7 +43,7 @@ OBJ_PTR FM_rescale_text(OBJ_PTR fmkr, OBJ_PTR scaling_factor) // updates default
    return fmkr;
 }
 
-int String_Is_Blank(char  *str) {
+static int String_Is_Blank(char  *str) {
    char c;
    if (str == NULL) return 1;
    while (1) {
@@ -54,7 +54,8 @@ int String_Is_Blank(char  *str) {
    return 0;
    }
 
-void tex_show_rotated_text(FM *p, char *text, double x, double y, double scale, double angle, int justification, int alignment)
+static void tex_show_rotated_text(
+   FM *p, char *text, double x, double y, double scale, double angle, int justification, int alignment)
 {  // x and y are the device coords for the reference point of the text
    char ref, jst;
    double ft_ht, sz;
@@ -215,7 +216,7 @@ void Close_tex(OBJ_PTR fmkr, bool quiet_mode)
 }   
 
 
-void Write_preview_header(OBJ_PTR fmkr, FILE *file) {
+static void Write_preview_header(OBJ_PTR fmkr, FILE *file) {
    OBJ_PTR tmp;
    fprintf(file, "\\documentclass{%s}\n\n", Get_tex_preview_documentclass(fmkr));   
    /* we print out the preamble generated from tioga.sty.in */
@@ -255,7 +256,7 @@ void Write_preview_header(OBJ_PTR fmkr, FILE *file) {
 }
 
 
-void Write_figure_command(OBJ_PTR fmkr, char *simple_name, FILE *file) {
+static void Write_figure_command(OBJ_PTR fmkr, char *simple_name, FILE *file) {
    char *minwhitespace;
    
    if (Get_tex_preview_fullpage(fmkr)) {

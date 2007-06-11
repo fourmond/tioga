@@ -273,8 +273,10 @@ OBJ_PTR FM_marker_string_info(OBJ_PTR fmkr, OBJ_PTR font_number, OBJ_PTR string,
 
 #define TRANSFORM_VEC(dx,dy) tmp = dx; dx = (dx) * a + (dy) * c; dy = tmp * b + (dy) * d;
 
-void c_rotated_string_at_points(FM *p, double rotation, int font_number, unsigned char *text, double scale,
-   int n, double *xs, double *ys, int alignment, int justification, double horizontal_scaling, double vertical_scaling,
+static void c_rotated_string_at_points(
+   FM *p, double rotation, int font_number, unsigned char *text, double scale,
+   int n, double *xs, double *ys, int alignment, int justification, 
+   double horizontal_scaling, double vertical_scaling,
    double italic_angle, double ascent_angle)
 {
    double ft_ht = p->default_text_scale * scale * p->default_font_size * ENLARGE;

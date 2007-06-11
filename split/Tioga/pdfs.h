@@ -76,6 +76,8 @@ typedef struct jpg_info {
    int mask_obj_num;
    char *filename;
 } JPG_Info;
+extern void Write_JPG(JPG_Info *xo);
+extern void Free_JPG(JPG_Info *xo);
 
 typedef struct sampled_info {
    // start must match start of xobj_info
@@ -97,6 +99,8 @@ typedef struct sampled_info {
    int lookup_len;
    unsigned char *lookup;
 } Sampled_Info;
+extern void Write_Sampled(Sampled_Info *xo);
+extern void Free_Sampled(Sampled_Info *xo);
 
 #define JPG_SUBTYPE 1
 #define SAMPLED_SUBTYPE 2
@@ -187,44 +191,11 @@ extern Old_Font_Dictionary *old_font_dictionaries;
 
 #define RADIANS_TO_DEGREES (180.0 / PI)
 
-extern bool Used_Any_Fonts(void);
-extern void Clear_Fonts_In_Use_Flags(void);
-extern void Write_Font_Dictionaries(void);
-extern void Write_Font_Descriptors(void);
-extern void Write_Font_Widths(void);
-extern void Write_Functions(void);
-extern void Write_Stroke_Opacity_Objects(void);
-extern void Write_Fill_Opacity_Objects(void);
-extern void Write_Shadings(void);
-extern void Write_JPG(JPG_Info *xo);
-extern void Write_Sampled(Sampled_Info *xo);
-extern void Free_Stroke_Opacities(void);
-extern void Free_Shadings();
-extern void Free_Functions();
-extern void Free_JPG(JPG_Info *xo);
-extern void Free_Sampled(Sampled_Info *xo);
-extern void Free_Fill_Opacities(void);
-
-extern void c_append_rect(FM *p, double x, double y, double width, double height);
-extern void c_clip(FM *p);
-
 extern bool have_current_point, constructing_path, writing_file;
-extern double bbox_llx, bbox_lly, bbox_urx, bbox_ury;
 
 extern FILE *OF; // for the PDF file
 extern FILE *TF; // for the temp file holding the uncompressed stream
 
-extern void Unpack_RGB(VALUE rgb, double *rp, double *gp, double *bp);
-
-extern void Start_Axis_Standard_State(FM *p, double r, double g, double b, double line_width);
-extern void End_Axis_Standard_State(void);
-
-extern void Write_gsave(void);
-extern void Write_grestore(void);
-
-extern void c_private_set_default_font_size(FM *p, double size);
-
-void Init_Font_Dictionary(void);
 
 #endif   /* __pdfs_H__ */
 

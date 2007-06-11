@@ -195,7 +195,7 @@ void Write_Shadings(void)
 }
 
 
-void c_axial_shading(FM *p, double x0, double y0, double x1, double y1,
+static void c_axial_shading(FM *p, double x0, double y0, double x1, double y1,
       int hival, int lookup_len, unsigned char *lookup, bool extend_start, bool extend_end)
 {
    Shading_Info *so = ALLOC(Shading_Info);
@@ -229,7 +229,7 @@ OBJ_PTR FM_private_axial_shading(OBJ_PTR fmkr, OBJ_PTR x0, OBJ_PTR y0, OBJ_PTR x
    return fmkr;
 }
 
-void c_radial_shading(FM *p, double x0, double y0, double r0, double x1, double y1, double r1,
+static void c_radial_shading(FM *p, double x0, double y0, double r0, double x1, double y1, double r1,
       int hival, int lookup_len, unsigned char *lookup,
       double a, double b, double c, double d, double e, double f, bool extend_start, bool extend_end)
 {
@@ -280,7 +280,56 @@ OBJ_PTR FM_private_radial_shading(OBJ_PTR fmkr,
 /*  Colormaps
 */
 
-OBJ_PTR c_create_colormap(FM *p, bool rgb_flag, int length,
+static double clr_value(double n1, double n2, double hue)  // from plplot plctrl.c
+{
+   double val;
+   while (hue >= 360.) hue -= 360.;
+   while (hue < 0.) hue += 360.;
+   if (hue < 60.) val = n1 + (n2 - n1) * hue / 60.;
+   else if (hue < 180.) val = n2;
+   else if (hue < 240.) val = n1 + (n2 - n1) * (240. - hue) / 60.;
+   else val = n1;
+   return (val);
+}
+
+static void c_hls_to_rgb(double h, double l, double s, double *p_r, double *p_g, double *p_b)  // from plplot plctrl.c
+{
+   double m1, m2;
+   if (l <= .5) m2 = l * (s + 1.);
+   else m2 = l + s - l * s;
+   m1 = 2 * l - m2;
+   *p_r = clr_value(m1, m2, h + 120.);
+   *p_g = clr_value(m1, m2, h);
+   *p_b = clr_value(m1, m2, h - 120.);
+}
+
+static void c_rgb_to_hls(double r, double g, double b, double *p_h, double *p_l, double *p_s)  // from plplot plctrl.c
+{
+   double h, l, s, d, rc, gc, bc, rgb_min, rgb_max;
+   rgb_min = MIN( r, MIN( g, b ));
+   rgb_max = MAX( r, MAX( g, b ));
+   l = (rgb_min+rgb_max) / 2.0;
+   if (rgb_min == rgb_max) s = h = 0;
+   else {
+      d = rgb_max - rgb_min;
+      if (l < 0.5) s = 0.5 * d / l;
+      else s = 0.5* d / (1.-l);
+      rc = (rgb_max-r) / d;
+      gc = (rgb_max-g) / d;
+      bc = (rgb_max-b) / d;
+      if (r == rgb_max) h = bc-gc;
+      else if (g == rgb_max) h = rc-bc+2;
+      else h = gc-rc-2;
+      h = h*60;
+      if (h <  0) h = h+360;
+      else if (h >= 360) h = h-360;
+   }
+   *p_h = h;
+   *p_l = l;
+   *p_s = s;
+}
+
+static OBJ_PTR c_create_colormap(FM *p, bool rgb_flag, int length,
    int num_pts, double *ps, double *c1s, double *c2s, double *c3s)
 {
    int i;
@@ -316,6 +365,16 @@ OBJ_PTR c_create_colormap(FM *p, bool rgb_flag, int length,
 OBJ_PTR FM_private_create_colormap(OBJ_PTR fmkr, OBJ_PTR rgb_flag,
              OBJ_PTR length, OBJ_PTR Ps, OBJ_PTR C1s, OBJ_PTR C2s, OBJ_PTR C3s)
 {
+        /* 
+            create mappings from 'position' (0 to 1) to color (in HLS or RGB color spaces)
+            the length parameter determines the number of entries in the color map (any integer between 2 and 256).
+            for rgb, the colors are given as (red, green, blue) intensities from 0.0 to 1.0
+            for hls, the colors are given as (hue, lightness, saturation)
+                lightness and saturation given as values from 0.0 to 1.0
+                hue given as degrees (0 to 360) around the color wheel from red->green->blue->red
+            Ps are the locations in (0 to 1) for the control points -- in increasing order
+            must have Ps[0] == 0.0 and Ps[num_ps-1] == 1.0
+        */
    FM *p = Get_FM(fmkr);
    bool rgb = rgb_flag != Qfalse;
    long p_len, c1_len, c2_len, c3_len;
@@ -330,6 +389,7 @@ OBJ_PTR FM_private_create_colormap(OBJ_PTR fmkr, OBJ_PTR rgb_flag,
             
 OBJ_PTR FM_get_color_from_colormap(OBJ_PTR fmkr, OBJ_PTR color_map, OBJ_PTR color_position)
 {
+        /* color_position is from 0 to 1.  this returns a vector for the RGB color from the given colormap */
    double x = Number_to_double(color_position);
    unsigned char *buff = (unsigned char *)(String_Ptr(color_map)), r, g, b, i;
    int len = String_Len(color_map);
@@ -346,6 +406,9 @@ OBJ_PTR FM_get_color_from_colormap(OBJ_PTR fmkr, OBJ_PTR color_map, OBJ_PTR colo
 
 OBJ_PTR FM_convert_to_colormap(OBJ_PTR fmkr, OBJ_PTR Rs, OBJ_PTR Gs, OBJ_PTR Bs)
 {
+        /* this creates an arbitrary mapping from positions to colors given as (r,g,b) triples */
+        /* the colormap size is set to the length of the vectors */
+        /* the Rs, Gs, and Bs are VALUEs from 0 to 1 representing the intensity of the color component */
    long r_len, g_len, b_len;
    double *r_ptr = Vector_Data_for_Read(Rs, &r_len);
    double *g_ptr = Vector_Data_for_Read(Gs, &g_len);
@@ -366,55 +429,6 @@ OBJ_PTR FM_convert_to_colormap(OBJ_PTR fmkr, OBJ_PTR Rs, OBJ_PTR Gs, OBJ_PTR Bs)
    Array_Store(result, 0, Integer_New(r_len-1));
    Array_Store(result, 1, lookup);
    return result;
-}
-
-static double clr_value(double n1, double n2, double hue)  // from plplot plctrl.c
-{
-   double val;
-   while (hue >= 360.) hue -= 360.;
-   while (hue < 0.) hue += 360.;
-   if (hue < 60.) val = n1 + (n2 - n1) * hue / 60.;
-   else if (hue < 180.) val = n2;
-   else if (hue < 240.) val = n1 + (n2 - n1) * (240. - hue) / 60.;
-   else val = n1;
-   return (val);
-}
-
-void c_hls_to_rgb(double h, double l, double s, double *p_r, double *p_g, double *p_b)  // from plplot plctrl.c
-{
-   double m1, m2;
-   if (l <= .5) m2 = l * (s + 1.);
-   else m2 = l + s - l * s;
-   m1 = 2 * l - m2;
-   *p_r = clr_value(m1, m2, h + 120.);
-   *p_g = clr_value(m1, m2, h);
-   *p_b = clr_value(m1, m2, h - 120.);
-}
-
-void c_rgb_to_hls(double r, double g, double b, double *p_h, double *p_l, double *p_s)  // from plplot plctrl.c
-{
-   double h, l, s, d, rc, gc, bc, rgb_min, rgb_max;
-   rgb_min = MIN( r, MIN( g, b ));
-   rgb_max = MAX( r, MAX( g, b ));
-   l = (rgb_min+rgb_max) / 2.0;
-   if (rgb_min == rgb_max) s = h = 0;
-   else {
-      d = rgb_max - rgb_min;
-      if (l < 0.5) s = 0.5 * d / l;
-      else s = 0.5* d / (1.-l);
-      rc = (rgb_max-r) / d;
-      gc = (rgb_max-g) / d;
-      bc = (rgb_max-b) / d;
-      if (r == rgb_max) h = bc-gc;
-      else if (g == rgb_max) h = rc-bc+2;
-      else h = gc-rc-2;
-      h = h*60;
-      if (h <  0) h = h+360;
-      else if (h >= 360) h = h-360;
-   }
-   *p_h = h;
-   *p_l = l;
-   *p_s = s;
 }
 
 static void Unpack_HLS(OBJ_PTR hls, double *hp, double *lp, double *sp)
@@ -445,6 +459,9 @@ OBJ_PTR FM_hls_to_rgb(OBJ_PTR fmkr, OBJ_PTR hls_vec)
 
 OBJ_PTR FM_rgb_to_hls(OBJ_PTR fmkr, OBJ_PTR rgb_vec)
 {
+    /* hue is given as an angle from 0 to 360 around the color wheel.
+        0, 60, 120, 180, 240, and 300 are respectively red, yellow, green, cyan, blue, and magenta. */
+    /* lightness and saturation are given as numbers from 0 to 1 */
    double h, l, s, r, g, b;
    Unpack_RGB(rgb_vec, &r, &g, &b);
    c_rgb_to_hls(r, g, b, &h, &l, &s);
@@ -456,7 +473,7 @@ OBJ_PTR FM_rgb_to_hls(OBJ_PTR fmkr, OBJ_PTR rgb_vec)
 }
 
 
-void c_title_color_set(FM *p, double r, double g, double b)
+static void c_title_color_set(FM *p, double r, double g, double b)
 {
    p->title_color_R = r;
    p->title_color_G = g;
@@ -486,7 +503,7 @@ OBJ_PTR FM_title_color_get(OBJ_PTR fmkr) // value is array of [r, g, b] intensit
    return result;
 }
 
-void c_xlabel_color_set(FM *p, double r, double g, double b)
+static void c_xlabel_color_set(FM *p, double r, double g, double b)
 {
    p->xlabel_color_R = r;
    p->xlabel_color_G = g;
@@ -516,7 +533,7 @@ OBJ_PTR FM_xlabel_color_get(OBJ_PTR fmkr) // value is array of [r, g, b] intensi
    return result;
 }
 
-void c_ylabel_color_set(FM *p, double r, double g, double b)
+static void c_ylabel_color_set(FM *p, double r, double g, double b)
 {
    p->ylabel_color_R = r;
    p->ylabel_color_G = g;
@@ -546,7 +563,7 @@ OBJ_PTR FM_ylabel_color_get(OBJ_PTR fmkr) // value is array of [r, g, b] intensi
    return result;
 }
 
-void c_xaxis_stroke_color_set(FM *p, double r, double g, double b)
+static void c_xaxis_stroke_color_set(FM *p, double r, double g, double b)
 {
    p->xaxis_stroke_color_R = r;
    p->xaxis_stroke_color_G = g;
@@ -576,7 +593,7 @@ OBJ_PTR FM_xaxis_stroke_color_get(OBJ_PTR fmkr) // value is array of [r, g, b] i
    return result;
 }
 
-void c_yaxis_stroke_color_set(FM *p, double r, double g, double b)
+static void c_yaxis_stroke_color_set(FM *p, double r, double g, double b)
 {
    p->yaxis_stroke_color_R = r;
    p->yaxis_stroke_color_G = g;

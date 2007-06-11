@@ -84,7 +84,7 @@ void Init_IDs(void)
     yaxis_tick_labels_ID = ID_Get("@yaxis_tick_labels");
 }
 
-void c_set_device_pagesize(FM *p, double width, double height) { // sizes in units of 1/720 inch
+static void c_set_device_pagesize(FM *p, double width, double height) { // sizes in units of 1/720 inch
    p->page_left = 0;
    p->page_right = width;
    p->page_bottom = 0;
@@ -106,7 +106,7 @@ VALUE FM_set_device_pagesize(VALUE fmkr, VALUE width, VALUE height)
 }
 
 
-void c_set_frame_sides(FM *p, double left, double right, double top, double bottom) { // sizes in page coords [0..1]
+static void c_set_frame_sides(FM *p, double left, double right, double top, double bottom) { // sizes in page coords [0..1]
    if (left > 1.0 || left < 0.0) RAISE_ERROR("Sorry: VALUE of left must be between 0 and 1 for set_frame_sides");
    if (right > 1.0 || right < 0.0) RAISE_ERROR("Sorry: VALUE of right must be between 0 and 1 for set_frame_sides");
    if (top > 1.0 || top < 0.0) RAISE_ERROR("Sorry: VALUE of top must be between 0 and 1 for set_frame_sides");

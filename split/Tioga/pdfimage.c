@@ -198,7 +198,7 @@ void Write_Sampled(Sampled_Info *xo)
    fprintf(OF, "\nendstream\nendobj\n");
 }
 
-void Create_Transform_from_Points( // transform maps (0,0), (1,0), and (0,1) to the given points
+static void Create_Transform_from_Points( // transform maps (0,0), (1,0), and (0,1) to the given points
    double llx, double lly, double lrx, double lry, double ulx, double uly,
    double *a, double *b, double *c, double *d, double *e, double *f)
 {
@@ -206,7 +206,7 @@ void Create_Transform_from_Points( // transform maps (0,0), (1,0), and (0,1) to 
    *a = lrx; *b = lry; *c = ulx; *d = uly;
 }
 
-void Get_Image_Dest(FM *p, OBJ_PTR image_destination, double *dest)
+static void Get_Image_Dest(FM *p, OBJ_PTR image_destination, double *dest)
 {
    if (Array_Len(image_destination) != 6)
       RAISE_ERROR("Sorry: invalid image destination array: must have 6 entries");
@@ -243,7 +243,7 @@ static void Show_JPEG(FM *p, char *filename, int width, int height, double *dest
    update_bbox(p, lrx+ulx-llx, lry+uly-lly);
 }
 
-void c_show_jpg(FM *p, char *filename, int width, int height, double *dest, int mask_obj_num)
+static void c_show_jpg(FM *p, char *filename, int width, int height, double *dest, int mask_obj_num)
 {
    Show_JPEG(p, filename, width, height, dest, JPG_SUBTYPE, mask_obj_num);
 }
@@ -258,7 +258,7 @@ OBJ_PTR FM_private_show_jpg(OBJ_PTR fmkr, OBJ_PTR filename, OBJ_PTR width, OBJ_P
    return fmkr;
 }
 
-OBJ_PTR c_private_create_image_data(FM *p, double **data, long num_cols, long num_rows,
+static OBJ_PTR c_private_create_image_data(FM *p, double **data, long num_cols, long num_rows,
             int first_row, int last_row, int first_column, int last_column,
             double min_val, double max_val, int max_code, int if_below_range, int if_above_range)
 {
@@ -376,7 +376,9 @@ OBJ_PTR FM_private_create_monochrome_image_data(OBJ_PTR fmkr, OBJ_PTR data,
       Number_to_double(boundary), reverse != Qfalse);
 }
 
-int c_private_show_image(FM *p, int image_type, double *dest, bool interpolate, bool reversed, int w, int h, unsigned char* data, int len, 
+static int c_private_show_image(
+   FM *p, int image_type, double *dest, bool interpolate, 
+   bool reversed, int w, int h, unsigned char* data, int len, 
    int value_mask_min, int value_mask_max, int hival, unsigned char* lookup, int lookup_len, int mask_obj_num)
 {
    Sampled_Info *xo = ALLOC(Sampled_Info);
@@ -416,8 +418,6 @@ int c_private_show_image(FM *p, int image_type, double *dest, bool interpolate, 
     }
     printf("\n");
    }
-   
-   
     printf("\n\nxo->image_data\n");
    for (ir=0; ir<h; ir++) {
     for (ic=0; ic<w; ic++) {

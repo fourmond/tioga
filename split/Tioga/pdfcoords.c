@@ -35,7 +35,7 @@ void Recalc_Font_Hts(FM *p)
    p->default_text_height_dy = convert_frame_to_figure_dy(p,dy);
 }
 
-void c_set_subframe(FM *p, double left_margin, double right_margin, double top_margin, double bottom_margin)
+static void c_set_subframe(FM *p, double left_margin, double right_margin, double top_margin, double bottom_margin)
 {
    double x, y, w, h;
    if (left_margin < 0 || right_margin < 0 || top_margin < 0 || bottom_margin < 0)
@@ -123,7 +123,7 @@ OBJ_PTR FM_doing_subfigure(OBJ_PTR fmkr)
    return fmkr;
 }
 
-void c_set_bounds(FM *p, double left, double right, double top, double bottom)
+static void c_set_bounds(FM *p, double left, double right, double top, double bottom)
 {
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling set_bounds");
    p->bounds_left = left; p->bounds_right = right;
@@ -180,7 +180,7 @@ OBJ_PTR FM_private_set_bounds(OBJ_PTR fmkr, OBJ_PTR left, OBJ_PTR right, OBJ_PTR
 
 // Conversions
 
-double c_convert_to_degrees(FM *p, double dx, double dy)  // dx and dy in figure coords
+static double c_convert_to_degrees(FM *p, double dx, double dy)  // dx and dy in figure coords
 {
    double angle;
    if (dx == 0.0 && dy == 0.0) angle = 0.0;

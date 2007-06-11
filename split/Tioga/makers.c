@@ -24,7 +24,7 @@
 
 /* Lines */
 
-   void c_private_make_spline_interpolated_points(FM *p, OBJ_PTR Xvec, OBJ_PTR Yvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
+static void c_private_make_spline_interpolated_points(FM *p, OBJ_PTR Xvec, OBJ_PTR Yvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
         int start_clamped, double start_slope, int end_clamped, double end_slope) {
       int i, n_pts_data;
       double *As, *Bs, *Cs, *Ds;
@@ -67,7 +67,7 @@
       return fmkr;
    }
 
-   void c_make_steps(FM *p, OBJ_PTR Xvec, OBJ_PTR Yvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
+static void c_make_steps(FM *p, OBJ_PTR Xvec, OBJ_PTR Yvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
         double xfirst, double yfirst, double xlast, double ylast){
       double xnext, xprev, x;
       int n_pts_to_add;
@@ -103,6 +103,12 @@
       
 OBJ_PTR FM_private_make_steps(OBJ_PTR fmkr, OBJ_PTR Xvec, OBJ_PTR Yvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
         OBJ_PTR xfirst, OBJ_PTR yfirst, OBJ_PTR xlast, OBJ_PTR ylast) {
+        /* adds n_pts_to_add points to Xs and Ys for steps with the given parameters.
+            X_data and Y_data are arrays of n values where n_pts_to_add = 2*(n+1)
+            (xfirst,yfirst) and (xlast,ylast) are extra data points to fix the first and last steps.
+        The X_data plus xfirst and xlast determine the widths of the steps.
+        The Y_data plus yfirst and ylast determine the height of the steps.
+        The steps occur at locations midway between the given x locations. */
       FM *p = Get_FM(fmkr);
       c_make_steps(p, Xvec, Yvec, Xvec_data, Yvec_data,
          Number_to_double(xfirst), Number_to_double(yfirst), Number_to_double(xlast), Number_to_double(ylast));
@@ -171,7 +177,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
    Vector_Store(dest_ys, j, y); \
    j++; }
 
-int conrec(double **d,
+static int conrec(double **d,
 	   int ilb,
 	   int iub,
 	   int jlb,
@@ -938,7 +944,7 @@ FLAG(int ni, int nj, int ind)
 
 
 
-   void c_make_contour(FM *p, OBJ_PTR dest_xs, OBJ_PTR dest_ys, OBJ_PTR gaps,
+   static void c_make_contour(FM *p, OBJ_PTR dest_xs, OBJ_PTR dest_ys, OBJ_PTR gaps,
          OBJ_PTR xs, OBJ_PTR ys,  OBJ_PTR zs_data, double z_level,  OBJ_PTR legit_data, int use_conrec) {
       long xlen, ylen, num_columns, num_rows;
       double *x_coords = Vector_Data_for_Read(xs, &xlen);
@@ -972,6 +978,16 @@ FLAG(int ni, int nj, int ind)
          OBJ_PTR legit, // the table of flags (nonzero means okay)
          OBJ_PTR method // int == 1 means CONREC
          ) {
+        /* uses Xvec_data and Yvec_data to create a cubic spline interpolant.
+        once the spline interpolant is created, it is sampled at the n_pts_to_add in Xs.
+        Xvec entry i is set to the value of the spline at Yvec entry i.
+        Both the X_data and the Xs should be stored in ascending order.
+        There is a boundary condition choice to be made for each end concerning the slope.
+        If clamped is true, the corresponding slope argument value sets the slope.
+        If clamped is false (known as a "free" or "natural" spline), 
+        the 2nd derivative is set to 0 and the slope is determined by the fit.
+        In this case, the corresponding slope argument is ignored.
+        */
       FM *p = Get_FM(fmkr);
       c_make_contour(p, dest_xs, dest_ys, gaps, xs, ys, zs, Number_to_double(z_level), legit, Number_to_int(method));
       return fmkr;

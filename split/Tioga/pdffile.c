@@ -63,7 +63,7 @@ FILE *TF = NULL; // for the temp file
 
 /* PDF File Management */
 
-void Free_XObjects(void)
+static void Free_XObjects(void)
 {
    XObject_Info *xo;
    while (xobj_list != NULL) {
@@ -210,7 +210,7 @@ void Write_grestore(void)
    fprintf(TF, "Q\n");
 }
 
-void Print_Xref(long int offset) {
+static void Print_Xref(long int offset) {
    char line[80];
    int i, len;
    sprintf(line, "%li", offset);

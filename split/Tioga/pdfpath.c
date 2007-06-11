@@ -137,7 +137,7 @@ OBJ_PTR FM_line_width_set(OBJ_PTR fmkr, OBJ_PTR val)  // val is thickness in poi
    return val;
 }
 
-void c_line_scale_set(FM *p, double new_scale)
+static void c_line_scale_set(FM *p, double new_scale)
 {
    if (new_scale <= 0) RAISE_ERROR("Sorry: line scale must be positive");
    p->default_line_scale = new_scale;
@@ -232,7 +232,7 @@ OBJ_PTR FM_line_type_set(OBJ_PTR fmkr, OBJ_PTR line_type)
 
     /* all locations and vectors are in figure coordinates */
 
-long c_round_dev(FM *p, double v) { // make sure that we don't get too far out or can overflow!
+static long c_round_dev(FM *p, double v) { // make sure that we don't get too far out or can overflow!
     if (v > MAX_DEV_COORD_ALLOWED) {
         //if (p->debug_verbosity_level > 0) printf("c_round_dev clipping %g\n", v);
         return iMAX_DEV_COORD_ALLOWED;
@@ -337,7 +337,7 @@ OBJ_PTR FM_append_curve_to_path(OBJ_PTR fmkr, OBJ_PTR x1, OBJ_PTR y1, OBJ_PTR x2
    return fmkr;
 }
 
-void c_closepath(FM *p)
+static void c_closepath(FM *p)
 {
    if (!constructing_path) RAISE_ERROR("Sorry: must be constructing path when call closepath");
    if (writing_file) fprintf(TF, "h\n");
@@ -351,7 +351,7 @@ OBJ_PTR FM_close_path(OBJ_PTR fmkr)
    return fmkr;
 }
 
-void c_append_arc(FM *p, double x_start, double y_start, double x_corner, double y_corner,
+static void c_append_arc(FM *p, double x_start, double y_start, double x_corner, double y_corner,
    double x_end, double y_end, double radius)
 {
    ARE_OK_NUMBERS(x_start,y_start);
@@ -399,7 +399,7 @@ void c_append_arc(FM *p, double x_start, double y_start, double x_corner, double
    c_curveto(p,x1,y1,x2,y2,x3,y3);
 }
 
-double Get_Arc_Radius(FM *p, OBJ_PTR dx, OBJ_PTR dy)
+static double Get_Arc_Radius(FM *p, OBJ_PTR dx, OBJ_PTR dy)
 {
    double rx = Number_to_double(dx), ry = Number_to_double(dy);
    rx = convert_figure_to_output_dx(p,rx);
@@ -412,6 +412,7 @@ double Get_Arc_Radius(FM *p, OBJ_PTR dx, OBJ_PTR dy)
 OBJ_PTR FM_append_arc_to_path(OBJ_PTR fmkr, OBJ_PTR x_start, OBJ_PTR y_start, OBJ_PTR x_corner, OBJ_PTR y_corner,
    OBJ_PTR x_end, OBJ_PTR y_end, OBJ_PTR dx, OBJ_PTR dy)
 {
+    // dx and dy are converted to output coords and smaller is used as radius
    FM *p = Get_FM(fmkr);
    c_append_arc(p,
       convert_figure_to_output_x(p,Number_to_double(x_start)), convert_figure_to_output_y(p,Number_to_double(y_start)),
@@ -421,7 +422,7 @@ OBJ_PTR FM_append_arc_to_path(OBJ_PTR fmkr, OBJ_PTR x_start, OBJ_PTR y_start, OB
    return fmkr;
 }
 
-void c_append_rect(FM *p, double x, double y, double width, double height)
+static void c_append_rect(FM *p, double x, double y, double width, double height)
 {
    c_moveto(p,x,y);
    c_lineto(p,x+width,y);
@@ -439,7 +440,7 @@ OBJ_PTR FM_append_rect_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width
    return fmkr;
 }
 
-void c_append_rounded_rect(FM *p, double x, double y, double width, double height, double radius)
+static void c_append_rounded_rect(FM *p, double x, double y, double width, double height, double radius)
 {
    double xc = x + width/2, yc = y + height/2, xp = x + width, yp = y + height;
    c_moveto(p,xc,y);
@@ -452,6 +453,7 @@ void c_append_rounded_rect(FM *p, double x, double y, double width, double heigh
 
 OBJ_PTR FM_append_rounded_rect_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height, OBJ_PTR dx, OBJ_PTR dy)
 {
+    // dx and dy are converted to output coords and smaller is used as radius
    FM *p = Get_FM(fmkr);
    c_append_rounded_rect(p,
       convert_figure_to_output_x(p,Number_to_double(x)), convert_figure_to_output_y(p,Number_to_double(y)),
@@ -463,7 +465,7 @@ OBJ_PTR FM_append_rounded_rect_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_P
 #define ROTATE90(x,y) tmp = x; x = y; y = -tmp;
 #define TRANSFORM(xp,yp,x,y) xp = a*(x)+c*(y)+e; yp = b*(x)+d*(y)+f;
 
-void c_append_oval(FM *p, double x, double y, double dx, double dy, double angle)
+static void c_append_oval(FM *p, double x, double y, double dx, double dy, double angle)
 {
    double cs = cos(angle/RADIANS_TO_DEGREES), sn = sin(angle/RADIANS_TO_DEGREES);
    double a = cs*dx, b = sn*dx, c = -sn*dy, d = cs*dy, e = x, f = y;
@@ -639,7 +641,7 @@ OBJ_PTR FM_close_eofill_and_stroke(OBJ_PTR fmkr)
    return fmkr;
 }
 
-void c_clip(FM *p)
+static void c_clip(FM *p)
 {
    if (!constructing_path) return;
    if (writing_file) fprintf(TF, "W n\n");
@@ -720,7 +722,7 @@ OBJ_PTR FM_fill_and_stroke_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR widt
    return fmkr;
 }
 
-void c_clip_rect(FM *p, double x, double y, double width, double height) // in output coords
+static void c_clip_rect(FM *p, double x, double y, double width, double height) // in output coords
 {
    double clip_left=x, clip_right, clip_top, clip_bottom=y, clip_width=width, clip_height=height;
    if (clip_width < 0.0) { clip_right = clip_left; clip_width = -clip_width; clip_left -= clip_width; }
