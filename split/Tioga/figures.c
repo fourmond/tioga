@@ -37,42 +37,6 @@ char *data_dir = NULL;
 OBJ_PTR cFM; /* the Tioga/FigureMaker class object */
 
 
-void RAISE_ERROR_s(char *fmt, char *s) {
-   char buff[1024];
-   sprintf(buff, fmt, s);
-   RAISE_ERROR(buff);
-}
-
-void RAISE_ERROR_ss(char *fmt, char *s1, char *s2) {
-   char buff[1024];
-   sprintf(buff, fmt, s1, s2);
-   RAISE_ERROR(buff);
-}
-
-void RAISE_ERROR_i(char *fmt, int x) {
-   char buff[1024];
-   sprintf(buff, fmt, x);
-   RAISE_ERROR(buff);
-}
-
-void RAISE_ERROR_ii(char *fmt, int x1, int x2) {
-   char buff[1024];
-   sprintf(buff, fmt, x1, x2);
-   RAISE_ERROR(buff);
-}
-
-void RAISE_ERROR_g(char *fmt, double x) {
-   char buff[1024];
-   sprintf(buff, fmt, x);
-   RAISE_ERROR(buff);
-}
-
-void RAISE_ERROR_gg(char *fmt, double x1, double x2) {
-   char buff[1024];
-   sprintf(buff, fmt, x1, x2);
-   RAISE_ERROR(buff);
-}
-
 static void FM_mark(FM *p) { /* all of the OBJ_PTRs in the FM struct should be marked */
    rb_gc_mark(p->fm);
 }

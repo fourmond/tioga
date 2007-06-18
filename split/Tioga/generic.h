@@ -22,7 +22,6 @@
 #ifndef __generic_H__
 #define __generic_H__
 
-
 /* most of the c code should use this interface 
    rather than directly depending on ruby interfaces */
 
@@ -32,63 +31,74 @@
 
 /* Ruby definitions for the generic interpreter interface */
 
+// if ruby, OBJ_PTR is VALUE
+// if python, OBJ_PTR is PyObject*
 #define OBJ_PTR VALUE
 
-#define Number_to_double(obj) NUM2DBL(obj)
+extern double Number_to_double(OBJ_PTR obj);
     // returns a C double
     // raises error if obj not a kind of number
-#define Number_to_int(obj) NUM2INT(obj)
+extern long Number_to_int(OBJ_PTR obj);
     // returns a C int
     // raises error if obj not a kind of integer
 
-#define Integer_New(val) INT2FIX(val)
+extern OBJ_PTR Integer_New(long val);
     // returns a new integer object with given val
-#define Float_New(val) rb_float_new(val)
+extern OBJ_PTR Float_New(double val);
     // returns a new float object with given val
 
-#define String_New(src,len) rb_str_new(src,len)
+extern OBJ_PTR String_New(char *src, long len);
     // returns a new string object initialized with len chars from src
-#define String_From_Cstring(src) rb_str_new2(src)
+extern OBJ_PTR String_From_Cstring(char *src);
     // returns a new string object initialized from null-terminated Cstring src
-#define String_Ptr(obj) RSTRING_PTR(rb_String(obj))
-    // returns char * pointer to storage buffer for string obj
+
+
+extern char *String_Ptr(OBJ_PTR obj);
+    // returns pointer to storage buffer for string obj
     // tries to convert obj to string if necessary
     // raises error if obj not a kind of string and cannot be converted to one
-#define String_Len(obj) RSTRING_LEN(rb_String(obj))
+
+extern long String_Len(OBJ_PTR obj);
     // returns int length of contents of string obj
     // tries to convert obj to string if necessary
     // raises error if obj not a kind of string and cannot be converted to one
 
-#define Array_New(len) rb_ary_new2(len)
+extern OBJ_PTR Array_New(long len);
     // returns a new array object of length len
-#define Array_Len(obj) (RARRAY(rb_Array(obj))->len)
+extern long Array_Len(OBJ_PTR obj);
     // returns length of the array obj
     // tries to convert obj to array if necessary
     // raises error if obj not a kind of array and cannot be converted to one
-#define Array_Entry(obj,indx) rb_ary_entry(obj,indx)
+extern OBJ_PTR Array_Entry(OBJ_PTR obj, long indx);
     // returns array obj entry indx
     // tries to convert obj to array if necessary
     // raises error if obj not a kind of array and cannot be converted to one
-#define Array_Store(obj,indx,val) rb_ary_store(obj,indx,val)
-    // sets array obj entry indx to val
+extern OBJ_PTR Array_Store(OBJ_PTR obj, long indx, OBJ_PTR val);
+    // sets array obj entry indx to val and then returns val.
     // raises error if obj not a kind of array
-#define Array_Push(obj,val) rb_ary_push(obj,val)
-    // pushes val onto the end of array obj
+extern OBJ_PTR Array_Push(OBJ_PTR obj, OBJ_PTR val);
+    // pushes val onto the end of array obj and then returns val.
     // raises error if obj not a kind of array
 
-#define ID_Get(name) rb_intern(name)
+
+// if ruby, ID_PTR is ID
+// if python, ID_PTR is PyObject*  ???
+#define ID_PTR ID
+
+extern ID_PTR ID_Get(char *name);
     // returns internal ID for the given name
-#define Obj_Attr_Get(obj,attr_ID) rb_ivar_get(obj,attr_ID)
+extern OBJ_PTR Obj_Attr_Get(OBJ_PTR obj, ID_PTR attr_ID);
     // returns value of the given attr of the obj
-#define Obj_Attr_Set(obj,attr_ID,val) rb_ivar_set(obj,attr_ID,val)
-    // sets the specified attr of the obj to val
+extern OBJ_PTR Obj_Attr_Set(OBJ_PTR obj, ID_PTR attr_ID, OBJ_PTR val);
+    // sets the specified attr of the obj to val, and then returns val.
+    
 //#define Obj_Attr_Get_by_StringName(obj,attr_name_string) rb_iv_get(obj,attr_name_string)
     // returns value of the given attr of the obj (name_string is char *)
 //#define Obj_Attr_Set_by_StringName(obj,attr_name_string,val) rb_iv_set(obj,attr_name_string,val)
     // sets the specified attr of the obj to val (name_string is char *)
 
-#define RAISE_ERROR(str) rb_raise(rb_eArgError,str)
-// The following do sprintf and then call RAISE_ERROR.
+extern void RAISE_ERROR(char *str);
+// The following do sprintf to a local string, and then call RAISE_ERROR.
 extern void RAISE_ERROR_s(char *fmt, char *s);
 extern void RAISE_ERROR_ss(char *fmt, char *s1, char *s2);
 extern void RAISE_ERROR_i(char *fmt, int x);
@@ -97,10 +107,28 @@ extern void RAISE_ERROR_g(char *fmt, double x);
 extern void RAISE_ERROR_gg(char *fmt, double x1, double x2);
 
 
-/* Dvector+Dtable version of generic double array interface */
+/* generic interface for vectors and tables */
 
-#define Vector_Data_for_Read(obj,len_ptr) Dvector_Data_for_Read(obj,len_ptr) 
-    //returns double *
+extern OBJ_PTR Vector_New(long len, double *vals);
+    // creates a 1D vector and initializes it with given values
+    // returns OBJ_PTR for the new vector of doubles
+
+extern OBJ_PTR Integer_Vector_New(long len, long *vals);
+    // creates a 1D vector and initializes it with given values
+    // returns OBJ_PTR for the new vector of integers
+
+extern double *Vector_Data_for_Read(OBJ_PTR obj, long *len_ptr);
+    // returns (double *) pointer to data (read access only)
+    // also returns length of vector via len_ptr
+
+
+extern double **Table_Data_for_Read(OBJ_PTR tbl, long *num_col_ptr, long *num_row_ptr);
+    // returns (double **) pointer to data (read access only)
+    // also returns number of cols and rows via num_col_ptr and num_row_ptr
+    
+    
+    
+// the following will go away
 #define Vector_Data_for_Write(obj,len_ptr) Dvector_Data_for_Write(obj,len_ptr) 
     //returns double * after ensuring that is okay to write into it
 #define Vector_Data_Resize(obj,new_len) Dvector_Data_Resize(obj,new_len) 
@@ -109,11 +137,6 @@ extern void RAISE_ERROR_gg(char *fmt, double x1, double x2);
     // VALUE ary, long indx, double val
     // sets vector object ary entry indx to double val
     // raises error if ary not a kind of vector
-
-#define Table_Info(tbl,num_col_ptr,num_row_ptr) Dtable_Ptr(tbl,num_col_ptr,num_row_ptr)
-    // VALUE tbl, long *num_col_ptr, long *num_row_ptr
-    // returns double ** for data stored in table
-    // sets number of cols and rows 
 
 
 #endif   /* __generic_H__ */

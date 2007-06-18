@@ -949,8 +949,8 @@ FLAG(int ni, int nj, int ind)
       long xlen, ylen, num_columns, num_rows;
       double *x_coords = Vector_Data_for_Read(xs, &xlen);
       double *y_coords = Vector_Data_for_Read(ys, &ylen);
-      double **zs = Table_Info(zs_data, &num_columns, &num_rows);
-      double **legit = Table_Info(legit_data, &num_columns, &num_rows);
+      double **zs = Table_Data_for_Read(zs_data, &num_columns, &num_rows);
+      double **legit = Table_Data_for_Read(legit_data, &num_columns, &num_rows);
       if (x_coords == NULL || gaps == Qnil || zs == NULL || y_coords == NULL) {
          RAISE_ERROR("Sorry: bad args for make_contour.  Need to provide xs, ys, gaps, and zs.");
       }

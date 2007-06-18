@@ -309,7 +309,7 @@ OBJ_PTR FM_private_create_image_data(OBJ_PTR fmkr, OBJ_PTR data,
 {
    FM *p = Get_FM(fmkr);
    long num_cols, num_rows;
-   double **ary = Table_Info(data, &num_cols, &num_rows);
+   double **ary = Table_Data_for_Read(data, &num_cols, &num_rows);
    return c_private_create_image_data(p, ary, num_cols, num_rows, 
       Number_to_int(first_row), Number_to_int(last_row), Number_to_int(first_column), Number_to_int(last_column),
       Number_to_double(min_val), Number_to_double(max_val), Number_to_int(max_code), Number_to_int(if_below_range), Number_to_int(if_above_range));
@@ -370,7 +370,7 @@ OBJ_PTR FM_private_create_monochrome_image_data(OBJ_PTR fmkr, OBJ_PTR data,
 {
    FM *p = Get_FM(fmkr);
    long num_cols, num_rows;
-   double **ary = Table_Info(data, &num_cols, &num_rows);
+   double **ary = Table_Data_for_Read(data, &num_cols, &num_rows);
    return c_private_create_monochrome_image_data(p, ary, num_cols, num_rows, 
       Number_to_int(first_row), Number_to_int(last_row), Number_to_int(first_column), Number_to_int(last_column),
       Number_to_double(boundary), reverse != Qfalse);
