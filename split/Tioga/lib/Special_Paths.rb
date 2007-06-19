@@ -53,7 +53,9 @@ link:images/Contours.png
     end
     
 =begin rdoc
-Creates a 'staircase' path with steps matching the given data points.  
+Creates a 'staircase' path with steps matching the given data points;
+returns 2-element array with first element a vector of the x values for
+the steps and second element a vector of the y values.
 
 Dictionary Entries
     'xfirst'        => a_float    # x location for the start of the steps
@@ -66,12 +68,13 @@ Dictionary Entries
     'y_last'                      # Alias for 'ylast'
     'xs'            => a_dvector  # The data x in figure coordinates
     'ys'            => a_dvector  # The data y in figure coordinates
-    'dest_xs'       => a_dvector  # The x values for the steps will go here.
-    'dest_ys'       => a_dvector  # The y values for the steps will go here.
+    'dest_xs'       => a_dvector  # The x values for the steps will go here (optional).
+    'dest_ys'       => a_dvector  # The y values for the steps will go here (optional).
 
 The widths of steps are determined by 'xfirst', 'xs', and 'xlast'; the heights of steps are
 determined by 'yfirst', 'ys', and 'ylast'.   The steps up and down occur at the midpoints between
-the given x locations.
+the given x locations.  If 'dest_xs' are given in the dictionary, that vector will be set to
+the x values for the steps.  Similarly for 'dest_ys'.
 
 Example
 
@@ -83,16 +86,15 @@ Example
         x_first = 0.0; x_last = 18.0; y_first = y_last = 2.5
         x_results = Dvector[]
         y_results = Dvector[]
-        t.make_steps(
+        stps = t.make_steps(
             'xs' => xs, 'ys' => ys,
-            'dest_xs' => x_results, 'dest_ys' => y_results,
             'x_first' => x_first, 'y_first' => y_first,
             'x_last' => x_last, 'y_last' => y_last)
         t.show_plot('boundaries' => [-1, 19, 8, 2]) do
             t.fill_color = FloralWhite
             t.fill_frame
             t.stroke_color = Blue
-            t.append_points_to_path(x_results, y_results)
+            t.append_points_to_path(stps[0], stps[1])
             t.stroke
             t.show_marker('Xs' => xs, 'Ys' => ys, 'marker' => Bullet,
                 'scale' => 0.6, 'color' => Red);

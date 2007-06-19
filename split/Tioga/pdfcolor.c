@@ -63,7 +63,7 @@ static int create_function(int hival, int lookup_len, unsigned char *lookup)
    Function_Info *fo = ALLOC(Function_Info);
    fo->next = functions_list;
    functions_list = fo;
-   fo->lookup = ALLOC_N(unsigned char, lookup_len);
+   fo->lookup = ALLOC_N_unsigned_char(lookup_len);
    MEMCPY(fo->lookup, lookup, unsigned char, lookup_len);
    fo->lookup_len = lookup_len;
    fo->hival = hival;
@@ -341,7 +341,7 @@ static OBJ_PTR c_create_colormap(FM *p, bool rgb_flag, int length,
    }
    int j, buff_len = length * 3, hival = length-1;
    unsigned char *buff;
-   buff = ALLOC_N(unsigned char, buff_len);
+   buff = ALLOC_N_unsigned_char(buff_len);
    for (j = 0, i = 0; j < length; j++) {
       double x = j; x /= (length-1);
       double c1, c2, c3, r, g, b;
@@ -417,7 +417,7 @@ OBJ_PTR FM_convert_to_colormap(OBJ_PTR fmkr, OBJ_PTR Rs, OBJ_PTR Gs, OBJ_PTR Bs)
       RAISE_ERROR("Sorry: vectors for convert_to_colormap must all be of same length");
    int i, j, buff_len = r_len * 3;
    unsigned char *buff;
-   buff = ALLOC_N(unsigned char, buff_len);
+   buff = ALLOC_N_unsigned_char(buff_len);
    for (i = 0, j = 0; j < r_len; j++) {
       buff[i++] = ROUND(r_ptr[j]*255);
       buff[i++] = ROUND(g_ptr[j]*255);

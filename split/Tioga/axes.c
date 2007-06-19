@@ -302,7 +302,7 @@ static char *Create_Label(double val, int scale, int prec, bool log_vals, bool u
    }
    int len = strlen(buff);
    if (postfix != NULL) { strcpy(buff+len, postfix); len = strlen(buff); }
-   string = ALLOC_N(char, len+1);
+   string = ALLOC_N_char(len+1);
    strcpy(string, buff);
    return string;
 }
@@ -397,7 +397,7 @@ static void Pick_Label_Precision(double vmin, double vmax, double tick, bool use
 
 static char **Get_Labels(FM *p, PlotAxis *s)
 {
-   char **labels = (char **)ALLOC_N(char *, s->nmajors);
+   char **labels = (char **)ALLOC_N_pointer(s->nmajors);
    char postfix[50], *ps;
    int i, k, j;
    k = s->numeric_label_frequency;
@@ -456,7 +456,7 @@ static double *Pick_Locations_for_Major_Ticks(double interval, double axis_min, 
        if (nmajors > 1) break;
        interval *= 0.5;
    }
-   majors = ALLOC_N(double, nmajors);
+   majors = ALLOC_N_double(nmajors);
    prev_tick = starting_tick;
    for (i=0; i < nmajors; i++) {
       majors[i] = prev_tick += interval;

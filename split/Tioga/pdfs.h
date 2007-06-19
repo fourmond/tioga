@@ -34,9 +34,9 @@ extern ID tex_preview_bottom_margin_ID, tex_preview_left_fudge_ID, tex_preview_t
 extern ID do_cmd_ID, data_dir_ID, initialized_ID, tex_xoffset_ID, tex_yoffset_ID;
 extern ID line_type_ID;
 
-extern long int *obj_offsets, capacity_obj_offsets, stream_start, stream_end, length_offset, xref_offset;
-extern int num_objects, next_available_object_number, next_available_gs_number, next_available_xo_number;
-extern int next_available_shade_number, next_available_font_number;
+extern long *obj_offsets, capacity_obj_offsets, stream_start, stream_end, length_offset, xref_offset;
+extern long num_objects, next_available_object_number, next_available_gs_number, next_available_xo_number;
+extern long next_available_shade_number, next_available_font_number;
 extern void Record_Object_Offset(int obj_number);
 extern char *predefined_Fonts[];
 extern int num_pdf_standard_fonts, num_predefined_fonts;

@@ -124,7 +124,22 @@ extern double *Vector_Data_for_Read(OBJ_PTR obj, long *len_ptr);
 extern double **Table_Data_for_Read(OBJ_PTR tbl, long *num_col_ptr, long *num_row_ptr);
     // returns (double **) pointer to data (read access only)
     // also returns number of cols and rows via num_col_ptr and num_row_ptr
-    
+
+
+/* generic interface for alloc */
+// use these instead of directly calling C
+// Ruby versions will trigger a garbage collection if necessary
+
+extern char *ALLOC_N_char(long len);
+extern unsigned char *ALLOC_N_unsigned_char(long len);
+
+extern long *ALLOC_N_long(long len);
+extern unsigned long *ALLOC_N_unsigned_long(long len);
+extern void REALLOC_N_long(long* ptr, long new_len);
+
+extern void **ALLOC_N_pointer(long len);
+extern bool *ALLOC_N_bool(long len);
+extern double *ALLOC_N_double(long len);
     
     
 // the following will go away

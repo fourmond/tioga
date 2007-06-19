@@ -111,6 +111,20 @@ void RAISE_ERROR_gg(char *fmt, double x1, double x2) {
 }
 
 
+/* generic interface for alloc */
+
+char *ALLOC_N_char(long len) { return ALLOC_N(char,len); }
+unsigned char *ALLOC_N_unsigned_char(long len) { return ALLOC_N(unsigned char,len); }
+
+long *ALLOC_N_long(long len) { return ALLOC_N(long,len); }
+unsigned long *ALLOC_N_unsigned_long(long len) { return ALLOC_N(unsigned long,len); }
+void REALLOC_N_long(long* ptr, long new_len) { REALLOC_N(ptr,long,new_len); }
+
+void **ALLOC_N_pointer(long len) { return ALLOC_N(void *,len); }
+bool *ALLOC_N_bool(long len) { return ALLOC_N(bool,len); }
+double *ALLOC_N_double(long len) { return ALLOC_N(double,len); }
+
+
 
 /* generic interface for vectors and tables */
 

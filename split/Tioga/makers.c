@@ -39,9 +39,9 @@ static void c_private_make_spline_interpolated_points(FM *p, OBJ_PTR Xvec, OBJ_P
       if (xlen == 0) return;
       n_pts_data = xdlen;
       As = Y_data;
-      Bs = (double *)ALLOC_N(double, n_pts_data);
-      Cs = (double *)ALLOC_N(double, n_pts_data);
-      Ds = (double *)ALLOC_N(double, n_pts_data);
+      Bs = ALLOC_N_double(n_pts_data);
+      Cs = ALLOC_N_double(n_pts_data);
+      Ds = ALLOC_N_double(n_pts_data);
       c_dvector_create_spline_interpolant(n_pts_data, X_data, Y_data,
          start_clamped, start_slope, end_clamped, end_slope, Bs, Cs, Ds);
       Ys = Vector_Data_Resize(Yvec, xlen);
@@ -67,55 +67,6 @@ static void c_private_make_spline_interpolated_points(FM *p, OBJ_PTR Xvec, OBJ_P
       return fmkr;
    }
 
-static void old_c_make_steps(FM *p, OBJ_PTR Xvec, OBJ_PTR Yvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
-        double xfirst, double yfirst, double xlast, double ylast){
-      double xnext, xprev, x;
-      int n_pts_to_add;
-      int i, j, n, old_length, new_length;
-      long xlen, ylen, xdlen, ydlen;
-      double *Xs = Vector_Data_for_Write(Xvec, &xlen);
-      double *Ys = Vector_Data_for_Write(Yvec, &ylen);
-      double *X_data = Vector_Data_for_Read(Xvec_data, &xdlen);
-      double *Y_data = Vector_Data_for_Read(Yvec_data, &ydlen);
-      if (Xs == NULL || Ys == NULL || X_data == NULL || Y_data == NULL
-            || xdlen != ydlen || xlen != ylen) {
-         RAISE_ERROR("Sorry: bad args for make_steps");
-      }
-      n = xdlen;
-      n_pts_to_add = 2*(n+1);
-      old_length = xlen;
-      new_length = old_length + n_pts_to_add;
-      Xs = Vector_Data_Resize(Xvec, new_length);
-      Ys = Vector_Data_Resize(Yvec, new_length);
-      for (i = 0, j = 0; i <= n; i++, j += 2) {
-         xprev = (i==0)? xfirst : X_data[i-1];
-         xnext = (i==n)? xlast : X_data[i];
-         x = 0.5*(xprev + xnext);
-         Xs[j+old_length] = Xs[j+1+old_length] = x;
-         }
-      Ys[0] = yfirst;
-      for (i = 0, j = 1; i < n; i++, j += 2) {
-         Ys[j+old_length] = Ys[j+1+old_length] = Y_data[i];
-         }
-      Ys[n_pts_to_add-1+old_length] = ylast;
-      USE_P
-      }
-
-OBJ_PTR old_FM_private_make_steps(OBJ_PTR fmkr, OBJ_PTR Xvec, OBJ_PTR Yvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
-        OBJ_PTR xfirst, OBJ_PTR yfirst, OBJ_PTR xlast, OBJ_PTR ylast) {
-        /* adds n_pts_to_add points to Xs and Ys for steps with the given parameters.
-            X_data and Y_data are arrays of n values where n_pts_to_add = 2*(n+1)
-            (xfirst,yfirst) and (xlast,ylast) are extra data points to fix the first and last steps.
-        The X_data plus xfirst and xlast determine the widths of the steps.
-        The Y_data plus yfirst and ylast determine the height of the steps.
-        The steps occur at locations midway between the given x locations. */
-      FM *p = Get_FM(fmkr);
-      old_c_make_steps(p, Xvec, Yvec, Xvec_data, Yvec_data,
-         Number_to_double(xfirst), Number_to_double(yfirst), Number_to_double(xlast), Number_to_double(ylast));
-      return fmkr;
-   }
-      
-
 static void c_make_steps(FM *p, 
          long *xsteps_len_ptr, double **Xs_ptr, 
          long *ysteps_len_ptr, double **Ys_ptr, 
@@ -132,19 +83,18 @@ static void c_make_steps(FM *p,
             || xdlen != ydlen || xlen != ylen) {
          RAISE_ERROR("Sorry: bad args for make_steps");
       }
-      xlen = 0;
-      ylen = 0;
+      xlen = 0; ylen = 0; // original code was written to append to vectors with lengths > 0
       n = xdlen;
       n_pts_to_add = 2*(n+1);
       old_length = xlen;
       new_length = old_length + n_pts_to_add;
       
       *xsteps_len_ptr = new_length;
-      Xs = (double *)calloc(new_length, sizeof(double));
+      Xs = ALLOC_N_double(new_length);
       *Xs_ptr = Xs;
 
       *ysteps_len_ptr = new_length;
-      Ys = (double *)calloc(new_length, sizeof(double));
+      Ys = ALLOC_N_double(new_length);
       *Ys_ptr = Ys;
       
       for (i = 0, j = 0; i <= n; i++, j += 2) {
@@ -550,9 +500,9 @@ get_space_for_curve()
 		RAISE_ERROR("storage is messed up (internal error)");
 		return;			// will not execute
 	}
-	xcurve = ALLOC_N(double, max_in_curve);
-	ycurve = ALLOC_N(double, max_in_curve);
-	legitcurve = ALLOC_N(bool, max_in_curve);
+	xcurve = ALLOC_N_double(max_in_curve);
+	ycurve = ALLOC_N_double(max_in_curve);
+	legitcurve = ALLOC_N_bool(max_in_curve);
 	curve_storage_exists = true;
 	num_in_curve = 0;
 	num_in_path = 0;
@@ -893,17 +843,17 @@ append_segment(double xr, double yr, double zr, double OKr,
 		// do this with an STL vector class
 		max_in_curve *= 2;
 		int i;
-		double *tmp = ALLOC_N(double, num_in_curve);
+		double *tmp = ALLOC_N_double(num_in_curve);
 		for (i = 0; i < num_in_curve; i++) tmp[i] = xcurve[i];
-		free(xcurve); xcurve = ALLOC_N(double, max_in_curve);
+		free(xcurve); xcurve = ALLOC_N_double(max_in_curve);
 		for (i = 0; i < num_in_curve; i++) xcurve[i] = tmp[i];
 		for (i = 0; i < num_in_curve; i++) tmp[i] = ycurve[i];
-		free(ycurve); ycurve = ALLOC_N(double, max_in_curve);
+		free(ycurve); ycurve = ALLOC_N_double(max_in_curve);
 		for (i = 0; i < num_in_curve; i++) ycurve[i] = tmp[i];
 		free(tmp);
-		bool *tmpl = ALLOC_N(bool, num_in_curve);
+		bool *tmpl = ALLOC_N_bool(num_in_curve);
 		for (i = 0; i < num_in_curve; i++)	tmpl[i] = legitcurve[i];
-		free(legitcurve); legitcurve = ALLOC_N(bool, max_in_curve);
+		free(legitcurve); legitcurve = ALLOC_N_bool(max_in_curve);
 		for (i = 0; i < num_in_curve; i++)	legitcurve[i] = tmpl[i];
 		free(tmpl);
 	}
@@ -974,7 +924,7 @@ FLAG(int ni, int nj, int ind)
 		if (flag_storage_exists)
 			RAISE_ERROR("storage is messed up (internal error)");
 		size = 1 + ni * nj / NBITS;	// total storage array length
-		flag = ALLOC_N(unsigned long, size);
+		flag = ALLOC_N_unsigned_long(size);
 		// Create mask
 		mask[0] = 1;
 		for (i = 1; i < NBITS; i++)

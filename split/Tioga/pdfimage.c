@@ -106,7 +106,7 @@ static void Write_Image_From_File(char *filename, int width, int height, char *o
    unsigned char *buff;
    int len, rd_len;
    int buff_len = 256000;
-   buff = ALLOC_N(unsigned char, buff_len);
+   buff = ALLOC_N_unsigned_char(buff_len);
    len = 0;
    while ((rd_len = fread(buff, 1, buff_len, jpg)) == buff_len) len += buff_len;
    len += rd_len;
@@ -185,7 +185,7 @@ void Write_Sampled(Sampled_Info *xo)
       xo->value_mask_min <= 255 && xo->value_mask_max <= 255 && xo->value_mask_min <= xo->value_mask_max)
       fprintf(OF, "\t/Mask [%i %i]\n", xo->value_mask_min, xo->value_mask_max);
    new_len = (xo->length * 11)/10 + 100;
-   buffer = ALLOC_N(unsigned char, new_len);
+   buffer = ALLOC_N_unsigned_char(new_len);
    if (flate_compress(buffer, &new_len, xo->image_data, xo->length) != FLATE_OK) {
       free(buffer);
       RAISE_ERROR("Error compressing image data");
@@ -230,7 +230,7 @@ static void Show_JPEG(FM *p, char *filename, int width, int height, double *dest
    xobj_list = (XObject_Info *)xo;
    xo->xo_num = next_available_xo_number++;
    xo->obj_num = next_available_object_number++;
-   xo->filename = ALLOC_N(char, strlen(filename)+1);
+   xo->filename = ALLOC_N_char(strlen(filename)+1);
    strcpy(xo->filename, filename);
    xo->width = width;
    xo->height = height;
@@ -285,7 +285,7 @@ static OBJ_PTR c_private_create_image_data(FM *p, double **data, long num_cols, 
    int i, j, k, width = last_column - first_column + 1, height = last_row - first_row + 1;
    int sz = width * height;
    if (sz <= 0) RAISE_ERROR_ii("Sorry: invalid data specification: width (%i) height (%i)", width, height);
-   char *buff = ALLOC_N(char, sz);
+   char *buff = ALLOC_N_char(sz);
    for (k = 0, i = first_row; i <= last_row; i++) {
       double *row = data[i];
       for (j = first_column; j <= last_column; j++) {
@@ -335,7 +335,7 @@ static OBJ_PTR c_private_create_monochrome_image_data(FM *p, double **data, long
    int sz = bytes_per_row * 8 * height;
    if (sz <= 0) RAISE_ERROR_ii("Sorry: invalid data specification: width (%i) height (%i)", width, height);
    // to simplify the process, do it in two stages: first get the values and then pack the bits
-   char *buff = ALLOC_N(char, sz);
+   char *buff = ALLOC_N_char(sz);
    for (k = 0, i = first_row; i <= last_row; i++) {
       double *row = data[i];
       for (j = first_column; j <= last_column; j++) {
@@ -347,7 +347,7 @@ static OBJ_PTR c_private_create_monochrome_image_data(FM *p, double **data, long
       }
    }
    int num_bytes = (sz+7) >> 3;
-   char *bits = ALLOC_N(char, num_bytes), c = 0;
+   char *bits = ALLOC_N_char(num_bytes), c = 0;
    int num_bits = num_bytes << 3;
    for (i = 0, k = -1; i < num_bits; i++) {
       int bit = (i < sz)? buff[i] : 0;
@@ -390,7 +390,7 @@ static int c_private_show_image(
    xobj_list = (XObject_Info *)xo;
    xo->xo_num = next_available_xo_number++;
    xo->obj_num = next_available_object_number++;
-   xo->image_data = ALLOC_N(unsigned char, len);
+   xo->image_data = ALLOC_N_unsigned_char(len);
    xo->length = len;
    xo->interpolate = interpolate;
    xo->reversed = reversed;
@@ -402,7 +402,7 @@ static int c_private_show_image(
          RAISE_ERROR_ii("Sorry: color space hival (%i) is too large for length of lookup table (%i)", hival, lookup_len);
       xo->hival = hival;
       lookup_len = (hival+1) * 3;
-      xo->lookup = ALLOC_N(unsigned char, lookup_len);
+      xo->lookup = ALLOC_N_unsigned_char(lookup_len);
       xo->lookup_len = lookup_len;
       MEMCPY(xo->lookup, lookup, unsigned char, lookup_len);
    }

@@ -48,9 +48,9 @@ char *predefined_Fonts[] = { /* must match the font numbers in FigureConstants.r
 int num_predefined_fonts = 14;
 int num_pdf_standard_fonts = 14;
 
-long int *obj_offsets, capacity_obj_offsets, stream_start, stream_end, length_offset, xref_offset;
-int num_objects, next_available_object_number, next_available_gs_number, next_available_xo_number;
-int next_available_shade_number, next_available_font_number;
+long *obj_offsets, capacity_obj_offsets, stream_start, stream_end, length_offset, xref_offset;
+long num_objects, next_available_object_number, next_available_gs_number, next_available_xo_number;
+long next_available_shade_number, next_available_font_number;
 Stroke_Opacity_State *stroke_opacities = NULL;
 Fill_Opacity_State *fill_opacities = NULL;
 XObject_Info *xobj_list = NULL;
@@ -84,7 +84,7 @@ void Init_pdf(void)
    writing_file = false;
    capacity_obj_offsets = 1000;
    num_objects = 0;
-   obj_offsets = ALLOC_N(long int, capacity_obj_offsets);
+   obj_offsets = ALLOC_N_long(capacity_obj_offsets);
    for (i=0; i < capacity_obj_offsets; i++) obj_offsets[i] = 0;
 }
 
@@ -93,7 +93,7 @@ void Record_Object_Offset(int obj_number)
    long int offset = ftell(OF);
    if (obj_number >= capacity_obj_offsets) {
       int size_increment = 50, i;
-      REALLOC_N(obj_offsets, long int, obj_number + size_increment);
+      REALLOC_N_long(obj_offsets, obj_number + size_increment);
       capacity_obj_offsets = obj_number + size_increment;
       for (i=num_objects; i < capacity_obj_offsets; i++) obj_offsets[i] = 0;
    }
@@ -225,8 +225,8 @@ static void Write_Stream(void)
    unsigned long int new_len = (len * 11) / 10 + 100;
    unsigned char *buffer, *dest_buffer;
    rewind(TF);
-   buffer = ALLOC_N(unsigned char, len+1);
-   dest_buffer = ALLOC_N(unsigned char, new_len+1);
+   buffer = ALLOC_N_unsigned_char(len+1);
+   dest_buffer = ALLOC_N_unsigned_char(new_len+1);
    fread(buffer, 1, len, TF);
    fclose(TF);
    if (FLATE_ENCODE) {
