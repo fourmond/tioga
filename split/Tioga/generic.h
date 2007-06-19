@@ -121,7 +121,6 @@ extern double *Vector_Data_for_Read(OBJ_PTR obj, long *len_ptr);
     // returns (double *) pointer to data (read access only)
     // also returns length of vector via len_ptr
 
-
 extern double **Table_Data_for_Read(OBJ_PTR tbl, long *num_col_ptr, long *num_row_ptr);
     // returns (double **) pointer to data (read access only)
     // also returns number of cols and rows via num_col_ptr and num_row_ptr

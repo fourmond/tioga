@@ -114,11 +114,26 @@ void RAISE_ERROR_gg(char *fmt, double x1, double x2) {
 
 /* generic interface for vectors and tables */
 
-double *Vector_Data_for_Read(OBJ_PTR obj, long *len_ptr) { return Dvector_Data_for_Read(obj,len_ptr); }
-
-OBJ_PTR Vector_New(long len, double *vals) { return Qnil; }
-
-OBJ_PTR Integer_Vector_New(long len, long *vals) { return Qnil; }
+double *Vector_Data_for_Read(OBJ_PTR obj, long *len_ptr) { 
+   return Dvector_Data_for_Read(obj,len_ptr);
+}
 
 double **Table_Data_for_Read(OBJ_PTR tbl, long *num_col_ptr, long *num_row_ptr) {
-   return Dtable_Ptr(tbl,num_col_ptr,num_row_ptr); }
+   return Dtable_Ptr(tbl,num_col_ptr,num_row_ptr);
+}
+
+OBJ_PTR Vector_New(long len, double *vals) { 
+   VALUE dv = Dvector_Create();
+   double *data = Dvector_Data_Resize(dv,len);
+   long i;
+   for (i=0; i<len; i++) data[i] = vals[i];
+   return dv;
+}
+
+OBJ_PTR Integer_Vector_New(long len, long *vals) {
+   VALUE ar = rb_ary_new2(len);
+   long i;
+   for (i=0; i<len; i++) rb_ary_store(ar,i,LONG2NUM(vals[i]));
+   return ar;
+}
+

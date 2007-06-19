@@ -583,7 +583,7 @@ EOD
         x_first = 0.0; x_last = 18.0; y_first = y_last = 2.5
         x_results = Dvector[]
         y_results = Dvector[]
-        t.make_steps(
+        stps = t.make_steps(
             'dest_xs' => x_results, 'dest_ys' => y_results, 
             'xs' => xs, 'ys' => ys,
             'x_first' => x_first, 'y_first' => y_first, 
@@ -615,10 +615,9 @@ EOD
         ys = Dvector[ 3.0, 3.7, 3.9, 4.2, 5.7, 6.6,  7.1,  6.7,  4.5 ]
         data_pts = xs.size
         x_first = 0.0; x_last = 18.0; y_first = y_last = 2.5
-        x_results = Dvector[]
-        y_results = Dvector[]
-        t.make_steps(
-            'dest_xs' => x_results, 'dest_ys' => y_results, 
+        x_results = Dvector[0]
+        y_results = Dvector[0]
+        stps = t.make_steps(
             'xs' => xs, 'ys' => ys,
             'x_first' => x_first, 'y_first' => y_first, 
             'x_last' => x_last, 'y_last' => y_last)
@@ -626,7 +625,7 @@ EOD
             t.fill_color = FloralWhite
             t.fill_frame
             t.stroke_color = Blue
-            t.append_points_to_path(x_results, y_results)
+            t.append_points_to_path(stps[0], stps[1])
             t.stroke
             t.show_marker('Xs' => xs, 'Ys' => ys, 'marker' => Bullet, 
                 'scale' => 0.6, 'color' => Red);

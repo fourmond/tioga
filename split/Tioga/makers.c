@@ -67,7 +67,7 @@ static void c_private_make_spline_interpolated_points(FM *p, OBJ_PTR Xvec, OBJ_P
       return fmkr;
    }
 
-static void c_make_steps(FM *p, OBJ_PTR Xvec, OBJ_PTR Yvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
+static void old_c_make_steps(FM *p, OBJ_PTR Xvec, OBJ_PTR Yvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
         double xfirst, double yfirst, double xlast, double ylast){
       double xnext, xprev, x;
       int n_pts_to_add;
@@ -100,8 +100,8 @@ static void c_make_steps(FM *p, OBJ_PTR Xvec, OBJ_PTR Yvec, OBJ_PTR Xvec_data, O
       Ys[n_pts_to_add-1+old_length] = ylast;
       USE_P
       }
-      
-OBJ_PTR FM_private_make_steps(OBJ_PTR fmkr, OBJ_PTR Xvec, OBJ_PTR Yvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
+
+OBJ_PTR old_FM_private_make_steps(OBJ_PTR fmkr, OBJ_PTR Xvec, OBJ_PTR Yvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
         OBJ_PTR xfirst, OBJ_PTR yfirst, OBJ_PTR xlast, OBJ_PTR ylast) {
         /* adds n_pts_to_add points to Xs and Ys for steps with the given parameters.
             X_data and Y_data are arrays of n values where n_pts_to_add = 2*(n+1)
@@ -110,9 +110,83 @@ OBJ_PTR FM_private_make_steps(OBJ_PTR fmkr, OBJ_PTR Xvec, OBJ_PTR Yvec, OBJ_PTR 
         The Y_data plus yfirst and ylast determine the height of the steps.
         The steps occur at locations midway between the given x locations. */
       FM *p = Get_FM(fmkr);
-      c_make_steps(p, Xvec, Yvec, Xvec_data, Yvec_data,
+      old_c_make_steps(p, Xvec, Yvec, Xvec_data, Yvec_data,
          Number_to_double(xfirst), Number_to_double(yfirst), Number_to_double(xlast), Number_to_double(ylast));
       return fmkr;
+   }
+      
+
+static void c_make_steps(FM *p, 
+         long *xsteps_len_ptr, double **Xs_ptr, 
+         long *ysteps_len_ptr, double **Ys_ptr, 
+         OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
+         double xfirst, double yfirst, double xlast, double ylast){
+      double xnext, xprev, x;
+      int n_pts_to_add;
+      int i, j, n, old_length, new_length;
+      long xlen, ylen, xdlen, ydlen;
+      double *Xs, *Ys;
+      double *X_data = Vector_Data_for_Read(Xvec_data, &xdlen);
+      double *Y_data = Vector_Data_for_Read(Yvec_data, &ydlen);
+      if (Xs == NULL || Ys == NULL || X_data == NULL || Y_data == NULL
+            || xdlen != ydlen || xlen != ylen) {
+         RAISE_ERROR("Sorry: bad args for make_steps");
+      }
+      xlen = 0;
+      ylen = 0;
+      n = xdlen;
+      n_pts_to_add = 2*(n+1);
+      old_length = xlen;
+      new_length = old_length + n_pts_to_add;
+      
+      *xsteps_len_ptr = new_length;
+      Xs = (double *)calloc(new_length, sizeof(double));
+      *Xs_ptr = Xs;
+
+      *ysteps_len_ptr = new_length;
+      Ys = (double *)calloc(new_length, sizeof(double));
+      *Ys_ptr = Ys;
+      
+      for (i = 0, j = 0; i <= n; i++, j += 2) {
+         xprev = (i==0)? xfirst : X_data[i-1];
+         xnext = (i==n)? xlast : X_data[i];
+         x = 0.5*(xprev + xnext);
+         Xs[j+old_length] = Xs[j+1+old_length] = x;
+         }
+      Ys[0] = yfirst;
+      for (i = 0, j = 1; i < n; i++, j += 2) {
+         Ys[j+old_length] = Ys[j+1+old_length] = Y_data[i];
+         }
+      Ys[n_pts_to_add-1+old_length] = ylast;
+
+      USE_P
+      }
+
+OBJ_PTR FM_private_make_steps(OBJ_PTR fmkr, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
+        OBJ_PTR xfirst, OBJ_PTR yfirst, OBJ_PTR xlast, OBJ_PTR ylast) {
+        /* adds n_pts_to_add points to Xs and Ys for steps with the given parameters.
+            X_data and Y_data are arrays of n values where n_pts_to_add = 2*(n+1)
+            (xfirst,yfirst) and (xlast,ylast) are extra data points to fix the first and last steps.
+        The X_data plus xfirst and xlast determine the widths of the steps.
+        The Y_data plus yfirst and ylast determine the height of the steps.
+        The steps occur at locations midway between the given x locations. */
+      FM *p = Get_FM(fmkr);
+      OBJ_PTR Xvec, Yvec, dest_xs, dest_ys, pts_array;
+      long xsteps_len, ysteps_len;
+      double *xsteps_data, *ysteps_data;
+      
+      c_make_steps(p, &xsteps_len, &xsteps_data, &ysteps_len, &ysteps_data, Xvec_data, Yvec_data,
+         Number_to_double(xfirst), Number_to_double(yfirst), Number_to_double(xlast), Number_to_double(ylast));
+
+      Xvec = Vector_New(xsteps_len, xsteps_data);
+      Yvec = Vector_New(ysteps_len, ysteps_data);
+      free(xsteps_data);
+      free(ysteps_data);
+      
+      pts_array = Array_New(2);
+      Array_Store(pts_array,0,Xvec);
+      Array_Store(pts_array,1,Yvec);
+      return pts_array;
    }
 
 /*

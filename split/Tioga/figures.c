@@ -484,7 +484,7 @@ void Init_FigureMaker(void) {
 /* makers */
    rb_define_method(cFM, "private_make_contour", FM_private_make_contour, 9);
    rb_define_method(cFM, "private_make_spline_interpolated_points", FM_private_make_spline_interpolated_points, 6);
-   rb_define_method(cFM, "private_make_steps", FM_private_make_steps, 8);
+   rb_define_method(cFM, "private_make_steps", FM_private_make_steps, 6);
    
 /* Title */
    attr_reader(title_visible)

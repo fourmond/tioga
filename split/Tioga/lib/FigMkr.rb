@@ -1121,11 +1121,20 @@ class FigureMaker
         yfirst = complain_if_missing_numeric_arg(dict, 'yfirst', 'y_first', 'make_steps')
         xlast = complain_if_missing_numeric_arg(dict, 'xlast', 'x_last', 'make_steps')
         ylast = complain_if_missing_numeric_arg(dict, 'ylast', 'y_last', 'make_steps')
-        dest_xs = get_dvec(dict, 'dest_xs', 'make_steps')
-        dest_ys = get_dvec(dict, 'dest_ys', 'make_steps')
+        dest_xs = dict['dest_xs']
+        dest_ys = dict['dest_ys']
         xs = get_dvec(dict, 'xs', 'make_steps')
         ys = get_dvec(dict, 'ys', 'make_steps')
-        private_make_steps(dest_xs, dest_ys, xs, ys, xfirst, yfirst, xlast, ylast)
+        pts_array = private_make_steps(xs, ys, xfirst, yfirst, xlast, ylast)
+        unless dest_xs == nil
+            dest_xs.resize(pts_array[0].size)
+            dest_xs.replace(pts_array[0])
+        end
+        unless dest_ys == nil
+            dest_ys.resize(pts_array[1].size)
+            dest_ys.replace(pts_array[1])
+        end
+        return pts_array
     end
     
     @@keys_for_make_curves = FigureMaker.make_name_lookup_hash([
