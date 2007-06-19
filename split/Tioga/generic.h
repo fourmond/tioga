@@ -140,6 +140,7 @@ extern void REALLOC_N_long(long* ptr, long new_len);
 extern void **ALLOC_N_pointer(long len);
 extern bool *ALLOC_N_bool(long len);
 extern double *ALLOC_N_double(long len);
+extern void REALLOC_N_double(double* ptr, long new_len);
     
     
 // the following will go away

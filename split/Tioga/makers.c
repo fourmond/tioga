@@ -24,17 +24,68 @@
 
 /* Lines */
 
-static void c_private_make_spline_interpolated_points(FM *p, OBJ_PTR Xvec, OBJ_PTR Yvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
-        int start_clamped, double start_slope, int end_clamped, double end_slope) {
+static void create_spline_interpolant(int n_pts_data, double *Xs, double *Ys,
+    bool start_clamped, double start_slope, bool end_clamped, double end_slope,
+    double *As, double *Bs, double *Cs)
+    // this is copied from dvector so that makers.c won't depend on dvectors.
+{
+   double *Hs = (double *)ALLOC_N(double, n_pts_data);
+   double *alphas = (double *)ALLOC_N(double, n_pts_data);
+   double *Ls = (double *)ALLOC_N(double, n_pts_data);
+   double *mu_s = (double *)ALLOC_N(double, n_pts_data);
+   double *Zs = (double *)ALLOC_N(double, n_pts_data);
+   int n = n_pts_data-1, i, j;
+   for (i=0; i < n; i++)
+      Hs[i] = Xs[i+1] - Xs[i];
+   if (start_clamped) alphas[0] = 3.0*(Ys[1]-Ys[0])/Hs[0] - 3.0*start_slope;
+   if (end_clamped) alphas[n] = 3.0*end_slope - 3.0*(Ys[n]-Ys[n-1])/Hs[n-1];
+   for (i=1; i < n; i++)
+      alphas[i] = 3.0*(Ys[i+1]*Hs[i-1]-Ys[i]*(Xs[i+1]-Xs[i-1])+Ys[i-1]*Hs[i])/(Hs[i-1]*Hs[i]);
+   if (start_clamped) { Ls[0] = 2.0*Hs[0]; mu_s[0] = 0.5; Zs[0] = alphas[0]/Ls[0]; }
+   else { Ls[0] = 1.0; mu_s[0] = 0.0; Zs[0] = 0.0; }
+   for (i = 1; i < n; i++) {
+      Ls[i] = 2.0*(Xs[i+1]-Xs[i-1]) - Hs[i-1]*mu_s[i-1];
+      mu_s[i] = Hs[i]/Ls[i];
+      Zs[i] = (alphas[i] - Hs[i-1]*Zs[i-1])/Ls[i];
+      }
+   if (end_clamped) { 
+      Ls[n] = Hs[n-1]*(2.0-mu_s[n-1]);
+      Bs[n] = Zs[n] = (alphas[n]-Hs[n-1]*Zs[n-1])/Ls[n];
+      }
+   else { Ls[n] = 1.0; Zs[n] = 0.0; Bs[n] = 0.0; }
+   for (j = n-1; j >= 0; j--) {
+      Bs[j] = Zs[j] - mu_s[j]*Bs[j+1];
+      Cs[j] = (Ys[j+1]-Ys[j])/Hs[j] - Hs[j]*(Bs[j+1]+2.0*Bs[j])/3.0;
+      As[j] = (Bs[j+1]-Bs[j])/(3.0*Hs[j]);
+      }
+   free(Zs); free(mu_s); free(Ls); free(alphas); free(Hs);
+}
+
+static double spline_interpolate(double x, int n_pts_data, 
+    double *Xs, double *Ys, double *As, double *Bs, double *Cs)
+    // this is copied from dvector so that makers.c won't depend on dvectors.
+{
+   int j;
+   for (j = 0; j < n_pts_data && x >= Xs[j]; j++);
+   if (j == n_pts_data) return Ys[j-1];
+   if (j == 0) return Ys[0];
+   j--;
+   double dx = x - Xs[j];
+   return Ys[j] + dx*(Cs[j] + dx*(Bs[j] + dx*As[j]));
+}
+
+static void c_private_make_spline_interpolated_points(FM *p, 
+         long xlen, double *Xs, double *Ys, 
+         OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
+         int start_clamped, double start_slope, 
+         int end_clamped, double end_slope) {
       int i, n_pts_data;
       double *As, *Bs, *Cs, *Ds;
-      long xlen, ylen, xdlen, ydlen;
-      double *Xs = Vector_Data_for_Write(Xvec, &xlen);
-      double *Ys = Vector_Data_for_Write(Yvec, &ylen);
+      long xdlen, ydlen;
       double *X_data = Vector_Data_for_Read(Xvec_data, &xdlen);
       double *Y_data = Vector_Data_for_Read(Yvec_data, &ydlen);
       if (Xs == NULL || Ys == NULL || X_data == NULL || Y_data == NULL || xdlen != ydlen) {
-         RAISE_ERROR("Sorry: bad args for make_curves");
+         RAISE_ERROR("Sorry: bad args");
       }
       if (xlen == 0) return;
       n_pts_data = xdlen;
@@ -42,29 +93,41 @@ static void c_private_make_spline_interpolated_points(FM *p, OBJ_PTR Xvec, OBJ_P
       Bs = ALLOC_N_double(n_pts_data);
       Cs = ALLOC_N_double(n_pts_data);
       Ds = ALLOC_N_double(n_pts_data);
-      c_dvector_create_spline_interpolant(n_pts_data, X_data, Y_data,
+      create_spline_interpolant(n_pts_data, X_data, Y_data,
          start_clamped, start_slope, end_clamped, end_slope, Bs, Cs, Ds);
-      Ys = Vector_Data_Resize(Yvec, xlen);
       for (i = 0; i < xlen; i++)
-         Ys[i] = c_dvector_spline_interpolate(Xs[i], n_pts_data, X_data, As, Bs, Cs, Ds);
+         Ys[i] = spline_interpolate(Xs[i], n_pts_data, X_data, As, Bs, Cs, Ds);
       free(Ds); free(Cs); free(Bs);
       USE_P
       }
       
-   OBJ_PTR FM_private_make_spline_interpolated_points(OBJ_PTR fmkr, OBJ_PTR Xvec, OBJ_PTR Yvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
-        OBJ_PTR start_slope, OBJ_PTR end_slope) {
+   OBJ_PTR FM_private_make_spline_interpolated_points(OBJ_PTR fmkr, 
+         OBJ_PTR Xvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
+         OBJ_PTR start_slope, OBJ_PTR end_slope) {
       FM *p = Get_FM(fmkr);
       bool start_clamped = (start_slope != Qnil), end_clamped = (end_slope != Qnil);
-      double start=0, end=0;
+      long xlen;
+      double start=0, end=0, *Ys;
+      double *Xs = Vector_Data_for_Read(Xvec, &xlen);
+      OBJ_PTR Yvec;
+      
       if (start_clamped) {
          start = Number_to_double(start_slope);
       }
       if (end_clamped) {
          end = Number_to_double(end_slope);
       }
-      c_private_make_spline_interpolated_points(p, Xvec, Yvec, Xvec_data, Yvec_data,
+      
+      Ys = ALLOC_N_double(xlen); // Ys are same length as Xs
+      
+      c_private_make_spline_interpolated_points(p, 
+         xlen, Xs, Ys, 
+         Xvec_data, Yvec_data,
          start_clamped, start, end_clamped, end);
-      return fmkr;
+         
+      Yvec = Vector_New(xlen, Ys);
+      free(Ys);
+      return Yvec;
    }
 
 static void c_make_steps(FM *p, 

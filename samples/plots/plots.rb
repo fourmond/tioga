@@ -594,9 +594,8 @@ EOD
             smooth_pts = 4*(data_pts-1) + 1
             dx = (xs[data_pts-1] - xs[0])/(smooth_pts-1)
             sample_xs = Dvector.new(smooth_pts) { |i| i*dx + xs[0] }
-            result_ys = Dvector.new
-            t.make_spline_interpolated_points(
-                'sample_xs' => sample_xs, 'result_ys' => result_ys,
+            result_ys = t.make_spline_interpolated_points(
+                'sample_xs' => sample_xs,
                 'xs' => xs, 'ys' => ys,
                 'start_slope' => 2.5*(ys[1]-ys[0])/(xs[1]-xs[0]))
             t.stroke_color = Blue

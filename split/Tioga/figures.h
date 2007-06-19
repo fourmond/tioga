@@ -399,8 +399,8 @@ extern VALUE FM_private_make_contour(VALUE fmkr,
      );
 extern VALUE FM_private_make_steps(VALUE fmkr, VALUE Xdata, VALUE Ydata,
     VALUE xfirst, VALUE yfirst, VALUE xlast, VALUE ylast);
-extern VALUE FM_private_make_spline_interpolated_points(VALUE fmkr, VALUE Xvec, VALUE Yvec, VALUE Xdata, VALUE Ydata,
-    VALUE start_slope, VALUE end_slope);
+extern VALUE FM_private_make_spline_interpolated_points(VALUE fmkr, VALUE Xvec, 
+   VALUE Xdata, VALUE Ydata, VALUE start_slope, VALUE end_slope);
 
 /*======================================================================*/
 // pdfcolor.c

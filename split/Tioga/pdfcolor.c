@@ -329,6 +329,18 @@ static void c_rgb_to_hls(double r, double g, double b, double *p_h, double *p_l,
    *p_s = s;
 }
 
+static double linear_interpolate(int num_pts, double *xs, double *ys, double x)
+{
+   int i;
+   if (num_pts == 1) return ys[0];
+   for (i = 0; i < num_pts; i++) {
+      if (xs[i] <= x && x < xs[i+1]) {
+         return ys[i] + (ys[i+1]-ys[i])*(x-xs[i])/(xs[i+1]-xs[i]);
+      }
+   }
+   return ys[num_pts-1];
+}
+
 static OBJ_PTR c_create_colormap(FM *p, bool rgb_flag, int length,
    int num_pts, double *ps, double *c1s, double *c2s, double *c3s)
 {
@@ -345,9 +357,9 @@ static OBJ_PTR c_create_colormap(FM *p, bool rgb_flag, int length,
    for (j = 0, i = 0; j < length; j++) {
       double x = j; x /= (length-1);
       double c1, c2, c3, r, g, b;
-      c1 = c_dvector_linear_interpolate(num_pts, ps, c1s, x);
-      c2 = c_dvector_linear_interpolate(num_pts, ps, c2s, x);
-      c3 = c_dvector_linear_interpolate(num_pts, ps, c3s, x);
+      c1 = linear_interpolate(num_pts, ps, c1s, x);
+      c2 = linear_interpolate(num_pts, ps, c2s, x);
+      c3 = linear_interpolate(num_pts, ps, c3s, x);
       if (rgb_flag) { r = c1; g = c2; b = c3; }
       else c_hls_to_rgb(c1, c2, c3, &r, &g, &b);
       buff[i++] = ROUND(hival * r);

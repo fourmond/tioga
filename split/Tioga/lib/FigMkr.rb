@@ -1144,10 +1144,15 @@ class FigureMaker
         start_slope = dict['start_slope']
         end_slope = dict['end_slope']
         sample_xs = get_dvec(dict, 'sample_xs', 'make_spline_interpolated_points')
-        result_ys = get_dvec(dict, 'result_ys', 'make_spline_interpolated_points')
         xs = get_dvec(dict, 'xs', 'make_spline_interpolated_points')
         ys = get_dvec(dict, 'ys', 'make_spline_interpolated_points')
-        private_make_spline_interpolated_points(sample_xs, result_ys, xs, ys, start_slope, end_slope)
+        yvec = private_make_spline_interpolated_points(sample_xs, xs, ys, start_slope, end_slope)
+        result_ys = dict['result_ys']
+        unless result_ys == nil
+            result_ys.resize(yvec.size)
+            result_ys.replace(yvec)
+        end
+        return yvec
     end
     
     @@keys_for_make_interpolant = FigureMaker.make_name_lookup_hash([

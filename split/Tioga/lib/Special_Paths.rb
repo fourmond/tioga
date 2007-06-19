@@ -110,6 +110,7 @@ link:images/Steps.png
 Creates an interpolated series of points smoothly connecting the given data points.  
 See also append_interpolant_to_path for creating smooth paths based on
 Bezier curves rather than on sampled points joined by straight line segments.
+Returns a vector of the y values corresponding to the requested 'sample_ys'.
 
 Dictionary Entries
     'start_slope'      => a_float    # optional
@@ -117,12 +118,12 @@ Dictionary Entries
     'xs'               => a_dvector  # The data x in figure coordinates
     'ys'               => a_dvector  # The data y in figure coordinates
     'sample_xs'        => a_dvector  # The x values where will interpolate
-    'result_ys'        => a_dvector  # The y values will be placed here.
+    'result_ys'        => a_dvector  # The y values will be placed here (optional).
 
 A cubic spline interpolant is created (see make_interpolant) using 'start_slope', 'end_slope', 'xs', and
 'ys'.  At each x location in 'sample_xs', the interpolant is used to find the corresponding y location
-which is then placed in the 'result_ys' vector.  The results can passed to routines such as 
-append_points_to_path or show_polyline.
+which is then returned as the value (and optionally also placed in the 'result_ys' vector).  
+The results can passed to routines such as append_points_to_path or show_polyline.
 
 Example
 
@@ -145,10 +146,8 @@ Example
             smooth_pts = 4*(data_pts-1) + 1
             dx = (xs[data_pts-1] - xs[0])/(smooth_pts-1)
             sample_xs = Dvector.new(smooth_pts) { |i| i*dx + xs[0] }
-            result_ys = Dvector.new
-            t.make_spline_interpolated_points(
-                'sample_xs' => sample_xs, 'result_ys' => result_ys,
-                'xs' => xs, 'ys' => ys,
+            result_ys = t.make_spline_interpolated_points(
+                'sample_xs' => sample_xs, 'xs' => xs, 'ys' => ys,
                 'start_slope' => 2.5*(ys[1]-ys[0])/(xs[1]-xs[0]))
             t.stroke_color = Blue
             t.append_points_to_path(sample_xs, result_ys)

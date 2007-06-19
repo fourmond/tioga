@@ -123,7 +123,7 @@ void REALLOC_N_long(long* ptr, long new_len) { REALLOC_N(ptr,long,new_len); }
 void **ALLOC_N_pointer(long len) { return ALLOC_N(void *,len); }
 bool *ALLOC_N_bool(long len) { return ALLOC_N(bool,len); }
 double *ALLOC_N_double(long len) { return ALLOC_N(double,len); }
-
+void REALLOC_N_double(double* ptr, long new_len) { REALLOC_N(ptr,double,new_len); }
 
 
 /* generic interface for vectors and tables */
