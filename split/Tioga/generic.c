@@ -118,12 +118,22 @@ unsigned char *ALLOC_N_unsigned_char(long len) { return ALLOC_N(unsigned char,le
 
 long *ALLOC_N_long(long len) { return ALLOC_N(long,len); }
 unsigned long *ALLOC_N_unsigned_long(long len) { return ALLOC_N(unsigned long,len); }
-void REALLOC_N_long(long* ptr, long new_len) { REALLOC_N(ptr,long,new_len); }
 
 void **ALLOC_N_pointer(long len) { return ALLOC_N(void *,len); }
 bool *ALLOC_N_bool(long len) { return ALLOC_N(bool,len); }
 double *ALLOC_N_double(long len) { return ALLOC_N(double,len); }
-void REALLOC_N_double(double* ptr, long new_len) { REALLOC_N(ptr,double,new_len); }
+
+void REALLOC_long(long **ptr, long new_len) { 
+   long *data_ptr = *ptr;
+   REALLOC_N(data_ptr,long,new_len);
+   *ptr = data_ptr;
+}
+
+void REALLOC_double(double **ptr, long new_len) { 
+   double *data_ptr = *ptr;
+   REALLOC_N(data_ptr,double,new_len);
+   *ptr = data_ptr;
+}
 
 
 /* generic interface for vectors and tables */

@@ -259,10 +259,16 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define min(x,y) (x<y?x:y)
 #define max(x,y) (x>y?x:y)
 
-#define PUSH_POINT(x,y,j) { \
-   Vector_Store(dest_xs, j, x); \
-   Vector_Store(dest_ys, j, y); \
-   j++; }
+#define PUSH_POINT(x,y) { \
+   if (*dest_len_ptr >= *dest_sz_ptr) { \
+      *dest_sz_ptr += *dest_sz_ptr + 100; \
+      REALLOC_double(dest_xs_ptr,*dest_sz_ptr); \
+      REALLOC_double(dest_ys_ptr,*dest_sz_ptr); \
+   } \
+   (*dest_xs_ptr)[*dest_len_ptr] = x; \
+   (*dest_ys_ptr)[*dest_len_ptr] = y; \
+   (*dest_len_ptr)++; \
+}
 
 static int conrec(double **d,
 	   int ilb,
@@ -273,8 +279,10 @@ static int conrec(double **d,
 	   double *y,
 	   int nc,
 	   double *z,
-	   OBJ_PTR dest_xs,
-	   OBJ_PTR dest_ys,
+	   long *dest_len_ptr,
+	   double **dest_xs_ptr,
+	   double **dest_ys_ptr,
+	   long *dest_sz_ptr,
 	   OBJ_PTR gaps,
 	   double x_limit,
 	   double y_limit)
@@ -285,14 +293,14 @@ static int conrec(double **d,
 // nc              ! number of contour levels
 // z               ! contour levels in increasing order
 {
-int num_pts = 0;
-double x_prev=0.0, y_prev=0.0;
-  int m1,m2,m3,case_value;
-  double dmin,dmax,x1=0.0,x2=0.0,y1=0.0,y2=0.0;
-  register int i,j,k,m;
-  double h[5];
-  int sh[5];
-  double xh[5],yh[5];
+   int num_pts = 0;
+   double x_prev=0.0, y_prev=0.0;
+   int m1,m2,m3,case_value;
+   double dmin,dmax,x1=0.0,x2=0.0,y1=0.0,y2=0.0;
+   register int i,j,k,m;
+   double h[5];
+   int sh[5];
+   double xh[5],yh[5];
   //===========================================================================
   // The indexing of im and jm should be noted as it has to start from zero
   // unlike the fortran counter part
@@ -478,9 +486,9 @@ double x_prev=0.0, y_prev=0.0;
 		if (dx < 0) dx = -dx; if (dy < 0) dy = -dy;
 		if (num_pts == 0 || dx > x_limit || dy > y_limit) {
          if (num_pts > 0) Array_Push(gaps, Integer_New(num_pts));
-         PUSH_POINT(x1,y1,num_pts);
+         PUSH_POINT(x1,y1); num_pts++;
 		}
-		PUSH_POINT(x2,y2,num_pts);
+		PUSH_POINT(x2,y2); num_pts++;
 		x_prev = x2; y_prev = y2;
 	      }
 	    }
@@ -516,17 +524,21 @@ static int      nx_1, ny_1, iGT, jGT, iLE, jLE;
 static void     free_space_for_curve();
 static void     get_space_for_curve();
 static void     draw_the_contour(
-	   OBJ_PTR dest_xs,
-	   OBJ_PTR dest_ys,
-	   OBJ_PTR gaps);
+            	long *dest_len_ptr,
+         	   double **dest_xs_ptr,
+         	   double **dest_ys_ptr,
+            	long *dest_sz_ptr,
+	            OBJ_PTR gaps);
 
 static bool     trace_contour(double z0,
 			      double *x,
 			      double *y,
-                  double **z,
+               double **z,
 			      double **legit,
-			      OBJ_PTR dest_xs,
-			      OBJ_PTR dest_ys,
+            	long *dest_len_ptr,
+         	   double **dest_xs_ptr,
+         	   double **dest_ys_ptr,
+            	long *dest_sz_ptr,
 			      OBJ_PTR gaps);
                   
 static int      FLAG(int ni, int nj, int ind);
@@ -594,8 +606,10 @@ gr_contour(
 	   int nx,
 	   int ny, 
 	   double z0,
-	   OBJ_PTR dest_xs,
-	   OBJ_PTR dest_ys,
+	   long *dest_len_ptr,
+	   double **dest_xs_ptr,
+	   double **dest_ys_ptr,
+	   long *dest_sz_ptr,
 	   OBJ_PTR gaps)
 {
 	register int    i, j;
@@ -639,7 +653,7 @@ gr_contour(
 				jLE = j;
 				iGT = i;
 				jGT = j;
-				trace_contour(z0, x, y, z, legit, dest_xs, dest_ys, gaps);
+				trace_contour(z0, x, y, z, legit, dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps);
 			}
 			// Space through legit points, that is, skipping through good
 			// data looking for another island of bad data which will
@@ -662,7 +676,7 @@ gr_contour(
 				jLE = j - 1;
 				iGT = i;
 				jGT = j;
-				trace_contour(z0, x, y, z, legit, dest_xs, dest_ys, gaps);
+				trace_contour(z0, x, y, z, legit, dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps);
 			}
 			// space through legit points
 			while (i > 0 && (legit == NULL || legit[i][j] != 0.0 && legit[i][ j - 1] != 0.0))
@@ -682,7 +696,7 @@ gr_contour(
 				jLE = j;
 				iGT = i;
 				jGT = j;
-				trace_contour(z0, x, y, z, legit, dest_xs, dest_ys, gaps);
+				trace_contour(z0, x, y, z, legit, dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps);
 			}
 			// space through legit points
 			while (j > 0 && (legit == NULL || legit[i][j] != 0.0 && legit[i + 1][ j] != 0.0))
@@ -702,7 +716,7 @@ gr_contour(
 				jLE = j + 1;
 				iGT = i;
 				jGT = j;
-				trace_contour(z0, x, y, z, legit, dest_xs, dest_ys, gaps);
+				trace_contour(z0, x, y, z, legit, dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps);
 			}
 			// space through legit points
 			while (i < nx_1 && (legit == NULL || legit[i][j] != 0.0 && legit[i][ j + 1] != 0.0))
@@ -729,7 +743,7 @@ gr_contour(
 				jLE = j;
 				iGT = i;
 				jGT = j;
-				trace_contour(z0, x, y, z, legit, dest_xs, dest_ys, gaps);
+				trace_contour(z0, x, y, z, legit, dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps);
 			}
 		}
 	}
@@ -748,8 +762,10 @@ trace_contour(double z0,
 	      double *y,
 	      double **z,
 	      double **legit,
-	      OBJ_PTR dest_xs,
-	      OBJ_PTR dest_ys,
+      	long *dest_len_ptr,
+   	   double **dest_xs_ptr,
+   	   double **dest_ys_ptr,
+      	long *dest_sz_ptr,
 	      OBJ_PTR gaps
 )
 {
@@ -793,7 +809,7 @@ trace_contour(double z0,
 	
 		// Did it hit an edge?
 		if (i > nx_1 || i < 0 || j > ny_1 || j < 0) {
-			draw_the_contour(dest_xs, dest_ys, gaps);
+			draw_the_contour(dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps);
 			return true;		// all done
 		}
 
@@ -806,14 +822,14 @@ trace_contour(double z0,
 				return false;
 			}
 			if (already_set) {
-				draw_the_contour(dest_xs, dest_ys, gaps);
+				draw_the_contour(dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps);
 				return true;	// all done
 			}
 		}
 
 		// Following new for 2.1.13
 		if (legit != NULL && legit[i][j] == 0.0) {
-			draw_the_contour(dest_xs, dest_ys, gaps);
+			draw_the_contour(dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps);
 			return true;		// all done
 		} 
 
@@ -941,8 +957,10 @@ append_segment(double xr, double yr, double zr, double OKr,
 #define FACTOR 3.0 // contour must be FACTOR*len long to be labelled
 static void
 draw_the_contour(
-	   OBJ_PTR dest_xs,
-	   OBJ_PTR dest_ys,
+   	long *dest_len_ptr,
+	   double **dest_xs_ptr,
+	   double **dest_ys_ptr,
+   	long *dest_sz_ptr,
 	   OBJ_PTR gaps)
 {
 	if (num_in_curve == 1) {
@@ -953,7 +971,7 @@ draw_the_contour(
     for (i = 0, k = 0; i < num_in_curve; i++) {
         if (legitcurve[i] == true) {
             // PUSH_POINT does num_in_path++
-            PUSH_POINT(xcurve[i],ycurve[i],num_in_path);
+            PUSH_POINT(xcurve[i],ycurve[i]); num_in_path++;
         } else {
             if (num_in_path > 0 && num_in_path != k) Array_Push(gaps, Integer_New(num_in_path));
             k = num_in_path;
@@ -1031,35 +1049,50 @@ FLAG(int ni, int nj, int ind)
 
 
 
-   static void c_make_contour(FM *p, OBJ_PTR dest_xs, OBJ_PTR dest_ys, OBJ_PTR gaps,
-         OBJ_PTR xs, OBJ_PTR ys,  OBJ_PTR zs_data, double z_level,  OBJ_PTR legit_data, int use_conrec) {
-      long xlen, ylen, num_columns, num_rows;
+   static void c_make_contour(FM *p, 
+      	long *dest_len_ptr,
+   	   double **dest_xs_ptr,
+   	   double **dest_ys_ptr,
+      	long *dest_sz_ptr,
+         OBJ_PTR gaps,
+         OBJ_PTR xs, OBJ_PTR ys,  
+         OBJ_PTR zs_data, double z_level,
+         OBJ_PTR legit_data, int use_conrec) {
+            
+      long xlen, ylen, num_zcolumns, num_zrows, num_columns, num_rows;
       double *x_coords = Vector_Data_for_Read(xs, &xlen);
       double *y_coords = Vector_Data_for_Read(ys, &ylen);
-      double **zs = Table_Data_for_Read(zs_data, &num_columns, &num_rows);
+      double **zs = Table_Data_for_Read(zs_data, &num_zcolumns, &num_zrows);
       double **legit = Table_Data_for_Read(legit_data, &num_columns, &num_rows);
+      double x_limit, y_limit;
+
       if (x_coords == NULL || gaps == Qnil || zs == NULL || y_coords == NULL) {
          RAISE_ERROR("Sorry: bad args for make_contour.  Need to provide xs, ys, gaps, and zs.");
       }
       if (xlen != num_columns || ylen != num_rows) {
          RAISE_ERROR("Sorry: bad args for make_contour.  Needs xs.size == num columns and ys.size == num rows.");
       }
-      double x_limit, y_limit;
-      x_limit = 0.001*(x_coords[xlen-1] - x_coords[0])/xlen;
-      if (x_limit < 0) x_limit = -x_limit;
-      y_limit = 0.001*(y_coords[ylen-1] - y_coords[0])/ylen;
-      if (y_limit < 0) y_limit = -y_limit;
+      if (num_zcolumns != num_columns || num_zrows != num_rows) {
+         RAISE_ERROR("Sorry: bad args for make_contour.  Needs same dimension zs and legit flags.");
+      }
+            
+      // NOTE: contour data is TRANSPOSE of tioga data, so we switch x's and y's in the call
       
-      // NOTE: conrec data is TRANSPOSE of our data, so we switch x's and y's in the call
-      if (use_conrec == 1) 
-        conrec(zs, 0, num_rows-1, 0, num_columns-1, y_coords, x_coords, 1, &z_level, dest_ys, dest_xs, gaps, y_limit, x_limit);
-      else 
-        gr_contour(y_coords, x_coords, zs, legit, num_rows, num_columns, z_level, dest_ys, dest_xs, gaps);
-      
+      if (use_conrec == 1) {
+         x_limit = 0.001*(x_coords[xlen-1] - x_coords[0])/xlen;
+         if (x_limit < 0) x_limit = -x_limit;
+         y_limit = 0.001*(y_coords[ylen-1] - y_coords[0])/ylen;
+         if (y_limit < 0) y_limit = -y_limit;
+         conrec(zs, 0, num_rows-1, 0, num_columns-1, y_coords, x_coords, 1, &z_level, 
+            dest_len_ptr, dest_ys_ptr, dest_xs_ptr, dest_sz_ptr, gaps, y_limit, x_limit);
+      } else {
+         gr_contour(y_coords, x_coords, zs, legit, num_rows, num_columns, z_level, 
+            dest_len_ptr, dest_ys_ptr, dest_xs_ptr, dest_sz_ptr, gaps);
+      }
    }
    
    OBJ_PTR FM_private_make_contour(OBJ_PTR fmkr,
-         OBJ_PTR dest_xs, OBJ_PTR dest_ys, OBJ_PTR gaps, // these vectors get the results
+         OBJ_PTR gaps, // these vectors get the results
          OBJ_PTR xs, OBJ_PTR ys, // data x coordinates and y coordinates
          OBJ_PTR zs, OBJ_PTR z_level, // the table of values and the desired contour level
          OBJ_PTR legit, // the table of flags (nonzero means okay)
@@ -1076,8 +1109,27 @@ FLAG(int ni, int nj, int ind)
         In this case, the corresponding slope argument is ignored.
         */
       FM *p = Get_FM(fmkr);
-      c_make_contour(p, dest_xs, dest_ys, gaps, xs, ys, zs, Number_to_double(z_level), legit, Number_to_int(method));
-      return fmkr;
+      long dest_len, dest_sz;
+      double *dest_xs_data;
+      double *dest_ys_data;
+      OBJ_PTR Xvec, Yvec, pts_array;
+      
+      dest_len = 0; dest_sz = 3000;
+      dest_xs_data = ALLOC_N_double(dest_sz);
+      dest_ys_data = ALLOC_N_double(dest_sz);
+
+      c_make_contour(p, &dest_len, &dest_xs_data, &dest_ys_data, &dest_sz, 
+         gaps, xs, ys, zs, Number_to_double(z_level), legit, Number_to_int(method));
+         
+      Xvec = Vector_New(dest_len, dest_xs_data);
+      Yvec = Vector_New(dest_len, dest_ys_data);
+      free(dest_xs_data);
+      free(dest_ys_data);
+      
+      pts_array = Array_New(2);
+      Array_Store(pts_array,0,Xvec);
+      Array_Store(pts_array,1,Yvec);
+      return pts_array;
    }
 
 

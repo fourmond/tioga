@@ -1085,8 +1085,8 @@ class FigureMaker
         if z_level == nil
             z_level = complain_if_missing_numeric_arg(dict, 'z', 'level', 'make_contour')
         end
-        dest_xs = get_dvec(dict, 'dest_xs', 'make_contour')
-        dest_ys = get_dvec(dict, 'dest_ys', 'make_contour')
+        dest_xs = dict['dest_xs']
+        dest_ys = dict['dest_ys']
         xs = get_dvec(dict, 'xs', 'make_contour')
         ys = get_dvec(dict, 'ys', 'make_contour')
         gaps = dict['gaps']
@@ -1097,7 +1097,9 @@ class FigureMaker
         if (!(zs.kind_of? Dtable))
             raise "Sorry: 'zs' for 'make_contour' must be a Dtable"
         end
-        dest_xs.clear; dest_ys.clear; gaps.clear
+        dest_xs.clear unless dest_xs == nil
+        dest_ys.clear unless dest_ys == nil
+        gaps.clear
         
         legit = dict['legit']
         if legit == nil
@@ -1108,8 +1110,18 @@ class FigureMaker
         
         method = dict['method']
         use_conrec = (method == 'conrec' or method == 'CONREC')? 1 : 0
-        private_make_contour(dest_xs, dest_ys, gaps, xs, ys, zs, z_level, legit, use_conrec)
+        pts_array = private_make_contour(gaps, xs, ys, zs, z_level, legit, use_conrec)
             
+        unless dest_xs == nil
+            dest_xs.resize(pts_array[0].size)
+            dest_xs.replace(pts_array[0])
+        end
+        unless dest_ys == nil
+            dest_ys.resize(pts_array[1].size)
+            dest_ys.replace(pts_array[1])
+        end
+        return pts_array
+
     end
     
     @@keys_for_make_steps = FigureMaker.make_name_lookup_hash([

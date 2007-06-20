@@ -11,7 +11,8 @@ Creates a path following a contour in a two dimensional table of data using an a
 Gri[http://gri.sourceforge.net/] done by Dan Kelley.
 (There is also an option to use the
 CONREC[http://local.wasp.uwa.edu.au/~pbourke/papers/conrec/] algorithm of Paul D. Bourke.)
-See show_contour.
+The results are returned in 2-element array with first element a vector of the x values for
+the contour and second element a vector of the y values.  See show_contour.
 
 Dictionary Entries
     'zs'        => a_dtable    # The data table
@@ -19,8 +20,8 @@ Dictionary Entries
     'xs'        => a_dvector   # The x figure coordinates for the columns of data
     'ys'        => a_dvector   # The y figure coordinates for the rows of data
     'legit'     => a_dtable    # Optional table, same size as zs, non-zero means corresponding data is okay.
-    'dest_xs'   => a_dvector   # The contour x values will be placed in this Dvector.
-    'dest_ys'   => a_dvector   # The contour y values will be placed in this Dvector.
+    'dest_xs'   => a_dvector   # The contour x values will be placed in this vector (optional).
+    'dest_ys'   => a_dvector   # The contour y values will be placed in this vector (optional).
     'gaps'      => an_array    # Indices for gaps will be placed in this Array.
     'z_level'   => a_float     # The contour level
     'z'                        # Alias for 'z_level'
@@ -34,14 +35,11 @@ Example
         clip_press_image
         t.stroke_color = SlateGray
         t.line_width = 1
-        dest_xs = Dvector.new; dest_ys = Dvector.new; gaps = Array.new
-        dict = { 'dest_xs' => dest_xs, 'dest_ys' => dest_ys, 'gaps' => gaps,
-                'xs' => @eos_logRHOs, 'ys' => @eos_logTs,
-                'data' => @pres_data }
+        dict = { 'gaps' => gaps, 'xs' => @eos_logRHOs, 'ys' => @eos_logTs, 'data' => @pres_data }
         levels.each do |level|
             dict['level'] = level
-            t.make_contour(dict)
-            t.append_points_with_gaps_to_path(dest_xs, dest_ys, gaps, true)
+            pts_array = t.make_contour(dict)
+            t.append_points_with_gaps_to_path(pts_array[0], pts_array[1], gaps, true)
             t.stroke
         end
     end

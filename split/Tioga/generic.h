@@ -135,23 +135,13 @@ extern unsigned char *ALLOC_N_unsigned_char(long len);
 
 extern long *ALLOC_N_long(long len);
 extern unsigned long *ALLOC_N_unsigned_long(long len);
-extern void REALLOC_N_long(long* ptr, long new_len);
 
 extern void **ALLOC_N_pointer(long len);
 extern bool *ALLOC_N_bool(long len);
 extern double *ALLOC_N_double(long len);
-extern void REALLOC_N_double(double* ptr, long new_len);
-    
-    
-// the following will go away
-#define Vector_Data_for_Write(obj,len_ptr) Dvector_Data_for_Write(obj,len_ptr) 
-    //returns double * after ensuring that is okay to write into it
-#define Vector_Data_Resize(obj,new_len) Dvector_Data_Resize(obj,new_len) 
-    //returns double * after resizing and making okay to write
-#define Vector_Store(ary,indx,val) Dvector_Store_Double(ary,indx,val)
-    // VALUE ary, long indx, double val
-    // sets vector object ary entry indx to double val
-    // raises error if ary not a kind of vector
+
+extern void REALLOC_long(long **ptr, long new_len);
+extern void REALLOC_double(double **ptr, long new_len);
 
 
 #endif   /* __generic_H__ */

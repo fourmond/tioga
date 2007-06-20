@@ -740,59 +740,7 @@ EOD
         t.close_path
         t.clip
     end
-    
-    def test_samples_with_contours
-        t.rescale(0.8)
-        title = 'Log Opacity'
-        levels = Array.new
-        (0..5).each { |i| levels << i + 0.4 }
-        t.subplot('right_margin' => @image_right_margin) { sampled_image(title) }
-        t.subplot('left_margin' => 0.95, 
-            'top_margin' => 0.05, 
-            'bottom_margin' => 0.05) { color_bar(title, levels) }
-        t.subplot('right_margin' => @image_right_margin) do
-            t.xaxis_type = t.yaxis_type = AXIS_WITH_TICKS_ONLY
-            t.no_title; t.no_xlabel; t.no_ylabel
-            bounds = [@eos_xmin, @eos_xmax, @eos_ymax, @eos_ymin]
-            t.show_plot(bounds) do
-                clip_press_image
-                t.stroke_color = SlateGray
-                t.line_width = 1
-                dest_xs = Dvector.new; dest_ys = Dvector.new; gaps = Array.new
-                dict = { 'dest_xs' => dest_xs, 
-                        'dest_ys' => dest_ys, 
-                        'gaps' => gaps,
-                        'xs' => @eos_logRHOs, 
-                        'ys' => @eos_logTs,
-                        'data' => @opacity_data }
-                levels.each do |level|
-                    dict['level'] = level
-                    num_xs = @eos_logRHOs.length
-                    num_ys = @eos_logTs.length
-                    legit = Dtable.new(num_xs, num_ys)
-                    num_xs.times do |ix|
-                      num_ys.times do |iy|
-                        if @opacity_data[ix,iy] < -999
-                          legit[ix,iy] = 0.0
-                        else
-                          legit[ix,iy] = 1.0
-                        end
-                      end
-                    end
-                    #dict['legit'] = legit
-                    t.make_contour(dict)
-                    if false
-                      t.append_points_to_path(dest_xs, dest_ys)
-                      t.fill_color = Green
-                      t.fill
-                    else
-                      t.append_points_with_gaps_to_path(dest_xs, dest_ys, gaps, true)
-                      t.stroke
-                    end
-                end
-            end
-        end
-    end
+
 
     def samples_with_contours
         t.rescale(0.8)
@@ -811,17 +759,15 @@ EOD
                 clip_press_image
                 t.stroke_color = SlateGray
                 t.line_width = 1
-                dest_xs = Dvector.new; dest_ys = Dvector.new; gaps = Array.new
-                dict = { 'dest_xs' => dest_xs, 
-                        'dest_ys' => dest_ys, 
-                        'gaps' => gaps,
+                gaps = Array.new
+                dict = { 'gaps' => gaps,
                         'xs' => @eos_logRHOs, 
                         'ys' => @eos_logTs,
                         'data' => @opacity_data }
                 levels.each do |level|
                     dict['level'] = level
-                    t.make_contour(dict)
-                    t.append_points_with_gaps_to_path(dest_xs, dest_ys, gaps, true)
+                    pts_array = t.make_contour(dict)
+                    t.append_points_with_gaps_to_path(pts_array[0], pts_array[1], gaps, true)
                     t.stroke
                 end
             end

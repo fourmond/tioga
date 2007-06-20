@@ -93,7 +93,7 @@ void Record_Object_Offset(int obj_number)
    long int offset = ftell(OF);
    if (obj_number >= capacity_obj_offsets) {
       int size_increment = 50, i;
-      REALLOC_N_long(obj_offsets, obj_number + size_increment);
+      REALLOC_long(obj_offsets, obj_number + size_increment);
       capacity_obj_offsets = obj_number + size_increment;
       for (i=num_objects; i < capacity_obj_offsets; i++) obj_offsets[i] = 0;
    }

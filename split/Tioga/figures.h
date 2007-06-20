@@ -390,8 +390,7 @@ extern VALUE FM_private_make_portfolio(VALUE fmkr, VALUE name, VALUE fignums, VA
 
 /*======================================================================*/
 // makers.c
-extern VALUE FM_private_make_contour(VALUE fmkr,
-     VALUE dest_xs, VALUE dest_ys, VALUE gaps, // these Dvectors get the results
+extern VALUE FM_private_make_contour(VALUE fmkr, VALUE gaps,
      VALUE xs, VALUE ys, // data x coordinates and y coordinates
      VALUE zs, VALUE z_level, // the Dtable of values and the desired contour level
      VALUE legit, // the Dtable of flags (nonzero means okay)
