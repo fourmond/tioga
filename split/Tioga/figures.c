@@ -396,6 +396,7 @@ void Init_FigureMaker(void) {
 /* path construction */
    rb_define_method(cFM, "move_to_point", FM_move_to_point, 2);
    rb_define_method(cFM, "append_point_to_path", FM_append_point_to_path, 2);
+   rb_define_method(cFM, "bezier_control_points", FM_bezier_control_points, 6);
    rb_define_method(cFM, "append_curve_to_path", FM_append_curve_to_path, 6);
    rb_define_method(cFM, "close_path", FM_close_path, 0);
    rb_define_method(cFM, "append_points_to_path", FM_append_points_to_path, 2);

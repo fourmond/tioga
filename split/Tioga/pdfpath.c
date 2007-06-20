@@ -314,6 +314,26 @@ OBJ_PTR FM_append_point_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y)
    return fmkr;
 }
 
+
+void c_bezier_control_points(double *data, double x0, double y0, double delta_x, double a, double b, double c)
+{
+   double x1, y1, x2, y2, x3, y3;
+   double cx = delta_x, ay = a * delta_x * delta_x * delta_x, by = b * delta_x * delta_x, cy = c * delta_x;
+   x1 = x0 + cx/3.0; x2 = x1 + cx/3.0; x3 = x0 + delta_x;
+   y1 = y0 + cy/3.0; y2 = y1 + (cy + by)/3.0; y3 = y0 + ay + by + cy;
+   data[0] = x1; data[1] = y1; data[2] = x2; data[3] = y2; data[4] = x3; data[5] = y3;
+}
+
+OBJ_PTR FM_bezier_control_points(OBJ_PTR fmkr, VALUE x0, VALUE y0, VALUE delta_x, VALUE a, VALUE b, VALUE c)
+{
+   double data[6];
+   c_bezier_control_points(data,
+      Number_to_double(x0), Number_to_double(y0), Number_to_double(delta_x),
+      Number_to_double(a), Number_to_double(b), Number_to_double(c));
+   return Vector_New(data,6);
+}
+
+
 void c_curveto(FM *p, double x1, double y1, double x2, double y2, double x3, double y3)
 {
    ARE_OK_NUMBERS(x1,y1);

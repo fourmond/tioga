@@ -5236,7 +5236,8 @@ void Init_Dvector() {
    rb_define_singleton_method(cDvector, "is_a_dvector", dvector_is_a_dvector, 1);
 
    
-   rb_define_method(cDvector, "make_bezier_control_points_for_cubic_in_x", dvector_make_bezier_control_points_for_cubic_in_x, 6);
+   rb_define_method(cDvector, "make_bezier_control_points_for_cubic_in_x", 
+      dvector_make_bezier_control_points_for_cubic_in_x, 6);
    
    rb_define_method(cDvector, "initialize", dvector_initialize, -1);
    rb_define_method(cDvector, "initialize_copy", dvector_replace, 1);

@@ -23,10 +23,20 @@ class Creating_Paths < Doc < FigureMaker
    def append_point_to_path(x, y)
    end
    
+   
+# Computes bezier control points corresponding to a given cubic.
+# The cubic, y(x), is defined from x0 to x0+delta_x.
+# At location x = x0 + dx, with dx between 0 and delta_x, define y = a*dx^3 + b*dx^2 + c*dx + y0.
+# This routine returns [x1, y1, x2, y2, x3, y3], the Bezier control points to match this cubic.
+
+   def bezier_control_points(x0, y0, delta_x, a, b, c)
+   end
+   
+   
 # Append a cubic Bezier curve to the current path. The curve extends from the current
 # path end to the point given by the figure coordinates (x3, y3), using (x1, y1) and
 # (x2, y2) as the Bezier control points (also in figure coordinates).  The new path
-# end is (x3, y3).
+# end is (x3, y3).  See also bezier_control_points.
 #
 # The illustration shows in dark blue the curve that is added for the control points given in red.
 #

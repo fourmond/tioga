@@ -558,6 +558,8 @@ extern void c_moveto(FM *p, double x, double y);
 extern VALUE FM_move_to_point(VALUE fmkr, VALUE x, VALUE y);  // x y m
 extern void c_lineto(FM *p, double x, double y);
 extern VALUE FM_append_point_to_path(VALUE fmkr, VALUE x, VALUE y);  // x y l
+extern void c_bezier_control_points(double *data, double x0, double y0, double delta_x, double a, double b, double c);
+extern VALUE FM_bezier_control_points(OBJ_PTR fmkr, VALUE x0, VALUE y0, VALUE delta_x, VALUE a, VALUE b, VALUE c);
 extern void c_curveto(FM *p, double x1, double y1, double x2, double y2, double x3, double y3);
 extern VALUE FM_append_curve_to_path(VALUE fmkr, 
    VALUE x1, VALUE y1, VALUE x2, VALUE y2, VALUE x3, VALUE y3); 
