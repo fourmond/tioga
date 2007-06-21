@@ -22,6 +22,8 @@
 #ifndef __generic_H__
 #define __generic_H__
 
+#include <stdbool.h>
+
 /* most of the c code should use this interface 
    rather than directly depending on ruby interfaces */
 
