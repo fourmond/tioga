@@ -56,19 +56,11 @@ extern void Init_generic(void);
 //#define OBJ_TRUE Py_True
 //#define OBJ_FALSE Py_False
 
-
-extern OBJ_PTR FM_private_context(OBJ_PTR fmkr, OBJ_PTR cmd);
-
-
 extern OBJ_PTR Call_Function(OBJ_PTR fmkr, ID_PTR fn, OBJ_PTR arg);
 // invokes method given by fn in the object fmkr with the given arg.
 
-
-
 extern bool Is_Kind_of_Integer(OBJ_PTR obj);
-
 extern bool Is_Kind_of_Number(OBJ_PTR obj);
-
 
 extern double Number_to_double(OBJ_PTR obj);
     // returns a C double

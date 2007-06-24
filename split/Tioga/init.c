@@ -24,7 +24,7 @@
 #include "pdfs.h"
 
 
-ID save_dir_ID, quiet_mode_ID;
+ID fm_data_ID, save_dir_ID, quiet_mode_ID;
 ID tex_preview_documentclass_ID, tex_preamble_ID, xaxis_numeric_label_tex_ID, yaxis_numeric_label_tex_ID, tex_preview_pagestyle_ID;
 ID tex_preview_paper_width_ID, tex_preview_paper_height_ID;
 ID tex_preview_hoffset_ID, tex_preview_voffset_ID;
@@ -49,6 +49,7 @@ void Init_IDs(void)
    // class variables
 	initialized_ID = ID_Get("@@initialized");
 	// instance variables
+   fm_data_ID = ID_Get("@fm_data");
 	save_dir_ID = ID_Get("@save_dir");
 	quiet_mode_ID = ID_Get("@quiet_mode");    
 	tex_xoffset_ID = ID_Get("@tex_xoffset");
@@ -195,6 +196,10 @@ char *Get_tex_preview_generated_preamble(OBJ_PTR fmkr) {
 
 double Get_tex_xoffset(OBJ_PTR fmkr) { return Get_double(fmkr, tex_xoffset_ID); }
 double Get_tex_yoffset(OBJ_PTR fmkr) { return Get_double(fmkr, tex_yoffset_ID); }
+
+
+OBJ_PTR Get_fm_data_attr(OBJ_PTR fmkr) { return Obj_Attr_Get(fmkr, fm_data_ID); }
+
 
 static char *Get_save_dir(OBJ_PTR fmkr) {
    OBJ_PTR v = Obj_Attr_Get(fmkr, save_dir_ID);
@@ -353,7 +358,7 @@ OBJ_PTR FM_set_frame_sides(OBJ_PTR fmkr, OBJ_PTR left, OBJ_PTR right, OBJ_PTR to
 }
 
 
-void Initialize_Figure(OBJ_PTR fmkr) {
+OBJ_PTR FM_private_init_fm_data(OBJ_PTR fmkr) {
    FM *p = Get_FM(fmkr);
    /* Page */
    p->root_figure = true;
@@ -523,6 +528,8 @@ void Initialize_Figure(OBJ_PTR fmkr) {
 
    /* emit a warning by default */
    p->croak_on_nonok_numbers = 1;
+
+   return fmkr;
 }
 
 OBJ_PTR Get_line_type(OBJ_PTR fmkr) { return Obj_Attr_Get(fmkr, line_type_ID); }
@@ -535,3 +542,6 @@ OBJ_PTR Get_xaxis_tick_labels(OBJ_PTR fmkr) { return Obj_Attr_Get(fmkr, xaxis_ti
 OBJ_PTR Get_yaxis_locations_for_major_ticks(OBJ_PTR fmkr) { return Obj_Attr_Get(fmkr, yaxis_locations_for_major_ticks_ID); }
 OBJ_PTR Get_yaxis_locations_for_minor_ticks(OBJ_PTR fmkr) { return Obj_Attr_Get(fmkr, yaxis_locations_for_minor_ticks_ID); };
 OBJ_PTR Get_yaxis_tick_labels(OBJ_PTR fmkr) { return Obj_Attr_Get(fmkr, yaxis_tick_labels_ID); }
+
+
+

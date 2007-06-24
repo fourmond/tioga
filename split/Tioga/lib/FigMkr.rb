@@ -58,12 +58,12 @@ class FigureMaker
     end
     
     def FigureMaker.pdflatex
-    	@@which_pdflatex = 'pdflatex' if @@which_pdflatex == nil
-    	@@which_pdflatex
+      @@which_pdflatex = 'pdflatex' if @@which_pdflatex == nil
+      @@which_pdflatex
     end
     
     def FigureMaker.pdflatex=(s)
-    	@@which_pdflatex = s
+      @@which_pdflatex = s
     end
     
     
@@ -284,10 +284,12 @@ class FigureMaker
         @yaxis_locations_for_major_ticks = nil
         @yaxis_locations_for_minor_ticks = nil
         @yaxis_tick_labels = nil
+        private_init_fm_data
     end
     
 
-    def initialize        
+    def initialize
+        @fm_data = Dvector.new(@@fm_data_size)
         reset_figures
     end
     
@@ -923,19 +925,24 @@ class FigureMaker
            save_yaxis_locations_for_major_ticks = self.yaxis_locations_for_major_ticks
            save_yaxis_locations_for_minor_ticks = self.yaxis_locations_for_minor_ticks
            save_yaxis_tick_labels = self.yaxis_tick_labels
-            
-           private_context(cmd)
-            
-           self.title = save_title
-           self.xlabel = save_xlabel
-           self.ylabel = save_ylabel
-           self.line_type = save_line_type
-           self.xaxis_locations_for_major_ticks = save_xaxis_locations_for_major_ticks
-           self.xaxis_locations_for_minor_ticks = save_xaxis_locations_for_minor_ticks
-           self.xaxis_tick_labels = save_xaxis_tick_labels
-           self.yaxis_locations_for_major_ticks = save_yaxis_locations_for_major_ticks
-           self.yaxis_locations_for_minor_ticks = save_yaxis_locations_for_minor_ticks
-           self.yaxis_tick_labels = save_yaxis_tick_labels
+           save_fm_data = Dvector.new(@@fm_data_size).replace(@fm_data)
+           pdf_gsave
+           begin
+               cmd.call       
+           ensure
+               pdf_grestore
+               self.title = save_title
+               self.xlabel = save_xlabel
+               self.ylabel = save_ylabel
+               self.line_type = save_line_type
+               self.xaxis_locations_for_major_ticks = save_xaxis_locations_for_major_ticks
+               self.xaxis_locations_for_minor_ticks = save_xaxis_locations_for_minor_ticks
+               self.xaxis_tick_labels = save_xaxis_tick_labels
+               self.yaxis_locations_for_major_ticks = save_yaxis_locations_for_major_ticks
+               self.yaxis_locations_for_minor_ticks = save_yaxis_locations_for_minor_ticks
+               self.yaxis_tick_labels = save_yaxis_tick_labels
+               @fm_data.replace(save_fm_data)            
+           end
             
         }      
     end

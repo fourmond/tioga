@@ -210,6 +210,9 @@ void Write_grestore(void)
    fprintf(TF, "Q\n");
 }
 
+OBJ_PTR FM_pdf_gsave(OBJ_PTR fmkr) { Write_gsave(); }
+OBJ_PTR FM_pdf_grestore(OBJ_PTR fmkr) { Write_grestore(); }
+
 static void Print_Xref(long int offset) {
    char line[80];
    int i, len;

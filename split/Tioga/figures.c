@@ -72,27 +72,8 @@ char *data_dir = NULL;
 
 OBJ_PTR cFM; /* the Tioga/FigureMaker class object */
 
-
-static void FM_mark(FM *p) { /* any OBJ_PTRs in the FM struct must be marked */
-}
-
-static void FM_free(FM *p) {
-   free(p);
-}
-
-static OBJ_PTR FM_alloc(OBJ_PTR klass) {
-   FM *p;
-   OBJ_PTR ary = Data_Make_Struct(klass, FM, FM_mark, FM_free, p);
-   Initialize_Figure(ary);
-   return ary;
-}
-
-bool Is_FM(OBJ_PTR fmkr) { return ( TYPE(fmkr) == T_DATA && RDATA(fmkr)->dfree == (RUBY_DATA_FUNC)FM_free ); }
-
 FM *Get_FM(OBJ_PTR fmkr) {
-   FM *p;
-   Data_Get_Struct(fmkr, FM, p);
-   return p;
+   return (FM *)Dvector_Data_for_Write(Get_fm_data_attr(fmkr), NULL);
 }
 
 /* page attribute accessors */
@@ -276,6 +257,11 @@ void Set_initialized() {
    rb_cv_set(cFM, "@@initialized", OBJ_TRUE);
 }
 
+static void Set_fm_data_size() {
+   rb_cv_set(cFM, "@@fm_data_size", Integer_New(1 + (sizeof(FM) / sizeof(double)))); 
+   // size is number of doubles needed to hold FM data
+}
+
 #define attr_reader(attr) rb_define_method(cFM, #attr , FM_##attr##_get, 0);
 #define attr_writer(attr) rb_define_method(cFM, #attr "=", FM_##attr##_set, 1);
 #define attr_accessors(attr) attr_reader(attr) attr_writer(attr)
@@ -318,12 +304,13 @@ void Init_FigureMaker(void) {
    rb_include_module(cFM, mDobjects);
    rb_include_module(cFM, mFlate);
 
-   rb_define_alloc_func(cFM, FM_alloc);
    Init_IDs();
    Init_Font_Dictionary();
    rb_define_method(cFM, "private_make", FM_private_make, 2);
    rb_define_method(cFM, "get_save_filename", FM_get_save_filename, 1);
    rb_define_method(cFM, "private_make_portfolio", FM_private_make_portfolio, 3);
+   rb_define_method(cFM, "private_init_fm_data", FM_private_init_fm_data, 0);
+      
    
 /* page attribute accessors */
    attr_reader(root_figure)
@@ -386,7 +373,8 @@ void Init_FigureMaker(void) {
    attr_accessors(croak_on_nonok_numbers)
 
 /* methods */
-   rb_define_method(cFM, "private_context", FM_private_context, 1);
+   rb_define_method(cFM, "pdf_gsave", FM_pdf_gsave, 0);
+   rb_define_method(cFM, "pdf_grestore", FM_pdf_grestore, 0);
    rb_define_method(cFM, "private_set_bounds", FM_private_set_bounds, 4);
    rb_define_method(cFM, "private_set_subframe", FM_private_set_subframe, 4);
    rb_define_method(cFM, "doing_subfigure", FM_doing_subfigure, 0);
@@ -642,6 +630,8 @@ void Init_FigureMaker(void) {
 /* Debugging */
    attr_accessors(debug_verbosity_level)
       
+      
+   Set_fm_data_size(); // must set this before create a FigureMaker instance
    rb_require("Tioga/FigMkr.rb");
    /* We now need to import the symbols */
 

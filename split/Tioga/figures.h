@@ -333,7 +333,6 @@ extern OBJ_PTR FM_no_bottom_edge(OBJ_PTR fmkr);
 /*======================================================================*/
 // figures.c
 extern FM *Get_FM(OBJ_PTR fmkr);
-extern bool Is_FM(OBJ_PTR fmkr);
 void Init_FigureMaker(void);
 extern bool Get_initialized();
 extern void Set_initialized();
@@ -341,6 +340,8 @@ extern void Set_initialized();
 /*======================================================================*/
 // init.c
 extern void Init_IDs(void);
+extern OBJ_PTR Get_fm_data_attr(OBJ_PTR fmkr);
+extern OBJ_PTR FM_private_init_fm_data(OBJ_PTR fmkr);
 extern OBJ_PTR FM_set_device_pagesize(OBJ_PTR fmkr, OBJ_PTR width, OBJ_PTR height); // size in output coords (decipoints)
 extern OBJ_PTR FM_set_frame_sides(OBJ_PTR fmkr, OBJ_PTR left, OBJ_PTR right, OBJ_PTR top, OBJ_PTR bottom); // in page coords [0..1]
 extern void Initialize_Figure(OBJ_PTR fmkr);
@@ -400,9 +401,9 @@ extern OBJ_PTR FM_private_make_spline_interpolated_points(OBJ_PTR fmkr, OBJ_PTR 
 extern void Free_Functions();
 extern void Write_Functions(void);
 extern void Free_Stroke_Opacities(void);
-extern OBJ_PTR FM_stroke_opacity_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_stroke_opacity_set(OBJ_PTR fmkr, OBJ_PTR val);
 extern void Free_Fill_Opacities(void);
-extern OBJ_PTR FM_fill_opacity_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_fill_opacity_set(OBJ_PTR fmkr, OBJ_PTR val);
 extern void Write_Stroke_Opacity_Objects(void);
 extern void Write_Fill_Opacity_Objects(void);
 extern void Free_Shadings();
@@ -419,16 +420,16 @@ extern OBJ_PTR FM_get_color_from_colormap(OBJ_PTR fmkr, OBJ_PTR color_map, OBJ_P
 extern OBJ_PTR FM_convert_to_colormap(OBJ_PTR fmkr, OBJ_PTR Rs, OBJ_PTR Gs, OBJ_PTR Bs);
 extern OBJ_PTR FM_hls_to_rgb(OBJ_PTR fmkr, OBJ_PTR hls_vec);
 extern OBJ_PTR FM_rgb_to_hls(OBJ_PTR fmkr, OBJ_PTR rgb_vec);
-extern OBJ_PTR FM_title_color_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_title_color_set(OBJ_PTR fmkr, OBJ_PTR val);
 extern OBJ_PTR FM_title_color_get(OBJ_PTR fmkr);
 extern OBJ_PTR FM_xlabel_color_get(OBJ_PTR fmkr);
-extern OBJ_PTR FM_xlabel_color_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_xlabel_color_set(OBJ_PTR fmkr, OBJ_PTR val);
 extern OBJ_PTR FM_ylabel_color_get(OBJ_PTR fmkr);
-extern OBJ_PTR FM_ylabel_color_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_ylabel_color_set(OBJ_PTR fmkr, OBJ_PTR val);
 extern OBJ_PTR FM_xaxis_stroke_color_get(OBJ_PTR fmkr);
-extern OBJ_PTR FM_xaxis_stroke_color_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_xaxis_stroke_color_set(OBJ_PTR fmkr, OBJ_PTR val);
 extern OBJ_PTR FM_yaxis_stroke_color_get(OBJ_PTR fmkr);
-extern OBJ_PTR FM_yaxis_stroke_color_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_yaxis_stroke_color_set(OBJ_PTR fmkr, OBJ_PTR val);
 
 /*======================================================================*/
 // pdfcoords.c
@@ -440,50 +441,50 @@ extern OBJ_PTR FM_doing_subplot(OBJ_PTR fmkr);
 extern OBJ_PTR FM_doing_subfigure(OBJ_PTR fmkr);
 extern OBJ_PTR FM_private_set_bounds(OBJ_PTR fmkr, OBJ_PTR left, OBJ_PTR right, OBJ_PTR top, OBJ_PTR bottom); /* in figure coords */
 extern OBJ_PTR FM_convert_to_degrees(OBJ_PTR fmkr, OBJ_PTR dx, OBJ_PTR dy);
-extern OBJ_PTR FM_convert_inches_to_output(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_output_to_inches(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_mm_to_output(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_output_to_mm(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_page_to_output_x(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_page_to_output_y(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_page_to_output_dx(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_page_to_output_dy(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_output_to_page_x(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_output_to_page_y(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_output_to_page_dx(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_output_to_page_dy(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_frame_to_page_x(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_frame_to_page_y(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_frame_to_page_dx(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_frame_to_page_dy(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_page_to_frame_x(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_page_to_frame_y(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_page_to_frame_dx(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_page_to_frame_dy(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_figure_to_frame_x(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_figure_to_frame_y(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_figure_to_frame_dx(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_figure_to_frame_dy(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_frame_to_figure_x(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_frame_to_figure_y(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_frame_to_figure_dx(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_frame_to_figure_dy(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_inches_to_output(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_output_to_inches(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_mm_to_output(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_output_to_mm(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_page_to_output_x(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_page_to_output_y(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_page_to_output_dx(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_page_to_output_dy(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_output_to_page_x(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_output_to_page_y(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_output_to_page_dx(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_output_to_page_dy(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_frame_to_page_x(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_frame_to_page_y(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_frame_to_page_dx(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_frame_to_page_dy(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_page_to_frame_x(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_page_to_frame_y(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_page_to_frame_dx(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_page_to_frame_dy(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_figure_to_frame_x(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_figure_to_frame_y(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_figure_to_frame_dx(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_figure_to_frame_dy(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_frame_to_figure_x(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_frame_to_figure_y(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_frame_to_figure_dx(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_frame_to_figure_dy(OBJ_PTR fmkr, OBJ_PTR val);
 extern double convert_figure_to_output_x(FM *p, double x);
 extern double convert_figure_to_output_y(FM *p, double y);
 extern double convert_figure_to_output_dy(FM *p, double dy);
 extern double convert_figure_to_output_dx(FM *p, double dx);
-extern OBJ_PTR FM_convert_figure_to_output_x(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_figure_to_output_y(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_figure_to_output_dx(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_figure_to_output_dy(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_figure_to_output_x(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_figure_to_output_y(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_figure_to_output_dx(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_figure_to_output_dy(OBJ_PTR fmkr, OBJ_PTR val);
 extern double convert_output_to_figure_x(FM *p, double x);
 extern double convert_output_to_figure_y(FM *p, double y);
 extern double convert_output_to_figure_dy(FM *p, double dy);
 extern double convert_output_to_figure_dx(FM *p, double dx);
-extern OBJ_PTR FM_convert_output_to_figure_x(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_output_to_figure_y(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_output_to_figure_dx(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
-extern OBJ_PTR FM_convert_output_to_figure_dy(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_output_to_figure_x(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_output_to_figure_y(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_output_to_figure_dx(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_convert_output_to_figure_dy(OBJ_PTR fmkr, OBJ_PTR val);
 
 /*======================================================================*/
 // pdffile.c
@@ -496,6 +497,8 @@ extern void Write_gsave(void);
 extern void Write_grestore(void);
 extern void Close_pdf(OBJ_PTR fmkr, bool quiet_mode);
 extern void Rename_pdf(char *oldname, char *newname);
+extern OBJ_PTR FM_pdf_gsave(OBJ_PTR fmkr);
+extern OBJ_PTR FM_pdf_grestore(OBJ_PTR fmkr);
 
 /*======================================================================*/
 // pdfimage.c
@@ -526,20 +529,20 @@ extern OBJ_PTR FM_private_show_monochrome_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_P
 // pdfpath.c
 extern void Unpack_RGB(OBJ_PTR rgb, double *rp, double *gp, double *bp);
 void c_stroke_color_set(FM *p, double r, double g, double b);
-extern OBJ_PTR FM_stroke_color_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_stroke_color_set(OBJ_PTR fmkr, OBJ_PTR val);
 extern OBJ_PTR FM_stroke_color_get(OBJ_PTR fmkr);
 void c_fill_color_set(FM *p, double r, double g, double b);
-extern OBJ_PTR FM_fill_color_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_fill_color_set(OBJ_PTR fmkr, OBJ_PTR val);
 extern OBJ_PTR FM_fill_color_get(OBJ_PTR fmkr);
 void c_line_width_set(FM *p, double line_width);
-extern OBJ_PTR FM_line_width_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_line_width_set(OBJ_PTR fmkr, OBJ_PTR val);
 extern OBJ_PTR FM_rescale_lines(OBJ_PTR fmkr, OBJ_PTR scaling);
 void c_line_cap_set(FM *p, int line_cap);
-extern OBJ_PTR FM_line_cap_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_line_cap_set(OBJ_PTR fmkr, OBJ_PTR val);
 void c_line_join_set(FM *p, int line_join);
-extern OBJ_PTR FM_line_join_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_line_join_set(OBJ_PTR fmkr, OBJ_PTR val);
 void c_miter_limit_set(FM *p, double miter_limit);
-extern OBJ_PTR FM_miter_limit_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_miter_limit_set(OBJ_PTR fmkr, OBJ_PTR val);
 extern OBJ_PTR FM_line_type_set(OBJ_PTR fmkr, OBJ_PTR line_type);
 void update_bbox(FM *p, double x, double y);
 extern OBJ_PTR FM_update_bbox(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y);
