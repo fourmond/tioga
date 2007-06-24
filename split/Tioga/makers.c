@@ -105,7 +105,7 @@ static void c_private_make_spline_interpolated_points(FM *p,
          OBJ_PTR Xvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
          OBJ_PTR start_slope, OBJ_PTR end_slope) {
       FM *p = Get_FM(fmkr);
-      bool start_clamped = (start_slope != Qnil), end_clamped = (end_slope != Qnil);
+      bool start_clamped = (start_slope != OBJ_NIL), end_clamped = (end_slope != OBJ_NIL);
       long xlen;
       double start=0, end=0, *Ys;
       double *Xs = Vector_Data_for_Read(Xvec, &xlen);
@@ -1066,7 +1066,7 @@ FLAG(int ni, int nj, int ind)
       double **legit = Table_Data_for_Read(legit_data, &num_columns, &num_rows);
       double x_limit, y_limit;
 
-      if (x_coords == NULL || gaps == Qnil || zs == NULL || y_coords == NULL) {
+      if (x_coords == NULL || gaps == OBJ_NIL || zs == NULL || y_coords == NULL) {
          RAISE_ERROR("Sorry: bad args for make_contour.  Need to provide xs, ys, gaps, and zs.");
       }
       if (xlen != num_columns || ylen != num_rows) {

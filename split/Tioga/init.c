@@ -19,10 +19,11 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
+#include "generic.h"
 #include "figures.h"
 #include "pdfs.h"
 
-VALUE rb_Integer_class, rb_Numeric_class;
+
 ID save_dir_ID, quiet_mode_ID;
 ID tex_preview_documentclass_ID, tex_preamble_ID, xaxis_numeric_label_tex_ID, yaxis_numeric_label_tex_ID, tex_preview_pagestyle_ID;
 ID tex_preview_paper_width_ID, tex_preview_paper_height_ID;
@@ -40,9 +41,9 @@ ID yaxis_locations_for_major_ticks_ID, yaxis_locations_for_minor_ticks_ID, yaxis
 
 void Init_IDs(void)
 {
-    
-   rb_Numeric_class = rb_define_class("Numeric", rb_cObject);
-   rb_Integer_class = rb_define_class("Integer", rb_Numeric_class);
+   
+   Init_generic();
+   
 	do_cmd_ID = ID_Get("do_cmd");
 	make_page_ID = ID_Get("make_page");
    // class variables
@@ -98,7 +99,7 @@ static void c_set_device_pagesize(FM *p, double width, double height) { // sizes
 }
 
 
-VALUE FM_set_device_pagesize(VALUE fmkr, VALUE width, VALUE height)
+OBJ_PTR FM_set_device_pagesize(OBJ_PTR fmkr, OBJ_PTR width, OBJ_PTR height)
 {
    FM *p = Get_FM(fmkr);
    c_set_device_pagesize(p, Number_to_double(width), Number_to_double(height));
@@ -107,12 +108,12 @@ VALUE FM_set_device_pagesize(VALUE fmkr, VALUE width, VALUE height)
 
 
 static void c_set_frame_sides(FM *p, double left, double right, double top, double bottom) { // sizes in page coords [0..1]
-   if (left > 1.0 || left < 0.0) RAISE_ERROR("Sorry: VALUE of left must be between 0 and 1 for set_frame_sides");
-   if (right > 1.0 || right < 0.0) RAISE_ERROR("Sorry: VALUE of right must be between 0 and 1 for set_frame_sides");
-   if (top > 1.0 || top < 0.0) RAISE_ERROR("Sorry: VALUE of top must be between 0 and 1 for set_frame_sides");
-   if (bottom > 1.0 || bottom < 0.0) RAISE_ERROR("Sorry: VALUE of bottom must be between 0 and 1 for set_frame_sides");
-   if (left >= right) RAISE_ERROR("Sorry: VALUE of left must be smaller than VALUE of right for set_frame_sides");
-   if (bottom >= top) RAISE_ERROR("Sorry: VALUE of bottom must be smaller than VALUE of top for set_frame_sides");
+   if (left > 1.0 || left < 0.0) RAISE_ERROR("Sorry: OBJ_PTR of left must be between 0 and 1 for set_frame_sides");
+   if (right > 1.0 || right < 0.0) RAISE_ERROR("Sorry: OBJ_PTR of right must be between 0 and 1 for set_frame_sides");
+   if (top > 1.0 || top < 0.0) RAISE_ERROR("Sorry: OBJ_PTR of top must be between 0 and 1 for set_frame_sides");
+   if (bottom > 1.0 || bottom < 0.0) RAISE_ERROR("Sorry: OBJ_PTR of bottom must be between 0 and 1 for set_frame_sides");
+   if (left >= right) RAISE_ERROR("Sorry: OBJ_PTR of left must be smaller than OBJ_PTR of right for set_frame_sides");
+   if (bottom >= top) RAISE_ERROR("Sorry: OBJ_PTR of bottom must be smaller than OBJ_PTR of top for set_frame_sides");
    p->frame_left = left;
    p->frame_right = right;
    p->frame_bottom = bottom;
@@ -121,7 +122,7 @@ static void c_set_frame_sides(FM *p, double left, double right, double top, doub
    p->frame_height = top - bottom;
 }
 
-VALUE FM_set_frame_sides(VALUE fmkr, VALUE left, VALUE right, VALUE top, VALUE bottom)
+OBJ_PTR FM_set_frame_sides(OBJ_PTR fmkr, OBJ_PTR left, OBJ_PTR right, OBJ_PTR top, OBJ_PTR bottom)
 {
    FM *p = Get_FM(fmkr);
    c_set_frame_sides(p, Number_to_double(left), Number_to_double(right), Number_to_double(top), Number_to_double(bottom));
@@ -129,7 +130,7 @@ VALUE FM_set_frame_sides(VALUE fmkr, VALUE left, VALUE right, VALUE top, VALUE b
 }
 
 
-void Initialize_Figure(VALUE fmkr) {
+void Initialize_Figure(OBJ_PTR fmkr) {
    FM *p = Get_FM(fmkr);
    /* Page */
    p->root_figure = true;
@@ -178,7 +179,7 @@ void Initialize_Figure(VALUE fmkr) {
    p->title_side = TOP;
    p->title_position = 0.5;
    p->title_scale = 1.1;
-   p->title_shift = 0.7; // in char heights, positive for out from edge (or toward larger x or y VALUE)
+   p->title_shift = 0.7; // in char heights, positive for out from edge (or toward larger x or y OBJ_PTR)
    p->title_angle = 0.0;
    p->title_alignment = ALIGNED_AT_BASELINE;
    p->title_justification = CENTERED;
@@ -191,7 +192,7 @@ void Initialize_Figure(VALUE fmkr) {
    p->xlabel_side = BOTTOM;
    p->xlabel_position = 0.5;
    p->xlabel_scale = 1.0;
-   p->xlabel_shift = 2.0; // in char heights, positive for out from edge (or toward larger x or y VALUE)
+   p->xlabel_shift = 2.0; // in char heights, positive for out from edge (or toward larger x or y OBJ_PTR)
    p->xlabel_angle = 0.0;
    p->xlabel_alignment = ALIGNED_AT_BASELINE;
    p->xlabel_justification = CENTERED;
@@ -204,7 +205,7 @@ void Initialize_Figure(VALUE fmkr) {
    p->ylabel_side = LEFT;
    p->ylabel_position = 0.5;
    p->ylabel_scale = 1.0;
-   p->ylabel_shift = 1.8; // in char heights, positive for out from edge (or toward larger x or y VALUE)
+   p->ylabel_shift = 1.8; // in char heights, positive for out from edge (or toward larger x or y OBJ_PTR)
    p->ylabel_angle = 0.0;
    p->ylabel_alignment = ALIGNED_AT_BASELINE;
    p->ylabel_justification = CENTERED;
@@ -227,8 +228,8 @@ void Initialize_Figure(VALUE fmkr) {
    p->xaxis_major_tick_length = 0.6; // in units of numeric label char heights
    p->xaxis_minor_tick_length = 0.3; // in units of numeric label char heights
    p->xaxis_log_values = false;
-   p->xaxis_ticks_inside = true; // inside frame or toward larger x or y VALUE for specific location
-   p->xaxis_ticks_outside = false; // inside frame or toward smaller x or y VALUE for specific location
+   p->xaxis_ticks_inside = true; // inside frame or toward larger x or y OBJ_PTR for specific location
+   p->xaxis_ticks_outside = false; // inside frame or toward smaller x or y OBJ_PTR for specific location
    p->xaxis_tick_interval = 0.0; // set to 0 to use default
    p->xaxis_min_between_major_ticks = 2; // in units of numeric label char heights
    p->xaxis_number_of_minor_intervals = 0; // set to 0 to use default
@@ -237,7 +238,7 @@ void Initialize_Figure(VALUE fmkr) {
    p->xaxis_digits_max = 0;
    p->xaxis_numeric_label_decimal_digits = -1; // set to negative to use default
    p->xaxis_numeric_label_scale = 0.7;
-   p->xaxis_numeric_label_shift = 0.3; // in char heights, positive for out from edge (or toward larger x or y VALUE)
+   p->xaxis_numeric_label_shift = 0.3; // in char heights, positive for out from edge (or toward larger x or y OBJ_PTR)
    p->xaxis_numeric_label_angle = 0.0;
    p->xaxis_numeric_label_alignment = ALIGNED_AT_MIDHEIGHT;
    p->xaxis_numeric_label_justification = CENTERED;
@@ -263,8 +264,8 @@ void Initialize_Figure(VALUE fmkr) {
    p->yaxis_major_tick_length = 0.6; // in units of numeric label char heights
    p->yaxis_minor_tick_length = 0.3; // in units of numeric label char heights
    p->yaxis_log_values = false;
-   p->yaxis_ticks_inside = true; // inside frame or toward larger x or y VALUE for specific location
-   p->yaxis_ticks_outside = false; // inside frame or toward smaller x or y VALUE for specific location
+   p->yaxis_ticks_inside = true; // inside frame or toward larger x or y OBJ_PTR for specific location
+   p->yaxis_ticks_outside = false; // inside frame or toward smaller x or y OBJ_PTR for specific location
    p->yaxis_tick_interval = 0.0; // set to 0 to use default
    p->yaxis_min_between_major_ticks = 2; // in units of numeric label char heights
    p->yaxis_number_of_minor_intervals = 0; // set to 0 to use default
@@ -273,7 +274,7 @@ void Initialize_Figure(VALUE fmkr) {
    p->yaxis_digits_max = 0;
    p->yaxis_numeric_label_decimal_digits = -1; // set to negative to use default
    p->yaxis_numeric_label_scale = 0.7;
-   p->yaxis_numeric_label_shift = 0.5; // in char heights, positive for out from edge (or toward larger x or y VALUE)
+   p->yaxis_numeric_label_shift = 0.5; // in char heights, positive for out from edge (or toward larger x or y OBJ_PTR)
    p->yaxis_numeric_label_angle = 0.0;
    p->yaxis_numeric_label_alignment = ALIGNED_AT_MIDHEIGHT;
    p->yaxis_numeric_label_justification = CENTERED;
@@ -301,188 +302,177 @@ void Initialize_Figure(VALUE fmkr) {
    p->croak_on_nonok_numbers = 1;
 }
 
-VALUE do_cmd(VALUE fmkr, VALUE cmd) { return rb_funcall(fmkr, do_cmd_ID, 1, cmd); }
+OBJ_PTR do_cmd(OBJ_PTR fmkr, OBJ_PTR cmd) { return Call_Function(fmkr, do_cmd_ID, cmd); }
 
-static void Type_Error(VALUE obj, ID name_ID, char *expected)
+static void Type_Error(OBJ_PTR obj, ID name_ID, char *expected)
 {
-   char *name = rb_id2name(name_ID);
+   char *name = ID_Name(name_ID);
    while (name[0] == '@') name++;
-   RAISE_ERROR_ss("Require %s VALUE for '%s'", expected, name);
+   RAISE_ERROR_ss("Require %s OBJ_PTR for '%s'", expected, name);
 }
 
-bool Get_bool(VALUE obj, ID name_ID) {
-   VALUE v = Obj_Attr_Get(obj, name_ID);
-   if (v != Qfalse && v != Qtrue && v != Qnil)
+bool Get_bool(OBJ_PTR obj, ID name_ID) {
+   OBJ_PTR v = Obj_Attr_Get(obj, name_ID);
+   if (v != OBJ_FALSE && v != OBJ_TRUE && v != OBJ_NIL)
       Type_Error(v, name_ID, "true or false");
-   return v == Qtrue;
+   return v == OBJ_TRUE;
 }
 
-int Get_int(VALUE obj, ID name_ID) {
-   VALUE v = Obj_Attr_Get(obj, name_ID);
-   if (!rb_obj_is_kind_of(v,rb_Integer_class))
-      Type_Error(v, name_ID, "Integer");
+int Get_int(OBJ_PTR obj, ID name_ID) {
+   OBJ_PTR v = Obj_Attr_Get(obj, name_ID);
+   if (!Is_Kind_of_Integer(v)) Type_Error(v, name_ID, "Integer");
    return Number_to_int(v);
 }
 
-double Get_double(VALUE obj, ID name_ID) {
-   VALUE v = Obj_Attr_Get(obj, name_ID);
-   if (!rb_obj_is_kind_of(v,rb_Numeric_class))
-      Type_Error(v, name_ID, "Numeric");
+double Get_double(OBJ_PTR obj, ID name_ID) {
+   OBJ_PTR v = Obj_Attr_Get(obj, name_ID);
+   if (!Is_Kind_of_Number(v)) Type_Error(v, name_ID, "Numeric");
    return Number_to_double(v);
 }
 
 
-char *Get_tex_preview_paper_width(VALUE fmkr) {
-   VALUE v = Obj_Attr_Get(fmkr, tex_preview_paper_width_ID);
-   if (v == Qnil) return NULL;
+char *Get_tex_preview_paper_width(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_paper_width_ID);
+   if (v == OBJ_NIL) return NULL;
    return StringValuePtr(v);
 }
 
-char *Get_tex_preview_paper_height(VALUE fmkr) {
-   VALUE v = Obj_Attr_Get(fmkr, tex_preview_paper_height_ID);
-   if (v == Qnil) return NULL;
+char *Get_tex_preview_paper_height(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_paper_height_ID);
+   if (v == OBJ_NIL) return NULL;
    return StringValuePtr(v);
 }
 
-char *Get_tex_preview_hoffset(VALUE fmkr) {
-   VALUE v = Obj_Attr_Get(fmkr, tex_preview_hoffset_ID);
-   if (v == Qnil) return NULL;
+char *Get_tex_preview_hoffset(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_hoffset_ID);
+   if (v == OBJ_NIL) return NULL;
    return StringValuePtr(v);
 }
 
-char *Get_tex_preview_voffset(VALUE fmkr) {
-   VALUE v = Obj_Attr_Get(fmkr, tex_preview_voffset_ID);
-   if (v == Qnil) return NULL;
+char *Get_tex_preview_voffset(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_voffset_ID);
+   if (v == OBJ_NIL) return NULL;
    return StringValuePtr(v);
 }
 
-char *Get_tex_preview_figure_width(VALUE fmkr) {
-   VALUE v = Obj_Attr_Get(fmkr, tex_preview_figure_width_ID);
-   if (v == Qnil) return NULL;
+char *Get_tex_preview_figure_width(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_figure_width_ID);
+   if (v == OBJ_NIL) return NULL;
    return StringValuePtr(v);
 }
 
-char *Get_tex_preview_figure_height(VALUE fmkr) {
-   VALUE v = Obj_Attr_Get(fmkr, tex_preview_figure_height_ID);
-   if (v == Qnil) return NULL;
+char *Get_tex_preview_figure_height(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_figure_height_ID);
+   if (v == OBJ_NIL) return NULL;
    return StringValuePtr(v);
 }
 
 
-char *Get_tex_fontsize(VALUE fmkr) {
-   VALUE v = Obj_Attr_Get(fmkr, tex_fontsize_ID);
-   if (v == Qnil) return NULL;
+char *Get_tex_fontsize(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_fontsize_ID);
+   if (v == OBJ_NIL) return NULL;
    return StringValuePtr(v);
 }
 
-char *Get_tex_fontfamily(VALUE fmkr) {
-   VALUE v = Obj_Attr_Get(fmkr, tex_fontfamily_ID);
-   if (v == Qnil) return NULL;
+char *Get_tex_fontfamily(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_fontfamily_ID);
+   if (v == OBJ_NIL) return NULL;
    return StringValuePtr(v);
 }
 
-char *Get_tex_fontseries(VALUE fmkr) {
-   VALUE v = Obj_Attr_Get(fmkr, tex_fontseries_ID);
-   if (v == Qnil) return NULL;
+char *Get_tex_fontseries(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_fontseries_ID);
+   if (v == OBJ_NIL) return NULL;
    return StringValuePtr(v);
 }
 
-char *Get_tex_fontshape(VALUE fmkr) {
-   VALUE v = Obj_Attr_Get(fmkr, tex_fontshape_ID);
-   if (v == Qnil) return NULL;
+char *Get_tex_fontshape(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_fontshape_ID);
+   if (v == OBJ_NIL) return NULL;
    return StringValuePtr(v);
 }
 
-char *Get_tex_preview_minwhitespace(VALUE fmkr) {
-   VALUE v = Obj_Attr_Get(fmkr, tex_preview_minwhitespace_ID);
-   if (v == Qnil) return NULL;
+char *Get_tex_preview_minwhitespace(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_minwhitespace_ID);
+   if (v == OBJ_NIL) return NULL;
    return StringValuePtr(v);
 }
 
-bool Get_tex_preview_fullpage(VALUE fmkr) {
-   VALUE v = Obj_Attr_Get(fmkr, tex_preview_fullpage_ID);
-   return v != Qfalse && v != Qnil;
+bool Get_tex_preview_fullpage(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_fullpage_ID);
+   return v != OBJ_FALSE && v != OBJ_NIL;
 }
 
 /* gets the generated preamble */
-char *Get_tex_preview_generated_preamble(VALUE fmkr) {
+char *Get_tex_preview_generated_preamble(OBJ_PTR fmkr) {
   /* it is a class constant... */
-  VALUE v = rb_const_get(CLASS_OF(fmkr),ID_Get("TEX_PREAMBLE"));
-  if (v == Qnil) return NULL;
+  OBJ_PTR v = TEX_PREAMBLE(fmkr);
+  if (v == OBJ_NIL) return NULL;
   return StringValueCStr(v);
 }
 
-double Get_tex_xoffset(VALUE fmkr) { return Get_double(fmkr, tex_xoffset_ID); }
-double Get_tex_yoffset(VALUE fmkr) { return Get_double(fmkr, tex_yoffset_ID); }
+double Get_tex_xoffset(OBJ_PTR fmkr) { return Get_double(fmkr, tex_xoffset_ID); }
+double Get_tex_yoffset(OBJ_PTR fmkr) { return Get_double(fmkr, tex_yoffset_ID); }
 
-static char *Get_save_dir(VALUE fmkr) {
-   VALUE v = Obj_Attr_Get(fmkr, save_dir_ID);
-   if (v == Qnil) return NULL;
+static char *Get_save_dir(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, save_dir_ID);
+   if (v == OBJ_NIL) return NULL;
    return StringValuePtr(v);
 }
 
-char *Get_tex_preview_documentclass(VALUE fmkr) {
-   VALUE v = Obj_Attr_Get(fmkr, tex_preview_documentclass_ID);
-   if (v == Qnil) return NULL;
+char *Get_tex_preview_documentclass(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_documentclass_ID);
+   if (v == OBJ_NIL) return NULL;
    return StringValuePtr(v);
 }
 
-char *Get_tex_preamble(VALUE fmkr) {
-   VALUE v = Obj_Attr_Get(fmkr, tex_preamble_ID);
-   if (v == Qnil) return NULL;
+char *Get_tex_preamble(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preamble_ID);
+   if (v == OBJ_NIL) return NULL;
    return StringValuePtr(v);
 }
 
-char *Get_xaxis_numeric_label_tex(VALUE fmkr) {
-   VALUE v = Obj_Attr_Get(fmkr, xaxis_numeric_label_tex_ID);
-   if (v == Qnil) return NULL;
+char *Get_xaxis_numeric_label_tex(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, xaxis_numeric_label_tex_ID);
+   if (v == OBJ_NIL) return NULL;
    return StringValuePtr(v);
 }
 
-char *Get_yaxis_numeric_label_tex(VALUE fmkr) {
-   VALUE v = Obj_Attr_Get(fmkr, yaxis_numeric_label_tex_ID);
-   if (v == Qnil) return NULL;
+char *Get_yaxis_numeric_label_tex(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, yaxis_numeric_label_tex_ID);
+   if (v == OBJ_NIL) return NULL;
    return StringValuePtr(v);
 }
 
-char *Get_tex_preview_pagestyle(VALUE fmkr) {
-   VALUE v = Obj_Attr_Get(fmkr, tex_preview_pagestyle_ID);
-   if (v == Qnil) return NULL;
+char *Get_tex_preview_pagestyle(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_pagestyle_ID);
+   if (v == OBJ_NIL) return NULL;
    return StringValuePtr(v);
 }
 
-char *Get_tex_preview_tiogafigure_command(VALUE fmkr) {
-   VALUE v = Obj_Attr_Get(fmkr, tex_preview_tiogafigure_command_ID);
-   if (v == Qnil) return NULL;
+char *Get_tex_preview_tiogafigure_command(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_tiogafigure_command_ID);
+   if (v == OBJ_NIL) return NULL;
    return StringValuePtr(v);
 }
 
-static bool Get_quiet_mode(VALUE fmkr) {
-   VALUE v = Obj_Attr_Get(fmkr, quiet_mode_ID);
-   return v != Qfalse && v != Qnil;
+static bool Get_quiet_mode(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, quiet_mode_ID);
+   return v != OBJ_FALSE && v != OBJ_NIL;
 }
 
-static bool Get_initialized() {
-   VALUE v = rb_cvar_get(cFM, initialized_ID);
-   return v != Qfalse && v != Qnil;
-}
+OBJ_PTR Get_line_type(OBJ_PTR fmkr) { return Obj_Attr_Get(fmkr, line_type_ID); }
+void Set_line_type(OBJ_PTR fmkr, OBJ_PTR v) { Obj_Attr_Set(fmkr, line_type_ID, v); }
 
-static void Set_initialized() {
-   rb_cv_set(cFM, "@@initialized", Qtrue);
-}
+OBJ_PTR Get_xaxis_locations_for_major_ticks(OBJ_PTR fmkr) { return Obj_Attr_Get(fmkr, xaxis_locations_for_major_ticks_ID); }
+OBJ_PTR Get_xaxis_locations_for_minor_ticks(OBJ_PTR fmkr) { return Obj_Attr_Get(fmkr, xaxis_locations_for_minor_ticks_ID); }
+OBJ_PTR Get_xaxis_tick_labels(OBJ_PTR fmkr) { return Obj_Attr_Get(fmkr, xaxis_tick_labels_ID); }
 
-VALUE Get_line_type(VALUE fmkr) { return Obj_Attr_Get(fmkr, line_type_ID); }
-void Set_line_type(VALUE fmkr, VALUE v) { Obj_Attr_Set(fmkr, line_type_ID, v); }
+OBJ_PTR Get_yaxis_locations_for_major_ticks(OBJ_PTR fmkr) { return Obj_Attr_Get(fmkr, yaxis_locations_for_major_ticks_ID); }
+OBJ_PTR Get_yaxis_locations_for_minor_ticks(OBJ_PTR fmkr) { return Obj_Attr_Get(fmkr, yaxis_locations_for_minor_ticks_ID); };
+OBJ_PTR Get_yaxis_tick_labels(OBJ_PTR fmkr) { return Obj_Attr_Get(fmkr, yaxis_tick_labels_ID); }
 
-VALUE Get_xaxis_locations_for_major_ticks(VALUE fmkr) { return Obj_Attr_Get(fmkr, xaxis_locations_for_major_ticks_ID); }
-VALUE Get_xaxis_locations_for_minor_ticks(VALUE fmkr) { return Obj_Attr_Get(fmkr, xaxis_locations_for_minor_ticks_ID); }
-VALUE Get_xaxis_tick_labels(VALUE fmkr) { return Obj_Attr_Get(fmkr, xaxis_tick_labels_ID); }
-
-VALUE Get_yaxis_locations_for_major_ticks(VALUE fmkr) { return Obj_Attr_Get(fmkr, yaxis_locations_for_major_ticks_ID); }
-VALUE Get_yaxis_locations_for_minor_ticks(VALUE fmkr) { return Obj_Attr_Get(fmkr, yaxis_locations_for_minor_ticks_ID); };
-VALUE Get_yaxis_tick_labels(VALUE fmkr) { return Obj_Attr_Get(fmkr, yaxis_tick_labels_ID); }
-
-static void Make_Save_Fname(VALUE fmkr, char *full_name, char *f_name,
+static void Make_Save_Fname(OBJ_PTR fmkr, char *full_name, char *f_name,
    bool with_save_dir, bool with_pdf_extension) {
    int i, j, k, len, mod_len, mod_num, did_mod_num = false;
    char c, *fmt, model[STRLEN], *save=NULL;
@@ -505,32 +495,32 @@ static void Make_Save_Fname(VALUE fmkr, char *full_name, char *f_name,
      }
 }
    
-VALUE FM_get_save_filename(VALUE fmkr, VALUE name) {
+OBJ_PTR FM_get_save_filename(OBJ_PTR fmkr, OBJ_PTR name) {
    char full_name[STRLEN];
-   Make_Save_Fname(fmkr, full_name, (name == Qnil)? NULL : StringValuePtr(name), false, false);
+   Make_Save_Fname(fmkr, full_name, (name == OBJ_NIL)? NULL : StringValuePtr(name), false, false);
    return String_From_Cstring(full_name);
 }
    
-VALUE FM_private_make(VALUE fmkr, VALUE name, VALUE cmd) {
+OBJ_PTR FM_private_make(OBJ_PTR fmkr, OBJ_PTR name, OBJ_PTR cmd) {
    char full_name[STRLEN], mod_num_name[STRLEN];
    FM *p = Get_FM(fmkr);
    FM saved = *p;
-   VALUE result;
+   OBJ_PTR result;
    bool quiet = Get_quiet_mode(fmkr);
    if (!Get_initialized()) {
       Init_pdf();
       Init_tex();
       Set_initialized();
    }
-   Make_Save_Fname(fmkr, full_name, (name == Qnil)? NULL : StringValuePtr(name), true, true);
+   Make_Save_Fname(fmkr, full_name, (name == OBJ_NIL)? NULL : StringValuePtr(name), true, true);
    Open_pdf(fmkr, full_name, quiet);
    Open_tex(fmkr, full_name, quiet);
    Write_gsave();
    p->root_figure = true;
    p->in_subplot = false;
-   result = rb_funcall(fmkr, make_page_ID, 1, cmd);
+   result = Call_Function(fmkr, make_page_ID, cmd);
    Write_grestore();
-   if (result == Qfalse) quiet = true;
+   if (result == OBJ_FALSE) quiet = true;
    Close_pdf(fmkr, quiet);
    Close_tex(fmkr, quiet);
    Create_wrapper(fmkr, full_name, quiet);   
@@ -538,9 +528,9 @@ VALUE FM_private_make(VALUE fmkr, VALUE name, VALUE cmd) {
    return result;
 }
    
-VALUE FM_private_make_portfolio(VALUE fmkr, VALUE name, VALUE fignums, VALUE fignames) {
+OBJ_PTR FM_private_make_portfolio(OBJ_PTR fmkr, OBJ_PTR name, OBJ_PTR fignums, OBJ_PTR fignames) {
    char full_name[STRLEN];
-   Make_Save_Fname(fmkr, full_name, (name == Qnil)? NULL : StringValuePtr(name), true, false);
+   Make_Save_Fname(fmkr, full_name, (name == OBJ_NIL)? NULL : StringValuePtr(name), true, false);
    private_make_portfolio(full_name, fignums, fignames);
    return String_From_Cstring(full_name);
 }

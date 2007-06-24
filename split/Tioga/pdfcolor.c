@@ -225,7 +225,7 @@ OBJ_PTR FM_private_axial_shading(OBJ_PTR fmkr, OBJ_PTR x0, OBJ_PTR y0, OBJ_PTR x
    c_axial_shading(p, convert_figure_to_output_x(p,Number_to_double(x0)), convert_figure_to_output_y(p,Number_to_double(y0)),
       convert_figure_to_output_x(p,Number_to_double(x1)), convert_figure_to_output_y(p,Number_to_double(y1)),
       Number_to_int(hival), String_Len(lookup), (unsigned char *)(String_Ptr(lookup)),
-      extend_start == Qtrue, extend_end == Qtrue);
+      extend_start == OBJ_TRUE, extend_end == OBJ_TRUE);
    return fmkr;
 }
 
@@ -273,7 +273,7 @@ OBJ_PTR FM_private_radial_shading(OBJ_PTR fmkr,
       convert_figure_to_output_dx(p,Number_to_double(a)), convert_figure_to_output_dy(p,Number_to_double(b)),
       convert_figure_to_output_dx(p,Number_to_double(c)), convert_figure_to_output_dy(p,Number_to_double(d)),
       convert_figure_to_output_x(p,0.0), convert_figure_to_output_y(p,0.0),
-      extend_start == Qtrue, extend_end == Qtrue);
+      extend_start == OBJ_TRUE, extend_end == OBJ_TRUE);
    return fmkr;
 }
 
@@ -388,7 +388,7 @@ OBJ_PTR FM_private_create_colormap(OBJ_PTR fmkr, OBJ_PTR rgb_flag,
             must have Ps[0] == 0.0 and Ps[num_ps-1] == 1.0
         */
    FM *p = Get_FM(fmkr);
-   bool rgb = rgb_flag != Qfalse;
+   bool rgb = rgb_flag != OBJ_FALSE;
    long p_len, c1_len, c2_len, c3_len;
    double *p_ptr = Vector_Data_for_Read(Ps, &p_len);
    double *c1_ptr = Vector_Data_for_Read(C1s, &c1_len);
@@ -413,7 +413,7 @@ OBJ_PTR FM_get_color_from_colormap(OBJ_PTR fmkr, OBJ_PTR color_map, OBJ_PTR colo
    Array_Store(result, 1, Float_New(g/255.0));
    Array_Store(result, 2, Float_New(b/255.0));
    return result;
-   fmkr = Qnil;
+   fmkr = OBJ_NIL;
 }
 
 OBJ_PTR FM_convert_to_colormap(OBJ_PTR fmkr, OBJ_PTR Rs, OBJ_PTR Gs, OBJ_PTR Bs)

@@ -46,7 +46,7 @@ CROAK_ON_NONOK(p); return;}
 
 void Unpack_RGB(OBJ_PTR rgb, double *rp, double *gp, double *bp)
 {
-   if (rgb == Qnil) { *rp = *gp = *bp = 0.0; return; }
+   if (rgb == OBJ_NIL) { *rp = *gp = *bp = 0.0; return; }
    if (Array_Len(rgb) != 3) RAISE_ERROR("Sorry: invalid rgb array for setting color: must have 3 entries");
    OBJ_PTR entry = Array_Entry(rgb, 0);
    double r = Number_to_double(entry);
@@ -201,7 +201,7 @@ OBJ_PTR FM_line_type_set(OBJ_PTR fmkr, OBJ_PTR line_type)
    FM *p = Get_FM(fmkr);
    double sz;
    if (constructing_path) RAISE_ERROR("Sorry: must not be constructing a path when change line_type");
-   if (line_type == Qnil) {
+   if (line_type == OBJ_NIL) {
       fprintf(TF, "[] 0 d\n");
    } else {
       if (writing_file) {
@@ -209,7 +209,7 @@ OBJ_PTR FM_line_type_set(OBJ_PTR fmkr, OBJ_PTR line_type)
             RAISE_ERROR("Sorry: invalid line_type.  Must be [ [dash pattern] dash phase ]");
          OBJ_PTR dashArray = Array_Entry(line_type, 0), dashPhase = Array_Entry(line_type, 1);
          fprintf(TF, "[ ");
-         if (dashArray != Qnil) {
+         if (dashArray != OBJ_NIL) {
             long i, len = Array_Len(dashArray);
             for (i=0; i < len; i++) {
                OBJ_PTR entry = Array_Entry(dashArray, i);
@@ -330,7 +330,7 @@ OBJ_PTR FM_bezier_control_points(OBJ_PTR fmkr, VALUE x0, VALUE y0, VALUE delta_x
    c_bezier_control_points(data,
       Number_to_double(x0), Number_to_double(y0), Number_to_double(delta_x),
       Number_to_double(a), Number_to_double(b), Number_to_double(c));
-   return Vector_New(data,6);
+   return Vector_New(6,data);
 }
 
 
@@ -553,14 +553,14 @@ OBJ_PTR FM_append_points_to_path(OBJ_PTR fmkr, OBJ_PTR x_vec, OBJ_PTR y_vec)
 OBJ_PTR FM_private_append_points_with_gaps_to_path(OBJ_PTR fmkr, OBJ_PTR x_vec, OBJ_PTR y_vec, OBJ_PTR gaps, OBJ_PTR close_gaps)
     // where there's a gap, do a moveto instead of a lineto
 {
-   if (gaps == Qnil) return FM_append_points_to_path(fmkr, x_vec, y_vec);
+   if (gaps == OBJ_NIL) return FM_append_points_to_path(fmkr, x_vec, y_vec);
    FM *p = Get_FM(fmkr);
    long xlen, ylen, glen, i, j;
    double x0, y0;
    double *xs = Vector_Data_for_Read(x_vec, &xlen);
    double *ys = Vector_Data_for_Read(y_vec, &ylen);
    double *gs = Vector_Data_for_Read(gaps, &glen);
-   bool do_close = (close_gaps == Qtrue);
+   bool do_close = (close_gaps == OBJ_TRUE);
    if (xlen != ylen) RAISE_ERROR("Sorry: must have same number xs and ys for append_points_with_gaps");
    if (xlen <= 0) return fmkr;
    x0 = convert_figure_to_output_x(p,xs[0]); y0 = convert_figure_to_output_y(p,ys[0]);

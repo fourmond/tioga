@@ -26,6 +26,21 @@
 #include "intern.h"
 #include "generic.h"
 
+static OBJ_PTR rb_Integer_class, rb_Numeric_class;
+
+void Init_generic(void) {
+   rb_Numeric_class = rb_define_class("Numeric", rb_cObject);
+   rb_Integer_class = rb_define_class("Integer", rb_Numeric_class);
+}
+
+bool Is_Kind_of_Integer(OBJ_PTR obj) { return rb_obj_is_kind_of(obj,rb_Integer_class); }
+bool Is_Kind_of_Number(OBJ_PTR obj) { return rb_obj_is_kind_of(obj,rb_Numeric_class); }
+
+
+
+OBJ_PTR Call_Function(OBJ_PTR fmkr, ID_PTR fn, OBJ_PTR arg) {
+   return rb_funcall(fmkr, fn, 1, arg);
+}
 
 double Number_to_double(OBJ_PTR obj) { return NUM2DBL(obj); }
     
@@ -59,10 +74,17 @@ OBJ_PTR Array_Push(OBJ_PTR obj, OBJ_PTR val) { rb_ary_push(obj,val); return val;
 
 ID_PTR ID_Get(char *name) { return rb_intern(name); }
 
+char *ID_Name(ID_PTR id) { return rb_id2name(id); }
+
 OBJ_PTR Obj_Attr_Get(OBJ_PTR obj, ID_PTR attr_ID) { return rb_ivar_get(obj,attr_ID); }
 
 OBJ_PTR Obj_Attr_Set(OBJ_PTR obj, ID_PTR attr_ID, OBJ_PTR val) {
       return rb_ivar_set(obj,attr_ID,val); }
+      
+      
+      
+OBJ_PTR TEX_PREAMBLE(OBJ_PTR fmkr) { return rb_const_get(CLASS_OF(fmkr),ID_Get("TEX_PREAMBLE")); }
+
 
 //#define Obj_Attr_Get_by_StringName(obj,attr_name_string) rb_iv_get(obj,attr_name_string)
     // returns value of the given attr of the obj (name_string is char *)

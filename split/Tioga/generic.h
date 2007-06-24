@@ -24,18 +24,50 @@
 
 #include <stdbool.h>
 
+
+//if ruby
+#include "ruby.h"
+#include "intern.h"
+
+
+extern void Init_generic(void);
+
+
 /* most of the c code should use this interface 
    rather than directly depending on ruby interfaces */
 
-/* similarly, use routines from this interface
-   instead of directly using Dvector or Dtable */
 
-
-/* Ruby definitions for the generic interpreter interface */
-
-// if ruby, OBJ_PTR is VALUE
-// if python, OBJ_PTR is PyObject*
+// if ruby
 #define OBJ_PTR VALUE
+// if python
+//#define OBJ_PTR PyObject*
+
+// if ruby
+#define ID_PTR ID
+// if python
+//#define ID_PTR char*
+
+//if ruby
+#define OBJ_NIL Qnil
+#define OBJ_TRUE Qtrue
+#define OBJ_FALSE Qfalse
+//if python
+//#define OBJ_NIL Py_None
+//#define OBJ_TRUE Py_True
+//#define OBJ_FALSE Py_False
+
+
+
+
+extern OBJ_PTR Call_Function(OBJ_PTR fmkr, ID_PTR fn, OBJ_PTR arg);
+// invokes method given by fn in the object fmkr with the given arg.
+
+
+
+extern bool Is_Kind_of_Integer(OBJ_PTR obj);
+
+extern bool Is_Kind_of_Number(OBJ_PTR obj);
+
 
 extern double Number_to_double(OBJ_PTR obj);
     // returns a C double
@@ -83,17 +115,23 @@ extern OBJ_PTR Array_Push(OBJ_PTR obj, OBJ_PTR val);
     // raises error if obj not a kind of array
 
 
-// if ruby, ID_PTR is ID
-// if python, ID_PTR is PyObject*  ???
-#define ID_PTR ID
-
 extern ID_PTR ID_Get(char *name);
     // returns internal ID for the given name
+extern char *ID_Name(ID_PTR id);
+   // return the name of the given id.
 extern OBJ_PTR Obj_Attr_Get(OBJ_PTR obj, ID_PTR attr_ID);
     // returns value of the given attr of the obj
 extern OBJ_PTR Obj_Attr_Set(OBJ_PTR obj, ID_PTR attr_ID, OBJ_PTR val);
     // sets the specified attr of the obj to val, and then returns val.
     
+    
+    
+extern OBJ_PTR TEX_PREAMBLE(OBJ_PTR fmkr);
+   // returns the class FigureMaker constant named TEX_PREAMBLE
+
+
+
+
 //#define Obj_Attr_Get_by_StringName(obj,attr_name_string) rb_iv_get(obj,attr_name_string)
     // returns value of the given attr of the obj (name_string is char *)
 //#define Obj_Attr_Set_by_StringName(obj,attr_name_string,val) rb_iv_set(obj,attr_name_string,val)

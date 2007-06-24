@@ -390,11 +390,11 @@ OBJ_PTR FM_private_show_marker(
    mode = int_args / 100; int_args -= mode * 100;
    alignment = int_args / 10; int_args -= alignment * 10;
    justification = int_args;
-   if (string == Qnil) {
+   if (string == OBJ_NIL) {
       if (c < 0 || c > 255)
          RAISE_ERROR_i("Sorry: invalid character code (%i) : must be between 0 and 255", c);
       text = buff; text[0] = c;  text[1] = '\0';
-      if (stroke_width != Qnil) {
+      if (stroke_width != OBJ_NIL) {
          double width = Number_to_double(stroke_width);
          prev_line_width = p->line_width; // restore it later
          fprintf(TF, "%0.6f w\n", width * ENLARGE);
@@ -403,7 +403,7 @@ OBJ_PTR FM_private_show_marker(
       text = (unsigned char *)(String_Ptr(string));
    }
    fprintf(TF, "%d Tr\n", mode);
-   if (stroke_color != Qnil &&
+   if (stroke_color != OBJ_NIL &&
          (mode == STROKE || mode == FILL_AND_STROKE || 
             mode == STROKE_AND_CLIP || mode == FILL_STROKE_AND_CLIP)) {
        Unpack_RGB(stroke_color, &stroke_color_R, &stroke_color_G, &stroke_color_B);
@@ -417,7 +417,7 @@ OBJ_PTR FM_private_show_marker(
           c_stroke_color_set(p, stroke_color_R, stroke_color_G, stroke_color_B);
        }
    }
-   if (fill_color != Qnil &&
+   if (fill_color != OBJ_NIL &&
          (mode == FILL || mode == FILL_AND_STROKE || 
             mode == FILL_AND_CLIP || mode == FILL_STROKE_AND_CLIP)) {
        Unpack_RGB(fill_color, &fill_color_R, &fill_color_G, &fill_color_B);
@@ -431,7 +431,7 @@ OBJ_PTR FM_private_show_marker(
           c_fill_color_set(p, fill_color_R, fill_color_G, fill_color_B);
        }
    }
-   if (x == Qnil) {
+   if (x == OBJ_NIL) {
       long xlen, ylen;
       xs = Vector_Data_for_Read(x_vec, &xlen);
       ys = Vector_Data_for_Read(y_vec, &ylen);

@@ -171,8 +171,8 @@ OBJ_PTR FM_check_label_clip(OBJ_PTR fmkr, OBJ_PTR xloc, OBJ_PTR yloc)
    x = convert_figure_to_frame_x(p,x);
    y = convert_figure_to_frame_y(p,y);
    if (x < p->label_left_margin || y < p->label_bottom_margin ||
-         1.0 - x < p->label_right_margin || 1.0 - y < p->label_top_margin)  return Qfalse;
-   return Qtrue;
+         1.0 - x < p->label_right_margin || 1.0 - y < p->label_top_margin)  return OBJ_FALSE;
+   return OBJ_TRUE;
 }
 
 /* TeX File Management */
@@ -199,7 +199,7 @@ void Open_tex(OBJ_PTR fmkr, char *filename, bool quiet_mode)
    fprintf(fp,"\\def\\BS{\\phantom{\\Huge\\scalebox{0}[2]{\\hbox{\\rotatebox{180}{O}O}}}}\n"); 
       // graphicx seems to vertically align baseline (B) like center (c), 
       // so we add BS (Big Strut) to make them look the same
-   fmkr = Qnil; // unused
+   fmkr = OBJ_NIL; // unused
 }
 
 void Close_tex(OBJ_PTR fmkr, bool quiet_mode)
@@ -339,7 +339,7 @@ void private_make_portfolio(char *name, OBJ_PTR fignums, OBJ_PTR fignames)
     fprintf(file, "\\begin{document}\n");
     fprintf(file, "%% Start of figures, one per page\n\n");
     len = Array_Len(fignames);
-    if (fignums == Qnil) {
+    if (fignums == OBJ_NIL) {
         for (i=0; i < len; i++) {
             fprintf(file, "\\includepdf{%s.pdf}\n", Get_String(fignames, i));
         }

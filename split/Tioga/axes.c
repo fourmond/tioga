@@ -69,7 +69,7 @@ typedef struct {
 
 static void Init_PlotAxis_struct(PlotAxis *s) {
    s->free_majors = s->free_strings_for_labels = false;
-   s->locations_for_major_ticks = s->locations_for_minor_ticks = s->tick_labels = Qnil;
+   s->locations_for_major_ticks = s->locations_for_minor_ticks = s->tick_labels = OBJ_NIL;
    s->stroke_color_R = 0.0; s->stroke_color_G = 0.0; s->stroke_color_B = 0.0; 
    s->majors = NULL;
    s->labels = NULL;
@@ -402,7 +402,7 @@ static char **Get_Labels(FM *p, PlotAxis *s)
    int i, k, j;
    k = s->numeric_label_frequency;
    j = s->numeric_label_phase;
-   if (s->tick_labels==Qnil) { // create label strings
+   if (s->tick_labels==OBJ_NIL) { // create label strings
       int mode, prec, scale;
       Pick_Label_Precision(s->axis_min, s->axis_max, s->interval, s->use_fixed_pt, &mode, &prec, s->digits_max, &scale);
       int i;
@@ -532,7 +532,7 @@ static void Pick_Major_Tick_Interval(FM *p, double tick_min, double tick_gap, do
 static void draw_major_ticks(FM *p, PlotAxis *s)
 {
    s->num_minors = s->number_of_minor_intervals; 
-   if (s->locations_for_major_ticks != Qnil) {
+   if (s->locations_for_major_ticks != OBJ_NIL) {
       long len;
       s->majors = Vector_Data_for_Read(s->locations_for_major_ticks, &len);
       s->nmajors = len;
@@ -595,7 +595,7 @@ static void draw_minor_ticks(FM *p, PlotAxis *s)
    if (s->top_or_right) { inside = -inside; outside = -outside; }
    if (s->line_width != s->minor_tick_width)
       c_line_width_set(p, s->line_width = s->minor_tick_width);
-   if (s->locations_for_minor_ticks != Qnil) {
+   if (s->locations_for_minor_ticks != OBJ_NIL) {
       long cnt;
       double *locs = Vector_Data_for_Read(s->locations_for_minor_ticks, &cnt);
       for (i=0; i < cnt; i++) {

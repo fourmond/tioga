@@ -25,12 +25,48 @@
 
 #include "figures.h"
 #include "pdfs.h"
+#include "dvector.h"
+#include "dtable.h"
 #include "flate.h"
 
 #include <symbols.h>
 #include "../symbols.c"
 
 #include <stdio.h>
+
+
+#define DBL_ATTR(attr) \
+static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return rb_float_new(p->attr); } \
+static VALUE FM_##attr##_set(VALUE fmkr, VALUE val) { \
+   FM *p = Get_FM(fmkr); VALUE v = rb_Float(val); p->attr = NUM2DBL(v); return val; }
+
+#define INT_ATTR(attr) \
+static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return INT2FIX(p->attr); } \
+static VALUE FM_##attr##_set(VALUE fmkr, VALUE val) { \
+   FM *p = Get_FM(fmkr); VALUE v = rb_Integer(val); p->attr = NUM2INT(v); return val; }
+
+#define VAL_ATTR(attr) \
+static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return p->attr; } \
+static VALUE FM_##attr##_set(VALUE fmkr, VALUE val) { \
+   FM *p = Get_FM(fmkr); p->attr = val; return val; }
+
+#define BOOL_ATTR(attr) \
+static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return (p->attr)? Qtrue : Qfalse; } \
+static VALUE FM_##attr##_set(VALUE fmkr, VALUE val) { \
+   FM *p = Get_FM(fmkr); p->attr = (val != Qfalse); return val; }
+
+#define RO_DBL_ATTR(attr) \
+static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return rb_float_new(p->attr); }
+
+#define RO_INT_ATTR(attr) \
+static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return INT2FIX(p->attr); }
+
+#define RO_VAL_ATTR(attr) \
+static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return p->attr; }
+
+#define RO_BOOL_ATTR(attr) \
+static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return (p->attr)? Qtrue : Qfalse; }
+
 
 char *data_dir = NULL;
 
@@ -231,6 +267,16 @@ FM *Get_FM(OBJ_PTR fmkr) {
 
 /* Warning on non-ok numbers */
    BOOL_ATTR(croak_on_nonok_numbers)
+
+
+bool Get_initialized() {
+   OBJ_PTR v = rb_cvar_get(cFM, initialized_ID);
+   return v != OBJ_FALSE && v != OBJ_NIL;
+}
+
+void Set_initialized() {
+   rb_cv_set(cFM, "@@initialized", OBJ_TRUE);
+}
 
 #define attr_reader(attr) rb_define_method(cFM, #attr , FM_##attr##_get, 0);
 #define attr_writer(attr) rb_define_method(cFM, #attr "=", FM_##attr##_set, 1);

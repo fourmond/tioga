@@ -23,14 +23,10 @@
 #define __figures_H__
 
 #include <namespace.h>
-
 #include <math.h>
 #include <stdbool.h>
 #include <ctype.h>
-#include "dvector.h"
-#include "dtable.h"
-#include "ruby.h"
-#include "intern.h"
+
 #include "generic.h"
 
 #include <defs.h>
@@ -115,9 +111,9 @@ typedef struct {
     bool root_figure;
     bool in_subplot;
     double page_left, page_bottom, page_top, page_right, page_width, page_height;
-        // in output units.    READ ONLY from Ruby.
+        // in output units.    READ ONLY.
     
-/* frame and bounds attributes.  READ ONLY from Ruby.  */
+/* frame and bounds attributes.  READ ONLY.  */
     // frame location as fractions of page width & height.
     double frame_left, frame_right, frame_top, frame_bottom, frame_width, frame_height;
     // bounds in figure coords.
@@ -132,8 +128,8 @@ typedef struct {
     
     double default_font_size; // in points
     double default_text_scale;
-    double default_text_height_dx; // in figure coords.  READ ONLY from Ruby.  set when change default_text_scale.
-    double default_text_height_dy; // in figure coords.  READ ONLY from Ruby.  set when change default_text_scale.
+    double default_text_height_dx; // in figure coords.  READ ONLY.  set when change default_text_scale.
+    double default_text_height_dy; // in figure coords.  READ ONLY.  set when change default_text_scale.
     
     double label_left_margin; // as fraction of frame width
     double label_right_margin; // as fraction of frame width
@@ -174,7 +170,7 @@ typedef struct {
     double title_position;
     
     double title_scale;
-    double title_shift; // in char heights, positive for out from edge (or toward larger x or y value)
+    double title_shift; // in char heights, positive for out from edge (or toward larger x or y OBJ_PTR)
     double title_angle;
     int title_alignment;
     int title_justification;
@@ -187,7 +183,7 @@ typedef struct {
     double xlabel_position; // xlabel side is given by xaxis_loc
     
     double xlabel_scale;
-    double xlabel_shift; // in char heights, positive for out from edge (or toward larger x or y value)
+    double xlabel_shift; // in char heights, positive for out from edge (or toward larger x or y OBJ_PTR)
     double xlabel_angle;
     int xlabel_side;
     int xlabel_alignment;
@@ -201,7 +197,7 @@ typedef struct {
     double ylabel_position; // ylabel side is given by yaxis_loc
     
     double ylabel_scale;
-    double ylabel_shift; // in char heights, positive for out from edge (or toward larger x or y value)
+    double ylabel_shift; // in char heights, positive for out from edge (or toward larger x or y OBJ_PTR)
     double ylabel_angle;
     int ylabel_side;
     int ylabel_alignment;
@@ -225,8 +221,8 @@ typedef struct {
     double xaxis_major_tick_length; // in units of numeric label char heights
     double xaxis_minor_tick_length; // in units of numeric label char heights
     bool xaxis_log_values;
-    bool xaxis_ticks_inside; // inside frame or toward larger x or y value for specific location
-    bool xaxis_ticks_outside; // inside frame or toward smaller x or y value for specific location
+    bool xaxis_ticks_inside; // inside frame or toward larger x or y OBJ_PTR for specific location
+    bool xaxis_ticks_outside; // inside frame or toward smaller x or y OBJ_PTR for specific location
     double xaxis_tick_interval; // set to 0 to use default
     double xaxis_min_between_major_ticks; // in units of numeric label char heights
     int xaxis_number_of_minor_intervals; // set to 0 to use default
@@ -235,7 +231,7 @@ typedef struct {
     int xaxis_digits_max;
     int xaxis_numeric_label_decimal_digits; // set to negative to use default
     double xaxis_numeric_label_scale;
-    double xaxis_numeric_label_shift; // in char heights, positive for out from edge (or toward larger x or y value)
+    double xaxis_numeric_label_shift; // in char heights, positive for out from edge (or toward larger x or y OBJ_PTR)
     double xaxis_numeric_label_angle;
     int xaxis_numeric_label_alignment;
     int xaxis_numeric_label_justification;
@@ -263,8 +259,8 @@ typedef struct {
     double yaxis_major_tick_length; // in units of numeric label char heights
     double yaxis_minor_tick_length; // in units of numeric label char heights
     bool yaxis_log_values;
-    bool yaxis_ticks_inside; // inside frame or toward larger x or y value for specific location
-    bool yaxis_ticks_outside; // inside frame or toward smaller x or y value for specific location
+    bool yaxis_ticks_inside; // inside frame or toward larger x or y OBJ_PTR for specific location
+    bool yaxis_ticks_outside; // inside frame or toward smaller x or y OBJ_PTR for specific location
     double yaxis_tick_interval; // set to 0 to use default
     double yaxis_min_between_major_ticks; // in units of numeric label char heights
     int yaxis_number_of_minor_intervals; // set to 0 to use default
@@ -273,7 +269,7 @@ typedef struct {
     int yaxis_digits_max;
     int yaxis_numeric_label_decimal_digits; // set to negative to use default
     double yaxis_numeric_label_scale;
-    double yaxis_numeric_label_shift; // in char heights, positive for out from edge (or toward larger x or y value)
+    double yaxis_numeric_label_shift; // in char heights, positive for out from edge (or toward larger x or y OBJ_PTR)
     double yaxis_numeric_label_angle;
     int yaxis_numeric_label_alignment;
     int yaxis_numeric_label_justification;
@@ -308,15 +304,16 @@ typedef struct {
     
 /* PRIVATE -- not to be included in the Ruby interface */
     double clip_left, clip_right, clip_top, clip_bottom; // in output coords
-    VALUE fm;
+    OBJ_PTR fm;
 } FM;
 
 typedef FM Figure_Maker;
 
 extern double bbox_llx, bbox_lly, bbox_urx, bbox_ury;
 
-extern VALUE cFM; /* class object for FigureMaker */
 extern char *data_dir;
+
+
 
 
 /*======================================================================*/
@@ -325,320 +322,322 @@ extern void figure_moveto(FM *p, double x, double y); // figure coords
 extern void figure_lineto(FM *p, double x, double y); // figure coords
 extern void figure_join(FM *p, double x0, double y0, double x1, double y1); // figure coords
 extern void figure_join_and_stroke(FM *p, double x0, double y0, double x1, double y1); // figure coords
-extern char *Get_String(VALUE ary, int index);
-extern VALUE FM_show_axis(VALUE fmkr, VALUE loc);
-extern VALUE FM_show_edge(VALUE fmkr, VALUE loc);
-extern VALUE FM_no_title(VALUE fmkr);
-extern VALUE FM_no_xlabel(VALUE fmkr);
-extern VALUE FM_no_ylabel(VALUE fmkr);
-extern VALUE FM_no_xaxis(VALUE fmkr);
-extern VALUE FM_no_yaxis(VALUE fmkr);
-extern VALUE FM_no_left_edge(VALUE fmkr);
-extern VALUE FM_no_right_edge(VALUE fmkr);
-extern VALUE FM_no_top_edge(VALUE fmkr);
-extern VALUE FM_no_bottom_edge(VALUE fmkr);
+extern char *Get_String(OBJ_PTR ary, int index);
+extern OBJ_PTR FM_show_axis(OBJ_PTR fmkr, OBJ_PTR loc);
+extern OBJ_PTR FM_show_edge(OBJ_PTR fmkr, OBJ_PTR loc);
+extern OBJ_PTR FM_no_title(OBJ_PTR fmkr);
+extern OBJ_PTR FM_no_xlabel(OBJ_PTR fmkr);
+extern OBJ_PTR FM_no_ylabel(OBJ_PTR fmkr);
+extern OBJ_PTR FM_no_xaxis(OBJ_PTR fmkr);
+extern OBJ_PTR FM_no_yaxis(OBJ_PTR fmkr);
+extern OBJ_PTR FM_no_left_edge(OBJ_PTR fmkr);
+extern OBJ_PTR FM_no_right_edge(OBJ_PTR fmkr);
+extern OBJ_PTR FM_no_top_edge(OBJ_PTR fmkr);
+extern OBJ_PTR FM_no_bottom_edge(OBJ_PTR fmkr);
 
 /*======================================================================*/
 // figures.c
-extern FM *Get_FM(VALUE fmkr);
-extern bool Is_FM(VALUE fmkr);
+extern FM *Get_FM(OBJ_PTR fmkr);
+extern bool Is_FM(OBJ_PTR fmkr);
 void Init_FigureMaker(void);
+extern bool Get_initialized();
+extern void Set_initialized();
 
 /*======================================================================*/
 // init.c
 extern void Init_IDs(void);
-extern VALUE FM_set_device_pagesize(VALUE fmkr, VALUE width, VALUE height); // size in output coords (decipoints)
-extern VALUE FM_set_frame_sides(VALUE fmkr, VALUE left, VALUE right, VALUE top, VALUE bottom); // in page coords [0..1]
-extern void Initialize_Figure(VALUE fmkr);
-extern VALUE do_cmd(VALUE fmkr, VALUE cmd);
-extern bool Get_bool(VALUE obj, ID name_ID);
-extern int Get_int(VALUE obj, ID name_ID);
-extern double Get_double(VALUE obj, ID name_ID); // for instance variables of the obj
-extern char *Get_tex_preview_paper_width(VALUE fmkr);
-extern char *Get_tex_preview_paper_height(VALUE fmkr);
-extern char *Get_tex_preview_hoffset(VALUE fmkr);
-extern char *Get_tex_preview_voffset(VALUE fmkr);
-extern char *Get_tex_preview_figure_width(VALUE fmkr);
-extern char *Get_tex_preview_figure_height(VALUE fmkr);
-extern char *Get_tex_fontsize(VALUE fmkr);
-extern char *Get_tex_fontfamily(VALUE fmkr);
-extern char *Get_tex_fontseries(VALUE fmkr);
-extern char *Get_tex_fontshape(VALUE fmkr);
-extern char *Get_tex_preview_minwhitespace(VALUE fmkr);
-extern bool Get_tex_preview_fullpage(VALUE fmkr);
-extern char *Get_tex_preview_tiogafigure_command(VALUE fmkr);
-extern char *Get_tex_preview_generated_preamble(VALUE fmkr);
-extern double Get_tex_xoffset(VALUE fmkr);
-extern double Get_tex_yoffset(VALUE fmkr);
-extern char *Get_tex_preview_documentclass(VALUE fmkr);
-extern char *Get_tex_preamble(VALUE fmkr);
-extern char *Get_tex_xaxis_numeric_label(VALUE fmkr);
-extern char *Get_tex_yaxis_numeric_label(VALUE fmkr);
-extern char *Get_tex_preview_pagestyle(VALUE fmkr);
-extern char *Get_tex_preview_tiogafigure_command(VALUE fmkr);
-extern VALUE Get_line_type(VALUE fmkr);
-extern void Set_line_type(VALUE fmkr, VALUE v);
-extern VALUE Get_xaxis_tick_labels(VALUE fmkr);
-extern VALUE Get_xaxis_locations_for_major_ticks(VALUE fmkr);
-extern VALUE Get_xaxis_locations_for_minor_ticks(VALUE fmkr);
-extern VALUE Get_yaxis_tick_labels(VALUE fmkr);
-extern VALUE Get_yaxis_locations_for_major_ticks(VALUE fmkr);
-extern VALUE Get_yaxis_locations_for_minor_ticks(VALUE fmkr);
-extern VALUE FM_get_save_filename(VALUE fmkr, VALUE name);
-extern VALUE FM_private_make(VALUE fmkr, VALUE name, VALUE cmd);
-extern VALUE FM_private_make_portfolio(VALUE fmkr, VALUE name, VALUE fignums, VALUE fignames);
+extern OBJ_PTR FM_set_device_pagesize(OBJ_PTR fmkr, OBJ_PTR width, OBJ_PTR height); // size in output coords (decipoints)
+extern OBJ_PTR FM_set_frame_sides(OBJ_PTR fmkr, OBJ_PTR left, OBJ_PTR right, OBJ_PTR top, OBJ_PTR bottom); // in page coords [0..1]
+extern void Initialize_Figure(OBJ_PTR fmkr);
+extern OBJ_PTR do_cmd(OBJ_PTR fmkr, OBJ_PTR cmd);
+extern bool Get_bool(OBJ_PTR obj, ID name_ID);
+extern int Get_int(OBJ_PTR obj, ID name_ID);
+extern double Get_double(OBJ_PTR obj, ID name_ID); // for instance variables of the obj
+extern char *Get_tex_preview_paper_width(OBJ_PTR fmkr);
+extern char *Get_tex_preview_paper_height(OBJ_PTR fmkr);
+extern char *Get_tex_preview_hoffset(OBJ_PTR fmkr);
+extern char *Get_tex_preview_voffset(OBJ_PTR fmkr);
+extern char *Get_tex_preview_figure_width(OBJ_PTR fmkr);
+extern char *Get_tex_preview_figure_height(OBJ_PTR fmkr);
+extern char *Get_tex_fontsize(OBJ_PTR fmkr);
+extern char *Get_tex_fontfamily(OBJ_PTR fmkr);
+extern char *Get_tex_fontseries(OBJ_PTR fmkr);
+extern char *Get_tex_fontshape(OBJ_PTR fmkr);
+extern char *Get_tex_preview_minwhitespace(OBJ_PTR fmkr);
+extern bool Get_tex_preview_fullpage(OBJ_PTR fmkr);
+extern char *Get_tex_preview_tiogafigure_command(OBJ_PTR fmkr);
+extern char *Get_tex_preview_generated_preamble(OBJ_PTR fmkr);
+extern double Get_tex_xoffset(OBJ_PTR fmkr);
+extern double Get_tex_yoffset(OBJ_PTR fmkr);
+extern char *Get_tex_preview_documentclass(OBJ_PTR fmkr);
+extern char *Get_tex_preamble(OBJ_PTR fmkr);
+extern char *Get_tex_xaxis_numeric_label(OBJ_PTR fmkr);
+extern char *Get_tex_yaxis_numeric_label(OBJ_PTR fmkr);
+extern char *Get_tex_preview_pagestyle(OBJ_PTR fmkr);
+extern char *Get_tex_preview_tiogafigure_command(OBJ_PTR fmkr);
+extern OBJ_PTR Get_line_type(OBJ_PTR fmkr);
+extern void Set_line_type(OBJ_PTR fmkr, OBJ_PTR v);
+extern OBJ_PTR Get_xaxis_tick_labels(OBJ_PTR fmkr);
+extern OBJ_PTR Get_xaxis_locations_for_major_ticks(OBJ_PTR fmkr);
+extern OBJ_PTR Get_xaxis_locations_for_minor_ticks(OBJ_PTR fmkr);
+extern OBJ_PTR Get_yaxis_tick_labels(OBJ_PTR fmkr);
+extern OBJ_PTR Get_yaxis_locations_for_major_ticks(OBJ_PTR fmkr);
+extern OBJ_PTR Get_yaxis_locations_for_minor_ticks(OBJ_PTR fmkr);
+extern OBJ_PTR FM_get_save_filename(OBJ_PTR fmkr, OBJ_PTR name);
+extern OBJ_PTR FM_private_make(OBJ_PTR fmkr, OBJ_PTR name, OBJ_PTR cmd);
+extern OBJ_PTR FM_private_make_portfolio(OBJ_PTR fmkr, OBJ_PTR name, OBJ_PTR fignums, OBJ_PTR fignames);
 
 /*======================================================================*/
 // makers.c
-extern VALUE FM_private_make_contour(VALUE fmkr, VALUE gaps,
-     VALUE xs, VALUE ys, // data x coordinates and y coordinates
-     VALUE zs, VALUE z_level, // the Dtable of values and the desired contour level
-     VALUE legit, // the Dtable of flags (nonzero means okay)
-     VALUE method // int == 1 means use CONREC
+extern OBJ_PTR FM_private_make_contour(OBJ_PTR fmkr, OBJ_PTR gaps,
+     OBJ_PTR xs, OBJ_PTR ys, // data x coordinates and y coordinates
+     OBJ_PTR zs, OBJ_PTR z_level, // the Dtable of OBJ_PTRs and the desired contour level
+     OBJ_PTR legit, // the Dtable of flags (nonzero means okay)
+     OBJ_PTR method // int == 1 means use CONREC
      );
-extern VALUE FM_private_make_steps(VALUE fmkr, VALUE Xdata, VALUE Ydata,
-    VALUE xfirst, VALUE yfirst, VALUE xlast, VALUE ylast);
-extern VALUE FM_private_make_spline_interpolated_points(VALUE fmkr, VALUE Xvec, 
-   VALUE Xdata, VALUE Ydata, VALUE start_slope, VALUE end_slope);
+extern OBJ_PTR FM_private_make_steps(OBJ_PTR fmkr, OBJ_PTR Xdata, OBJ_PTR Ydata,
+    OBJ_PTR xfirst, OBJ_PTR yfirst, OBJ_PTR xlast, OBJ_PTR ylast);
+extern OBJ_PTR FM_private_make_spline_interpolated_points(OBJ_PTR fmkr, OBJ_PTR Xvec, 
+   OBJ_PTR Xdata, OBJ_PTR Ydata, OBJ_PTR start_slope, OBJ_PTR end_slope);
 
 /*======================================================================*/
 // pdfcolor.c
 extern void Free_Functions();
 extern void Write_Functions(void);
 extern void Free_Stroke_Opacities(void);
-extern VALUE FM_stroke_opacity_set(VALUE fmkr, VALUE value);
+extern OBJ_PTR FM_stroke_opacity_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
 extern void Free_Fill_Opacities(void);
-extern VALUE FM_fill_opacity_set(VALUE fmkr, VALUE value);
+extern OBJ_PTR FM_fill_opacity_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
 extern void Write_Stroke_Opacity_Objects(void);
 extern void Write_Fill_Opacity_Objects(void);
 extern void Free_Shadings();
 extern void Write_Shadings(void);
-extern VALUE FM_private_axial_shading(VALUE fmkr, VALUE x0, VALUE y0,
-        VALUE x1, VALUE y1, VALUE colormap, VALUE extend_start, VALUE extend_end);
-extern VALUE FM_private_radial_shading(VALUE fmkr, VALUE x0, VALUE y0, VALUE r0,
-        VALUE x1, VALUE y1, VALUE r1, VALUE colormap,
-        VALUE a, VALUE b, VALUE c, VALUE d,
-        VALUE extend_start, VALUE extend_end);
-extern VALUE FM_private_create_colormap(VALUE fmkr, VALUE rgb_flag,
-            VALUE length, VALUE Ps, VALUE C1s, VALUE C2s, VALUE C3s);
-extern VALUE FM_get_color_from_colormap(VALUE fmkr, VALUE color_map, VALUE color_position);
-extern VALUE FM_convert_to_colormap(VALUE fmkr, VALUE Rs, VALUE Gs, VALUE Bs);
-extern VALUE FM_hls_to_rgb(VALUE fmkr, VALUE hls_vec);
-extern VALUE FM_rgb_to_hls(VALUE fmkr, VALUE rgb_vec);
-extern VALUE FM_title_color_set(VALUE fmkr, VALUE value);
-extern VALUE FM_title_color_get(VALUE fmkr);
-extern VALUE FM_xlabel_color_get(VALUE fmkr);
-extern VALUE FM_xlabel_color_set(VALUE fmkr, VALUE value);
-extern VALUE FM_ylabel_color_get(VALUE fmkr);
-extern VALUE FM_ylabel_color_set(VALUE fmkr, VALUE value);
-extern VALUE FM_xaxis_stroke_color_get(VALUE fmkr);
-extern VALUE FM_xaxis_stroke_color_set(VALUE fmkr, VALUE value);
-extern VALUE FM_yaxis_stroke_color_get(VALUE fmkr);
-extern VALUE FM_yaxis_stroke_color_set(VALUE fmkr, VALUE value);
+extern OBJ_PTR FM_private_axial_shading(OBJ_PTR fmkr, OBJ_PTR x0, OBJ_PTR y0,
+        OBJ_PTR x1, OBJ_PTR y1, OBJ_PTR colormap, OBJ_PTR extend_start, OBJ_PTR extend_end);
+extern OBJ_PTR FM_private_radial_shading(OBJ_PTR fmkr, OBJ_PTR x0, OBJ_PTR y0, OBJ_PTR r0,
+        OBJ_PTR x1, OBJ_PTR y1, OBJ_PTR r1, OBJ_PTR colormap,
+        OBJ_PTR a, OBJ_PTR b, OBJ_PTR c, OBJ_PTR d,
+        OBJ_PTR extend_start, OBJ_PTR extend_end);
+extern OBJ_PTR FM_private_create_colormap(OBJ_PTR fmkr, OBJ_PTR rgb_flag,
+            OBJ_PTR length, OBJ_PTR Ps, OBJ_PTR C1s, OBJ_PTR C2s, OBJ_PTR C3s);
+extern OBJ_PTR FM_get_color_from_colormap(OBJ_PTR fmkr, OBJ_PTR color_map, OBJ_PTR color_position);
+extern OBJ_PTR FM_convert_to_colormap(OBJ_PTR fmkr, OBJ_PTR Rs, OBJ_PTR Gs, OBJ_PTR Bs);
+extern OBJ_PTR FM_hls_to_rgb(OBJ_PTR fmkr, OBJ_PTR hls_vec);
+extern OBJ_PTR FM_rgb_to_hls(OBJ_PTR fmkr, OBJ_PTR rgb_vec);
+extern OBJ_PTR FM_title_color_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_title_color_get(OBJ_PTR fmkr);
+extern OBJ_PTR FM_xlabel_color_get(OBJ_PTR fmkr);
+extern OBJ_PTR FM_xlabel_color_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_ylabel_color_get(OBJ_PTR fmkr);
+extern OBJ_PTR FM_ylabel_color_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_xaxis_stroke_color_get(OBJ_PTR fmkr);
+extern OBJ_PTR FM_xaxis_stroke_color_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_yaxis_stroke_color_get(OBJ_PTR fmkr);
+extern OBJ_PTR FM_yaxis_stroke_color_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
 
 /*======================================================================*/
 // pdfcoords.c
 extern void Recalc_Font_Hts(FM *p);
-extern VALUE FM_private_set_subframe(VALUE fmkr, VALUE left_margin, VALUE right_margin, VALUE top_margin, VALUE bottom_margin);
+extern OBJ_PTR FM_private_set_subframe(OBJ_PTR fmkr, OBJ_PTR left_margin, OBJ_PTR right_margin, OBJ_PTR top_margin, OBJ_PTR bottom_margin);
 extern void c_private_set_default_font_size(FM *p, double size);
-extern VALUE FM_private_set_default_font_size(VALUE fmkr, VALUE size); // size in points
-extern VALUE FM_private_context(VALUE fmkr, VALUE cmd);
-extern VALUE FM_doing_subplot(VALUE fmkr);
-extern VALUE FM_doing_subfigure(VALUE fmkr);
-extern VALUE FM_private_set_bounds(VALUE fmkr, VALUE left, VALUE right, VALUE top, VALUE bottom); /* in figure coords */
-extern VALUE FM_convert_to_degrees(VALUE fmkr, VALUE dx, VALUE dy);
-extern VALUE FM_convert_inches_to_output(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_output_to_inches(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_mm_to_output(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_output_to_mm(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_page_to_output_x(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_page_to_output_y(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_page_to_output_dx(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_page_to_output_dy(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_output_to_page_x(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_output_to_page_y(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_output_to_page_dx(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_output_to_page_dy(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_frame_to_page_x(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_frame_to_page_y(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_frame_to_page_dx(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_frame_to_page_dy(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_page_to_frame_x(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_page_to_frame_y(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_page_to_frame_dx(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_page_to_frame_dy(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_figure_to_frame_x(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_figure_to_frame_y(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_figure_to_frame_dx(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_figure_to_frame_dy(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_frame_to_figure_x(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_frame_to_figure_y(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_frame_to_figure_dx(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_frame_to_figure_dy(VALUE fmkr, VALUE value);
+extern OBJ_PTR FM_private_set_default_font_size(OBJ_PTR fmkr, OBJ_PTR size); // size in points
+extern OBJ_PTR FM_private_context(OBJ_PTR fmkr, OBJ_PTR cmd);
+extern OBJ_PTR FM_doing_subplot(OBJ_PTR fmkr);
+extern OBJ_PTR FM_doing_subfigure(OBJ_PTR fmkr);
+extern OBJ_PTR FM_private_set_bounds(OBJ_PTR fmkr, OBJ_PTR left, OBJ_PTR right, OBJ_PTR top, OBJ_PTR bottom); /* in figure coords */
+extern OBJ_PTR FM_convert_to_degrees(OBJ_PTR fmkr, OBJ_PTR dx, OBJ_PTR dy);
+extern OBJ_PTR FM_convert_inches_to_output(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_output_to_inches(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_mm_to_output(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_output_to_mm(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_page_to_output_x(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_page_to_output_y(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_page_to_output_dx(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_page_to_output_dy(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_output_to_page_x(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_output_to_page_y(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_output_to_page_dx(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_output_to_page_dy(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_frame_to_page_x(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_frame_to_page_y(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_frame_to_page_dx(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_frame_to_page_dy(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_page_to_frame_x(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_page_to_frame_y(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_page_to_frame_dx(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_page_to_frame_dy(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_figure_to_frame_x(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_figure_to_frame_y(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_figure_to_frame_dx(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_figure_to_frame_dy(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_frame_to_figure_x(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_frame_to_figure_y(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_frame_to_figure_dx(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_frame_to_figure_dy(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
 extern double convert_figure_to_output_x(FM *p, double x);
 extern double convert_figure_to_output_y(FM *p, double y);
 extern double convert_figure_to_output_dy(FM *p, double dy);
 extern double convert_figure_to_output_dx(FM *p, double dx);
-extern VALUE FM_convert_figure_to_output_x(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_figure_to_output_y(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_figure_to_output_dx(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_figure_to_output_dy(VALUE fmkr, VALUE value);
+extern OBJ_PTR FM_convert_figure_to_output_x(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_figure_to_output_y(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_figure_to_output_dx(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_figure_to_output_dy(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
 extern double convert_output_to_figure_x(FM *p, double x);
 extern double convert_output_to_figure_y(FM *p, double y);
 extern double convert_output_to_figure_dy(FM *p, double dy);
 extern double convert_output_to_figure_dx(FM *p, double dx);
-extern VALUE FM_convert_output_to_figure_x(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_output_to_figure_y(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_output_to_figure_dx(VALUE fmkr, VALUE value);
-extern VALUE FM_convert_output_to_figure_dy(VALUE fmkr, VALUE value);
+extern OBJ_PTR FM_convert_output_to_figure_x(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_output_to_figure_y(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_output_to_figure_dx(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_convert_output_to_figure_dy(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
 
 /*======================================================================*/
 // pdffile.c
 extern void Init_pdf(void);
 extern void Record_Object_Offset(int obj_number);
-extern void Open_pdf(VALUE fmkr, char *filename, bool quiet_mode);
+extern void Open_pdf(OBJ_PTR fmkr, char *filename, bool quiet_mode);
 extern void Start_Axis_Standard_State(FM *p, double r, double g, double b, double line_width);
 extern void End_Axis_Standard_State(void);
 extern void Write_gsave(void);
 extern void Write_grestore(void);
-extern void Close_pdf(VALUE fmkr, bool quiet_mode);
+extern void Close_pdf(OBJ_PTR fmkr, bool quiet_mode);
 extern void Rename_pdf(char *oldname, char *newname);
 
 /*======================================================================*/
 // pdfimage.c
-extern VALUE FM_private_show_jpg(VALUE fmkr, VALUE filename, 
-   VALUE width, VALUE height, VALUE image_destination, VALUE mask_xo_num);
-extern VALUE FM_private_create_image_data(VALUE fmkr, VALUE data,
-   VALUE first_row, VALUE last_row, VALUE first_column, VALUE last_column,
-   VALUE min_value, VALUE max_value, VALUE max_code, VALUE if_below_range, VALUE if_above_range);
-extern VALUE FM_private_create_monochrome_image_data(VALUE fmkr, VALUE data,
-   VALUE first_row, VALUE last_row, VALUE first_column, VALUE last_column,
-   VALUE boundary, VALUE reverse);
-extern VALUE FM_private_show_image(VALUE fmkr, VALUE llx, VALUE lly, VALUE lrx, VALUE lry, VALUE ulx, VALUE uly,
-   VALUE interpolate, VALUE w, VALUE h, VALUE data, VALUE value_mask_min, VALUE value_mask_max,
-   VALUE hival, VALUE lookup, VALUE mask_xo_num);
-extern VALUE FM_private_show_rgb_image(VALUE fmkr, 
-   VALUE llx, VALUE lly, VALUE lrx, VALUE lry, VALUE ulx, VALUE uly,
-   VALUE interpolate, VALUE w, VALUE h, VALUE data, VALUE mask_xo_num);
-extern VALUE FM_private_show_cmyk_image(VALUE fmkr, 
-   VALUE llx, VALUE lly, VALUE lrx, VALUE lry, VALUE ulx, VALUE uly,
-   VALUE interpolate, VALUE w, VALUE h, VALUE data, VALUE mask_xo_num);
-extern VALUE FM_private_show_grayscale_image(VALUE fmkr, 
-   VALUE llx, VALUE lly, VALUE lrx, VALUE lry, VALUE ulx, VALUE uly,
-   VALUE interpolate, VALUE w, VALUE h, VALUE data, VALUE mask_xo_num);
-extern VALUE FM_private_show_monochrome_image(VALUE fmkr, VALUE llx, VALUE lly, VALUE lrx, VALUE lry, VALUE ulx, VALUE uly,
-   VALUE interpolate, VALUE reversed, VALUE w, VALUE h, VALUE data, VALUE mask_xo_num);
+extern OBJ_PTR FM_private_show_jpg(OBJ_PTR fmkr, OBJ_PTR filename, 
+   OBJ_PTR width, OBJ_PTR height, OBJ_PTR image_destination, OBJ_PTR mask_xo_num);
+extern OBJ_PTR FM_private_create_image_data(OBJ_PTR fmkr, OBJ_PTR data,
+   OBJ_PTR first_row, OBJ_PTR last_row, OBJ_PTR first_column, OBJ_PTR last_column,
+   OBJ_PTR min_OBJ_PTR, OBJ_PTR max_OBJ_PTR, OBJ_PTR max_code, OBJ_PTR if_below_range, OBJ_PTR if_above_range);
+extern OBJ_PTR FM_private_create_monochrome_image_data(OBJ_PTR fmkr, OBJ_PTR data,
+   OBJ_PTR first_row, OBJ_PTR last_row, OBJ_PTR first_column, OBJ_PTR last_column,
+   OBJ_PTR boundary, OBJ_PTR reverse);
+extern OBJ_PTR FM_private_show_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly,
+   OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR OBJ_PTR_mask_min, OBJ_PTR OBJ_PTR_mask_max,
+   OBJ_PTR hival, OBJ_PTR lookup, OBJ_PTR mask_xo_num);
+extern OBJ_PTR FM_private_show_rgb_image(OBJ_PTR fmkr, 
+   OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly,
+   OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_xo_num);
+extern OBJ_PTR FM_private_show_cmyk_image(OBJ_PTR fmkr, 
+   OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly,
+   OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_xo_num);
+extern OBJ_PTR FM_private_show_grayscale_image(OBJ_PTR fmkr, 
+   OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly,
+   OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_xo_num);
+extern OBJ_PTR FM_private_show_monochrome_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly,
+   OBJ_PTR interpolate, OBJ_PTR reversed, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_xo_num);
 
 /*======================================================================*/
 // pdfpath.c
-extern void Unpack_RGB(VALUE rgb, double *rp, double *gp, double *bp);
+extern void Unpack_RGB(OBJ_PTR rgb, double *rp, double *gp, double *bp);
 void c_stroke_color_set(FM *p, double r, double g, double b);
-extern VALUE FM_stroke_color_set(VALUE fmkr, VALUE value);
-extern VALUE FM_stroke_color_get(VALUE fmkr);
+extern OBJ_PTR FM_stroke_color_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_stroke_color_get(OBJ_PTR fmkr);
 void c_fill_color_set(FM *p, double r, double g, double b);
-extern VALUE FM_fill_color_set(VALUE fmkr, VALUE value);
-extern VALUE FM_fill_color_get(VALUE fmkr);
+extern OBJ_PTR FM_fill_color_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_fill_color_get(OBJ_PTR fmkr);
 void c_line_width_set(FM *p, double line_width);
-extern VALUE FM_line_width_set(VALUE fmkr, VALUE value);
-extern VALUE FM_rescale_lines(VALUE fmkr, VALUE scaling);
+extern OBJ_PTR FM_line_width_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_rescale_lines(OBJ_PTR fmkr, OBJ_PTR scaling);
 void c_line_cap_set(FM *p, int line_cap);
-extern VALUE FM_line_cap_set(VALUE fmkr, VALUE value);
+extern OBJ_PTR FM_line_cap_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
 void c_line_join_set(FM *p, int line_join);
-extern VALUE FM_line_join_set(VALUE fmkr, VALUE value);
+extern OBJ_PTR FM_line_join_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
 void c_miter_limit_set(FM *p, double miter_limit);
-extern VALUE FM_miter_limit_set(VALUE fmkr, VALUE value);
-extern VALUE FM_line_type_set(VALUE fmkr, VALUE line_type);
+extern OBJ_PTR FM_miter_limit_set(OBJ_PTR fmkr, OBJ_PTR OBJ_PTR);
+extern OBJ_PTR FM_line_type_set(OBJ_PTR fmkr, OBJ_PTR line_type);
 void update_bbox(FM *p, double x, double y);
-extern VALUE FM_update_bbox(VALUE fmkr, VALUE x, VALUE y);
-extern VALUE FM_bbox_left(VALUE fmkr);
-extern VALUE FM_bbox_right(VALUE fmkr);
-extern VALUE FM_bbox_top(VALUE fmkr);
-extern VALUE FM_bbox_bottom(VALUE fmkr);
+extern OBJ_PTR FM_update_bbox(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y);
+extern OBJ_PTR FM_bbox_left(OBJ_PTR fmkr);
+extern OBJ_PTR FM_bbox_right(OBJ_PTR fmkr);
+extern OBJ_PTR FM_bbox_top(OBJ_PTR fmkr);
+extern OBJ_PTR FM_bbox_bottom(OBJ_PTR fmkr);
 extern void c_moveto(FM *p, double x, double y);
-extern VALUE FM_move_to_point(VALUE fmkr, VALUE x, VALUE y);  // x y m
+extern OBJ_PTR FM_move_to_point(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y);  // x y m
 extern void c_lineto(FM *p, double x, double y);
-extern VALUE FM_append_point_to_path(VALUE fmkr, VALUE x, VALUE y);  // x y l
+extern OBJ_PTR FM_append_point_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y);  // x y l
 extern void c_bezier_control_points(double *data, double x0, double y0, double delta_x, double a, double b, double c);
-extern VALUE FM_bezier_control_points(OBJ_PTR fmkr, VALUE x0, VALUE y0, VALUE delta_x, VALUE a, VALUE b, VALUE c);
+extern OBJ_PTR FM_bezier_control_points(OBJ_PTR fmkr, OBJ_PTR x0, OBJ_PTR y0, OBJ_PTR delta_x, OBJ_PTR a, OBJ_PTR b, OBJ_PTR c);
 extern void c_curveto(FM *p, double x1, double y1, double x2, double y2, double x3, double y3);
-extern VALUE FM_append_curve_to_path(VALUE fmkr, 
-   VALUE x1, VALUE y1, VALUE x2, VALUE y2, VALUE x3, VALUE y3); 
-extern VALUE FM_close_path(VALUE fmkr); // h
-extern VALUE FM_append_arc_to_path(VALUE fmkr, VALUE x_start, VALUE y_start, VALUE x_corner, VALUE y_corner,
-   VALUE x_end, VALUE y_end, VALUE dx, VALUE dy);
-extern VALUE FM_append_rect_to_path(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height);  // x y w h re
-extern VALUE FM_append_rounded_rect_to_path(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height, VALUE dx, VALUE dy);
-extern VALUE FM_append_oval_to_path(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE angle);
-extern VALUE FM_append_circle_to_path(VALUE fmkr, VALUE x, VALUE y, VALUE dx);
-extern VALUE FM_append_points_to_path(VALUE fmkr, VALUE x_vec, VALUE y_vec);
-extern VALUE FM_private_append_points_with_gaps_to_path(VALUE fmkr, VALUE x_vec, VALUE y_vec, VALUE gaps, VALUE close_gaps);
-extern VALUE FM_stroke(VALUE fmkr);  // S
-extern VALUE FM_close_and_stroke(VALUE fmkr);  // s
-extern VALUE FM_fill(VALUE fmkr); // f
-extern VALUE FM_discard_path(VALUE fmkr); // n
-extern VALUE FM_eofill(VALUE fmkr); // f*
-extern VALUE FM_fill_and_stroke(VALUE fmkr); // B
-extern VALUE FM_eofill_and_stroke(VALUE fmkr); // B*
-extern VALUE FM_close_fill_and_stroke(VALUE fmkr); // b
-extern VALUE FM_close_eofill_and_stroke(VALUE fmkr); // b*
-extern VALUE FM_clip(VALUE fmkr);  // W n
-extern VALUE FM_eoclip(VALUE fmkr);  // W* n
-extern VALUE FM_stroke_line(VALUE fmkr, VALUE x1, VALUE y1, VALUE x2, VALUE y2);
-extern VALUE FM_fill_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height);
-extern VALUE FM_stroke_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height);
-extern VALUE FM_fill_and_stroke_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height);
-extern VALUE FM_clip_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height);
-extern VALUE FM_fill_oval(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE angle);
-extern VALUE FM_stroke_oval(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE angle);
-extern VALUE FM_fill_and_stroke_oval(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE angle);
-extern VALUE FM_clip_oval(VALUE fmkr, VALUE x, VALUE y, VALUE dx, VALUE dy, VALUE angle);
-extern VALUE FM_fill_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height, VALUE dx, VALUE dy);
-extern VALUE FM_stroke_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height, VALUE dx, VALUE dy);
-extern VALUE FM_fill_and_stroke_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height, VALUE dx, VALUE dy);
-extern VALUE FM_clip_rounded_rect(VALUE fmkr, VALUE x, VALUE y, VALUE width, VALUE height, VALUE dx, VALUE dy);
-extern VALUE FM_fill_circle(VALUE fmkr, VALUE x, VALUE y, VALUE dx);
-extern VALUE FM_stroke_circle(VALUE fmkr, VALUE x, VALUE y, VALUE dx);
-extern VALUE FM_fill_and_stroke_circle(VALUE fmkr, VALUE x, VALUE y, VALUE dx);
-extern VALUE FM_clip_circle(VALUE fmkr, VALUE x, VALUE y, VALUE dx);
-extern VALUE FM_append_frame_to_path(VALUE fmkr);
-extern VALUE FM_fill_frame(VALUE fmkr);
-extern VALUE FM_stroke_frame(VALUE fmkr);
-extern VALUE FM_fill_and_stroke_frame(VALUE fmkr);
-extern VALUE FM_clip_to_frame(VALUE fmkr);
+extern OBJ_PTR FM_append_curve_to_path(OBJ_PTR fmkr, 
+   OBJ_PTR x1, OBJ_PTR y1, OBJ_PTR x2, OBJ_PTR y2, OBJ_PTR x3, OBJ_PTR y3); 
+extern OBJ_PTR FM_close_path(OBJ_PTR fmkr); // h
+extern OBJ_PTR FM_append_arc_to_path(OBJ_PTR fmkr, OBJ_PTR x_start, OBJ_PTR y_start, OBJ_PTR x_corner, OBJ_PTR y_corner,
+   OBJ_PTR x_end, OBJ_PTR y_end, OBJ_PTR dx, OBJ_PTR dy);
+extern OBJ_PTR FM_append_rect_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height);  // x y w h re
+extern OBJ_PTR FM_append_rounded_rect_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height, OBJ_PTR dx, OBJ_PTR dy);
+extern OBJ_PTR FM_append_oval_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx, OBJ_PTR dy, OBJ_PTR angle);
+extern OBJ_PTR FM_append_circle_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx);
+extern OBJ_PTR FM_append_points_to_path(OBJ_PTR fmkr, OBJ_PTR x_vec, OBJ_PTR y_vec);
+extern OBJ_PTR FM_private_append_points_with_gaps_to_path(OBJ_PTR fmkr, OBJ_PTR x_vec, OBJ_PTR y_vec, OBJ_PTR gaps, OBJ_PTR close_gaps);
+extern OBJ_PTR FM_stroke(OBJ_PTR fmkr);  // S
+extern OBJ_PTR FM_close_and_stroke(OBJ_PTR fmkr);  // s
+extern OBJ_PTR FM_fill(OBJ_PTR fmkr); // f
+extern OBJ_PTR FM_discard_path(OBJ_PTR fmkr); // n
+extern OBJ_PTR FM_eofill(OBJ_PTR fmkr); // f*
+extern OBJ_PTR FM_fill_and_stroke(OBJ_PTR fmkr); // B
+extern OBJ_PTR FM_eofill_and_stroke(OBJ_PTR fmkr); // B*
+extern OBJ_PTR FM_close_fill_and_stroke(OBJ_PTR fmkr); // b
+extern OBJ_PTR FM_close_eofill_and_stroke(OBJ_PTR fmkr); // b*
+extern OBJ_PTR FM_clip(OBJ_PTR fmkr);  // W n
+extern OBJ_PTR FM_eoclip(OBJ_PTR fmkr);  // W* n
+extern OBJ_PTR FM_stroke_line(OBJ_PTR fmkr, OBJ_PTR x1, OBJ_PTR y1, OBJ_PTR x2, OBJ_PTR y2);
+extern OBJ_PTR FM_fill_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height);
+extern OBJ_PTR FM_stroke_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height);
+extern OBJ_PTR FM_fill_and_stroke_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height);
+extern OBJ_PTR FM_clip_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height);
+extern OBJ_PTR FM_fill_oval(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx, OBJ_PTR dy, OBJ_PTR angle);
+extern OBJ_PTR FM_stroke_oval(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx, OBJ_PTR dy, OBJ_PTR angle);
+extern OBJ_PTR FM_fill_and_stroke_oval(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx, OBJ_PTR dy, OBJ_PTR angle);
+extern OBJ_PTR FM_clip_oval(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx, OBJ_PTR dy, OBJ_PTR angle);
+extern OBJ_PTR FM_fill_rounded_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height, OBJ_PTR dx, OBJ_PTR dy);
+extern OBJ_PTR FM_stroke_rounded_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height, OBJ_PTR dx, OBJ_PTR dy);
+extern OBJ_PTR FM_fill_and_stroke_rounded_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height, OBJ_PTR dx, OBJ_PTR dy);
+extern OBJ_PTR FM_clip_rounded_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height, OBJ_PTR dx, OBJ_PTR dy);
+extern OBJ_PTR FM_fill_circle(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx);
+extern OBJ_PTR FM_stroke_circle(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx);
+extern OBJ_PTR FM_fill_and_stroke_circle(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx);
+extern OBJ_PTR FM_clip_circle(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx);
+extern OBJ_PTR FM_append_frame_to_path(OBJ_PTR fmkr);
+extern OBJ_PTR FM_fill_frame(OBJ_PTR fmkr);
+extern OBJ_PTR FM_stroke_frame(OBJ_PTR fmkr);
+extern OBJ_PTR FM_fill_and_stroke_frame(OBJ_PTR fmkr);
+extern OBJ_PTR FM_clip_to_frame(OBJ_PTR fmkr);
 
 /*======================================================================*/
 // pdftext.c
 void Init_Font_Dictionary(void);
-extern VALUE FM_register_font(VALUE fmkr, VALUE font_name);  // returns font number.
+extern OBJ_PTR FM_register_font(OBJ_PTR fmkr, OBJ_PTR font_name);  // returns font number.
 extern bool Used_Any_Fonts(void);
 extern void Clear_Fonts_In_Use_Flags(void);
 extern void Write_Font_Dictionaries(void);
 extern void Write_Font_Descriptors(void);
 extern void Write_Font_Widths(void);
-extern VALUE FM_marker_string_info(VALUE fmkr, VALUE font_number, VALUE string, VALUE scale);
-extern VALUE FM_private_show_marker(VALUE fmkr, VALUE integer_args, VALUE stroke_width, VALUE string,
-    VALUE x, VALUE y, VALUE x_vec, VALUE y_vec,
-    VALUE h_scale, VALUE v_scale, VALUE scale, VALUE it_angle, VALUE ascent_angle, VALUE angle,
-    VALUE fill_color, VALUE stroke_color);
+extern OBJ_PTR FM_marker_string_info(OBJ_PTR fmkr, OBJ_PTR font_number, OBJ_PTR string, OBJ_PTR scale);
+extern OBJ_PTR FM_private_show_marker(OBJ_PTR fmkr, OBJ_PTR integer_args, OBJ_PTR stroke_width, OBJ_PTR string,
+    OBJ_PTR x, OBJ_PTR y, OBJ_PTR x_vec, OBJ_PTR y_vec,
+    OBJ_PTR h_scale, OBJ_PTR v_scale, OBJ_PTR scale, OBJ_PTR it_angle, OBJ_PTR ascent_angle, OBJ_PTR angle,
+    OBJ_PTR fill_color, OBJ_PTR stroke_color);
 
 /*======================================================================*/
 // texout.c
-extern VALUE FM_rescale_text(VALUE fmkr, VALUE scaling);
+extern OBJ_PTR FM_rescale_text(OBJ_PTR fmkr, OBJ_PTR scaling);
 extern void c_show_rotated_text(FM *p, char *text, int frame_side, double shift, double fraction,
    double scale, double angle, int justification, int alignment);
-extern VALUE FM_show_rotated_text(VALUE fmkr, VALUE text, VALUE frame_side, VALUE shift,
-    VALUE fraction, VALUE scale, VALUE angle, VALUE justification, VALUE alignment);
+extern OBJ_PTR FM_show_rotated_text(OBJ_PTR fmkr, OBJ_PTR text, OBJ_PTR frame_side, OBJ_PTR shift,
+    OBJ_PTR fraction, OBJ_PTR scale, OBJ_PTR angle, OBJ_PTR justification, OBJ_PTR alignment);
 extern void c_show_rotated_label(FM *p, char *text, 
    double xloc, double yloc, double scale, double angle, int justification, int alignment);
-extern VALUE FM_show_rotated_label(VALUE fmkr, VALUE text,
-    VALUE xloc, VALUE yloc, VALUE scale, VALUE angle, VALUE justification, VALUE alignment);
-extern VALUE FM_check_label_clip(VALUE fmkr, VALUE xloc, VALUE yloc);
-extern void Open_tex(VALUE fmkr, char *filename, bool quiet_mode);
-extern void Close_tex(VALUE fmkr, bool quiet_mode);
-extern void Create_wrapper(VALUE fmkr, char *filename, bool quiet_mode);
+extern OBJ_PTR FM_show_rotated_label(OBJ_PTR fmkr, OBJ_PTR text,
+    OBJ_PTR xloc, OBJ_PTR yloc, OBJ_PTR scale, OBJ_PTR angle, OBJ_PTR justification, OBJ_PTR alignment);
+extern OBJ_PTR FM_check_label_clip(OBJ_PTR fmkr, OBJ_PTR xloc, OBJ_PTR yloc);
+extern void Open_tex(OBJ_PTR fmkr, char *filename, bool quiet_mode);
+extern void Close_tex(OBJ_PTR fmkr, bool quiet_mode);
+extern void Create_wrapper(OBJ_PTR fmkr, char *filename, bool quiet_mode);
 extern void Init_tex(void);
 extern void Rename_tex(char *oldname, char *newname);
-extern void private_make_portfolio(char *filename, VALUE fignums, VALUE fignames);
+extern void private_make_portfolio(char *filename, OBJ_PTR fignums, OBJ_PTR fignames);
 
 /*======================================================================*/
 
@@ -719,38 +718,6 @@ extern void private_make_portfolio(char *filename, VALUE fignums, VALUE fignames
 #ifndef SIGN
 #define SIGN(a)         ((a)<0 ? -1 : 1)
 #endif
-
-#define DBL_ATTR(attr) \
-static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return rb_float_new(p->attr); } \
-static VALUE FM_##attr##_set(VALUE fmkr, VALUE val) { \
-   FM *p = Get_FM(fmkr); VALUE v = rb_Float(val); p->attr = NUM2DBL(v); return val; }
-
-#define INT_ATTR(attr) \
-static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return INT2FIX(p->attr); } \
-static VALUE FM_##attr##_set(VALUE fmkr, VALUE val) { \
-   FM *p = Get_FM(fmkr); VALUE v = rb_Integer(val); p->attr = NUM2INT(v); return val; }
-
-#define VAL_ATTR(attr) \
-static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return p->attr; } \
-static VALUE FM_##attr##_set(VALUE fmkr, VALUE val) { \
-   FM *p = Get_FM(fmkr); p->attr = val; return val; }
-
-#define BOOL_ATTR(attr) \
-static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return (p->attr)? Qtrue : Qfalse; } \
-static VALUE FM_##attr##_set(VALUE fmkr, VALUE val) { \
-   FM *p = Get_FM(fmkr); p->attr = (val != Qfalse); return val; }
-
-#define RO_DBL_ATTR(attr) \
-static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return rb_float_new(p->attr); }
-
-#define RO_INT_ATTR(attr) \
-static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return INT2FIX(p->attr); }
-
-#define RO_VAL_ATTR(attr) \
-static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return p->attr; }
-
-#define RO_BOOL_ATTR(attr) \
-static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return (p->attr)? Qtrue : Qfalse; }
 
 #endif   /* __figures_H__ */
 

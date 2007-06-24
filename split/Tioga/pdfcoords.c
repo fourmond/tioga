@@ -96,7 +96,7 @@ static OBJ_PTR do_context_ensure(OBJ_PTR args)
    Context_Info *cp = (Context_Info *)args;
    fprintf(TF, "Q\n");
    *cp->p = cp->saved;
-   return Qnil; // what should we be returning here?
+   return OBJ_NIL; // what should we be returning here?
 }
 
 OBJ_PTR FM_private_context(OBJ_PTR fmkr, OBJ_PTR cmd)

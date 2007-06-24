@@ -373,7 +373,7 @@ OBJ_PTR FM_private_create_monochrome_image_data(OBJ_PTR fmkr, OBJ_PTR data,
    double **ary = Table_Data_for_Read(data, &num_cols, &num_rows);
    return c_private_create_monochrome_image_data(p, ary, num_cols, num_rows, 
       Number_to_int(first_row), Number_to_int(last_row), Number_to_int(first_column), Number_to_int(last_column),
-      Number_to_double(boundary), reverse != Qfalse);
+      Number_to_double(boundary), reverse != OBJ_FALSE);
 }
 
 static int c_private_show_image(
@@ -464,7 +464,7 @@ static OBJ_PTR private_show_image(int image_type, OBJ_PTR fmkr, OBJ_PTR llx, OBJ
    dest[3] = convert_figure_to_output_y(p,Number_to_double(lry));
    dest[4] = convert_figure_to_output_x(p,Number_to_double(ulx));
    dest[5] = convert_figure_to_output_y(p,Number_to_double(uly));
-   int obj_num = c_private_show_image(p, image_type, dest, (interpolate != Qfalse), (reversed == Qtrue), Number_to_int(w), Number_to_int(h), 
+   int obj_num = c_private_show_image(p, image_type, dest, (interpolate != OBJ_FALSE), (reversed == OBJ_TRUE), Number_to_int(w), Number_to_int(h), 
       (unsigned char *)String_Ptr(data), String_Len(data), mask_min, mask_max, high_val, lookup_str, lookup_len, Number_to_int(mask_obj_num));
    return Integer_New(obj_num);
 }
@@ -472,33 +472,33 @@ static OBJ_PTR private_show_image(int image_type, OBJ_PTR fmkr, OBJ_PTR llx, OBJ
 OBJ_PTR FM_private_show_rgb_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry,
     OBJ_PTR ulx, OBJ_PTR uly, OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_obj_num)
 {
-   return private_show_image(RGB_IMAGE, fmkr, llx, lly, lrx, lry, ulx, uly, interpolate, Qfalse, w, h, data, Qnil, Qnil, Qnil, Qnil, mask_obj_num);
+   return private_show_image(RGB_IMAGE, fmkr, llx, lly, lrx, lry, ulx, uly, interpolate, OBJ_FALSE, w, h, data, OBJ_NIL, OBJ_NIL, OBJ_NIL, OBJ_NIL, mask_obj_num);
 }
 
 OBJ_PTR FM_private_show_cmyk_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry,
     OBJ_PTR ulx, OBJ_PTR uly, OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_obj_num)
 {
-   return private_show_image(CMYK_IMAGE, fmkr, llx, lly, lrx, lry, ulx, uly, interpolate, Qfalse, w, h, data, Qnil, Qnil, Qnil, Qnil, mask_obj_num);
+   return private_show_image(CMYK_IMAGE, fmkr, llx, lly, lrx, lry, ulx, uly, interpolate, OBJ_FALSE, w, h, data, OBJ_NIL, OBJ_NIL, OBJ_NIL, OBJ_NIL, mask_obj_num);
 }
 
 OBJ_PTR FM_private_show_grayscale_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry,
     OBJ_PTR ulx, OBJ_PTR uly, OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_obj_num)
 {
-   return private_show_image(GRAY_IMAGE, fmkr, llx, lly, lrx, lry, ulx, uly, interpolate, Qfalse, w, h, data, Qnil, Qnil, Qnil, Qnil, mask_obj_num);
+   return private_show_image(GRAY_IMAGE, fmkr, llx, lly, lrx, lry, ulx, uly, interpolate, OBJ_FALSE, w, h, data, OBJ_NIL, OBJ_NIL, OBJ_NIL, OBJ_NIL, mask_obj_num);
 }
 
 OBJ_PTR FM_private_show_monochrome_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry,
     OBJ_PTR ulx, OBJ_PTR uly, OBJ_PTR interpolate, OBJ_PTR reversed, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_obj_num)
 {
    return private_show_image(MONO_IMAGE, fmkr, llx, lly, lrx, lry, ulx, uly, interpolate, reversed, 
-         w, h, data, Qnil, Qnil, Qnil, Qnil, mask_obj_num);
+         w, h, data, OBJ_NIL, OBJ_NIL, OBJ_NIL, OBJ_NIL, mask_obj_num);
 }
 
 OBJ_PTR FM_private_show_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry,
     OBJ_PTR ulx, OBJ_PTR uly, OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data,
     OBJ_PTR value_mask_min, OBJ_PTR value_mask_max, OBJ_PTR hival, OBJ_PTR lookup, OBJ_PTR mask_obj_num)
 {
-   return private_show_image(COLORMAP_IMAGE, fmkr, llx, lly, lrx, lry, ulx, uly, interpolate, Qfalse, w, h, data, 
+   return private_show_image(COLORMAP_IMAGE, fmkr, llx, lly, lrx, lry, ulx, uly, interpolate, OBJ_FALSE, w, h, data, 
       value_mask_min, value_mask_max, hival, lookup, mask_obj_num);
 }
 

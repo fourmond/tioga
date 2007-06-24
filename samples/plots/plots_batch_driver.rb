@@ -39,4 +39,4 @@ class MyPlots # add to the methods for MyPlots
    
 end
 
-FigureMaker.default.eval_function('run') # call run in 
+FigureMaker.default.eval_function('run')
