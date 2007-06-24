@@ -25,6 +25,46 @@
 #include "ruby.h"
 #include "intern.h"
 #include "generic.h"
+#include "figures.h"
+#include "pdfs.h"
+
+
+
+// We need to do some extra work to use 'ensure' around 'context'
+// which is necessary in case code does 'return' from the block being executed in the context
+// otherwise we won't get a chance to restore the state
+typedef struct {
+   OBJ_PTR fmkr;
+   FM *p;
+   FM saved;
+   OBJ_PTR cmd;
+} Context_Info;
+
+static OBJ_PTR do_context_body(OBJ_PTR args)
+{
+   Context_Info *cp = (Context_Info *)args; // nasty but it works
+   fprintf(TF, "q\n");
+   return do_cmd(cp->fmkr, cp->cmd);
+}
+
+static OBJ_PTR do_context_ensure(OBJ_PTR args)
+{
+   Context_Info *cp = (Context_Info *)args;
+   fprintf(TF, "Q\n");
+   *cp->p = cp->saved;
+   return OBJ_NIL; // what should we be returning here?
+}
+
+OBJ_PTR FM_private_context(OBJ_PTR fmkr, OBJ_PTR cmd)
+{
+   Context_Info c;
+   c.fmkr = fmkr;
+   c.cmd = cmd;
+   c.p = Get_FM(fmkr);
+   c.saved = *c.p;
+   return rb_ensure(do_context_body, (OBJ_PTR)&c, do_context_ensure, (OBJ_PTR)&c);
+}
+
 
 static OBJ_PTR rb_Integer_class, rb_Numeric_class;
 

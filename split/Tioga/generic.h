@@ -57,6 +57,7 @@ extern void Init_generic(void);
 //#define OBJ_FALSE Py_False
 
 
+extern OBJ_PTR FM_private_context(OBJ_PTR fmkr, OBJ_PTR cmd);
 
 
 extern OBJ_PTR Call_Function(OBJ_PTR fmkr, ID_PTR fn, OBJ_PTR arg);

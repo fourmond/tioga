@@ -436,7 +436,6 @@ extern void Recalc_Font_Hts(FM *p);
 extern OBJ_PTR FM_private_set_subframe(OBJ_PTR fmkr, OBJ_PTR left_margin, OBJ_PTR right_margin, OBJ_PTR top_margin, OBJ_PTR bottom_margin);
 extern void c_private_set_default_font_size(FM *p, double size);
 extern OBJ_PTR FM_private_set_default_font_size(OBJ_PTR fmkr, OBJ_PTR size); // size in points
-extern OBJ_PTR FM_private_context(OBJ_PTR fmkr, OBJ_PTR cmd);
 extern OBJ_PTR FM_doing_subplot(OBJ_PTR fmkr);
 extern OBJ_PTR FM_doing_subfigure(OBJ_PTR fmkr);
 extern OBJ_PTR FM_private_set_bounds(OBJ_PTR fmkr, OBJ_PTR left, OBJ_PTR right, OBJ_PTR top, OBJ_PTR bottom); /* in figure coords */

@@ -308,16 +308,6 @@ OBJ_PTR FM_private_make_portfolio(OBJ_PTR fmkr, OBJ_PTR name, OBJ_PTR fignums, O
 }
 
 
-
-
-
-
-
-
-
-///      TO BE REMOVED
-
-
 static void c_set_device_pagesize(FM *p, double width, double height) { // sizes in units of 1/720 inch
    p->page_left = 0;
    p->page_right = width;

@@ -727,14 +727,6 @@ OBJ_PTR FM_show_edge(OBJ_PTR fmkr, OBJ_PTR loc) {
 }
 
 
-
-
-
-
-
-
-///      TO BE REMOVED
-
 OBJ_PTR FM_no_title(OBJ_PTR fmkr)
 {
    FM *p = Get_FM(fmkr);

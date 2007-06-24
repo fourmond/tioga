@@ -26,7 +26,6 @@
 
 #include "flate.h"
 
-extern VALUE rb_Integer_class, rb_Numeric_class;
 extern ID save_dir_ID, model_number_ID, add_model_number_ID, quiet_mode_ID;
 extern ID tex_preview_documentclass_ID, tex_preview_preamble_ID, tex_preview_pagestyle_ID;
 extern ID tex_preview_left_margin_ID, tex_preview_right_margin_ID, tex_preview_top_margin_ID;

@@ -61,42 +61,6 @@ OBJ_PTR FM_private_set_subframe(OBJ_PTR fmkr, OBJ_PTR left_margin, OBJ_PTR right
 }
 
 
-
-// We need to do some extra work to use 'ensure' around 'context'
-// which is necessary in case code does 'return' from the block being executed in the context
-// otherwise we won't get a chance to restore the state
-typedef struct {
-   OBJ_PTR fmkr;
-   FM *p;
-   FM saved;
-   OBJ_PTR cmd;
-} Context_Info;
-
-static OBJ_PTR do_context_body(OBJ_PTR args)
-{
-   Context_Info *cp = (Context_Info *)args; // nasty but it works
-   fprintf(TF, "q\n");
-   return do_cmd(cp->fmkr, cp->cmd);
-}
-
-static OBJ_PTR do_context_ensure(OBJ_PTR args)
-{
-   Context_Info *cp = (Context_Info *)args;
-   fprintf(TF, "Q\n");
-   *cp->p = cp->saved;
-   return OBJ_NIL; // what should we be returning here?
-}
-
-OBJ_PTR FM_private_context(OBJ_PTR fmkr, OBJ_PTR cmd)
-{
-   Context_Info c;
-   c.fmkr = fmkr;
-   c.cmd = cmd;
-   c.p = Get_FM(fmkr);
-   c.saved = *c.p;
-   return rb_ensure(do_context_body, (OBJ_PTR)&c, do_context_ensure, (OBJ_PTR)&c);
-}
-
 static void c_set_bounds(FM *p, double left, double right, double top, double bottom)
 {
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling set_bounds");
@@ -485,19 +449,6 @@ OBJ_PTR FM_convert_output_to_figure_dy(OBJ_PTR fmkr, OBJ_PTR v)
 }
 
 
-
-
-
-
-
-
-
-
-
-
-///      TO BE REMOVED
-
-
 void c_private_set_default_font_size(FM *p, double size) {
     p->default_font_size = size;
     Recalc_Font_Hts(p);
@@ -508,10 +459,6 @@ OBJ_PTR FM_private_set_default_font_size(OBJ_PTR fmkr, OBJ_PTR size) {
    c_private_set_default_font_size(p, Number_to_double(size));
    return fmkr;
 }
-
-
-//???????? can the context stuff all be done in the interpreter now ?????????  
-//FM_private_context and friends
 
 
 OBJ_PTR FM_doing_subplot(OBJ_PTR fmkr)
