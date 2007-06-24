@@ -306,8 +306,7 @@ static char *Create_Label(double val, int scale, int prec, bool log_vals, bool u
 }
 
 char *Get_String(OBJ_PTR ary, int index) {
-   OBJ_PTR strobj = Array_Entry(ary,index);
-   return StringValuePtr(strobj);
+   return String_Ptr(Array_Entry(ary,index));
 }
 
 #define MAX_FIXDIG_POS  6
