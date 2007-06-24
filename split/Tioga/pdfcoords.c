@@ -61,18 +61,6 @@ OBJ_PTR FM_private_set_subframe(OBJ_PTR fmkr, OBJ_PTR left_margin, OBJ_PTR right
 }
 
 
-void c_private_set_default_font_size(FM *p, double size) {
-    p->default_font_size = size;
-    Recalc_Font_Hts(p);
-}
-
-OBJ_PTR FM_private_set_default_font_size(OBJ_PTR fmkr, OBJ_PTR size) {
-   FM *p = Get_FM(fmkr);
-   c_private_set_default_font_size(p, Number_to_double(size));
-   return fmkr;
-}
-
-
 
 // We need to do some extra work to use 'ensure' around 'context'
 // which is necessary in case code does 'return' from the block being executed in the context
@@ -107,20 +95,6 @@ OBJ_PTR FM_private_context(OBJ_PTR fmkr, OBJ_PTR cmd)
    c.p = Get_FM(fmkr);
    c.saved = *c.p;
    return rb_ensure(do_context_body, (OBJ_PTR)&c, do_context_ensure, (OBJ_PTR)&c);
-}
-
-OBJ_PTR FM_doing_subplot(OBJ_PTR fmkr)
-{
-   FM *p = Get_FM(fmkr);
-   p->in_subplot = true;
-   return fmkr;
-}
-
-OBJ_PTR FM_doing_subfigure(OBJ_PTR fmkr)
-{
-   FM *p = Get_FM(fmkr);
-   p->root_figure = false;
-   return fmkr;
 }
 
 static void c_set_bounds(FM *p, double left, double right, double top, double bottom)
@@ -508,5 +482,49 @@ OBJ_PTR FM_convert_output_to_figure_dy(OBJ_PTR fmkr, OBJ_PTR v)
 {
    FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    return Float_New(convert_output_to_figure_dy(p,val));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+///      TO BE REMOVED
+
+
+void c_private_set_default_font_size(FM *p, double size) {
+    p->default_font_size = size;
+    Recalc_Font_Hts(p);
+}
+
+OBJ_PTR FM_private_set_default_font_size(OBJ_PTR fmkr, OBJ_PTR size) {
+   FM *p = Get_FM(fmkr);
+   c_private_set_default_font_size(p, Number_to_double(size));
+   return fmkr;
+}
+
+
+//???????? can the context stuff all be done in the interpreter now ?????????  
+//FM_private_context and friends
+
+
+OBJ_PTR FM_doing_subplot(OBJ_PTR fmkr)
+{
+   FM *p = Get_FM(fmkr);
+   p->in_subplot = true;
+   return fmkr;
+}
+
+OBJ_PTR FM_doing_subfigure(OBJ_PTR fmkr)
+{
+   FM *p = Get_FM(fmkr);
+   p->root_figure = false;
+   return fmkr;
 }
 

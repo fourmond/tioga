@@ -302,9 +302,8 @@ typedef struct {
     /* Whether to complain about out non ok numbers in paths */
     int croak_on_nonok_numbers;
     
-/* PRIVATE -- not to be included in the Ruby interface */
+/* PRIVATE -- not to be included in the user interface */
     double clip_left, clip_right, clip_top, clip_bottom; // in output coords
-    OBJ_PTR fm;
 } FM;
 
 typedef FM Figure_Maker;
@@ -318,10 +317,6 @@ extern char *data_dir;
 
 /*======================================================================*/
 // axes.c
-extern void figure_moveto(FM *p, double x, double y); // figure coords
-extern void figure_lineto(FM *p, double x, double y); // figure coords
-extern void figure_join(FM *p, double x0, double y0, double x1, double y1); // figure coords
-extern void figure_join_and_stroke(FM *p, double x0, double y0, double x1, double y1); // figure coords
 extern char *Get_String(OBJ_PTR ary, int index);
 extern OBJ_PTR FM_show_axis(OBJ_PTR fmkr, OBJ_PTR loc);
 extern OBJ_PTR FM_show_edge(OBJ_PTR fmkr, OBJ_PTR loc);

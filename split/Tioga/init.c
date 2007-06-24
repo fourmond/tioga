@@ -85,6 +85,239 @@ void Init_IDs(void)
     yaxis_tick_labels_ID = ID_Get("@yaxis_tick_labels");
 }
 
+OBJ_PTR do_cmd(OBJ_PTR fmkr, OBJ_PTR cmd) { return Call_Function(fmkr, do_cmd_ID, cmd); }
+
+static void Type_Error(OBJ_PTR obj, ID name_ID, char *expected)
+{
+   char *name = ID_Name(name_ID);
+   while (name[0] == '@') name++;
+   RAISE_ERROR_ss("Require %s OBJ_PTR for '%s'", expected, name);
+}
+
+bool Get_bool(OBJ_PTR obj, ID name_ID) {
+   OBJ_PTR v = Obj_Attr_Get(obj, name_ID);
+   if (v != OBJ_FALSE && v != OBJ_TRUE && v != OBJ_NIL)
+      Type_Error(v, name_ID, "true or false");
+   return v == OBJ_TRUE;
+}
+
+int Get_int(OBJ_PTR obj, ID name_ID) {
+   OBJ_PTR v = Obj_Attr_Get(obj, name_ID);
+   if (!Is_Kind_of_Integer(v)) Type_Error(v, name_ID, "Integer");
+   return Number_to_int(v);
+}
+
+double Get_double(OBJ_PTR obj, ID name_ID) {
+   OBJ_PTR v = Obj_Attr_Get(obj, name_ID);
+   if (!Is_Kind_of_Number(v)) Type_Error(v, name_ID, "Numeric");
+   return Number_to_double(v);
+}
+
+char *Get_tex_preview_paper_width(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_paper_width_ID);
+   if (v == OBJ_NIL) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_preview_paper_height(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_paper_height_ID);
+   if (v == OBJ_NIL) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_preview_hoffset(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_hoffset_ID);
+   if (v == OBJ_NIL) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_preview_voffset(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_voffset_ID);
+   if (v == OBJ_NIL) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_preview_figure_width(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_figure_width_ID);
+   if (v == OBJ_NIL) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_preview_figure_height(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_figure_height_ID);
+   if (v == OBJ_NIL) return NULL;
+   return StringValuePtr(v);
+}
+
+
+char *Get_tex_fontsize(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_fontsize_ID);
+   if (v == OBJ_NIL) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_fontfamily(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_fontfamily_ID);
+   if (v == OBJ_NIL) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_fontseries(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_fontseries_ID);
+   if (v == OBJ_NIL) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_fontshape(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_fontshape_ID);
+   if (v == OBJ_NIL) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_preview_minwhitespace(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_minwhitespace_ID);
+   if (v == OBJ_NIL) return NULL;
+   return StringValuePtr(v);
+}
+
+bool Get_tex_preview_fullpage(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_fullpage_ID);
+   return v != OBJ_FALSE && v != OBJ_NIL;
+}
+
+/* gets the generated preamble */
+char *Get_tex_preview_generated_preamble(OBJ_PTR fmkr) {
+  /* it is a class constant... */
+  OBJ_PTR v = TEX_PREAMBLE(fmkr);
+  if (v == OBJ_NIL) return NULL;
+  return StringValueCStr(v);
+}
+
+double Get_tex_xoffset(OBJ_PTR fmkr) { return Get_double(fmkr, tex_xoffset_ID); }
+double Get_tex_yoffset(OBJ_PTR fmkr) { return Get_double(fmkr, tex_yoffset_ID); }
+
+static char *Get_save_dir(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, save_dir_ID);
+   if (v == OBJ_NIL) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_preview_documentclass(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_documentclass_ID);
+   if (v == OBJ_NIL) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_preamble(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preamble_ID);
+   if (v == OBJ_NIL) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_xaxis_numeric_label_tex(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, xaxis_numeric_label_tex_ID);
+   if (v == OBJ_NIL) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_yaxis_numeric_label_tex(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, yaxis_numeric_label_tex_ID);
+   if (v == OBJ_NIL) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_preview_pagestyle(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_pagestyle_ID);
+   if (v == OBJ_NIL) return NULL;
+   return StringValuePtr(v);
+}
+
+char *Get_tex_preview_tiogafigure_command(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_tiogafigure_command_ID);
+   if (v == OBJ_NIL) return NULL;
+   return StringValuePtr(v);
+}
+
+static bool Get_quiet_mode(OBJ_PTR fmkr) {
+   OBJ_PTR v = Obj_Attr_Get(fmkr, quiet_mode_ID);
+   return v != OBJ_FALSE && v != OBJ_NIL;
+}
+
+
+static void Make_Save_Fname(OBJ_PTR fmkr, char *full_name, char *f_name,
+   bool with_save_dir, bool with_pdf_extension) {
+   int i, j, k, len, mod_len, mod_num, did_mod_num = false;
+   char c, *fmt, model[STRLEN], *save=NULL;
+   if (with_save_dir) save = Get_save_dir(fmkr);
+   if (with_save_dir && save != NULL && strlen(save) > 0) { 
+      sprintf(full_name, "%s/", save); j = strlen(full_name); }
+   else j = 0;
+   if (f_name == NULL) f_name = "plot";
+   len = strlen(f_name);
+   for (i=0; i < len; i++) {
+      c = f_name[i];
+      full_name[j++] = c;
+      }
+   full_name[j] = '\0';
+   char *dot = strrchr(full_name,'.');
+   if (dot == NULL || strcmp(dot+1,"pdf") != 0) { /* add pdf extension */
+        full_name[j] = '\0';
+        if (!with_pdf_extension) return;
+        strcpy(full_name+j, ".pdf");
+     }
+}
+   
+OBJ_PTR FM_get_save_filename(OBJ_PTR fmkr, OBJ_PTR name) {
+   char full_name[STRLEN];
+   Make_Save_Fname(fmkr, full_name, (name == OBJ_NIL)? NULL : StringValuePtr(name), false, false);
+   return String_From_Cstring(full_name);
+}
+   
+OBJ_PTR FM_private_make(OBJ_PTR fmkr, OBJ_PTR name, OBJ_PTR cmd) {
+   char full_name[STRLEN], mod_num_name[STRLEN];
+   FM *p = Get_FM(fmkr);
+   FM saved = *p;
+   OBJ_PTR result;
+   bool quiet = Get_quiet_mode(fmkr);
+   if (!Get_initialized()) {
+      Init_pdf();
+      Init_tex();
+      Set_initialized();
+   }
+   Make_Save_Fname(fmkr, full_name, (name == OBJ_NIL)? NULL : StringValuePtr(name), true, true);
+   Open_pdf(fmkr, full_name, quiet);
+   Open_tex(fmkr, full_name, quiet);
+   Write_gsave();
+   p->root_figure = true;
+   p->in_subplot = false;
+   result = Call_Function(fmkr, make_page_ID, cmd);
+   Write_grestore();
+   if (result == OBJ_FALSE) quiet = true;
+   Close_pdf(fmkr, quiet);
+   Close_tex(fmkr, quiet);
+   Create_wrapper(fmkr, full_name, quiet);   
+   *p = saved;
+   return result;
+}
+   
+OBJ_PTR FM_private_make_portfolio(OBJ_PTR fmkr, OBJ_PTR name, OBJ_PTR fignums, OBJ_PTR fignames) {
+   char full_name[STRLEN];
+   Make_Save_Fname(fmkr, full_name, (name == OBJ_NIL)? NULL : StringValuePtr(name), true, false);
+   private_make_portfolio(full_name, fignums, fignames);
+   return String_From_Cstring(full_name);
+}
+
+
+
+
+
+
+
+
+
+///      TO BE REMOVED
+
+
 static void c_set_device_pagesize(FM *p, double width, double height) { // sizes in units of 1/720 inch
    p->page_left = 0;
    p->page_right = width;
@@ -302,165 +535,6 @@ void Initialize_Figure(OBJ_PTR fmkr) {
    p->croak_on_nonok_numbers = 1;
 }
 
-OBJ_PTR do_cmd(OBJ_PTR fmkr, OBJ_PTR cmd) { return Call_Function(fmkr, do_cmd_ID, cmd); }
-
-static void Type_Error(OBJ_PTR obj, ID name_ID, char *expected)
-{
-   char *name = ID_Name(name_ID);
-   while (name[0] == '@') name++;
-   RAISE_ERROR_ss("Require %s OBJ_PTR for '%s'", expected, name);
-}
-
-bool Get_bool(OBJ_PTR obj, ID name_ID) {
-   OBJ_PTR v = Obj_Attr_Get(obj, name_ID);
-   if (v != OBJ_FALSE && v != OBJ_TRUE && v != OBJ_NIL)
-      Type_Error(v, name_ID, "true or false");
-   return v == OBJ_TRUE;
-}
-
-int Get_int(OBJ_PTR obj, ID name_ID) {
-   OBJ_PTR v = Obj_Attr_Get(obj, name_ID);
-   if (!Is_Kind_of_Integer(v)) Type_Error(v, name_ID, "Integer");
-   return Number_to_int(v);
-}
-
-double Get_double(OBJ_PTR obj, ID name_ID) {
-   OBJ_PTR v = Obj_Attr_Get(obj, name_ID);
-   if (!Is_Kind_of_Number(v)) Type_Error(v, name_ID, "Numeric");
-   return Number_to_double(v);
-}
-
-
-char *Get_tex_preview_paper_width(OBJ_PTR fmkr) {
-   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_paper_width_ID);
-   if (v == OBJ_NIL) return NULL;
-   return StringValuePtr(v);
-}
-
-char *Get_tex_preview_paper_height(OBJ_PTR fmkr) {
-   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_paper_height_ID);
-   if (v == OBJ_NIL) return NULL;
-   return StringValuePtr(v);
-}
-
-char *Get_tex_preview_hoffset(OBJ_PTR fmkr) {
-   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_hoffset_ID);
-   if (v == OBJ_NIL) return NULL;
-   return StringValuePtr(v);
-}
-
-char *Get_tex_preview_voffset(OBJ_PTR fmkr) {
-   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_voffset_ID);
-   if (v == OBJ_NIL) return NULL;
-   return StringValuePtr(v);
-}
-
-char *Get_tex_preview_figure_width(OBJ_PTR fmkr) {
-   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_figure_width_ID);
-   if (v == OBJ_NIL) return NULL;
-   return StringValuePtr(v);
-}
-
-char *Get_tex_preview_figure_height(OBJ_PTR fmkr) {
-   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_figure_height_ID);
-   if (v == OBJ_NIL) return NULL;
-   return StringValuePtr(v);
-}
-
-
-char *Get_tex_fontsize(OBJ_PTR fmkr) {
-   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_fontsize_ID);
-   if (v == OBJ_NIL) return NULL;
-   return StringValuePtr(v);
-}
-
-char *Get_tex_fontfamily(OBJ_PTR fmkr) {
-   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_fontfamily_ID);
-   if (v == OBJ_NIL) return NULL;
-   return StringValuePtr(v);
-}
-
-char *Get_tex_fontseries(OBJ_PTR fmkr) {
-   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_fontseries_ID);
-   if (v == OBJ_NIL) return NULL;
-   return StringValuePtr(v);
-}
-
-char *Get_tex_fontshape(OBJ_PTR fmkr) {
-   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_fontshape_ID);
-   if (v == OBJ_NIL) return NULL;
-   return StringValuePtr(v);
-}
-
-char *Get_tex_preview_minwhitespace(OBJ_PTR fmkr) {
-   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_minwhitespace_ID);
-   if (v == OBJ_NIL) return NULL;
-   return StringValuePtr(v);
-}
-
-bool Get_tex_preview_fullpage(OBJ_PTR fmkr) {
-   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_fullpage_ID);
-   return v != OBJ_FALSE && v != OBJ_NIL;
-}
-
-/* gets the generated preamble */
-char *Get_tex_preview_generated_preamble(OBJ_PTR fmkr) {
-  /* it is a class constant... */
-  OBJ_PTR v = TEX_PREAMBLE(fmkr);
-  if (v == OBJ_NIL) return NULL;
-  return StringValueCStr(v);
-}
-
-double Get_tex_xoffset(OBJ_PTR fmkr) { return Get_double(fmkr, tex_xoffset_ID); }
-double Get_tex_yoffset(OBJ_PTR fmkr) { return Get_double(fmkr, tex_yoffset_ID); }
-
-static char *Get_save_dir(OBJ_PTR fmkr) {
-   OBJ_PTR v = Obj_Attr_Get(fmkr, save_dir_ID);
-   if (v == OBJ_NIL) return NULL;
-   return StringValuePtr(v);
-}
-
-char *Get_tex_preview_documentclass(OBJ_PTR fmkr) {
-   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_documentclass_ID);
-   if (v == OBJ_NIL) return NULL;
-   return StringValuePtr(v);
-}
-
-char *Get_tex_preamble(OBJ_PTR fmkr) {
-   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preamble_ID);
-   if (v == OBJ_NIL) return NULL;
-   return StringValuePtr(v);
-}
-
-char *Get_xaxis_numeric_label_tex(OBJ_PTR fmkr) {
-   OBJ_PTR v = Obj_Attr_Get(fmkr, xaxis_numeric_label_tex_ID);
-   if (v == OBJ_NIL) return NULL;
-   return StringValuePtr(v);
-}
-
-char *Get_yaxis_numeric_label_tex(OBJ_PTR fmkr) {
-   OBJ_PTR v = Obj_Attr_Get(fmkr, yaxis_numeric_label_tex_ID);
-   if (v == OBJ_NIL) return NULL;
-   return StringValuePtr(v);
-}
-
-char *Get_tex_preview_pagestyle(OBJ_PTR fmkr) {
-   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_pagestyle_ID);
-   if (v == OBJ_NIL) return NULL;
-   return StringValuePtr(v);
-}
-
-char *Get_tex_preview_tiogafigure_command(OBJ_PTR fmkr) {
-   OBJ_PTR v = Obj_Attr_Get(fmkr, tex_preview_tiogafigure_command_ID);
-   if (v == OBJ_NIL) return NULL;
-   return StringValuePtr(v);
-}
-
-static bool Get_quiet_mode(OBJ_PTR fmkr) {
-   OBJ_PTR v = Obj_Attr_Get(fmkr, quiet_mode_ID);
-   return v != OBJ_FALSE && v != OBJ_NIL;
-}
-
 OBJ_PTR Get_line_type(OBJ_PTR fmkr) { return Obj_Attr_Get(fmkr, line_type_ID); }
 void Set_line_type(OBJ_PTR fmkr, OBJ_PTR v) { Obj_Attr_Set(fmkr, line_type_ID, v); }
 
@@ -471,67 +545,3 @@ OBJ_PTR Get_xaxis_tick_labels(OBJ_PTR fmkr) { return Obj_Attr_Get(fmkr, xaxis_ti
 OBJ_PTR Get_yaxis_locations_for_major_ticks(OBJ_PTR fmkr) { return Obj_Attr_Get(fmkr, yaxis_locations_for_major_ticks_ID); }
 OBJ_PTR Get_yaxis_locations_for_minor_ticks(OBJ_PTR fmkr) { return Obj_Attr_Get(fmkr, yaxis_locations_for_minor_ticks_ID); };
 OBJ_PTR Get_yaxis_tick_labels(OBJ_PTR fmkr) { return Obj_Attr_Get(fmkr, yaxis_tick_labels_ID); }
-
-static void Make_Save_Fname(OBJ_PTR fmkr, char *full_name, char *f_name,
-   bool with_save_dir, bool with_pdf_extension) {
-   int i, j, k, len, mod_len, mod_num, did_mod_num = false;
-   char c, *fmt, model[STRLEN], *save=NULL;
-   if (with_save_dir) save = Get_save_dir(fmkr);
-   if (with_save_dir && save != NULL && strlen(save) > 0) { 
-      sprintf(full_name, "%s/", save); j = strlen(full_name); }
-   else j = 0;
-   if (f_name == NULL) f_name = "plot";
-   len = strlen(f_name);
-   for (i=0; i < len; i++) {
-      c = f_name[i];
-      full_name[j++] = c;
-      }
-   full_name[j] = '\0';
-   char *dot = strrchr(full_name,'.');
-   if (dot == NULL || strcmp(dot+1,"pdf") != 0) { /* add pdf extension */
-        full_name[j] = '\0';
-        if (!with_pdf_extension) return;
-        strcpy(full_name+j, ".pdf");
-     }
-}
-   
-OBJ_PTR FM_get_save_filename(OBJ_PTR fmkr, OBJ_PTR name) {
-   char full_name[STRLEN];
-   Make_Save_Fname(fmkr, full_name, (name == OBJ_NIL)? NULL : StringValuePtr(name), false, false);
-   return String_From_Cstring(full_name);
-}
-   
-OBJ_PTR FM_private_make(OBJ_PTR fmkr, OBJ_PTR name, OBJ_PTR cmd) {
-   char full_name[STRLEN], mod_num_name[STRLEN];
-   FM *p = Get_FM(fmkr);
-   FM saved = *p;
-   OBJ_PTR result;
-   bool quiet = Get_quiet_mode(fmkr);
-   if (!Get_initialized()) {
-      Init_pdf();
-      Init_tex();
-      Set_initialized();
-   }
-   Make_Save_Fname(fmkr, full_name, (name == OBJ_NIL)? NULL : StringValuePtr(name), true, true);
-   Open_pdf(fmkr, full_name, quiet);
-   Open_tex(fmkr, full_name, quiet);
-   Write_gsave();
-   p->root_figure = true;
-   p->in_subplot = false;
-   result = Call_Function(fmkr, make_page_ID, cmd);
-   Write_grestore();
-   if (result == OBJ_FALSE) quiet = true;
-   Close_pdf(fmkr, quiet);
-   Close_tex(fmkr, quiet);
-   Create_wrapper(fmkr, full_name, quiet);   
-   *p = saved;
-   return result;
-}
-   
-OBJ_PTR FM_private_make_portfolio(OBJ_PTR fmkr, OBJ_PTR name, OBJ_PTR fignums, OBJ_PTR fignames) {
-   char full_name[STRLEN];
-   Make_Save_Fname(fmkr, full_name, (name == OBJ_NIL)? NULL : StringValuePtr(name), true, false);
-   private_make_portfolio(full_name, fignums, fignames);
-   return String_From_Cstring(full_name);
-}
-

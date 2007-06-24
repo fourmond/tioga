@@ -73,8 +73,7 @@ char *data_dir = NULL;
 OBJ_PTR cFM; /* the Tioga/FigureMaker class object */
 
 
-static void FM_mark(FM *p) { /* all of the OBJ_PTRs in the FM struct should be marked */
-   rb_gc_mark(p->fm);
+static void FM_mark(FM *p) { /* any OBJ_PTRs in the FM struct must be marked */
 }
 
 static void FM_free(FM *p) {
@@ -85,7 +84,6 @@ static OBJ_PTR FM_alloc(OBJ_PTR klass) {
    FM *p;
    OBJ_PTR ary = Data_Make_Struct(klass, FM, FM_mark, FM_free, p);
    Initialize_Figure(ary);
-   p->fm = ary;
    return ary;
 }
 

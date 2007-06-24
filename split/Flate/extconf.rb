@@ -1,4 +1,4 @@
-# Dtable installation file
+# Flate installation file
 require 'mkmf'
 
 unless have_header("zlib.h") and have_library("z", "compress", "zlib.h")

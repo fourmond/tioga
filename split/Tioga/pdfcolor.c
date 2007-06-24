@@ -485,6 +485,19 @@ OBJ_PTR FM_rgb_to_hls(OBJ_PTR fmkr, OBJ_PTR rgb_vec)
 }
 
 
+
+
+
+
+
+
+
+
+///      TO BE REMOVED
+
+
+
+
 static void c_title_color_set(FM *p, double r, double g, double b)
 {
    p->title_color_R = r;
