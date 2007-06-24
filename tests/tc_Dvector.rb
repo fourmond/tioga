@@ -337,6 +337,10 @@ class TestDvector < Test::Unit::TestCase
         assert_equal(Dvector[44, 55], a.replace(Dvector[44, 55]))
         a = Dvector[11]
         assert_equal(Dvector[44, 55], a.replace([44, 55]))
+        a = Dvector[11, 12]
+        assert_equal(Dvector[44, 55], a.replace([44, 55]))
+        a = Dvector.new(0)
+        assert_equal(Dvector[44, 55], a.replace([44, 55]))
     end
     
     def test_push

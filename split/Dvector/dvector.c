@@ -2103,7 +2103,7 @@ VALUE dvector_replace(VALUE dest, VALUE orig) {
    org = Get_Dvector(orig);
    d = Get_Dvector(dest);
    if (d->ptr) {
-      if (d->capa >= org->len && d->shared == Qnil) {
+      if (0 && d->capa >= org->len && d->shared == Qnil) {
          d->len = org->len;
          MEMCPY(d->ptr, org->ptr, double, d->len);
          return dest;
