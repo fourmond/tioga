@@ -177,4 +177,16 @@ extern void REALLOC_long(long **ptr, long new_len);
 extern void REALLOC_double(double **ptr, long new_len);
 
 
+// zlib compression
+
+extern int do_flate_compress(unsigned char *new_ptr, unsigned long *new_len_ptr, unsigned char *ptr, long len);
+// returns FLATE_OK if all okay.
+// source is given by ptr and is len bytes in length.
+// new_ptr is destination buffer of size *new_len_ptr.  
+// NOTE: the destination buffer for flate_compress should be LARGER than the source buffer to be safe.
+// The minimal extra is 0.1% larger than the source plus 12 bytes.
+// My rule is to use (len * 11)/10 + 100 just to be sure.
+
+#define FLATE_OK              0
+
 #endif   /* __generic_H__ */

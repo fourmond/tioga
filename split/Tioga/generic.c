@@ -27,6 +27,7 @@
 #include "generic.h"
 #include "figures.h"
 #include "pdfs.h"
+#include "flate.h"
 
 
 static OBJ_PTR rb_Integer_class, rb_Numeric_class;
@@ -183,4 +184,9 @@ OBJ_PTR Integer_Vector_New(long len, long *vals) {
    for (i=0; i<len; i++) rb_ary_store(ar,i,LONG2NUM(vals[i]));
    return ar;
 }
+
+
+
+int do_flate_compress(unsigned char *new_ptr, unsigned long *new_len_ptr, unsigned char *ptr, long len) {
+   return flate_compress(new_ptr, new_len_ptr, ptr, len); }
 

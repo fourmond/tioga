@@ -186,7 +186,7 @@ void Write_Sampled(Sampled_Info *xo)
       fprintf(OF, "\t/Mask [%i %i]\n", xo->value_mask_min, xo->value_mask_max);
    new_len = (xo->length * 11)/10 + 100;
    buffer = ALLOC_N_unsigned_char(new_len);
-   if (flate_compress(buffer, &new_len, xo->image_data, xo->length) != FLATE_OK) {
+   if (do_flate_compress(buffer, &new_len, xo->image_data, xo->length) != FLATE_OK) {
       free(buffer);
       RAISE_ERROR("Error compressing image data");
    }

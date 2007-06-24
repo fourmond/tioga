@@ -233,7 +233,7 @@ static void Write_Stream(void)
    fread(buffer, 1, len, TF);
    fclose(TF);
    if (FLATE_ENCODE) {
-      if (flate_compress(dest_buffer, &new_len, buffer, len) != FLATE_OK) {
+      if (do_flate_compress(dest_buffer, &new_len, buffer, len) != FLATE_OK) {
          free(buffer); free(dest_buffer);
          RAISE_ERROR("Error compressing PDF stream data");
       }
