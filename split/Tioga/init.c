@@ -314,7 +314,7 @@ OBJ_PTR c_private_make(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR cmd) {
       Set_initialized();
    }
    Make_Save_Fname(fmkr, full_name, (name == OBJ_NIL)? NULL : String_Ptr(name), true, true);
-   Open_pdf(fmkr, full_name, quiet);
+   Open_pdf(fmkr, p, full_name, quiet);
    Open_tex(fmkr, full_name, quiet);
    Write_gsave();
    p->root_figure = true;
@@ -322,7 +322,7 @@ OBJ_PTR c_private_make(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR cmd) {
    result = Call_Function(fmkr, make_page_ID, cmd);
    Write_grestore();
    if (result == OBJ_FALSE) quiet = true;
-   Close_pdf(fmkr, quiet);
+   Close_pdf(fmkr, p, quiet);
    Close_tex(fmkr, quiet);
    Create_wrapper(fmkr, full_name, quiet);   
    *p = saved;

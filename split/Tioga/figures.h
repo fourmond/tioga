@@ -503,12 +503,12 @@ extern OBJ_PTR c_private_set_bounds(OBJ_PTR fmkr, FM *p,
 // pdffile.c
 extern void Init_pdf(void);
 extern void Record_Object_Offset(int obj_number);
-extern void Open_pdf(OBJ_PTR fmkr, char *filename, bool quiet_mode);
+extern void Open_pdf(OBJ_PTR fmkr, FM *p, char *filename, bool quiet_mode);
 extern void Start_Axis_Standard_State(OBJ_PTR fmkr, FM *p, double r, double g, double b, double line_width);
 extern void End_Axis_Standard_State(void);
 extern void Write_gsave(void);
 extern void Write_grestore(void);
-extern void Close_pdf(OBJ_PTR fmkr, bool quiet_mode);
+extern void Close_pdf(OBJ_PTR fmkr, FM *p, bool quiet_mode);
 extern void Rename_pdf(char *oldname, char *newname);
 
 extern OBJ_PTR c_pdf_gsave(OBJ_PTR fmkr, FM *p);

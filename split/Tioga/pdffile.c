@@ -137,9 +137,7 @@ static void Get_pdf_name(char *ofile, char *filename, int maxlen)
    strcat(ofile, "_figure.pdf");
 }
 
-void Open_pdf(OBJ_PTR fmkr, char *filename, bool quiet_mode)
-{
-   FM *p = Get_FM(fmkr);
+void Open_pdf(OBJ_PTR fmkr, FM *p, char *filename, bool quiet_mode) {
    int i;
    if (writing_file) RAISE_ERROR("Sorry: cannot start a new output file until finish current one.");
    Clear_Fonts_In_Use_Flags();
@@ -244,9 +242,8 @@ static void Write_Stream(void)
    free(buffer); free(dest_buffer);
 }
 
-void Close_pdf(OBJ_PTR fmkr, bool quiet_mode)
+void Close_pdf(OBJ_PTR fmkr, FM *p, bool quiet_mode)
 {
-   FM *p = Get_FM(fmkr);
    int i;
    double llx, lly, urx, ury, xoff, yoff;
    if (!writing_file) RAISE_ERROR("Sorry: cannot End_Output if not writing file.");
