@@ -25,6 +25,7 @@
 
 #include "figures.h"
 #include "pdfs.h"
+#include "wrappers.h"
 #include "dvector.h"
 #include "dtable.h"
 #include "flate.h"
@@ -249,7 +250,7 @@ FM *Get_FM(OBJ_PTR fmkr) {
 
 
 bool Get_initialized() {
-   OBJ_PTR v = rb_cvar_get(cFM, initialized_ID);
+   OBJ_PTR v = rb_cv_get(cFM, "@@initialized");
    return v != OBJ_FALSE && v != OBJ_NIL;
 }
 

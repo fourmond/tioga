@@ -27,19 +27,12 @@ static FILE *fp; // for the TeX file
 
 /* TeX text */
 
-static void c_text_scale_set(FM *p, double scale)
-{
-   double factor = scale / p->default_text_scale;
-   if (factor <= 0) RAISE_ERROR("Sorry: text scaling must be positive");
-   p->default_text_height_dx *= factor;
-   p->default_text_height_dy *= factor;
+OBJ_PTR c_rescale_text(OBJ_PTR fmkr, FM *p, double scaling_factor) {
+   double scale = scaling_factor * p->default_text_scale;
+   if (scaling_factor <= 0) RAISE_ERROR("Sorry: text scaling must be positive");
+   p->default_text_height_dx *= scaling_factor;
+   p->default_text_height_dy *= scaling_factor;
    p->default_text_scale = scale;
-}
-
-OBJ_PTR FM_rescale_text(OBJ_PTR fmkr, OBJ_PTR scaling_factor) // updates default text heights too
-{
-   FM *p = Get_FM(fmkr);
-   c_text_scale_set(p, Number_to_double(scaling_factor) * p->default_text_scale);
    return fmkr;
 }
 
@@ -130,44 +123,24 @@ static void Convert_Frame_Text_Position_To_Output_Location(FM *p, int frame_side
    }
    *xp = p->page_left + page_x; *yp = p->page_bottom + page_y;
 }
-
-void c_show_rotated_text(FM *p, char *text, int frame_side, double shift, double fraction,
-   double scale, double angle, int justification, int alignment)
-{
+       
+OBJ_PTR c_show_rotated_text(OBJ_PTR fmkr, FM *p, char *text, int frame_side, double shift, double fraction,
+   double scale, double angle, int justification, int alignment) {
    double x, y, base_angle, ft_ht = p->default_text_scale * scale * p->default_font_size;
    Convert_Frame_Text_Position_To_Output_Location(p, frame_side, shift*ft_ht*ENLARGE, fraction, &x, &y, &base_angle, text);
    tex_show_rotated_text(p, text, x, y, scale, angle + base_angle, justification, alignment);
-}
-   
-OBJ_PTR FM_show_rotated_text(OBJ_PTR fmkr, OBJ_PTR text, OBJ_PTR frame_side, OBJ_PTR shift,
-   OBJ_PTR fraction, OBJ_PTR scale, OBJ_PTR angle, OBJ_PTR justification, OBJ_PTR alignment)
-{
-   FM *p = Get_FM(fmkr);
-   c_show_rotated_text(p, String_Ptr(text), Number_to_int(frame_side), Number_to_double(shift),
-      Number_to_double(fraction), Number_to_double(scale), Number_to_double(angle), Number_to_int(justification), Number_to_int(alignment));
-   return fmkr;
-}
-         
-void c_show_rotated_label(FM *p, char *text, 
-   double xloc, double yloc, double scale, double angle, int justification, int alignment)
-{
-   tex_show_rotated_text(p, text, convert_figure_to_output_x(p, xloc), convert_figure_to_output_y(p, yloc),
-      scale, angle, justification, alignment);
-}
-   
-OBJ_PTR FM_show_rotated_label(OBJ_PTR fmkr, OBJ_PTR text,
-   OBJ_PTR xloc, OBJ_PTR yloc, OBJ_PTR scale, OBJ_PTR angle, OBJ_PTR justification, OBJ_PTR alignment)
-{
-   FM *p = Get_FM(fmkr);
-   c_show_rotated_label(p, String_Ptr(text), Number_to_double(xloc), Number_to_double(yloc),
-      Number_to_double(scale), Number_to_double(angle), Number_to_int(justification), Number_to_int(alignment));
    return fmkr;
 }
 
-OBJ_PTR FM_check_label_clip(OBJ_PTR fmkr, OBJ_PTR xloc, OBJ_PTR yloc)
-{
-   FM *p = Get_FM(fmkr);
-   double x = Number_to_double(xloc), y = Number_to_double(yloc);
+         
+OBJ_PTR c_show_rotated_label(OBJ_PTR fmkr, FM *p, char *text, 
+   double xloc, double yloc, double scale, double angle, int justification, int alignment) {
+   tex_show_rotated_text(p, text, convert_figure_to_output_x(p, xloc), convert_figure_to_output_y(p, yloc),
+      scale, angle, justification, alignment);
+   return fmkr;
+}
+   
+OBJ_PTR c_check_label_clip(OBJ_PTR fmkr, FM *p, double x, double y) {
    x = convert_figure_to_frame_x(p,x);
    y = convert_figure_to_frame_y(p,y);
    if (x < p->label_left_margin || y < p->label_bottom_margin ||

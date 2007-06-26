@@ -35,7 +35,7 @@ void Recalc_Font_Hts(FM *p)
    p->default_text_height_dy = convert_frame_to_figure_dy(p,dy);
 }
 
-static void c_set_subframe(FM *p, double left_margin, double right_margin, double top_margin, double bottom_margin)
+OBJ_PTR c_set_subframe(OBJ_PTR fmkr, FM *p, double left_margin, double right_margin, double top_margin, double bottom_margin)
 {
    double x, y, w, h;
    if (left_margin < 0 || right_margin < 0 || top_margin < 0 || bottom_margin < 0)
@@ -51,14 +51,9 @@ static void c_set_subframe(FM *p, double left_margin, double right_margin, doubl
    w = p->frame_width = p->frame_right - p->frame_left;
    h = p->frame_height = p->frame_top - p->frame_bottom;
    Recalc_Font_Hts(p);
-}
-
-OBJ_PTR FM_private_set_subframe(OBJ_PTR fmkr, OBJ_PTR left_margin, OBJ_PTR right_margin, OBJ_PTR top_margin, OBJ_PTR bottom_margin)
-{
-   FM *p = Get_FM(fmkr);
-   c_set_subframe(p, Number_to_double(left_margin), Number_to_double(right_margin), Number_to_double(top_margin), Number_to_double(bottom_margin));
    return fmkr;
 }
+
 
 
 static void c_set_bounds(FM *p, double left, double right, double top, double bottom)
@@ -103,14 +98,8 @@ static void c_set_bounds(FM *p, double left, double right, double top, double bo
    Recalc_Font_Hts(p);
 }
 
-OBJ_PTR FM_private_set_bounds(OBJ_PTR fmkr, OBJ_PTR left, OBJ_PTR right, OBJ_PTR top, OBJ_PTR bottom)
+OBJ_PTR c_private_set_bounds(OBJ_PTR fmkr, FM *p, double left_boundary, double right_boundary, double top_boundary, double bottom_boundary)
 {
-   FM *p = Get_FM(fmkr);
-   double left_boundary, right_boundary, top_boundary, bottom_boundary;
-   left_boundary = Number_to_double(left);
-   right_boundary = Number_to_double(right);
-   top_boundary = Number_to_double(top);
-   bottom_boundary = Number_to_double(bottom);
    c_set_bounds(p, left_boundary, right_boundary, top_boundary, bottom_boundary);
    return fmkr;
 }
@@ -118,8 +107,8 @@ OBJ_PTR FM_private_set_bounds(OBJ_PTR fmkr, OBJ_PTR left, OBJ_PTR right, OBJ_PTR
 
 // Conversions
 
-static double c_convert_to_degrees(FM *p, double dx, double dy)  // dx and dy in figure coords
-{
+
+OBJ_PTR c_convert_to_degrees(OBJ_PTR fmkr, FM *p, double dx, double dy) { // dx and dy in figure coords
    double angle;
    if (dx == 0.0 && dy == 0.0) angle = 0.0;
    else if (dx > 0.0 && dy == 0.0) angle = (p->bounds_left > p->bounds_right)? 180.0 : 0.0;
@@ -127,211 +116,173 @@ static double c_convert_to_degrees(FM *p, double dx, double dy)  // dx and dy in
    else if (dx == 0.0 && dy > 0.0) angle = (p->bounds_bottom > p->bounds_top)? -90.0 : 90.0;
    else if (dx == 0.0 && dy < 0.0) angle = (p->bounds_bottom > p->bounds_top)? 90.0 : -90.0;
    else angle = atan2(convert_figure_to_output_dy(p,dy),convert_figure_to_output_dx(p,dx))*RADIANS_TO_DEGREES;
-   return angle;
+   return Float_New(angle);
 }
 
-OBJ_PTR FM_convert_to_degrees(OBJ_PTR fmkr, OBJ_PTR dx, OBJ_PTR dy) // dx and dy in figure coords
+OBJ_PTR c_convert_inches_to_output(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr);
-   return Float_New(c_convert_to_degrees(p, Number_to_double(dx), Number_to_double(dy)));
-}
-
-
-
-OBJ_PTR FM_convert_inches_to_output(OBJ_PTR fmkr, OBJ_PTR v)
-{
-   double val = Number_to_double(v);
    val = convert_inches_to_output(val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_output_to_inches(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_output_to_inches(OBJ_PTR fmkr, FM *p, double val)
 {
-   double val = Number_to_double(v);
    val = convert_output_to_inches(val);
    return Float_New(val);
 }
 
-
-OBJ_PTR FM_convert_mm_to_output(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_mm_to_output(OBJ_PTR fmkr, FM *p, double val)
 {
-   double val = Number_to_double(v);
    val = convert_mm_to_output(val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_output_to_mm(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_output_to_mm(OBJ_PTR fmkr, FM *p, double val)
 {
-   double val = Number_to_double(v);
    val = convert_output_to_mm(val);
    return Float_New(val);
 }
 
-
-OBJ_PTR FM_convert_page_to_output_x(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_page_to_output_x(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_page_to_output_x(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_page_to_output_y(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_page_to_output_y(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_page_to_output_y(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_page_to_output_dx(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_page_to_output_dx(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_page_to_output_dx(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_page_to_output_dy(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_page_to_output_dy(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_page_to_output_dy(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_output_to_page_x(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_output_to_page_x(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_output_to_page_x(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_output_to_page_y(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_output_to_page_y(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_output_to_page_y(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_output_to_page_dx(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_output_to_page_dx(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    return convert_output_to_page_dx(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_output_to_page_dy(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_output_to_page_dy(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_output_to_page_dy(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_frame_to_page_x(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_frame_to_page_x(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_frame_to_page_x(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_frame_to_page_y(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_frame_to_page_y(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_frame_to_page_y(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_frame_to_page_dx(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_frame_to_page_dx(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_frame_to_page_dx(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_frame_to_page_dy(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_frame_to_page_dy(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_frame_to_page_dy(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_page_to_frame_x(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_page_to_frame_x(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_page_to_frame_x(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_page_to_frame_y(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_page_to_frame_y(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_page_to_frame_y(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_page_to_frame_dx(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_page_to_frame_dx(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_page_to_frame_dx(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_page_to_frame_dy(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_page_to_frame_dy(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_page_to_frame_dy(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_figure_to_frame_x(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_figure_to_frame_x(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_figure_to_frame_x(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_figure_to_frame_y(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_figure_to_frame_y(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_figure_to_frame_y(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_figure_to_frame_dx(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_figure_to_frame_dx(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_figure_to_frame_dx(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_figure_to_frame_dy(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_figure_to_frame_dy(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_figure_to_frame_dy(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_frame_to_figure_x(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_frame_to_figure_x(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_frame_to_figure_x(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_frame_to_figure_y(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_frame_to_figure_y(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_frame_to_figure_y(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_frame_to_figure_dx(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_frame_to_figure_dx(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_frame_to_figure_dx(p,val);
    return Float_New(val);
 }
 
-OBJ_PTR FM_convert_frame_to_figure_dy(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_frame_to_figure_dy(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    val = convert_frame_to_figure_dy(p,val);
    return Float_New(val);
 }
@@ -368,27 +319,23 @@ double convert_figure_to_output_y(FM *p, double y)
    return y;
 }
 
-OBJ_PTR FM_convert_figure_to_output_x(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_figure_to_output_x(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    return Float_New(convert_figure_to_output_x(p,val));
 }
 
-OBJ_PTR FM_convert_figure_to_output_y(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_figure_to_output_y(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    return Float_New(convert_figure_to_output_y(p,val));
 }
 
-OBJ_PTR FM_convert_figure_to_output_dx(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_figure_to_output_dx(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    return Float_New(convert_figure_to_output_dx(p,val));
 }
 
-OBJ_PTR FM_convert_figure_to_output_dy(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_figure_to_output_dy(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    return Float_New(convert_figure_to_output_dy(p,val));
 }
 
@@ -424,53 +371,36 @@ double convert_output_to_figure_y(FM *p, double y)
    return y;
 }
 
-OBJ_PTR FM_convert_output_to_figure_x(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_output_to_figure_x(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    return Float_New(convert_output_to_figure_x(p,val));
 }
 
-OBJ_PTR FM_convert_output_to_figure_y(OBJ_PTR fmkr, OBJ_PTR v)
+OBJ_PTR c_convert_output_to_figure_y(OBJ_PTR fmkr, FM *p, double val)
 {
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
    return Float_New(convert_output_to_figure_y(p,val));
 }
 
-OBJ_PTR FM_convert_output_to_figure_dx(OBJ_PTR fmkr, OBJ_PTR v)
-{
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
-   return Float_New(convert_output_to_figure_dx(p,val));
-}
+OBJ_PTR c_convert_output_to_figure_dx(OBJ_PTR fmkr, FM *p, double val)
+{ return Float_New(convert_output_to_figure_dx(p,val)); }
 
-OBJ_PTR FM_convert_output_to_figure_dy(OBJ_PTR fmkr, OBJ_PTR v)
-{
-   FM *p = Get_FM(fmkr); double val = Number_to_double(v);
-   return Float_New(convert_output_to_figure_dy(p,val));
-}
+OBJ_PTR c_convert_output_to_figure_dy(OBJ_PTR fmkr, FM *p, double val)
+{ return Float_New(convert_output_to_figure_dy(p,val)); }
 
-
-void c_private_set_default_font_size(FM *p, double size) {
+OBJ_PTR c_private_set_default_font_size(OBJ_PTR fmkr, FM *p, double size) {
     p->default_font_size = size;
     Recalc_Font_Hts(p);
-}
-
-OBJ_PTR FM_private_set_default_font_size(OBJ_PTR fmkr, OBJ_PTR size) {
-   FM *p = Get_FM(fmkr);
-   c_private_set_default_font_size(p, Number_to_double(size));
    return fmkr;
 }
 
-
-OBJ_PTR FM_doing_subplot(OBJ_PTR fmkr)
+OBJ_PTR c_doing_subplot(OBJ_PTR fmkr, FM *p)
 {
-   FM *p = Get_FM(fmkr);
    p->in_subplot = true;
    return fmkr;
 }
 
-OBJ_PTR FM_doing_subfigure(OBJ_PTR fmkr)
+OBJ_PTR c_doing_subfigure(OBJ_PTR fmkr, FM *p)
 {
-   FM *p = Get_FM(fmkr);
    p->root_figure = false;
    return fmkr;
 }

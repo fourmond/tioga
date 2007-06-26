@@ -2097,19 +2097,12 @@ PRIVATE
 VALUE dvector_replace(VALUE dest, VALUE orig) {
    VALUE shared;
    Dvector *org, *d;
-   dvector_modify(dest);
+   dvector_modify(dest); // take care of any sharing issues.
    orig = dvector_to_dvector(orig); /* it might be some kind of Array rather than a Dvector */
    if (dest == orig) return dest;
    org = Get_Dvector(orig);
    d = Get_Dvector(dest);
-   if (d->ptr) {
-      if (0 && d->capa >= org->len && d->shared == Qnil) {
-         d->len = org->len;
-         MEMCPY(d->ptr, org->ptr, double, d->len);
-         return dest;
-      }
-      free(d->ptr);
-   }
+   if (d->ptr) free(d->ptr); // we know it isn't shared because we did dvector_modify above
    shared = dvector_make_shared(orig);
    org = Get_Dvector(shared);
    d->ptr = org->ptr;

@@ -318,17 +318,17 @@ extern char *data_dir;
 /*======================================================================*/
 // axes.c
 extern char *Get_String(OBJ_PTR ary, int index);
-extern OBJ_PTR FM_show_axis(OBJ_PTR fmkr, OBJ_PTR loc);
-extern OBJ_PTR FM_show_edge(OBJ_PTR fmkr, OBJ_PTR loc);
-extern OBJ_PTR FM_no_title(OBJ_PTR fmkr);
-extern OBJ_PTR FM_no_xlabel(OBJ_PTR fmkr);
-extern OBJ_PTR FM_no_ylabel(OBJ_PTR fmkr);
-extern OBJ_PTR FM_no_xaxis(OBJ_PTR fmkr);
-extern OBJ_PTR FM_no_yaxis(OBJ_PTR fmkr);
-extern OBJ_PTR FM_no_left_edge(OBJ_PTR fmkr);
-extern OBJ_PTR FM_no_right_edge(OBJ_PTR fmkr);
-extern OBJ_PTR FM_no_top_edge(OBJ_PTR fmkr);
-extern OBJ_PTR FM_no_bottom_edge(OBJ_PTR fmkr);
+
+extern OBJ_PTR c_show_axis(OBJ_PTR fmkr, FM *p, int location);
+extern OBJ_PTR c_show_edge(OBJ_PTR fmkr, FM *p, int location);
+extern OBJ_PTR c_no_xlabel(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_no_ylabel(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_no_xaxis(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_no_yaxis(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_no_left_edge(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_no_right_edge(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_no_top_edge(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_no_bottom_edge(OBJ_PTR fmkr, FM *p);
 
 /*======================================================================*/
 // figures.c
@@ -341,9 +341,6 @@ extern void Set_initialized();
 // init.c
 extern void Init_IDs(void);
 extern OBJ_PTR Get_fm_data_attr(OBJ_PTR fmkr);
-extern OBJ_PTR FM_private_init_fm_data(OBJ_PTR fmkr);
-extern OBJ_PTR FM_set_device_pagesize(OBJ_PTR fmkr, OBJ_PTR width, OBJ_PTR height); // size in output coords (decipoints)
-extern OBJ_PTR FM_set_frame_sides(OBJ_PTR fmkr, OBJ_PTR left, OBJ_PTR right, OBJ_PTR top, OBJ_PTR bottom); // in page coords [0..1]
 extern void Initialize_Figure(OBJ_PTR fmkr);
 extern OBJ_PTR do_cmd(OBJ_PTR fmkr, OBJ_PTR cmd);
 extern bool Get_bool(OBJ_PTR obj, ID name_ID);
@@ -379,262 +376,276 @@ extern OBJ_PTR Get_xaxis_locations_for_minor_ticks(OBJ_PTR fmkr);
 extern OBJ_PTR Get_yaxis_tick_labels(OBJ_PTR fmkr);
 extern OBJ_PTR Get_yaxis_locations_for_major_ticks(OBJ_PTR fmkr);
 extern OBJ_PTR Get_yaxis_locations_for_minor_ticks(OBJ_PTR fmkr);
-extern OBJ_PTR FM_get_save_filename(OBJ_PTR fmkr, OBJ_PTR name);
-extern OBJ_PTR FM_private_make(OBJ_PTR fmkr, OBJ_PTR name, OBJ_PTR cmd);
-extern OBJ_PTR FM_private_make_portfolio(OBJ_PTR fmkr, OBJ_PTR name, OBJ_PTR fignums, OBJ_PTR fignames);
+
+extern OBJ_PTR c_private_init_fm_data(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_set_frame_sides(OBJ_PTR fmkr, FM *p, 
+   double left, double right, double top, double bottom);
+extern OBJ_PTR c_set_device_pagesize(OBJ_PTR fmkr, FM *p, double width, double height);
+extern OBJ_PTR c_get_save_filename(OBJ_PTR fmkr, FM *p, OBJ_PTR name);
+extern OBJ_PTR c_private_make_portfolio(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR fignums, OBJ_PTR fignames);
 
 /*======================================================================*/
 // makers.c
-extern OBJ_PTR FM_private_make_contour(OBJ_PTR fmkr, OBJ_PTR gaps,
-     OBJ_PTR xs, OBJ_PTR ys, // data x coordinates and y coordinates
-     OBJ_PTR zs, OBJ_PTR z_level, // the Dtable of OBJ_PTRs and the desired contour level
-     OBJ_PTR legit, // the Dtable of flags (nonzero means okay)
-     OBJ_PTR method // int == 1 means use CONREC
-     );
-extern OBJ_PTR FM_private_make_steps(OBJ_PTR fmkr, OBJ_PTR Xdata, OBJ_PTR Ydata,
-    OBJ_PTR xfirst, OBJ_PTR yfirst, OBJ_PTR xlast, OBJ_PTR ylast);
-extern OBJ_PTR FM_private_make_spline_interpolated_points(OBJ_PTR fmkr, OBJ_PTR Xvec, 
-   OBJ_PTR Xdata, OBJ_PTR Ydata, OBJ_PTR start_slope, OBJ_PTR end_slope);
+extern OBJ_PTR c_private_make_contour(OBJ_PTR fmkr, FM *p,
+         OBJ_PTR gaps, // these vectors get the results
+         OBJ_PTR xs, OBJ_PTR ys, // data x coordinates and y coordinates
+         OBJ_PTR zs, double z_level, // the table of values and the desired contour level
+         OBJ_PTR legit, // the table of flags (nonzero means okay)
+         int method // method == 1 means CONREC
+         );
+extern OBJ_PTR c_private_make_steps(OBJ_PTR fmkr, FM *p, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
+   double xfirst, double yfirst, double xlast, double ylast);
+        /* adds n_pts_to_add points to Xs and Ys for steps with the given parameters.
+            X_data and Y_data are arrays of n values where n_pts_to_add = 2*(n+1)
+            (xfirst,yfirst) and (xlast,ylast) are extra data points to fix the first and last steps.
+        The X_data plus xfirst and xlast determine the widths of the steps.
+        The Y_data plus yfirst and ylast determine the height of the steps.
+        The steps occur at locations midway between the given x locations. */
+extern OBJ_PTR c_private_make_spline_interpolated_points(OBJ_PTR fmkr, FM *p,
+         OBJ_PTR Xvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
+         OBJ_PTR start_slope, OBJ_PTR end_slope);
 
 /*======================================================================*/
 // pdfcolor.c
 extern void Free_Functions();
 extern void Write_Functions(void);
 extern void Free_Stroke_Opacities(void);
-extern OBJ_PTR FM_stroke_opacity_set(OBJ_PTR fmkr, OBJ_PTR val);
 extern void Free_Fill_Opacities(void);
-extern OBJ_PTR FM_fill_opacity_set(OBJ_PTR fmkr, OBJ_PTR val);
 extern void Write_Stroke_Opacity_Objects(void);
 extern void Write_Fill_Opacity_Objects(void);
 extern void Free_Shadings();
 extern void Write_Shadings(void);
-extern OBJ_PTR FM_private_axial_shading(OBJ_PTR fmkr, OBJ_PTR x0, OBJ_PTR y0,
-        OBJ_PTR x1, OBJ_PTR y1, OBJ_PTR colormap, OBJ_PTR extend_start, OBJ_PTR extend_end);
-extern OBJ_PTR FM_private_radial_shading(OBJ_PTR fmkr, OBJ_PTR x0, OBJ_PTR y0, OBJ_PTR r0,
-        OBJ_PTR x1, OBJ_PTR y1, OBJ_PTR r1, OBJ_PTR colormap,
-        OBJ_PTR a, OBJ_PTR b, OBJ_PTR c, OBJ_PTR d,
-        OBJ_PTR extend_start, OBJ_PTR extend_end);
-extern OBJ_PTR FM_private_create_colormap(OBJ_PTR fmkr, OBJ_PTR rgb_flag,
-            OBJ_PTR length, OBJ_PTR Ps, OBJ_PTR C1s, OBJ_PTR C2s, OBJ_PTR C3s);
-extern OBJ_PTR FM_get_color_from_colormap(OBJ_PTR fmkr, OBJ_PTR color_map, OBJ_PTR color_position);
-extern OBJ_PTR FM_convert_to_colormap(OBJ_PTR fmkr, OBJ_PTR Rs, OBJ_PTR Gs, OBJ_PTR Bs);
-extern OBJ_PTR FM_hls_to_rgb(OBJ_PTR fmkr, OBJ_PTR hls_vec);
-extern OBJ_PTR FM_rgb_to_hls(OBJ_PTR fmkr, OBJ_PTR rgb_vec);
-extern OBJ_PTR FM_title_color_set(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_title_color_get(OBJ_PTR fmkr);
-extern OBJ_PTR FM_xlabel_color_get(OBJ_PTR fmkr);
-extern OBJ_PTR FM_xlabel_color_set(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_ylabel_color_get(OBJ_PTR fmkr);
-extern OBJ_PTR FM_ylabel_color_set(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_xaxis_stroke_color_get(OBJ_PTR fmkr);
-extern OBJ_PTR FM_xaxis_stroke_color_set(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_yaxis_stroke_color_get(OBJ_PTR fmkr);
-extern OBJ_PTR FM_yaxis_stroke_color_set(OBJ_PTR fmkr, OBJ_PTR val);
+
+extern void c_stroke_opacity_set(OBJ_PTR fmkr, FM *p, double stroke_opacity);
+extern void c_fill_opacity_set(OBJ_PTR fmkr, FM *p, double fill_opacity);
+extern OBJ_PTR c_private_axial_shading(OBJ_PTR fmkr, FM *p, 
+      double x0, double y0, double x1, double y1,
+      OBJ_PTR colormap, bool extend_start, bool extend_end);
+extern OBJ_PTR c_private_radial_shading(OBJ_PTR fmkr, FM *p, 
+      double x0, double y0, double r0,
+      double x1, double y1, double r1, OBJ_PTR colormap,
+      double a, double b, double c, double d, bool extend_start, bool extend_end);
+extern OBJ_PTR c_private_create_colormap(OBJ_PTR fmkr, FM *p, 
+      bool rgb, int length, OBJ_PTR Ps, OBJ_PTR C1s, OBJ_PTR C2s, OBJ_PTR C3s);
+extern OBJ_PTR c_get_color_from_colormap(OBJ_PTR fmkr, FM *p, OBJ_PTR color_map, double x);
+extern OBJ_PTR c_convert_to_colormap(OBJ_PTR fmkr, FM* p, OBJ_PTR Rs, OBJ_PTR Gs, OBJ_PTR Bs);
+extern OBJ_PTR c_hls_to_rgb(OBJ_PTR fmkr, FM *p, OBJ_PTR hls_vec);
+extern OBJ_PTR c_rgb_to_hls(OBJ_PTR fmkr, FM *p, OBJ_PTR rgb_vec);
+extern OBJ_PTR c_title_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val);
+extern OBJ_PTR c_title_color_get(OBJ_PTR fmkr, FM *p); // value is array of [r, g, b] intensities from 0 to 1
+extern OBJ_PTR c_xlabel_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val);
+extern OBJ_PTR c_xlabel_color_get(OBJ_PTR fmkr, FM *p); // value is array of [r, g, b] intensities from 0 to 1
+extern OBJ_PTR c_ylabel_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val);
+extern OBJ_PTR c_ylabel_color_get(OBJ_PTR fmkr, FM *p); // value is array of [r, g, b] intensities from 0 to 1
+extern OBJ_PTR c_xaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val);
+extern OBJ_PTR c_xaxis_stroke_color_get(OBJ_PTR fmkr, FM *p); // value is array of [r, g, b] intensities from 0 to 1
+extern OBJ_PTR c_yaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val);
+extern OBJ_PTR c_yaxis_stroke_color_get(OBJ_PTR fmkr, FM *p); // value is array of [r, g, b] intensities from 0 to 1
 
 /*======================================================================*/
 // pdfcoords.c
 extern void Recalc_Font_Hts(FM *p);
-extern OBJ_PTR FM_private_set_subframe(OBJ_PTR fmkr, OBJ_PTR left_margin, OBJ_PTR right_margin, OBJ_PTR top_margin, OBJ_PTR bottom_margin);
-extern void c_private_set_default_font_size(FM *p, double size);
-extern OBJ_PTR FM_private_set_default_font_size(OBJ_PTR fmkr, OBJ_PTR size); // size in points
-extern OBJ_PTR FM_doing_subplot(OBJ_PTR fmkr);
-extern OBJ_PTR FM_doing_subfigure(OBJ_PTR fmkr);
-extern OBJ_PTR FM_private_set_bounds(OBJ_PTR fmkr, OBJ_PTR left, OBJ_PTR right, OBJ_PTR top, OBJ_PTR bottom); /* in figure coords */
-extern OBJ_PTR FM_convert_to_degrees(OBJ_PTR fmkr, OBJ_PTR dx, OBJ_PTR dy);
-extern OBJ_PTR FM_convert_inches_to_output(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_output_to_inches(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_mm_to_output(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_output_to_mm(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_page_to_output_x(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_page_to_output_y(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_page_to_output_dx(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_page_to_output_dy(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_output_to_page_x(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_output_to_page_y(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_output_to_page_dx(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_output_to_page_dy(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_frame_to_page_x(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_frame_to_page_y(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_frame_to_page_dx(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_frame_to_page_dy(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_page_to_frame_x(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_page_to_frame_y(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_page_to_frame_dx(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_page_to_frame_dy(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_figure_to_frame_x(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_figure_to_frame_y(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_figure_to_frame_dx(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_figure_to_frame_dy(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_frame_to_figure_x(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_frame_to_figure_y(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_frame_to_figure_dx(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_frame_to_figure_dy(OBJ_PTR fmkr, OBJ_PTR val);
 extern double convert_figure_to_output_x(FM *p, double x);
 extern double convert_figure_to_output_y(FM *p, double y);
 extern double convert_figure_to_output_dy(FM *p, double dy);
 extern double convert_figure_to_output_dx(FM *p, double dx);
-extern OBJ_PTR FM_convert_figure_to_output_x(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_figure_to_output_y(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_figure_to_output_dx(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_figure_to_output_dy(OBJ_PTR fmkr, OBJ_PTR val);
 extern double convert_output_to_figure_x(FM *p, double x);
 extern double convert_output_to_figure_y(FM *p, double y);
 extern double convert_output_to_figure_dy(FM *p, double dy);
 extern double convert_output_to_figure_dx(FM *p, double dx);
-extern OBJ_PTR FM_convert_output_to_figure_x(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_output_to_figure_y(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_output_to_figure_dx(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_convert_output_to_figure_dy(OBJ_PTR fmkr, OBJ_PTR val);
+
+extern OBJ_PTR c_set_subframe(OBJ_PTR fmkr, FM *p, 
+      double left_margin, double right_margin, double top_margin, double bottom_margin);
+extern OBJ_PTR c_private_set_default_font_size(OBJ_PTR fmkr, FM *p, double size);
+extern OBJ_PTR c_convert_to_degrees(OBJ_PTR fmkr, FM *p, double dx, double dy); // dx and dy in figure coords
+extern OBJ_PTR c_convert_inches_to_output(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_output_to_inches(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_mm_to_output(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_output_to_mm(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_page_to_output_x(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_page_to_output_y(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_page_to_output_dx(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_page_to_output_dy(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_output_to_page_x(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_output_to_page_y(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_output_to_page_dx(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_output_to_page_dy(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_frame_to_page_x(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_frame_to_page_y(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_frame_to_page_dx(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_frame_to_page_dy(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_page_to_frame_x(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_page_to_frame_y(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_page_to_frame_dx(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_page_to_frame_dy(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_figure_to_frame_x(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_figure_to_frame_y(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_figure_to_frame_dx(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_figure_to_frame_dy(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_frame_to_figure_x(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_frame_to_figure_y(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_frame_to_figure_dx(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_frame_to_figure_dy(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_figure_to_output_x(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_figure_to_output_y(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_figure_to_output_dx(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_figure_to_output_dy(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_output_to_figure_x(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_output_to_figure_y(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_output_to_figure_dx(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_convert_output_to_figure_dy(OBJ_PTR fmkr, FM *p, double val);
+extern OBJ_PTR c_doing_subplot(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_doing_subfigure(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_private_set_bounds(OBJ_PTR fmkr, FM *p, 
+   double left_boundary, double right_boundary, double top_boundary, double bottom_boundary);
 
 /*======================================================================*/
 // pdffile.c
 extern void Init_pdf(void);
 extern void Record_Object_Offset(int obj_number);
 extern void Open_pdf(OBJ_PTR fmkr, char *filename, bool quiet_mode);
-extern void Start_Axis_Standard_State(FM *p, double r, double g, double b, double line_width);
+extern void Start_Axis_Standard_State(OBJ_PTR fmkr, FM *p, double r, double g, double b, double line_width);
 extern void End_Axis_Standard_State(void);
 extern void Write_gsave(void);
 extern void Write_grestore(void);
 extern void Close_pdf(OBJ_PTR fmkr, bool quiet_mode);
 extern void Rename_pdf(char *oldname, char *newname);
-extern OBJ_PTR FM_pdf_gsave(OBJ_PTR fmkr);
-extern OBJ_PTR FM_pdf_grestore(OBJ_PTR fmkr);
+
+extern OBJ_PTR c_pdf_gsave(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_pdf_grestore(OBJ_PTR fmkr, FM *p);
 
 /*======================================================================*/
 // pdfimage.c
-extern OBJ_PTR FM_private_show_jpg(OBJ_PTR fmkr, OBJ_PTR filename, 
-   OBJ_PTR width, OBJ_PTR height, OBJ_PTR image_destination, OBJ_PTR mask_xo_num);
-extern OBJ_PTR FM_private_create_image_data(OBJ_PTR fmkr, OBJ_PTR data,
-   OBJ_PTR first_row, OBJ_PTR last_row, OBJ_PTR first_column, OBJ_PTR last_column,
-   OBJ_PTR min_OBJ_PTR, OBJ_PTR max_OBJ_PTR, OBJ_PTR max_code, OBJ_PTR if_below_range, OBJ_PTR if_above_range);
-extern OBJ_PTR FM_private_create_monochrome_image_data(OBJ_PTR fmkr, OBJ_PTR data,
-   OBJ_PTR first_row, OBJ_PTR last_row, OBJ_PTR first_column, OBJ_PTR last_column,
-   OBJ_PTR boundary, OBJ_PTR reverse);
-extern OBJ_PTR FM_private_show_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly,
-   OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR OBJ_PTR_mask_min, OBJ_PTR OBJ_PTR_mask_max,
-   OBJ_PTR hival, OBJ_PTR lookup, OBJ_PTR mask_xo_num);
-extern OBJ_PTR FM_private_show_rgb_image(OBJ_PTR fmkr, 
-   OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly,
-   OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_xo_num);
-extern OBJ_PTR FM_private_show_cmyk_image(OBJ_PTR fmkr, 
-   OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly,
-   OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_xo_num);
-extern OBJ_PTR FM_private_show_grayscale_image(OBJ_PTR fmkr, 
-   OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly,
-   OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_xo_num);
-extern OBJ_PTR FM_private_show_monochrome_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly,
-   OBJ_PTR interpolate, OBJ_PTR reversed, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_xo_num);
+extern OBJ_PTR c_private_create_image_data(OBJ_PTR fmkr, FM *p, OBJ_PTR table,
+            int first_row, int last_row, int first_column, int last_column,
+            double min_val, double max_val, int max_code, int if_below_range, int if_above_range);
+extern OBJ_PTR c_private_create_monochrome_image_data(OBJ_PTR fmkr, FM *p, OBJ_PTR table,
+            int first_row, int last_row, int first_column, int last_column,
+            double boundary, bool reversed);
+extern OBJ_PTR c_private_show_image(OBJ_PTR fmkr, FM *p, int image_type, double llx, double lly, double lrx, double lry,
+    double ulx, double uly, bool interpolate, bool reversed, int w, int h, unsigned char* data, long len, 
+    OBJ_PTR mask_min, OBJ_PTR mask_max, OBJ_PTR hival, OBJ_PTR lookup_data, int mask_obj_num);
 
 /*======================================================================*/
 // pdfpath.c
 extern void Unpack_RGB(OBJ_PTR rgb, double *rp, double *gp, double *bp);
-void c_stroke_color_set(FM *p, double r, double g, double b);
-extern OBJ_PTR FM_stroke_color_set(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_stroke_color_get(OBJ_PTR fmkr);
-void c_fill_color_set(FM *p, double r, double g, double b);
-extern OBJ_PTR FM_fill_color_set(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_fill_color_get(OBJ_PTR fmkr);
-void c_line_width_set(FM *p, double line_width);
-extern OBJ_PTR FM_line_width_set(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_rescale_lines(OBJ_PTR fmkr, OBJ_PTR scaling);
-void c_line_cap_set(FM *p, int line_cap);
-extern OBJ_PTR FM_line_cap_set(OBJ_PTR fmkr, OBJ_PTR val);
-void c_line_join_set(FM *p, int line_join);
-extern OBJ_PTR FM_line_join_set(OBJ_PTR fmkr, OBJ_PTR val);
-void c_miter_limit_set(FM *p, double miter_limit);
-extern OBJ_PTR FM_miter_limit_set(OBJ_PTR fmkr, OBJ_PTR val);
-extern OBJ_PTR FM_line_type_set(OBJ_PTR fmkr, OBJ_PTR line_type);
-void update_bbox(FM *p, double x, double y);
-extern OBJ_PTR FM_update_bbox(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y);
-extern OBJ_PTR FM_bbox_left(OBJ_PTR fmkr);
-extern OBJ_PTR FM_bbox_right(OBJ_PTR fmkr);
-extern OBJ_PTR FM_bbox_top(OBJ_PTR fmkr);
-extern OBJ_PTR FM_bbox_bottom(OBJ_PTR fmkr);
-extern void c_moveto(FM *p, double x, double y);
-extern OBJ_PTR FM_move_to_point(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y);  // x y m
-extern void c_lineto(FM *p, double x, double y);
-extern OBJ_PTR FM_append_point_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y);  // x y l
-extern void c_bezier_control_points(double *data, double x0, double y0, double delta_x, double a, double b, double c);
-extern OBJ_PTR FM_bezier_control_points(OBJ_PTR fmkr, OBJ_PTR x0, OBJ_PTR y0, OBJ_PTR delta_x, OBJ_PTR a, OBJ_PTR b, OBJ_PTR c);
-extern void c_curveto(FM *p, double x1, double y1, double x2, double y2, double x3, double y3);
-extern OBJ_PTR FM_append_curve_to_path(OBJ_PTR fmkr, 
-   OBJ_PTR x1, OBJ_PTR y1, OBJ_PTR x2, OBJ_PTR y2, OBJ_PTR x3, OBJ_PTR y3); 
-extern OBJ_PTR FM_close_path(OBJ_PTR fmkr); // h
-extern OBJ_PTR FM_append_arc_to_path(OBJ_PTR fmkr, OBJ_PTR x_start, OBJ_PTR y_start, OBJ_PTR x_corner, OBJ_PTR y_corner,
-   OBJ_PTR x_end, OBJ_PTR y_end, OBJ_PTR dx, OBJ_PTR dy);
-extern OBJ_PTR FM_append_rect_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height);  // x y w h re
-extern OBJ_PTR FM_append_rounded_rect_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height, OBJ_PTR dx, OBJ_PTR dy);
-extern OBJ_PTR FM_append_oval_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx, OBJ_PTR dy, OBJ_PTR angle);
-extern OBJ_PTR FM_append_circle_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx);
-extern OBJ_PTR FM_append_points_to_path(OBJ_PTR fmkr, OBJ_PTR x_vec, OBJ_PTR y_vec);
-extern OBJ_PTR FM_private_append_points_with_gaps_to_path(OBJ_PTR fmkr, OBJ_PTR x_vec, OBJ_PTR y_vec, OBJ_PTR gaps, OBJ_PTR close_gaps);
-extern OBJ_PTR FM_stroke(OBJ_PTR fmkr);  // S
-extern OBJ_PTR FM_close_and_stroke(OBJ_PTR fmkr);  // s
-extern OBJ_PTR FM_fill(OBJ_PTR fmkr); // f
-extern OBJ_PTR FM_discard_path(OBJ_PTR fmkr); // n
-extern OBJ_PTR FM_eofill(OBJ_PTR fmkr); // f*
-extern OBJ_PTR FM_fill_and_stroke(OBJ_PTR fmkr); // B
-extern OBJ_PTR FM_eofill_and_stroke(OBJ_PTR fmkr); // B*
-extern OBJ_PTR FM_close_fill_and_stroke(OBJ_PTR fmkr); // b
-extern OBJ_PTR FM_close_eofill_and_stroke(OBJ_PTR fmkr); // b*
-extern OBJ_PTR FM_clip(OBJ_PTR fmkr);  // W n
-extern OBJ_PTR FM_eoclip(OBJ_PTR fmkr);  // W* n
-extern OBJ_PTR FM_stroke_line(OBJ_PTR fmkr, OBJ_PTR x1, OBJ_PTR y1, OBJ_PTR x2, OBJ_PTR y2);
-extern OBJ_PTR FM_fill_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height);
-extern OBJ_PTR FM_stroke_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height);
-extern OBJ_PTR FM_fill_and_stroke_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height);
-extern OBJ_PTR FM_clip_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height);
-extern OBJ_PTR FM_fill_oval(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx, OBJ_PTR dy, OBJ_PTR angle);
-extern OBJ_PTR FM_stroke_oval(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx, OBJ_PTR dy, OBJ_PTR angle);
-extern OBJ_PTR FM_fill_and_stroke_oval(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx, OBJ_PTR dy, OBJ_PTR angle);
-extern OBJ_PTR FM_clip_oval(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx, OBJ_PTR dy, OBJ_PTR angle);
-extern OBJ_PTR FM_fill_rounded_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height, OBJ_PTR dx, OBJ_PTR dy);
-extern OBJ_PTR FM_stroke_rounded_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height, OBJ_PTR dx, OBJ_PTR dy);
-extern OBJ_PTR FM_fill_and_stroke_rounded_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height, OBJ_PTR dx, OBJ_PTR dy);
-extern OBJ_PTR FM_clip_rounded_rect(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height, OBJ_PTR dx, OBJ_PTR dy);
-extern OBJ_PTR FM_fill_circle(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx);
-extern OBJ_PTR FM_stroke_circle(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx);
-extern OBJ_PTR FM_fill_and_stroke_circle(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx);
-extern OBJ_PTR FM_clip_circle(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx);
-extern OBJ_PTR FM_append_frame_to_path(OBJ_PTR fmkr);
-extern OBJ_PTR FM_fill_frame(OBJ_PTR fmkr);
-extern OBJ_PTR FM_stroke_frame(OBJ_PTR fmkr);
-extern OBJ_PTR FM_fill_and_stroke_frame(OBJ_PTR fmkr);
-extern OBJ_PTR FM_clip_to_frame(OBJ_PTR fmkr);
+extern void update_bbox(FM *p, double x, double y);
+
+extern void c_stroke_color_set_RGB(OBJ_PTR fmkr, FM *p, double r, double g, double b);
+extern OBJ_PTR c_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR value);
+extern OBJ_PTR c_stroke_color_get(OBJ_PTR fmkr, FM *p);
+extern void c_fill_color_set_RGB(OBJ_PTR fmkr, FM *p, double r, double g, double b);
+extern OBJ_PTR c_fill_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR value);
+extern OBJ_PTR c_fill_color_get(OBJ_PTR fmkr, FM *p);
+extern void c_line_width_set(OBJ_PTR fmkr, FM *p, double line_width);
+extern OBJ_PTR c_rescale_lines(OBJ_PTR fmkr, FM *p, double scaling_factor);
+extern void c_line_cap_set(OBJ_PTR fmkr, FM *p, int line_cap);
+extern void c_line_join_set(OBJ_PTR fmkr, FM *p, int line_join);
+extern void c_miter_limit_set(OBJ_PTR fmkr, FM *p, double miter_limit);
+extern OBJ_PTR c_line_type_set(OBJ_PTR fmkr, FM *p, OBJ_PTR line_type);
+extern OBJ_PTR c_update_bbox(OBJ_PTR fmkr, FM *p, double x, double y);
+extern OBJ_PTR c_bbox_left(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_bbox_right(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_bbox_top(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_bbox_bottom(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_move_to_point(OBJ_PTR fmkr, FM *p, double x, double y);
+extern OBJ_PTR c_moveto(OBJ_PTR fmkr, FM *p, double x, double y);
+extern OBJ_PTR c_append_point_to_path(OBJ_PTR fmkr, FM *p, double x, double y);
+extern OBJ_PTR c_lineto(OBJ_PTR fmkr, FM *p, double x, double y);
+extern OBJ_PTR c_bezier_control_points(OBJ_PTR fmkr, FM *p, 
+   double x0, double y0, double delta_x, double a, double b, double c);
+extern OBJ_PTR c_append_curve_to_path(OBJ_PTR fmkr, FM *p, double x1, double y1, 
+   double x2, double y2, double x3, double y3);
+extern OBJ_PTR c_curveto(OBJ_PTR fmkr, FM *p, 
+   double x1, double y1, double x2, double y2, double x3, double y3);
+extern OBJ_PTR c_close_path(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_append_arc_to_path(OBJ_PTR fmkr, FM *p, 
+   double x_start, double y_start, double x_corner, double y_corner,
+   double x_end, double y_end, double dx, double dy);
+extern OBJ_PTR c_append_arc(OBJ_PTR fmkr, FM *p, 
+   double x_start, double y_start, double x_corner, double y_corner,
+   double x_end, double y_end, double radius);
+extern OBJ_PTR c_append_rect_to_path(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height);
+extern OBJ_PTR c_append_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height);
+extern OBJ_PTR c_append_rounded_rect_to_path(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, double dx, double dy);
+extern OBJ_PTR c_append_rounded_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, double radius);
+extern OBJ_PTR c_append_oval_to_path(OBJ_PTR fmkr, FM *p, double x, double y, double dx, double dy, double angle);
+extern OBJ_PTR c_append_oval(OBJ_PTR fmkr, FM *p, double x, double y, double dx, double dy, double angle);
+extern OBJ_PTR c_append_circle_to_path(OBJ_PTR fmkr, FM *p, double x, double y, double dx);
+extern OBJ_PTR c_append_points_to_path(OBJ_PTR fmkr, FM *p, OBJ_PTR x_vec, OBJ_PTR y_vec);
+extern OBJ_PTR c_private_append_points_with_gaps_to_path(OBJ_PTR fmkr, FM *p,
+   OBJ_PTR x_vec, OBJ_PTR y_vec, OBJ_PTR gaps, bool do_close);
+extern OBJ_PTR c_stroke(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_close_and_stroke(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_fill(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_discard_path(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_eofill(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_fill_and_stroke(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_eofill_and_stroke(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_close_fill_and_stroke(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_close_eofill_and_stroke(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_clip(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_eoclip(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_fill_and_clip(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_stroke_and_clip(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_fill_stroke_and_clip(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_stroke_line(OBJ_PTR fmkr, FM *p, double x1, double y1, double x2, double y2);
+extern OBJ_PTR c_fill_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height);
+extern OBJ_PTR c_stroke_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height);
+extern OBJ_PTR c_fill_and_stroke_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height);
+extern OBJ_PTR c_clip_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height);
+extern OBJ_PTR c_clip_dev_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height);
+extern OBJ_PTR c_clip_oval(OBJ_PTR fmkr, FM *p, double x, double y, double dx, double dy, double angle);
+extern OBJ_PTR c_fill_oval(OBJ_PTR fmkr, FM *p, double x, double y, double dx, double dy, double angle);
+extern OBJ_PTR c_stroke_oval(OBJ_PTR fmkr, FM *p, double x, double y, double dx, double dy, double angle);
+extern OBJ_PTR c_fill_and_stroke_oval(OBJ_PTR fmkr, FM *p, double x, double y, double dx, double dy, double angle);
+extern OBJ_PTR c_clip_rounded_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, double dx, double dy);
+extern OBJ_PTR c_fill_rounded_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, double dx, double dy);
+extern OBJ_PTR c_stroke_rounded_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, double dx, double dy);
+extern OBJ_PTR c_fill_and_stroke_rounded_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, double dx, double dy);
+extern OBJ_PTR c_clip_circle(OBJ_PTR fmkr, FM *p, double x, double y, double dx);
+extern OBJ_PTR c_fill_circle(OBJ_PTR fmkr, FM *p, double x, double y, double dx);
+extern OBJ_PTR c_stroke_circle(OBJ_PTR fmkr, FM *p, double x, double y, double dx);
+extern OBJ_PTR c_fill_and_stroke_circle(OBJ_PTR fmkr, FM *p, double x, double y, double dx);
+extern OBJ_PTR c_append_frame(OBJ_PTR fmkr, FM *p, bool clip);
+extern OBJ_PTR c_append_frame_to_path(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_fill_frame(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_stroke_frame(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_fill_and_stroke_frame(OBJ_PTR fmkr, FM *p);
+extern OBJ_PTR c_clip_to_frame(OBJ_PTR fmkr, FM *p);
 
 /*======================================================================*/
 // pdftext.c
-void Init_Font_Dictionary(void);
-extern OBJ_PTR FM_register_font(OBJ_PTR fmkr, OBJ_PTR font_name);  // returns font number.
+extern void Init_Font_Dictionary(void);
 extern bool Used_Any_Fonts(void);
 extern void Clear_Fonts_In_Use_Flags(void);
 extern void Write_Font_Dictionaries(void);
 extern void Write_Font_Descriptors(void);
 extern void Write_Font_Widths(void);
-extern OBJ_PTR FM_marker_string_info(OBJ_PTR fmkr, OBJ_PTR font_number, OBJ_PTR string, OBJ_PTR scale);
-extern OBJ_PTR FM_private_show_marker(OBJ_PTR fmkr, OBJ_PTR integer_args, OBJ_PTR stroke_width, OBJ_PTR string,
-    OBJ_PTR x, OBJ_PTR y, OBJ_PTR x_vec, OBJ_PTR y_vec,
-    OBJ_PTR h_scale, OBJ_PTR v_scale, OBJ_PTR scale, OBJ_PTR it_angle, OBJ_PTR ascent_angle, OBJ_PTR angle,
-    OBJ_PTR fill_color, OBJ_PTR stroke_color);
+
+extern OBJ_PTR c_register_font(OBJ_PTR fmkr, FM *p, char *font_name);
+extern OBJ_PTR c_marker_string_info(OBJ_PTR fmkr, FM *p, int fnt, unsigned char *text, double scale);
+extern OBJ_PTR c_private_show_marker(
+   OBJ_PTR fmkr, FM *p, int int_args, OBJ_PTR stroke_width, OBJ_PTR string,
+   OBJ_PTR x, OBJ_PTR y, OBJ_PTR x_vec, OBJ_PTR y_vec,
+   double h_scale, double v_scale, double scale, double it_angle, double ascent_angle, double angle,
+   OBJ_PTR fill_color, OBJ_PTR stroke_color);
 
 /*======================================================================*/
 // texout.c
-extern OBJ_PTR FM_rescale_text(OBJ_PTR fmkr, OBJ_PTR scaling);
-extern void c_show_rotated_text(FM *p, char *text, int frame_side, double shift, double fraction,
-   double scale, double angle, int justification, int alignment);
-extern OBJ_PTR FM_show_rotated_text(OBJ_PTR fmkr, OBJ_PTR text, OBJ_PTR frame_side, OBJ_PTR shift,
-    OBJ_PTR fraction, OBJ_PTR scale, OBJ_PTR angle, OBJ_PTR justification, OBJ_PTR alignment);
-extern void c_show_rotated_label(FM *p, char *text, 
-   double xloc, double yloc, double scale, double angle, int justification, int alignment);
-extern OBJ_PTR FM_show_rotated_label(OBJ_PTR fmkr, OBJ_PTR text,
-    OBJ_PTR xloc, OBJ_PTR yloc, OBJ_PTR scale, OBJ_PTR angle, OBJ_PTR justification, OBJ_PTR alignment);
-extern OBJ_PTR FM_check_label_clip(OBJ_PTR fmkr, OBJ_PTR xloc, OBJ_PTR yloc);
 extern void Open_tex(OBJ_PTR fmkr, char *filename, bool quiet_mode);
 extern void Close_tex(OBJ_PTR fmkr, bool quiet_mode);
 extern void Create_wrapper(OBJ_PTR fmkr, char *filename, bool quiet_mode);
 extern void Init_tex(void);
 extern void Rename_tex(char *oldname, char *newname);
 extern void private_make_portfolio(char *filename, OBJ_PTR fignums, OBJ_PTR fignames);
+
+extern OBJ_PTR c_rescale_text(OBJ_PTR fmkr, FM *p, double scaling_factor);
+extern OBJ_PTR c_show_rotated_text(OBJ_PTR fmkr, FM *p, char *text, int frame_side, double shift, double fraction,
+   double scale, double angle, int justification, int alignment);
+extern OBJ_PTR c_show_rotated_label(OBJ_PTR fmkr, FM *p, char *text, 
+   double xloc, double yloc, double scale, double angle, int justification, int alignment);
+extern OBJ_PTR c_check_label_clip(OBJ_PTR fmkr, FM *p, double x, double y);
 
 /*======================================================================*/
 

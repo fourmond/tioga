@@ -73,61 +73,45 @@ static double spline_interpolate(double x, int n_pts_data,
    double dx = x - Xs[j];
    return Ys[j] + dx*(Cs[j] + dx*(Bs[j] + dx*As[j]));
 }
-
-static void c_private_make_spline_interpolated_points(FM *p, 
-         long xlen, double *Xs, double *Ys, 
-         OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
-         int start_clamped, double start_slope, 
-         int end_clamped, double end_slope) {
-      int i, n_pts_data;
-      double *As, *Bs, *Cs, *Ds;
-      long xdlen, ydlen;
-      double *X_data = Vector_Data_for_Read(Xvec_data, &xdlen);
-      double *Y_data = Vector_Data_for_Read(Yvec_data, &ydlen);
-      if (Xs == NULL || Ys == NULL || X_data == NULL || Y_data == NULL || xdlen != ydlen) {
-         RAISE_ERROR("Sorry: bad args");
-      }
-      if (xlen == 0) return;
-      n_pts_data = xdlen;
-      As = Y_data;
-      Bs = ALLOC_N_double(n_pts_data);
-      Cs = ALLOC_N_double(n_pts_data);
-      Ds = ALLOC_N_double(n_pts_data);
-      create_spline_interpolant(n_pts_data, X_data, Y_data,
-         start_clamped, start_slope, end_clamped, end_slope, Bs, Cs, Ds);
-      for (i = 0; i < xlen; i++)
-         Ys[i] = spline_interpolate(Xs[i], n_pts_data, X_data, As, Bs, Cs, Ds);
-      free(Ds); free(Cs); free(Bs);
-      USE_P
-      }
       
-   OBJ_PTR FM_private_make_spline_interpolated_points(OBJ_PTR fmkr, 
-         OBJ_PTR Xvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
-         OBJ_PTR start_slope, OBJ_PTR end_slope) {
-      FM *p = Get_FM(fmkr);
-      bool start_clamped = (start_slope != OBJ_NIL), end_clamped = (end_slope != OBJ_NIL);
-      long xlen;
-      double start=0, end=0, *Ys;
-      double *Xs = Vector_Data_for_Read(Xvec, &xlen);
-      OBJ_PTR Yvec;
       
-      if (start_clamped) {
-         start = Number_to_double(start_slope);
-      }
-      if (end_clamped) {
-         end = Number_to_double(end_slope);
-      }
-      
-      Ys = ALLOC_N_double(xlen); // Ys are same length as Xs
-      
-      c_private_make_spline_interpolated_points(p, 
-         xlen, Xs, Ys, 
-         Xvec_data, Yvec_data,
-         start_clamped, start, end_clamped, end);
+OBJ_PTR c_private_make_spline_interpolated_points(OBJ_PTR fmkr, FM *p,
+      OBJ_PTR Xvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
+      OBJ_PTR start_slope, OBJ_PTR end_slope) {
          
-      Yvec = Vector_New(xlen, Ys);
-      free(Ys);
-      return Yvec;
+   bool start_clamped = (start_slope != OBJ_NIL), end_clamped = (end_slope != OBJ_NIL);
+   long xlen;
+   double start=0, end=0, *Ys;
+   double *Xs = Vector_Data_for_Read(Xvec, &xlen);
+   OBJ_PTR Yvec;
+   
+   if (start_clamped) start = Number_to_double(start_slope);
+   if (end_clamped) end = Number_to_double(end_slope);
+   
+   Ys = ALLOC_N_double(xlen); // Ys are same length as Xs
+   
+   int i, n_pts_data;
+   double *As, *Bs, *Cs, *Ds;
+   long xdlen, ydlen;
+   double *X_data = Vector_Data_for_Read(Xvec_data, &xdlen);
+   double *Y_data = Vector_Data_for_Read(Yvec_data, &ydlen);
+   if (Xs == NULL || Ys == NULL || X_data == NULL || Y_data == NULL || xdlen != ydlen) {
+      RAISE_ERROR("Sorry: bad args");
+   }
+   if (xlen == 0) return;
+   n_pts_data = xdlen;
+   As = Y_data;
+   Bs = ALLOC_N_double(n_pts_data);
+   Cs = ALLOC_N_double(n_pts_data);
+   Ds = ALLOC_N_double(n_pts_data);
+   create_spline_interpolant(n_pts_data, X_data, Y_data,
+      start_clamped, start, end_clamped, end, Bs, Cs, Ds);
+   for (i = 0; i < xlen; i++)
+      Ys[i] = spline_interpolate(Xs[i], n_pts_data, X_data, As, Bs, Cs, Ds);
+   free(Ds); free(Cs); free(Bs);
+   Yvec = Vector_New(xlen, Ys);
+   free(Ys);
+   return Yvec;
    }
 
 static void c_make_steps(FM *p, 
@@ -174,22 +158,21 @@ static void c_make_steps(FM *p,
 
       USE_P
       }
-
-OBJ_PTR FM_private_make_steps(OBJ_PTR fmkr, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
-        OBJ_PTR xfirst, OBJ_PTR yfirst, OBJ_PTR xlast, OBJ_PTR ylast) {
+      
+OBJ_PTR c_private_make_steps(OBJ_PTR fmkr, FM *p, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
+        double xfirst, double yfirst, double xlast, double ylast) {
         /* adds n_pts_to_add points to Xs and Ys for steps with the given parameters.
             X_data and Y_data are arrays of n values where n_pts_to_add = 2*(n+1)
             (xfirst,yfirst) and (xlast,ylast) are extra data points to fix the first and last steps.
         The X_data plus xfirst and xlast determine the widths of the steps.
         The Y_data plus yfirst and ylast determine the height of the steps.
         The steps occur at locations midway between the given x locations. */
-      FM *p = Get_FM(fmkr);
       OBJ_PTR Xvec, Yvec, dest_xs, dest_ys, pts_array;
       long xsteps_len, ysteps_len;
       double *xsteps_data, *ysteps_data;
       
       c_make_steps(p, &xsteps_len, &xsteps_data, &ysteps_len, &ysteps_data, Xvec_data, Yvec_data,
-         Number_to_double(xfirst), Number_to_double(yfirst), Number_to_double(xlast), Number_to_double(ylast));
+         xfirst, yfirst, xlast, ylast);
 
       Xvec = Vector_New(xsteps_len, xsteps_data);
       Yvec = Vector_New(ysteps_len, ysteps_data);
@@ -1091,12 +1074,13 @@ FLAG(int ni, int nj, int ind)
       }
    }
    
-   OBJ_PTR FM_private_make_contour(OBJ_PTR fmkr,
+            
+   OBJ_PTR c_private_make_contour(OBJ_PTR fmkr, FM *p,
          OBJ_PTR gaps, // these vectors get the results
          OBJ_PTR xs, OBJ_PTR ys, // data x coordinates and y coordinates
-         OBJ_PTR zs, OBJ_PTR z_level, // the table of values and the desired contour level
+         OBJ_PTR zs, double z_level, // the table of values and the desired contour level
          OBJ_PTR legit, // the table of flags (nonzero means okay)
-         OBJ_PTR method // int == 1 means CONREC
+         int method // int == 1 means CONREC
          ) {
         /* uses Xvec_data and Yvec_data to create a cubic spline interpolant.
         once the spline interpolant is created, it is sampled at the n_pts_to_add in Xs.
@@ -1108,7 +1092,6 @@ FLAG(int ni, int nj, int ind)
         the 2nd derivative is set to 0 and the slope is determined by the fit.
         In this case, the corresponding slope argument is ignored.
         */
-      FM *p = Get_FM(fmkr);
       long dest_len, dest_sz;
       double *dest_xs_data;
       double *dest_ys_data;
@@ -1119,7 +1102,7 @@ FLAG(int ni, int nj, int ind)
       dest_ys_data = ALLOC_N_double(dest_sz);
 
       c_make_contour(p, &dest_len, &dest_xs_data, &dest_ys_data, &dest_sz, 
-         gaps, xs, ys, zs, Number_to_double(z_level), legit, Number_to_int(method));
+         gaps, xs, ys, zs, z_level, legit, method);
          
       Xvec = Vector_New(dest_len, dest_xs_data);
       Yvec = Vector_New(dest_len, dest_ys_data);

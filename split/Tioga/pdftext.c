@@ -127,8 +127,7 @@ static Font_Dictionary *GetFontInfo(int font_number)
    return NULL;
 }
 
-static int c_register_font(char *font_name)
-{
+OBJ_PTR c_register_font(OBJ_PTR fmkr, FM *p, char *font_name) {
    Font_Dictionary *f;
    int i;
    for (f = font_dictionaries; f != NULL; f = f->next) {
@@ -143,14 +142,10 @@ static int c_register_font(char *font_name)
    }
    f = GetFontDict(font_name, next_available_font_number);
    if (f == NULL) RAISE_ERROR_s("Error in reading font metrics for %s", font_name);
-   return next_available_font_number++;
+   next_available_font_number++;
+   return Integer_New(next_available_font_number); 
 }
 
-OBJ_PTR FM_register_font(OBJ_PTR fmkr, OBJ_PTR font_name)
-{
-   int font_num = c_register_font(String_Ptr(font_name));
-   return Integer_New(font_num); 
-}
 
 bool Used_Any_Fonts(void)
 {
@@ -247,15 +242,11 @@ static void GetStringInfo(FM *p, int font_number, unsigned char *text, double ft
    *ury_ptr = ury * ft_ht * 1e-3;
 }
 
-OBJ_PTR FM_marker_string_info(OBJ_PTR fmkr, OBJ_PTR font_number, OBJ_PTR string, OBJ_PTR scale)
-{ // [ width, llx, lly, urx, ury ] in figure coords
-   FM *p = Get_FM(fmkr);
-   unsigned char *text = (unsigned char *)(String_Ptr(string));
-   double ft_ht = p->default_text_scale * Number_to_double(scale) * p->default_font_size * ENLARGE;
+OBJ_PTR c_marker_string_info(OBJ_PTR fmkr, FM *p, int fnt, unsigned char *text, double scale) {
+   double ft_ht = p->default_text_scale * scale * p->default_font_size * ENLARGE;
    int ft_height = ROUND(ft_ht);
    ft_ht = ft_height;
    double llx, lly, urx, ury, width;
-   int fnt = Number_to_int(font_number);
    GetStringInfo(p, fnt, text, ft_ht, &llx, &lly, &urx, &ury, &width);
    OBJ_PTR result = Array_New(5);
    width = convert_output_to_figure_dx(p,width);
@@ -274,7 +265,7 @@ OBJ_PTR FM_marker_string_info(OBJ_PTR fmkr, OBJ_PTR font_number, OBJ_PTR string,
 #define TRANSFORM_VEC(dx,dy) tmp = dx; dx = (dx) * a + (dy) * c; dy = tmp * b + (dy) * d;
 
 static void c_rotated_string_at_points(
-   FM *p, double rotation, int font_number, unsigned char *text, double scale,
+   OBJ_PTR fmkr, FM *p, double rotation, int font_number, unsigned char *text, double scale,
    int n, double *xs, double *ys, int alignment, int justification, 
    double horizontal_scaling, double vertical_scaling,
    double italic_angle, double ascent_angle)
@@ -368,15 +359,12 @@ static void c_rotated_string_at_points(
    fprintf(TF, "ET\n");
 }
 
-OBJ_PTR FM_private_show_marker(
-   OBJ_PTR fmkr, OBJ_PTR integer_args, OBJ_PTR stroke_width, OBJ_PTR string,
+OBJ_PTR c_private_show_marker(
+   OBJ_PTR fmkr, FM *p, int int_args, OBJ_PTR stroke_width, OBJ_PTR string,
    OBJ_PTR x, OBJ_PTR y, OBJ_PTR x_vec, OBJ_PTR y_vec,
-   OBJ_PTR h_scale, OBJ_PTR v_scale, OBJ_PTR scale, OBJ_PTR it_angle, 
-   OBJ_PTR ascent_angle, OBJ_PTR angle,
-   OBJ_PTR fill_color, OBJ_PTR stroke_color)
-{
-   FM *p = Get_FM(fmkr);
-   int int_args, c, alignment, justification, fnt_num, n, mode;
+   double h_scale, double v_scale, double scale, double it_angle, double ascent_angle, double angle,
+   OBJ_PTR fill_color, OBJ_PTR stroke_color) {
+   int c, alignment, justification, fnt_num, n, mode;
    unsigned char *text = NULL, buff[2];
    double *xs, *ys, xloc, yloc, prev_line_width = -1;
    bool restore_fill_color = false, restore_stroke_color = false;
@@ -384,7 +372,6 @@ OBJ_PTR FM_private_show_marker(
    double prev_stroke_color_R, prev_stroke_color_G, prev_stroke_color_B;
    double fill_color_R=0.0, fill_color_G=0.0, fill_color_B=0.0;
    double prev_fill_color_R, prev_fill_color_G, prev_fill_color_B;
-   int_args = Number_to_int(integer_args);
    c = int_args / 100000; int_args -= c * 100000;
    fnt_num = int_args / 1000; int_args -= fnt_num * 1000;
    mode = int_args / 100; int_args -= mode * 100;
@@ -414,7 +401,7 @@ OBJ_PTR FM_private_show_marker(
           prev_stroke_color_G = p->stroke_color_G;
           prev_stroke_color_B = p->stroke_color_B;
           restore_stroke_color = true;
-          c_stroke_color_set(p, stroke_color_R, stroke_color_G, stroke_color_B);
+          c_stroke_color_set_RGB(fmkr, p, stroke_color_R, stroke_color_G, stroke_color_B);
        }
    }
    if (fill_color != OBJ_NIL &&
@@ -428,7 +415,7 @@ OBJ_PTR FM_private_show_marker(
           prev_fill_color_G = p->fill_color_G;
           prev_fill_color_B = p->fill_color_B;
           restore_fill_color = true;
-          c_fill_color_set(p, fill_color_R, fill_color_G, fill_color_B);
+          c_fill_color_set_RGB(fmkr, p, fill_color_R, fill_color_G, fill_color_B);
        }
    }
    if (x == OBJ_NIL) {
@@ -443,12 +430,12 @@ OBJ_PTR FM_private_show_marker(
       yloc = Number_to_double(y); ys = &yloc;
       n = 1;
    }
-   c_rotated_string_at_points(p, Number_to_double(angle), fnt_num, text, Number_to_double(scale), n, xs, ys,
-      alignment, justification, Number_to_double(h_scale), Number_to_double(v_scale), Number_to_double(it_angle), Number_to_double(ascent_angle));
-   if (prev_line_width >= 0) c_line_width_set(p, prev_line_width);
+   c_rotated_string_at_points(fmkr, p, angle, fnt_num, text, scale, n, xs, ys,
+      alignment, justification, h_scale, v_scale, it_angle, ascent_angle);
+   if (prev_line_width >= 0) c_line_width_set(fmkr, p, prev_line_width);
    if (restore_fill_color)
-       c_fill_color_set(p, prev_fill_color_R, prev_fill_color_G, prev_fill_color_B);
+       c_fill_color_set_RGB(fmkr, p, prev_fill_color_R, prev_fill_color_G, prev_fill_color_B);
    if (restore_stroke_color) 
-       c_stroke_color_set(p, prev_stroke_color_R, prev_stroke_color_G, prev_stroke_color_B);
+       c_stroke_color_set_RGB(fmkr, p, prev_stroke_color_R, prev_stroke_color_G, prev_stroke_color_B);
    return fmkr;
 }

@@ -77,12 +77,12 @@ static void Init_PlotAxis_struct(PlotAxis *s) {
 
 static void figure_moveto(OBJ_PTR fmkr, FM *p, double x, double y) // figure coords
 {
-   c_moveto(p, convert_figure_to_output_x(p,x), convert_figure_to_output_y(p,y));
+   c_moveto(fmkr, p, convert_figure_to_output_x(p,x), convert_figure_to_output_y(p,y));
 }
 
 static void figure_lineto(OBJ_PTR fmkr, FM *p, double x, double y) // figure coords
 {
-   c_lineto(p, convert_figure_to_output_x(p,x), convert_figure_to_output_y(p,y));
+   c_lineto(fmkr, p, convert_figure_to_output_x(p,x), convert_figure_to_output_y(p,y));
 }
 
 static void figure_join(OBJ_PTR fmkr, FM *p, 
@@ -94,14 +94,14 @@ static void figure_join(OBJ_PTR fmkr, FM *p,
 
 static void axis_stroke(OBJ_PTR fmkr, FM *p)
 {
-   FM_stroke(fmkr);
+   c_stroke(fmkr,p);
 }
 
 static void figure_join_and_stroke(OBJ_PTR fmkr, FM *p, 
    double x0, double y0, double x1, double y1) // figure coords
 {
    figure_join(fmkr, p, x0, y0, x1, y1);
-   FM_stroke(fmkr);
+   c_stroke(fmkr,p);
 }
 
 static void Get_xaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s)
@@ -256,7 +256,7 @@ static void draw_axis_line(OBJ_PTR fmkr, FM *p, int location, PlotAxis *s)
          s->top_or_right = false;
          break;
    }
-   c_line_width_set(p, s->line_width);
+   c_line_width_set(fmkr, p, s->line_width);
    figure_join_and_stroke(fmkr, p, s->x0, s->y0, s->x1, s->y1);
 }
 
@@ -555,7 +555,7 @@ static void draw_major_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s)
    if (s->ticks_outside) outside = length;
    if (s->top_or_right) { inside = -inside; outside = -outside; }
    if (s->line_width != s->major_tick_width)
-      c_line_width_set(p, s->line_width = s->major_tick_width);
+      c_line_width_set(fmkr, p, s->line_width = s->major_tick_width);
    for (i=0; i < s->nmajors; i++) {
       if (s->vertical)
          figure_join(fmkr, p, s->x0+inside, s->majors[i], s->x0+outside, s->majors[i]);
@@ -592,7 +592,7 @@ static void draw_minor_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s)
    if (s->ticks_outside) outside = length;
    if (s->top_or_right) { inside = -inside; outside = -outside; }
    if (s->line_width != s->minor_tick_width)
-      c_line_width_set(p, s->line_width = s->minor_tick_width);
+      c_line_width_set(fmkr, p, s->line_width = s->minor_tick_width);
    if (s->locations_for_minor_ticks != OBJ_NIL) {
       long cnt;
       double *locs = Vector_Data_for_Read(s->locations_for_minor_ticks, &cnt);
@@ -627,7 +627,7 @@ static void draw_minor_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s)
 static void show_numeric_label(OBJ_PTR fmkr, FM *p, PlotAxis *s, char *text, int location, double position, double shift)
 { // position is in figure coords and must be converted to frame coords
    double pos = ((!s->reversed)? (position - s->axis_min) : (s->axis_max - position)) / s->length;
-   c_show_rotated_text(p, text, location, shift, pos, 
+   c_show_rotated_text(fmkr, p, text, location, shift, pos, 
       s->numeric_label_scale, s->numeric_label_angle, s->numeric_label_justification, s->numeric_label_alignment);
 }
 
@@ -645,7 +645,7 @@ static void draw_numeric_labels(OBJ_PTR fmkr, FM *p, int location, PlotAxis *s)
 static void c_show_side(OBJ_PTR fmkr, FM *p, PlotAxis *s) {
    int i;
    if (s->type == AXIS_HIDDEN) return;
-   Start_Axis_Standard_State(p, 
+   Start_Axis_Standard_State(fmkr, p, 
       s->stroke_color_R, s->stroke_color_G, s->stroke_color_B, 
       s->line_width * p->default_line_scale);
       // gsave, set line type and stroke color
@@ -672,13 +672,11 @@ static void c_show_side(OBJ_PTR fmkr, FM *p, PlotAxis *s) {
    }
 }
 
-OBJ_PTR FM_show_axis(OBJ_PTR fmkr, OBJ_PTR loc)
+
+OBJ_PTR c_show_axis(OBJ_PTR fmkr, FM *p, int location)
 {
-   FM *p = Get_FM(fmkr);
    PlotAxis axis;
-   int location;
    Init_PlotAxis_struct(&axis);
-   location = Number_to_int(loc);
    if (location == LEFT || location == RIGHT || location == AT_X_ORIGIN) {
       if (!p->yaxis_visible) goto done;
       Get_yaxis_Specs(fmkr, p, &axis);
@@ -693,12 +691,10 @@ OBJ_PTR FM_show_axis(OBJ_PTR fmkr, OBJ_PTR loc)
    return fmkr;
 }
       
-OBJ_PTR FM_show_edge(OBJ_PTR fmkr, OBJ_PTR loc) {
-   FM *p = Get_FM(fmkr);
+OBJ_PTR c_show_edge(OBJ_PTR fmkr, FM *p, int location)
+{
    PlotAxis axis;
-   int location;
    Init_PlotAxis_struct(&axis);
-   location = Number_to_int(loc);
    switch (location) {
       case LEFT:
          if (!p->left_edge_visible) goto done;
@@ -726,71 +722,56 @@ OBJ_PTR FM_show_edge(OBJ_PTR fmkr, OBJ_PTR loc) {
 }
 
 
-OBJ_PTR FM_no_title(OBJ_PTR fmkr)
+OBJ_PTR c_no_title(OBJ_PTR fmkr, FM *p)
 {
-   FM *p = Get_FM(fmkr);
    p->title_visible = false;
    return fmkr;
 }
 
-OBJ_PTR FM_no_xlabel(OBJ_PTR fmkr)
+OBJ_PTR c_no_xlabel(OBJ_PTR fmkr, FM *p)
 {
-   FM *p = Get_FM(fmkr);
    p->xlabel_visible = false;
    return fmkr;
 }
 
-
-OBJ_PTR FM_no_ylabel(OBJ_PTR fmkr)
+OBJ_PTR c_no_ylabel(OBJ_PTR fmkr, FM *p)
 {
-   FM *p = Get_FM(fmkr);
    p->ylabel_visible = false;
    return fmkr;
 }
 
-
-OBJ_PTR FM_no_xaxis(OBJ_PTR fmkr)
+OBJ_PTR c_no_xaxis(OBJ_PTR fmkr, FM *p)
 {
-   FM *p = Get_FM(fmkr);
    p->xaxis_visible = false;
    return fmkr;
 }
 
-
-OBJ_PTR FM_no_yaxis(OBJ_PTR fmkr)
+OBJ_PTR c_no_yaxis(OBJ_PTR fmkr, FM *p)
 {
-   FM *p = Get_FM(fmkr);
    p->yaxis_visible = false;
    return fmkr;
 }
 
-
-OBJ_PTR FM_no_left_edge(OBJ_PTR fmkr)
+OBJ_PTR c_no_left_edge(OBJ_PTR fmkr, FM *p)
 {
-   FM *p = Get_FM(fmkr);
    p->left_edge_visible = false;
    return fmkr;
 }
 
-
-OBJ_PTR FM_no_right_edge(OBJ_PTR fmkr)
+OBJ_PTR c_no_right_edge(OBJ_PTR fmkr, FM *p)
 {
-   FM *p = Get_FM(fmkr);
    p->right_edge_visible = false;
    return fmkr;
 }
 
-
-OBJ_PTR FM_no_top_edge(OBJ_PTR fmkr)
+OBJ_PTR c_no_top_edge(OBJ_PTR fmkr, FM *p)
 {
-   FM *p = Get_FM(fmkr);
    p->top_edge_visible = false;
    return fmkr;
 }
 
-OBJ_PTR FM_no_bottom_edge(OBJ_PTR fmkr)
+OBJ_PTR c_no_bottom_edge(OBJ_PTR fmkr, FM *p)
 {
-   FM *p = Get_FM(fmkr);
    p->bottom_edge_visible = false;
    return fmkr;
 }

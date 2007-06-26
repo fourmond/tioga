@@ -178,22 +178,22 @@ void Open_pdf(OBJ_PTR fmkr, char *filename, bool quiet_mode)
       Get_pdf_xoffset(), Get_pdf_yoffset());
    /* set stroke and fill colors to black */
    have_current_point = constructing_path = false;
-   c_line_width_set(p, p->line_width);
-   c_line_cap_set(p, p->line_cap);
-   c_line_join_set(p, p->line_join);
-   c_miter_limit_set(p, p->miter_limit);
-   FM_line_type_set(fmkr, Get_line_type(fmkr));
-   c_stroke_color_set(p, p->stroke_color_R, p->stroke_color_G, p->stroke_color_B);
-   c_fill_color_set(p, p->fill_color_R, p->fill_color_G, p->fill_color_B);
+   c_line_width_set(fmkr, p, p->line_width);
+   c_line_cap_set(fmkr, p, p->line_cap);
+   c_line_join_set(fmkr, p, p->line_join);
+   c_miter_limit_set(fmkr, p, p->miter_limit);
+   c_line_type_set(fmkr, p, Get_line_type(fmkr));
+   c_stroke_color_set_RGB(fmkr, p, p->stroke_color_R, p->stroke_color_G, p->stroke_color_B);
+   c_fill_color_set_RGB(fmkr, p, p->fill_color_R, p->fill_color_G, p->fill_color_B);
    // initialize clip region
    bbox_llx = bbox_lly = 1e5;
    bbox_urx = bbox_ury = -1e5;
 }
 
-void Start_Axis_Standard_State(FM *p, double r, double g, double b, double line_width) {
+void Start_Axis_Standard_State(OBJ_PTR fmkr, FM *p, double r, double g, double b, double line_width) {
    fprintf(TF, "q 2 J [] 0 d\n");
-   c_line_width_set(p, line_width);
-   c_stroke_color_set(p, r, g, b);
+   c_line_width_set(fmkr, p, line_width);
+   c_stroke_color_set_RGB(fmkr, p, r, g, b);
    /* 2 J sets the line cap style to square cap */
    /* set stroke and fill colors to black.  set line type to solid */
 }
@@ -210,8 +210,8 @@ void Write_grestore(void)
    fprintf(TF, "Q\n");
 }
 
-OBJ_PTR FM_pdf_gsave(OBJ_PTR fmkr) { Write_gsave(); }
-OBJ_PTR FM_pdf_grestore(OBJ_PTR fmkr) { Write_grestore(); }
+OBJ_PTR c_pdf_gsave(OBJ_PTR fmkr, FM *p) { Write_gsave(); }
+OBJ_PTR c_pdf_grestore(OBJ_PTR fmkr, FM *p) { Write_grestore(); }
 
 static void Print_Xref(long int offset) {
    char line[80];

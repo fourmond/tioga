@@ -24,19 +24,42 @@
 #include "pdfs.h"
 
 
-ID fm_data_ID, save_dir_ID, quiet_mode_ID;
-ID tex_preview_documentclass_ID, tex_preamble_ID, xaxis_numeric_label_tex_ID, yaxis_numeric_label_tex_ID, tex_preview_pagestyle_ID;
-ID tex_preview_paper_width_ID, tex_preview_paper_height_ID;
-ID tex_preview_hoffset_ID, tex_preview_voffset_ID;
-ID tex_preview_figure_width_ID, tex_preview_figure_height_ID, tex_preview_tiogafigure_command_ID;
-ID tex_preview_fullpage_ID, tex_preview_minwhitespace_ID;
-ID do_cmd_ID, make_page_ID, initialized_ID, tex_xoffset_ID, tex_yoffset_ID;
-ID tex_fontsize_ID, tex_fontfamily_ID, tex_fontseries_ID, tex_fontshape_ID;
-
-
-ID line_type_ID, title_ID, xlabel_ID, ylabel_ID;
-ID xaxis_locations_for_major_ticks_ID, xaxis_locations_for_minor_ticks_ID, xaxis_tick_labels_ID;
-ID yaxis_locations_for_major_ticks_ID, yaxis_locations_for_minor_ticks_ID, yaxis_tick_labels_ID;
+static ID_PTR fm_data_ID;
+static ID_PTR save_dir_ID;
+static ID_PTR quiet_mode_ID;
+static ID_PTR tex_preview_documentclass_ID;
+static ID_PTR tex_preamble_ID;
+static ID_PTR xaxis_numeric_label_tex_ID;
+static ID_PTR yaxis_numeric_label_tex_ID;
+static ID_PTR tex_preview_pagestyle_ID;
+static ID_PTR tex_preview_paper_width_ID;
+static ID_PTR tex_preview_paper_height_ID;
+static ID_PTR tex_preview_hoffset_ID;
+static ID_PTR tex_preview_voffset_ID;
+static ID_PTR tex_preview_figure_width_ID;
+static ID_PTR tex_preview_figure_height_ID;
+static ID_PTR tex_preview_tiogafigure_command_ID;
+static ID_PTR tex_preview_fullpage_ID;
+static ID_PTR tex_preview_minwhitespace_ID;
+static ID_PTR do_cmd_ID;
+static ID_PTR make_page_ID;
+static ID_PTR initialized_ID;
+static ID_PTR tex_xoffset_ID;
+static ID_PTR tex_yoffset_ID;
+static ID_PTR tex_fontsize_ID;
+static ID_PTR tex_fontfamily_ID;
+static ID_PTR tex_fontseries_ID;
+static ID_PTR tex_fontshape_ID;
+static ID_PTR line_type_ID;
+static ID_PTR title_ID;
+static ID_PTR xlabel_ID;
+static ID_PTR ylabel_ID;
+static ID_PTR xaxis_locations_for_major_ticks_ID;
+static ID_PTR xaxis_locations_for_minor_ticks_ID;
+static ID_PTR xaxis_tick_labels_ID;
+static ID_PTR yaxis_locations_for_major_ticks_ID;
+static ID_PTR yaxis_locations_for_minor_ticks_ID;
+static ID_PTR yaxis_tick_labels_ID;
 
 
 void Init_IDs(void)
@@ -272,15 +295,16 @@ static void Make_Save_Fname(OBJ_PTR fmkr, char *full_name, char *f_name,
      }
 }
    
-OBJ_PTR FM_get_save_filename(OBJ_PTR fmkr, OBJ_PTR name) {
+
+OBJ_PTR c_get_save_filename(OBJ_PTR fmkr, FM *p, OBJ_PTR name) {
    char full_name[STRLEN];
    Make_Save_Fname(fmkr, full_name, (name == OBJ_NIL)? NULL : String_Ptr(name), false, false);
    return String_From_Cstring(full_name);
 }
    
-OBJ_PTR FM_private_make(OBJ_PTR fmkr, OBJ_PTR name, OBJ_PTR cmd) {
+   
+OBJ_PTR c_private_make(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR cmd) {
    char full_name[STRLEN], mod_num_name[STRLEN];
-   FM *p = Get_FM(fmkr);
    FM saved = *p;
    OBJ_PTR result;
    bool quiet = Get_quiet_mode(fmkr);
@@ -305,7 +329,8 @@ OBJ_PTR FM_private_make(OBJ_PTR fmkr, OBJ_PTR name, OBJ_PTR cmd) {
    return result;
 }
    
-OBJ_PTR FM_private_make_portfolio(OBJ_PTR fmkr, OBJ_PTR name, OBJ_PTR fignums, OBJ_PTR fignames) {
+      
+OBJ_PTR c_private_make_portfolio(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR fignums, OBJ_PTR fignames) {
    char full_name[STRLEN];
    Make_Save_Fname(fmkr, full_name, (name == OBJ_NIL)? NULL : String_Ptr(name), true, false);
    private_make_portfolio(full_name, fignums, fignames);
@@ -313,7 +338,8 @@ OBJ_PTR FM_private_make_portfolio(OBJ_PTR fmkr, OBJ_PTR name, OBJ_PTR fignums, O
 }
 
 
-static void c_set_device_pagesize(FM *p, double width, double height) { // sizes in units of 1/720 inch
+OBJ_PTR c_set_device_pagesize(OBJ_PTR fmkr, FM *p, double width, double height) { 
+   // sizes in units of 1/720 inch
    p->page_left = 0;
    p->page_right = width;
    p->page_bottom = 0;
@@ -324,18 +350,11 @@ static void c_set_device_pagesize(FM *p, double width, double height) { // sizes
    p->clip_right = p->page_right;
    p->clip_top = p->page_top;
    p->clip_bottom = p->page_bottom;
-}
-
-
-OBJ_PTR FM_set_device_pagesize(OBJ_PTR fmkr, OBJ_PTR width, OBJ_PTR height)
-{
-   FM *p = Get_FM(fmkr);
-   c_set_device_pagesize(p, Number_to_double(width), Number_to_double(height));
    return fmkr;
 }
 
 
-static void c_set_frame_sides(FM *p, double left, double right, double top, double bottom) { // sizes in page coords [0..1]
+OBJ_PTR c_set_frame_sides(OBJ_PTR fmkr, FM *p, double left, double right, double top, double bottom) { // sizes in page coords [0..1]
    if (left > 1.0 || left < 0.0) RAISE_ERROR("Sorry: OBJ_PTR of left must be between 0 and 1 for set_frame_sides");
    if (right > 1.0 || right < 0.0) RAISE_ERROR("Sorry: OBJ_PTR of right must be between 0 and 1 for set_frame_sides");
    if (top > 1.0 || top < 0.0) RAISE_ERROR("Sorry: OBJ_PTR of top must be between 0 and 1 for set_frame_sides");
@@ -348,25 +367,18 @@ static void c_set_frame_sides(FM *p, double left, double right, double top, doub
    p->frame_top = top;
    p->frame_width = right - left;
    p->frame_height = top - bottom;
-}
-
-OBJ_PTR FM_set_frame_sides(OBJ_PTR fmkr, OBJ_PTR left, OBJ_PTR right, OBJ_PTR top, OBJ_PTR bottom)
-{
-   FM *p = Get_FM(fmkr);
-   c_set_frame_sides(p, Number_to_double(left), Number_to_double(right), Number_to_double(top), Number_to_double(bottom));
    return fmkr;
 }
 
 
-OBJ_PTR FM_private_init_fm_data(OBJ_PTR fmkr) {
-   FM *p = Get_FM(fmkr);
+OBJ_PTR c_private_init_fm_data(OBJ_PTR fmkr, FM *p) {
    /* Page */
    p->root_figure = true;
    p->in_subplot = false;
-   c_private_set_default_font_size(p, 12.0);
-   c_set_device_pagesize(p, 5 * 72.0 * ENLARGE, 5 * 72.0 * ENLARGE);
+   c_private_set_default_font_size(fmkr, p, 12.0);
+   c_set_device_pagesize(fmkr, p, 5 * 72.0 * ENLARGE, 5 * 72.0 * ENLARGE);
    /* default frame */
-   c_set_frame_sides(p, 0.15, 0.85, 0.85, 0.15);
+   c_set_frame_sides(fmkr, p, 0.15, 0.85, 0.85, 0.15);
    /* default bounds */
    p->bounds_left = p->bounds_bottom = p->bounds_xmin = p->bounds_ymin = 0;
    p->bounds_right = p->bounds_top = p->bounds_xmax = p->bounds_ymax = 1;
