@@ -243,18 +243,12 @@ static void Show_JPEG(FM *p, char *filename, int width, int height, double *dest
    update_bbox(p, lrx+ulx-llx, lry+uly-lly);
 }
 
-static void c_show_jpg(FM *p, char *filename, int width, int height, double *dest, int mask_obj_num)
-{
-   Show_JPEG(p, filename, width, height, dest, JPG_SUBTYPE, mask_obj_num);
-}
-
-OBJ_PTR FM_private_show_jpg(OBJ_PTR fmkr, OBJ_PTR filename, OBJ_PTR width, OBJ_PTR height, OBJ_PTR image_destination, OBJ_PTR mask_obj_num)
-{
+OBJ_PTR c_private_show_jpg(OBJ_PTR fmkr, FM *p, char *filename, 
+   int width, int height, OBJ_PTR image_destination, int mask_obj_num) {
    double dest[6];
-   FM *p = Get_FM(fmkr);
    if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling show_jpg");
    Get_Image_Dest(p, image_destination, dest);
-   c_show_jpg(p, String_Ptr(filename), Number_to_int(width), Number_to_int(height), dest, Number_to_int(mask_obj_num));
+   Show_JPEG(p, filename, width, height, dest, JPG_SUBTYPE, mask_obj_num);
    return fmkr;
 }
 

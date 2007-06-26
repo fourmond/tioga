@@ -236,7 +236,10 @@ OBJ_PTR FM_private_create_monochrome_image_data(OBJ_PTR fmkr, OBJ_PTR data,
       Number_to_int(first_row), Number_to_int(last_row), Number_to_int(first_column), Number_to_int(last_column),
       Number_to_double(boundary), reverse != OBJ_FALSE);
 }
-
+OBJ_PTR FM_private_show_jpg(OBJ_PTR fmkr, OBJ_PTR filename, 
+   OBJ_PTR width, OBJ_PTR height, OBJ_PTR image_destination, OBJ_PTR mask_obj_num) {
+   return c_private_show_jpg(fmkr, Get_FM(fmkr), String_Ptr(filename), 
+      Number_to_int(width), Number_to_int(height), image_destination, Number_to_int(mask_obj_num)); }
 OBJ_PTR FM_private_show_rgb_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry,
     OBJ_PTR ulx, OBJ_PTR uly, OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_obj_num)
 {

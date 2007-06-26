@@ -522,6 +522,8 @@ extern OBJ_PTR c_private_create_image_data(OBJ_PTR fmkr, FM *p, OBJ_PTR table,
 extern OBJ_PTR c_private_create_monochrome_image_data(OBJ_PTR fmkr, FM *p, OBJ_PTR table,
             int first_row, int last_row, int first_column, int last_column,
             double boundary, bool reversed);
+extern OBJ_PTR c_private_show_jpg(OBJ_PTR fmkr, FM *p, char *filename, 
+   int width, int height, OBJ_PTR image_destination, int mask_obj_num);
 extern OBJ_PTR c_private_show_image(OBJ_PTR fmkr, FM *p, int image_type, double llx, double lly, double lrx, double lry,
     double ulx, double uly, bool interpolate, bool reversed, int w, int h, unsigned char* data, long len, 
     OBJ_PTR mask_min, OBJ_PTR mask_max, OBJ_PTR hival, OBJ_PTR lookup_data, int mask_obj_num);
