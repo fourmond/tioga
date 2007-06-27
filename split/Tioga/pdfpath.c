@@ -29,7 +29,7 @@ double bbox_llx, bbox_lly, bbox_urx, bbox_ury;
 static void croak_on_nonok(FM *p, const char * function)
 {
   if(p->croak_on_nonok_numbers)
-    rb_warn("Illegal coordinates in function %s, element suppressed", 
+    GIVE_WARNING("Illegal coordinates in function %s, element suppressed", 
 	    function);
 }
 

@@ -190,7 +190,6 @@ void Close_tex(OBJ_PTR fmkr, bool quiet_mode)
 
 
 static void Write_preview_header(OBJ_PTR fmkr, FILE *file) {
-   OBJ_PTR tmp;
    fprintf(file, "\\documentclass{%s}\n\n", Get_tex_preview_documentclass(fmkr));   
    /* we print out the preamble generated from tioga.sty.in */
    fprintf(file, "%% Tioga preamble generated from tioga.sty.in\n");
@@ -202,8 +201,7 @@ static void Write_preview_header(OBJ_PTR fmkr, FILE *file) {
    fprintf(file, "%% Command to format numeric labels on yaxis\n");
    fprintf(file, "\\newcommand{\\tiogayaxisnumericlabel}[1]{%s}\n\n", Get_yaxis_numeric_label_tex(fmkr));
    fprintf(file, "%% Color constants definitions\n");
-   tmp = rb_const_get(CLASS_OF(fmkr), ID_Get("COLOR_PREAMBLE"));
-   fprintf(file, "%s\n\n", StringValueCStr(tmp));
+   fprintf(file, "%s\n\n", CString_Ptr(COLOR_PREAMBLE(fmkr)));   
    fprintf(file, "%% Set page margins, page size and orientation.\n");
    fprintf(file, "\t\\usepackage[pdftex,tmargin=0pt,lmargin=0pt,"
 	   "rmargin=0pt,bmargin=0pt,\n");

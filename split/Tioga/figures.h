@@ -321,6 +321,7 @@ extern char *Get_String(OBJ_PTR ary, int index);
 
 extern OBJ_PTR c_show_axis(OBJ_PTR fmkr, FM *p, int location);
 extern OBJ_PTR c_show_edge(OBJ_PTR fmkr, FM *p, int location);
+extern OBJ_PTR c_no_title(OBJ_PTR fmkr, FM *p);
 extern OBJ_PTR c_no_xlabel(OBJ_PTR fmkr, FM *p);
 extern OBJ_PTR c_no_ylabel(OBJ_PTR fmkr, FM *p);
 extern OBJ_PTR c_no_xaxis(OBJ_PTR fmkr, FM *p);
@@ -364,8 +365,8 @@ extern double Get_tex_xoffset(OBJ_PTR fmkr);
 extern double Get_tex_yoffset(OBJ_PTR fmkr);
 extern char *Get_tex_preview_documentclass(OBJ_PTR fmkr);
 extern char *Get_tex_preamble(OBJ_PTR fmkr);
-extern char *Get_tex_xaxis_numeric_label(OBJ_PTR fmkr);
-extern char *Get_tex_yaxis_numeric_label(OBJ_PTR fmkr);
+extern char *Get_xaxis_numeric_label_tex(OBJ_PTR fmkr);
+extern char *Get_yaxis_numeric_label_tex(OBJ_PTR fmkr);
 extern char *Get_tex_preview_pagestyle(OBJ_PTR fmkr);
 extern char *Get_tex_preview_tiogafigure_command(OBJ_PTR fmkr);
 extern OBJ_PTR Get_line_type(OBJ_PTR fmkr);
@@ -382,6 +383,7 @@ extern OBJ_PTR c_set_frame_sides(OBJ_PTR fmkr, FM *p,
    double left, double right, double top, double bottom);
 extern OBJ_PTR c_set_device_pagesize(OBJ_PTR fmkr, FM *p, double width, double height);
 extern OBJ_PTR c_get_save_filename(OBJ_PTR fmkr, FM *p, OBJ_PTR name);
+extern OBJ_PTR c_private_make(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR cmd);
 extern OBJ_PTR c_private_make_portfolio(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR fignums, OBJ_PTR fignames);
 
 /*======================================================================*/

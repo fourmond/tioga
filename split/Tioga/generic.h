@@ -125,8 +125,9 @@ extern OBJ_PTR Obj_Attr_Set(OBJ_PTR obj, ID_PTR attr_ID, OBJ_PTR val);
     
 extern OBJ_PTR TEX_PREAMBLE(OBJ_PTR fmkr);
    // returns the class FigureMaker constant named TEX_PREAMBLE
-
-
+    
+extern OBJ_PTR COLOR_PREAMBLE(OBJ_PTR fmkr);
+   // returns the class FigureMaker constant named COLOR_PREAMBLE
 
 
 //#define Obj_Attr_Get_by_StringName(obj,attr_name_string) rb_iv_get(obj,attr_name_string)
@@ -143,6 +144,9 @@ extern void RAISE_ERROR_ii(char *fmt, int x1, int x2);
 extern void RAISE_ERROR_g(char *fmt, double x);
 extern void RAISE_ERROR_gg(char *fmt, double x1, double x2);
 
+extern void GIVE_WARNING(const char *fmt, const char *str);
+   // Unconditionally issues a warning message to standard error.
+   // The given string fmt and the arg str are interpreted as with printf.
 
 /* generic interface for vectors and tables */
 

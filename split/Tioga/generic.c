@@ -93,6 +93,8 @@ OBJ_PTR Obj_Attr_Set(OBJ_PTR obj, ID_PTR attr_ID, OBJ_PTR val) {
       
       
 OBJ_PTR TEX_PREAMBLE(OBJ_PTR fmkr) { return rb_const_get(CLASS_OF(fmkr),ID_Get("TEX_PREAMBLE")); }
+      
+OBJ_PTR COLOR_PREAMBLE(OBJ_PTR fmkr) { return rb_const_get(CLASS_OF(fmkr),ID_Get("COLOR_PREAMBLE")); }
 
 
 //#define Obj_Attr_Get_by_StringName(obj,attr_name_string) rb_iv_get(obj,attr_name_string)
@@ -100,7 +102,7 @@ OBJ_PTR TEX_PREAMBLE(OBJ_PTR fmkr) { return rb_const_get(CLASS_OF(fmkr),ID_Get("
 //#define Obj_Attr_Set_by_StringName(obj,attr_name_string,val) rb_iv_set(obj,attr_name_string,val)
     // sets the specified attr of the obj to val (name_string is char *)
 
-
+void GIVE_WARNING(const char *fmt, const char *str) { rb_warn(fmt,str); }
 
 void RAISE_ERROR(char *str) { rb_raise(rb_eArgError,str); }
 
