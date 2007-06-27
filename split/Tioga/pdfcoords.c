@@ -181,7 +181,7 @@ OBJ_PTR c_convert_output_to_page_y(OBJ_PTR fmkr, FM *p, double val)
 
 OBJ_PTR c_convert_output_to_page_dx(OBJ_PTR fmkr, FM *p, double val)
 {
-   return convert_output_to_page_dx(p,val);
+   val = convert_output_to_page_dx(p,val);
    return Float_New(val);
 }
 

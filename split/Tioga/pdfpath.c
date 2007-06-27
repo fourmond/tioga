@@ -166,7 +166,8 @@ OBJ_PTR c_line_type_set(OBJ_PTR fmkr, FM *p, OBJ_PTR line_type) { // array phase
       if (writing_file) {
          if (Array_Len(line_type) != 2)
             RAISE_ERROR("Sorry: invalid line_type.  Must be [ [dash pattern] dash phase ]");
-         OBJ_PTR dashArray = Array_Entry(line_type, 0), dashPhase = Array_Entry(line_type, 1);
+         OBJ_PTR dashArray = Array_Entry(line_type, 0);
+         OBJ_PTR dashPhase = Array_Entry(line_type, 1);
          fprintf(TF, "[ ");
          if (dashArray != OBJ_NIL) {
             long i, len = Array_Len(dashArray);

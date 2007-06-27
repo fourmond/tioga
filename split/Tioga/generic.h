@@ -85,6 +85,10 @@ extern char *String_Ptr(OBJ_PTR obj);
     // tries to convert obj to string if necessary
     // raises error if obj not a kind of string and cannot be converted to one
 
+extern char *CString_Ptr(OBJ_PTR obj);
+    // like String_Ptr, but checks to make sure that there are no NULL chars in the string
+    // i.e., raises an exception if String_Len(obj) is not same as strlen(String_Ptr(obj))
+
 extern long String_Len(OBJ_PTR obj);
     // returns int length of contents of string obj
     // tries to convert obj to string if necessary

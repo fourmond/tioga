@@ -111,27 +111,27 @@ void Init_IDs(void)
 
 OBJ_PTR do_cmd(OBJ_PTR fmkr, OBJ_PTR cmd) { return Call_Function(fmkr, do_cmd_ID, cmd); }
 
-static void Type_Error(OBJ_PTR obj, ID name_ID, char *expected)
+static void Type_Error(OBJ_PTR obj, ID_PTR name_ID, char *expected)
 {
    char *name = ID_Name(name_ID);
    while (name[0] == '@') name++;
    RAISE_ERROR_ss("Require %s OBJ_PTR for '%s'", expected, name);
 }
 
-bool Get_bool(OBJ_PTR obj, ID name_ID) {
+bool Get_bool(OBJ_PTR obj, ID_PTR name_ID) {
    OBJ_PTR v = Obj_Attr_Get(obj, name_ID);
    if (v != OBJ_FALSE && v != OBJ_TRUE && v != OBJ_NIL)
       Type_Error(v, name_ID, "true or false");
    return v == OBJ_TRUE;
 }
 
-int Get_int(OBJ_PTR obj, ID name_ID) {
+int Get_int(OBJ_PTR obj, ID_PTR name_ID) {
    OBJ_PTR v = Obj_Attr_Get(obj, name_ID);
    if (!Is_Kind_of_Integer(v)) Type_Error(v, name_ID, "Integer");
    return Number_to_int(v);
 }
 
-double Get_double(OBJ_PTR obj, ID name_ID) {
+double Get_double(OBJ_PTR obj, ID_PTR name_ID) {
    OBJ_PTR v = Obj_Attr_Get(obj, name_ID);
    if (!Is_Kind_of_Number(v)) Type_Error(v, name_ID, "Numeric");
    return Number_to_double(v);
@@ -214,7 +214,7 @@ char *Get_tex_preview_generated_preamble(OBJ_PTR fmkr) {
   /* it is a class constant... */
   OBJ_PTR v = TEX_PREAMBLE(fmkr);
   if (v == OBJ_NIL) return NULL;
-  return StringValueCStr(v);
+  return CString_Ptr(v);
 }
 
 double Get_tex_xoffset(OBJ_PTR fmkr) { return Get_double(fmkr, tex_xoffset_ID); }

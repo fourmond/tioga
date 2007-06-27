@@ -222,7 +222,7 @@ static void Get_Image_Dest(FM *p, OBJ_PTR image_destination, double *dest)
 
 static void Show_JPEG(FM *p, char *filename, int width, int height, double *dest, int subtype, int mask_obj_num)
 {
-   JPG_Info *xo = ALLOC(JPG_Info);
+   JPG_Info *xo = (JPG_Info *)calloc(1,sizeof(JPG_Info));
    xo->xobj_subtype = subtype;
    double llx = dest[0], lly = dest[1], lrx = dest[2], lry = dest[3], ulx = dest[4],  uly = dest[5];
    double a, b, c, d, e, f; // the transform to position the image
@@ -374,7 +374,7 @@ OBJ_PTR c_private_show_image(OBJ_PTR fmkr, FM *p, int image_type, double llx, do
    ulx = convert_figure_to_output_x(p,ulx);
    uly = convert_figure_to_output_y(p,uly);
 
-   Sampled_Info *xo = ALLOC(Sampled_Info);
+   Sampled_Info *xo = (Sampled_Info *)calloc(1,sizeof(Sampled_Info));
    xo->xobj_subtype = SAMPLED_SUBTYPE;
    double a, b, c, d, e, f; // the transform to position the image
    int ir, ic, id;
@@ -386,7 +386,7 @@ OBJ_PTR c_private_show_image(OBJ_PTR fmkr, FM *p, int image_type, double llx, do
    xo->length = len;
    xo->interpolate = interpolate;
    xo->reversed = reversed;
-   MEMCPY(xo->image_data, data, unsigned char, len);
+   memcpy(xo->image_data, data, len);
    xo->image_type = image_type;
    if (image_type != COLORMAP_IMAGE) xo->lookup = NULL;
    else {
@@ -396,7 +396,7 @@ OBJ_PTR c_private_show_image(OBJ_PTR fmkr, FM *p, int image_type, double llx, do
       lookup_len = (hival+1) * 3;
       xo->lookup = ALLOC_N_unsigned_char(lookup_len);
       xo->lookup_len = lookup_len;
-      MEMCPY(xo->lookup, lookup, unsigned char, lookup_len);
+      memcpy(xo->lookup, lookup, lookup_len);
    }
    xo->width = w;
    xo->height = h;   

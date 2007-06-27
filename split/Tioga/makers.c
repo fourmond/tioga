@@ -20,6 +20,7 @@
 */
 
 #include "figures.h"
+#include "generic.h"
 
 
 /* Lines */
@@ -29,11 +30,11 @@ static void create_spline_interpolant(int n_pts_data, double *Xs, double *Ys,
     double *As, double *Bs, double *Cs)
     // this is copied from dvector so that makers.c won't depend on dvectors.
 {
-   double *Hs = (double *)ALLOC_N(double, n_pts_data);
-   double *alphas = (double *)ALLOC_N(double, n_pts_data);
-   double *Ls = (double *)ALLOC_N(double, n_pts_data);
-   double *mu_s = (double *)ALLOC_N(double, n_pts_data);
-   double *Zs = (double *)ALLOC_N(double, n_pts_data);
+   double *Hs = ALLOC_N_double(n_pts_data);
+   double *alphas = ALLOC_N_double(n_pts_data);
+   double *Ls = ALLOC_N_double(n_pts_data);
+   double *mu_s = ALLOC_N_double(n_pts_data);
+   double *Zs = ALLOC_N_double(n_pts_data);
    int n = n_pts_data-1, i, j;
    for (i=0; i < n; i++)
       Hs[i] = Xs[i+1] - Xs[i];
@@ -167,7 +168,11 @@ OBJ_PTR c_private_make_steps(OBJ_PTR fmkr, FM *p, OBJ_PTR Xvec_data, OBJ_PTR Yve
         The X_data plus xfirst and xlast determine the widths of the steps.
         The Y_data plus yfirst and ylast determine the height of the steps.
         The steps occur at locations midway between the given x locations. */
-      OBJ_PTR Xvec, Yvec, dest_xs, dest_ys, pts_array;
+      OBJ_PTR Xvec;
+      OBJ_PTR Yvec;
+      OBJ_PTR dest_xs;
+      OBJ_PTR dest_ys;
+      OBJ_PTR pts_array;
       long xsteps_len, ysteps_len;
       double *xsteps_data, *ysteps_data;
       
@@ -1095,7 +1100,9 @@ FLAG(int ni, int nj, int ind)
       long dest_len, dest_sz;
       double *dest_xs_data;
       double *dest_ys_data;
-      OBJ_PTR Xvec, Yvec, pts_array;
+      OBJ_PTR Xvec;
+      OBJ_PTR Yvec;
+      OBJ_PTR pts_array;
       
       dest_len = 0; dest_sz = 3000;
       dest_xs_data = ALLOC_N_double(dest_sz);

@@ -334,8 +334,8 @@ extern OBJ_PTR c_no_bottom_edge(OBJ_PTR fmkr, FM *p);
 // figures.c
 extern FM *Get_FM(OBJ_PTR fmkr);
 void Init_FigureMaker(void);
-extern bool Get_initialized();
-extern void Set_initialized();
+extern bool Get_initialized(void);
+extern void Set_initialized(void);
 
 /*======================================================================*/
 // init.c
@@ -343,9 +343,9 @@ extern void Init_IDs(void);
 extern OBJ_PTR Get_fm_data_attr(OBJ_PTR fmkr);
 extern void Initialize_Figure(OBJ_PTR fmkr);
 extern OBJ_PTR do_cmd(OBJ_PTR fmkr, OBJ_PTR cmd);
-extern bool Get_bool(OBJ_PTR obj, ID name_ID);
-extern int Get_int(OBJ_PTR obj, ID name_ID);
-extern double Get_double(OBJ_PTR obj, ID name_ID); // for instance variables of the obj
+extern bool Get_bool(OBJ_PTR obj, ID_PTR name_ID);
+extern int Get_int(OBJ_PTR obj, ID_PTR name_ID);
+extern double Get_double(OBJ_PTR obj, ID_PTR name_ID); // for instance variables of the obj
 extern char *Get_tex_preview_paper_width(OBJ_PTR fmkr);
 extern char *Get_tex_preview_paper_height(OBJ_PTR fmkr);
 extern char *Get_tex_preview_hoffset(OBJ_PTR fmkr);
@@ -407,13 +407,13 @@ extern OBJ_PTR c_private_make_spline_interpolated_points(OBJ_PTR fmkr, FM *p,
 
 /*======================================================================*/
 // pdfcolor.c
-extern void Free_Functions();
+extern void Free_Functions(void);
 extern void Write_Functions(void);
 extern void Free_Stroke_Opacities(void);
 extern void Free_Fill_Opacities(void);
 extern void Write_Stroke_Opacity_Objects(void);
 extern void Write_Fill_Opacity_Objects(void);
-extern void Free_Shadings();
+extern void Free_Shadings(void);
 extern void Write_Shadings(void);
 
 extern void c_stroke_opacity_set(OBJ_PTR fmkr, FM *p, double stroke_opacity);

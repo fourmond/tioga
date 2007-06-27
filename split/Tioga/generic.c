@@ -64,6 +64,13 @@ long String_Len(OBJ_PTR obj) {
    VALUE str = rb_String(obj);
    return RSTRING(str)->len; }
 
+char *CString_Ptr(OBJ_PTR obj) {
+   VALUE str = rb_String(obj);
+   char *cs = RSTRING(str)->ptr;
+   long len = RSTRING(str)->len;
+   if (len != strlen(cs)) RAISE_ERROR("invalid C string; contains NULL character");
+   return cs; }
+
 OBJ_PTR Array_New(long len) { return rb_ary_new2(len); }
 
 long Array_Len(OBJ_PTR obj) { return (RARRAY(rb_Array(obj))->len); }

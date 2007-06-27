@@ -60,11 +60,11 @@ void Write_Functions(void)
 
 static int create_function(int hival, int lookup_len, unsigned char *lookup)
 {
-   Function_Info *fo = ALLOC(Function_Info);
+   Function_Info *fo = (Function_Info *)calloc(1,sizeof(Function_Info));
    fo->next = functions_list;
    functions_list = fo;
    fo->lookup = ALLOC_N_unsigned_char(lookup_len);
-   MEMCPY(fo->lookup, lookup, unsigned char, lookup_len);
+   memcpy(fo->lookup, lookup, lookup_len);
    fo->lookup_len = lookup_len;
    fo->hival = hival;
    fo->obj_num = next_available_object_number++;

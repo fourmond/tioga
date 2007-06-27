@@ -521,10 +521,11 @@ class MyPlots
       x = Dvector[0,1,2,3,4]
       y = Dvector[0,1,2,3,4]
       #t.do_box_labels("Arrows tests", "Position", "Blues")
-      t.show_plot([-1,4,8,-1]) do
-        marker = BarThin #Circle
+      t.show_plot([-1,5,8,-1]) do
+        marker = Circle
+        scale = 1
         t.show_marker('Xs' => x, 'Ys' => y,
-                      'marker' => marker,
+                      'marker' => marker, "scale" => scale,
                       'color' => Green)
 
 
@@ -536,7 +537,7 @@ class MyPlots
 
         y.add!(1)
         t.show_marker('Xs' => x, 'Ys' => y,
-                      'marker' => marker,
+                      'marker' => marker, "scale" => 0.2,
                       'color' => Green)
 
         t.line_width = 0.2
@@ -548,7 +549,7 @@ class MyPlots
         y.reverse!
         x.reverse!
         t.show_marker('Xs' => x, 'Ys' => y,
-                      'marker' => marker,
+                      'marker' => marker, "scale" => scale,
                       'color' => Green)
 
         t.line_width = 3
@@ -559,7 +560,7 @@ class MyPlots
         t.line_width = 0.1
         t.stroke_color = Black
         for val in x
-          t.append_points_to_path(Dvector[val,val], Dvector[0,5])
+          t.append_points_to_path(Dvector[val,val], Dvector[0,6])
           t.stroke
         end
 

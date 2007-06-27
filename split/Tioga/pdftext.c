@@ -26,7 +26,7 @@ void Init_Font_Dictionary(void) {
    int i, num_fonts = num_pdf_standard_fonts;
    Font_Dictionary *font_info;
    for (i = 0; i < num_fonts; i++) {
-      font_info = ALLOC(Font_Dictionary);
+      font_info = (Font_Dictionary *)calloc(1,sizeof(Font_Dictionary));
       font_info->afm = &afm_array[i];
       font_info->font_num = font_info->afm->font_num;
       font_info->in_use = false;
