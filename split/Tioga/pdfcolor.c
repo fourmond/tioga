@@ -87,7 +87,7 @@ static int Get_Stroke_Opacity_XGS(double stroke_opacity)
    for (p = stroke_opacities; p != NULL; p = p->next) {
       if (p->stroke_opacity == stroke_opacity) return p->gs_num;
    }
-   p = ALLOC(Stroke_Opacity_State);
+   p = (Stroke_Opacity_State *)calloc(1,sizeof(Stroke_Opacity_State));
    p->stroke_opacity = stroke_opacity;
    p->gs_num = next_available_gs_number++;
    p->obj_num = next_available_object_number++;
@@ -119,7 +119,7 @@ static int Get_Fill_Opacity_XGS(double fill_opacity)
    for (p = fill_opacities; p != NULL; p = p->next) {
       if (p->fill_opacity == fill_opacity) return p->gs_num;
    }
-   p = ALLOC(Fill_Opacity_State);
+   p = (Fill_Opacity_State *)calloc(1,sizeof(Fill_Opacity_State));
    p->fill_opacity = fill_opacity;
    p->gs_num = next_available_gs_number++;
    p->obj_num = next_available_object_number++;
@@ -192,7 +192,7 @@ void Write_Shadings(void)
 static void c_axial_shading(FM *p, double x0, double y0, double x1, double y1,
       int hival, int lookup_len, unsigned char *lookup, bool extend_start, bool extend_end)
 {
-   Shading_Info *so = ALLOC(Shading_Info);
+   Shading_Info *so = (Shading_Info *)calloc(1,sizeof(Shading_Info));
    so->next = shades_list;
    shades_list = so;
    so->shade_num = next_available_shade_number++;
@@ -226,7 +226,7 @@ static void c_radial_shading(FM *p, double x0, double y0, double r0, double x1, 
       int hival, int lookup_len, unsigned char *lookup,
       double a, double b, double c, double d, double e, double f, bool extend_start, bool extend_end)
 {
-   Shading_Info *so = ALLOC(Shading_Info);
+   Shading_Info *so = (Shading_Info *)calloc(1,sizeof(Shading_Info));
    so->next = shades_list;
    shades_list = so;
    so->shade_num = next_available_shade_number++;

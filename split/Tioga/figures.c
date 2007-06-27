@@ -418,7 +418,7 @@ void Init_FigureMaker(void) {
    rb_define_method(cFM, "convert_output_to_figure_x", FM_convert_output_to_figure_x, 1);
    rb_define_method(cFM, "convert_output_to_figure_y", FM_convert_output_to_figure_y, 1);
    rb_define_method(cFM, "convert_output_to_figure_dx", FM_convert_output_to_figure_dx, 1);
-   rb_define_method(cFM, "convert_output_to_figuret_dy", FM_convert_output_to_figure_dy, 1);
+   rb_define_method(cFM, "convert_output_to_figure_dy", FM_convert_output_to_figure_dy, 1);
    rb_define_method(cFM, "convert_to_degrees", FM_convert_to_degrees, 2);
 /* text */
    rb_define_method(cFM, "private_set_default_font_size", FM_private_set_default_font_size, 1);
