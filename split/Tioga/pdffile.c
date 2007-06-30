@@ -63,7 +63,7 @@ FILE *TF = NULL; // for the temp file
 
 /* PDF File Management */
 
-static void Free_XObjects(void)
+static void Free_XObjects(int *ierr)
 {
    XObject_Info *xo;
    while (xobj_list != NULL) {
@@ -72,13 +72,13 @@ static void Free_XObjects(void)
       switch (xo->xobj_subtype) {
          case JPG_SUBTYPE: Free_JPG((JPG_Info *)xo); break;
          case SAMPLED_SUBTYPE: Free_Sampled((Sampled_Info *)xo); break;
-         default: RAISE_ERROR_i("Invalid XObject subtype (%i)", xo->xobj_subtype);
+         default: RAISE_ERROR_i("Invalid XObject subtype (%i)", xo->xobj_subtype, ierr); return;
       }
       free(xo);
    }
 }
 
-void Init_pdf(void)
+void Init_pdf(int *ierr)
 {
    int i;
    writing_file = false;
@@ -101,17 +101,18 @@ void Record_Object_Offset(int obj_number)
    if (obj_number >= num_objects) num_objects = obj_number + 1;
 }
 
-static void Write_XObjects(void)
+static void Write_XObjects(int *ierr)
 {
    XObject_Info *xo;
    for (xo = xobj_list; xo != NULL; xo = xo->next) {
       Record_Object_Offset(xo->obj_num);
       fprintf(OF, "%i 0 obj << /Type /XObject ", xo->obj_num);
       switch (xo->xobj_subtype) {
-         case JPG_SUBTYPE: Write_JPG((JPG_Info *)xo); break;
-         case SAMPLED_SUBTYPE: Write_Sampled((Sampled_Info *)xo); break;
-         default: RAISE_ERROR_i("Invalid XObject subtype (%i)", xo->xobj_subtype);
+         case JPG_SUBTYPE: Write_JPG((JPG_Info *)xo, ierr); break;
+         case SAMPLED_SUBTYPE: Write_Sampled((Sampled_Info *)xo, ierr); break;
+         default: RAISE_ERROR_i("Invalid XObject subtype (%i)", xo->xobj_subtype, ierr);
       }
+      if (*ierr != 0) return;
       fprintf(OF, ">> endobj\n");
    }
 }
@@ -123,9 +124,9 @@ static void Write_XObjects(void)
 #define CATALOG_OBJ 5
 #define FIRST_OTHER_OBJ 6
 
-static void Free_Records()
+static void Free_Records(int *ierr)
 {
-   Free_Stroke_Opacities(); Free_Fill_Opacities(); Free_XObjects(); Free_Shadings(); Free_Functions();
+   Free_Stroke_Opacities(); Free_Fill_Opacities(); Free_XObjects(ierr); Free_Shadings(); Free_Functions();
 }
 
 static void Get_pdf_name(char *ofile, char *filename, int maxlen)
@@ -137,11 +138,13 @@ static void Get_pdf_name(char *ofile, char *filename, int maxlen)
    strcat(ofile, "_figure.pdf");
 }
 
-void Open_pdf(OBJ_PTR fmkr, FM *p, char *filename, bool quiet_mode) {
+void Open_pdf(OBJ_PTR fmkr, FM *p, char *filename, bool quiet_mode, int *ierr) {
    int i;
-   if (writing_file) RAISE_ERROR("Sorry: cannot start a new output file until finish current one.");
+   if (writing_file) {
+      RAISE_ERROR("Sorry: cannot start a new output file until finish current one.", ierr); return; }
    Clear_Fonts_In_Use_Flags();
-   Free_Records(); 
+   Free_Records(ierr);
+   if (*ierr != 0) return;
    next_available_object_number = FIRST_OTHER_OBJ;
    next_available_font_number = num_predefined_fonts + 1;
    next_available_gs_number = 1;
@@ -151,10 +154,10 @@ void Open_pdf(OBJ_PTR fmkr, FM *p, char *filename, bool quiet_mode) {
    time_t now = time(NULL);
    char ofile[300], timestring[100];
    Get_pdf_name(ofile, filename, 300);
-   if ((OF = fopen(ofile, "w")) == NULL)
-       RAISE_ERROR_s("Sorry: can't open %s.\n", filename);
-   if ((TF = tmpfile()) == NULL)
-       RAISE_ERROR_s("Sorry: can't create temp file for writing PDF file %s.\n", filename);
+   if ((OF = fopen(ofile, "w")) == NULL) {
+       RAISE_ERROR_s("Sorry: can't open %s.\n", filename, ierr); return; }
+   if ((TF = tmpfile()) == NULL) {
+       RAISE_ERROR_s("Sorry: can't create temp file for writing PDF file %s.\n", filename, ierr); return; }
    /* open PDF file and write header */
    fprintf(OF, "%%PDF-1.4\n");
    strcpy(timestring, ctime(&now));
@@ -176,22 +179,22 @@ void Open_pdf(OBJ_PTR fmkr, FM *p, char *filename, bool quiet_mode) {
       Get_pdf_xoffset(), Get_pdf_yoffset());
    /* set stroke and fill colors to black */
    have_current_point = constructing_path = false;
-   c_line_width_set(fmkr, p, p->line_width);
-   c_line_cap_set(fmkr, p, p->line_cap);
-   c_line_join_set(fmkr, p, p->line_join);
-   c_miter_limit_set(fmkr, p, p->miter_limit);
-   c_line_type_set(fmkr, p, Get_line_type(fmkr));
-   c_stroke_color_set_RGB(fmkr, p, p->stroke_color_R, p->stroke_color_G, p->stroke_color_B);
-   c_fill_color_set_RGB(fmkr, p, p->fill_color_R, p->fill_color_G, p->fill_color_B);
+   c_line_width_set(fmkr, p, p->line_width, ierr);
+   c_line_cap_set(fmkr, p, p->line_cap, ierr);
+   c_line_join_set(fmkr, p, p->line_join, ierr);
+   c_miter_limit_set(fmkr, p, p->miter_limit, ierr);
+   c_line_type_set(fmkr, p, Get_line_type(fmkr, ierr), ierr);
+   c_stroke_color_set_RGB(fmkr, p, p->stroke_color_R, p->stroke_color_G, p->stroke_color_B, ierr);
+   c_fill_color_set_RGB(fmkr, p, p->fill_color_R, p->fill_color_G, p->fill_color_B, ierr);
    // initialize clip region
    bbox_llx = bbox_lly = 1e5;
    bbox_urx = bbox_ury = -1e5;
 }
 
-void Start_Axis_Standard_State(OBJ_PTR fmkr, FM *p, double r, double g, double b, double line_width) {
+void Start_Axis_Standard_State(OBJ_PTR fmkr, FM *p, double r, double g, double b, double line_width, int *ierr) {
    fprintf(TF, "q 2 J [] 0 d\n");
-   c_line_width_set(fmkr, p, line_width);
-   c_stroke_color_set_RGB(fmkr, p, r, g, b);
+   c_line_width_set(fmkr, p, line_width, ierr);
+   c_stroke_color_set_RGB(fmkr, p, r, g, b, ierr);
    /* 2 J sets the line cap style to square cap */
    /* set stroke and fill colors to black.  set line type to solid */
 }
@@ -208,8 +211,8 @@ void Write_grestore(void)
    fprintf(TF, "Q\n");
 }
 
-OBJ_PTR c_pdf_gsave(OBJ_PTR fmkr, FM *p) { Write_gsave(); }
-OBJ_PTR c_pdf_grestore(OBJ_PTR fmkr, FM *p) { Write_grestore(); }
+OBJ_PTR c_pdf_gsave(OBJ_PTR fmkr, FM *p, int *ierr) { Write_gsave(); }
+OBJ_PTR c_pdf_grestore(OBJ_PTR fmkr, FM *p, int *ierr) { Write_grestore(); }
 
 static void Print_Xref(long int offset) {
    char line[80];
@@ -220,7 +223,7 @@ static void Print_Xref(long int offset) {
    fprintf(OF, "%s 00000 n \n", line);
    }
 
-static void Write_Stream(void)
+static void Write_Stream(int *ierr)
 {
    long int len = ftell(TF);
    unsigned long int new_len = (len * 11) / 10 + 100;
@@ -233,7 +236,8 @@ static void Write_Stream(void)
    if (FLATE_ENCODE) {
       if (do_flate_compress(dest_buffer, &new_len, buffer, len) != FLATE_OK) {
          free(buffer); free(dest_buffer);
-         RAISE_ERROR("Error compressing PDF stream data");
+         RAISE_ERROR("Error compressing PDF stream data", ierr); 
+         return;
       }
       fwrite(dest_buffer, 1, new_len, OF);
    } else {
@@ -242,14 +246,15 @@ static void Write_Stream(void)
    free(buffer); free(dest_buffer);
 }
 
-void Close_pdf(OBJ_PTR fmkr, FM *p, bool quiet_mode)
+void Close_pdf(OBJ_PTR fmkr, FM *p, bool quiet_mode, int *ierr)
 {
    int i;
    double llx, lly, urx, ury, xoff, yoff;
-   if (!writing_file) RAISE_ERROR("Sorry: cannot End_Output if not writing file.");
+   if (!writing_file) { RAISE_ERROR("Sorry: cannot End_Output if not writing file.", ierr); return; }
    writing_file = false;
-   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before ending file");
-   Write_Stream();
+   if (constructing_path) { RAISE_ERROR("Sorry: must finish with current path before ending file", ierr); return; }
+   Write_Stream(ierr);
+   if (*ierr != 0) return;
    stream_end = ftell(OF);
    fprintf(OF, "endstream\nendobj\n");
    Record_Object_Offset(PAGE_OBJ);
@@ -266,7 +271,7 @@ void Close_pdf(OBJ_PTR fmkr, FM *p, bool quiet_mode)
    lly = bbox_lly / ENLARGE + yoff - MARGIN;
    urx = bbox_urx / ENLARGE + xoff + MARGIN;
    ury = bbox_ury / ENLARGE + yoff + MARGIN;
-   if (urx < llx || ury < lly) RAISE_ERROR("Sorry: Empty plot!");
+   if (urx < llx || ury < lly) { RAISE_ERROR("Sorry: Empty plot!", ierr); return; }
    fprintf(OF, "%d %d %d %d", ROUND(llx), ROUND(lly), ROUND(urx), ROUND(ury));
    fprintf(OF, " ]\n/Contents %i 0 R\n/Resources << /ProcSet [/PDF /Text /ImageB /ImageC /ImageI]\n", STREAM_OBJ);
    if (Used_Any_Fonts()) {
@@ -315,8 +320,10 @@ void Close_pdf(OBJ_PTR fmkr, FM *p, bool quiet_mode)
    Write_Font_Widths();
    Write_Stroke_Opacity_Objects();
    Write_Fill_Opacity_Objects();
-   Write_XObjects();
-   Write_Functions();
+   Write_XObjects(ierr);
+   if (*ierr != 0) return;
+   Write_Functions(ierr);
+   if (*ierr != 0) return;
    Write_Shadings();
    xref_offset = ftell(OF);
    fprintf(OF, "xref\n0 %i\n0000000000 65535 f \n", num_objects);
@@ -326,7 +333,7 @@ void Close_pdf(OBJ_PTR fmkr, FM *p, bool quiet_mode)
    fseek(OF, length_offset, SEEK_SET);
    fprintf(OF, "%li", stream_end - stream_start);
    fclose(OF);
-   Free_Records(); 
+   Free_Records(ierr);
 }
 
 void Rename_pdf(char *oldname, char *newname)

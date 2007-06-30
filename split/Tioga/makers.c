@@ -78,26 +78,30 @@ static double spline_interpolate(double x, int n_pts_data,
       
 OBJ_PTR c_private_make_spline_interpolated_points(OBJ_PTR fmkr, FM *p,
       OBJ_PTR Xvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
-      OBJ_PTR start_slope, OBJ_PTR end_slope) {
+      OBJ_PTR start_slope, OBJ_PTR end_slope, int *ierr) {
          
    bool start_clamped = (start_slope != OBJ_NIL), end_clamped = (end_slope != OBJ_NIL);
    long xlen;
    double start=0, end=0, *Ys;
-   double *Xs = Vector_Data_for_Read(Xvec, &xlen);
+   double *Xs = Vector_Data_for_Read(Xvec, &xlen, ierr);
+      if (*ierr != 0) return;
    OBJ_PTR Yvec;
    
-   if (start_clamped) start = Number_to_double(start_slope);
-   if (end_clamped) end = Number_to_double(end_slope);
+   if (start_clamped) start = Number_to_double(start_slope, ierr);
+   if (end_clamped) end = Number_to_double(end_slope, ierr);
+   if (*ierr != 0) return OBJ_NIL;
    
    Ys = ALLOC_N_double(xlen); // Ys are same length as Xs
    
    int i, n_pts_data;
    double *As, *Bs, *Cs, *Ds;
    long xdlen, ydlen;
-   double *X_data = Vector_Data_for_Read(Xvec_data, &xdlen);
-   double *Y_data = Vector_Data_for_Read(Yvec_data, &ydlen);
+   double *X_data = Vector_Data_for_Read(Xvec_data, &xdlen, ierr);
+      if (*ierr != 0) return;
+   double *Y_data = Vector_Data_for_Read(Yvec_data, &ydlen, ierr);
+      if (*ierr != 0) return;
    if (Xs == NULL || Ys == NULL || X_data == NULL || Y_data == NULL || xdlen != ydlen) {
-      RAISE_ERROR("Sorry: bad args");
+      RAISE_ERROR("Sorry: bad args",ierr); return OBJ_NIL;
    }
    if (xlen == 0) return;
    n_pts_data = xdlen;
@@ -119,17 +123,20 @@ static void c_make_steps(FM *p,
          long *xsteps_len_ptr, double **Xs_ptr, 
          long *ysteps_len_ptr, double **Ys_ptr, 
          OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
-         double xfirst, double yfirst, double xlast, double ylast){
+         double xfirst, double yfirst, double xlast, double ylast, int *ierr){
       double xnext, xprev, x;
       int n_pts_to_add;
       int i, j, n, old_length, new_length;
       long xlen, ylen, xdlen, ydlen;
       double *Xs, *Ys;
-      double *X_data = Vector_Data_for_Read(Xvec_data, &xdlen);
-      double *Y_data = Vector_Data_for_Read(Yvec_data, &ydlen);
+      double *X_data = Vector_Data_for_Read(Xvec_data, &xdlen, ierr);
+      if (*ierr != 0) return;
+      double *Y_data = Vector_Data_for_Read(Yvec_data, &ydlen, ierr);
+      if (*ierr != 0) return;
       if (Xs == NULL || Ys == NULL || X_data == NULL || Y_data == NULL
             || xdlen != ydlen || xlen != ylen) {
-         RAISE_ERROR("Sorry: bad args for make_steps");
+         RAISE_ERROR("Sorry: bad args for make_steps", ierr);
+         return;
       }
       xlen = 0; ylen = 0; // original code was written to append to vectors with lengths > 0
       n = xdlen;
@@ -161,7 +168,7 @@ static void c_make_steps(FM *p,
       }
       
 OBJ_PTR c_private_make_steps(OBJ_PTR fmkr, FM *p, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
-        double xfirst, double yfirst, double xlast, double ylast) {
+        double xfirst, double yfirst, double xlast, double ylast, int *ierr) {
         /* adds n_pts_to_add points to Xs and Ys for steps with the given parameters.
             X_data and Y_data are arrays of n values where n_pts_to_add = 2*(n+1)
             (xfirst,yfirst) and (xlast,ylast) are extra data points to fix the first and last steps.
@@ -177,7 +184,8 @@ OBJ_PTR c_private_make_steps(OBJ_PTR fmkr, FM *p, OBJ_PTR Xvec_data, OBJ_PTR Yve
       double *xsteps_data, *ysteps_data;
       
       c_make_steps(p, &xsteps_len, &xsteps_data, &ysteps_len, &ysteps_data, Xvec_data, Yvec_data,
-         xfirst, yfirst, xlast, ylast);
+         xfirst, yfirst, xlast, ylast, ierr);
+      if (*ierr != 0) return OBJ_NIL;
 
       Xvec = Vector_New(xsteps_len, xsteps_data);
       Yvec = Vector_New(ysteps_len, ysteps_data);
@@ -185,8 +193,10 @@ OBJ_PTR c_private_make_steps(OBJ_PTR fmkr, FM *p, OBJ_PTR Xvec_data, OBJ_PTR Yve
       free(ysteps_data);
       
       pts_array = Array_New(2);
-      Array_Store(pts_array,0,Xvec);
-      Array_Store(pts_array,1,Yvec);
+      Array_Store(pts_array,0,Xvec,ierr);
+      if (*ierr != 0) return OBJ_NIL;
+      Array_Store(pts_array,1,Yvec,ierr);
+      if (*ierr != 0) return OBJ_NIL;
       return pts_array;
    }
 
@@ -273,7 +283,8 @@ static int conrec(double **d,
 	   long *dest_sz_ptr,
 	   OBJ_PTR gaps,
 	   double x_limit,
-	   double y_limit)
+	   double y_limit,
+	   int *ierr)
 // d               ! matrix of data to contour
 // ilb,iub,jlb,jub ! index bounds of data matrix
 // x               ! data matrix column coordinates
@@ -473,7 +484,7 @@ static int conrec(double **d,
 		double dx = x1 - x_prev, dy = y1 - y_prev;
 		if (dx < 0) dx = -dx; if (dy < 0) dy = -dy;
 		if (num_pts == 0 || dx > x_limit || dy > y_limit) {
-         if (num_pts > 0) Array_Push(gaps, Integer_New(num_pts));
+         if (num_pts > 0) { Array_Push(gaps, Integer_New(num_pts), ierr); if (*ierr != 0) return 0; }
          PUSH_POINT(x1,y1); num_pts++;
 		}
 		PUSH_POINT(x2,y2); num_pts++;
@@ -510,13 +521,14 @@ static int conrec(double **d,
 static int      nx_1, ny_1, iGT, jGT, iLE, jLE;
 
 static void     free_space_for_curve();
-static void     get_space_for_curve();
+static void     get_space_for_curve(int *ierr);
 static void     draw_the_contour(
             	long *dest_len_ptr,
          	   double **dest_xs_ptr,
          	   double **dest_ys_ptr,
             	long *dest_sz_ptr,
-	            OBJ_PTR gaps);
+	            OBJ_PTR gaps,
+	            int *ierr);
 
 static bool     trace_contour(double z0,
 			      double *x,
@@ -527,12 +539,13 @@ static bool     trace_contour(double z0,
          	   double **dest_xs_ptr,
          	   double **dest_ys_ptr,
             	long *dest_sz_ptr,
-			      OBJ_PTR gaps);
+			      OBJ_PTR gaps,
+			      int *iterr);
                   
-static int      FLAG(int ni, int nj, int ind);
+static int      FLAG(int ni, int nj, int ind, int *ierr);
 static int      append_segment(double xr, double yr, double zr, double OKr,
 			       double xs, double ys, double zs, double OKs,
-			       double z0);
+			       double z0, int *ierr);
 
 // Space for curve, shared by several routines
 static double  *xcurve, *ycurve;
@@ -556,12 +569,12 @@ free_space_for_curve()
 }
 
 static void
-get_space_for_curve()
+get_space_for_curve(int *ierr)
 {
 	max_in_curve = INITIAL_CURVE_SIZE;
 	if(curve_storage_exists) {
-		RAISE_ERROR("storage is messed up (internal error)");
-		return;			// will not execute
+		RAISE_ERROR("storage is messed up (internal error)", ierr);
+		return;
 	}
 	xcurve = ALLOC_N_double(max_in_curve);
 	ycurve = ALLOC_N_double(max_in_curve);
@@ -598,19 +611,21 @@ gr_contour(
 	   double **dest_xs_ptr,
 	   double **dest_ys_ptr,
 	   long *dest_sz_ptr,
-	   OBJ_PTR gaps)
+	   OBJ_PTR gaps,
+	   int *ierr)
 {
 	register int    i, j;
 	// Test for errors
-	if (nx <= 0) RAISE_ERROR("nx<=0 (internal error)");
-	if (ny <= 0) RAISE_ERROR("ny<=0 (internal error)");
+   if (nx <= 0) { RAISE_ERROR("nx<=0 (internal error)", ierr); return; }
+   if (ny <= 0) { RAISE_ERROR("ny<=0 (internal error)", ierr); return; }
 	// Save some globals
 	nx_1 = nx - 1;
 	ny_1 = ny - 1;
 	// Clear  all switches.
-	FLAG(nx, ny, -1);
+	FLAG(nx, ny, -1, ierr);
 	// Get space for the curve.
-	get_space_for_curve();
+	get_space_for_curve(ierr);
+   if (*ierr != 0) return;
     
 	// Search for a contour intersecting various places on the grid. Whenever
 	// a contour is found to be between two grid points, call trace_contour()
@@ -641,7 +656,8 @@ gr_contour(
 				jLE = j;
 				iGT = i;
 				jGT = j;
-				trace_contour(z0, x, y, z, legit, dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps);
+				trace_contour(z0, x, y, z, legit, dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps, ierr);
+            if (*ierr != 0) return;
 			}
 			// Space through legit points, that is, skipping through good
 			// data looking for another island of bad data which will
@@ -664,7 +680,8 @@ gr_contour(
 				jLE = j - 1;
 				iGT = i;
 				jGT = j;
-				trace_contour(z0, x, y, z, legit, dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps);
+				trace_contour(z0, x, y, z, legit, dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps, ierr);
+            if (*ierr != 0) return;
 			}
 			// space through legit points
 			while (i > 0 && (legit == NULL || legit[i][j] != 0.0 && legit[i][ j - 1] != 0.0))
@@ -684,7 +701,8 @@ gr_contour(
 				jLE = j;
 				iGT = i;
 				jGT = j;
-				trace_contour(z0, x, y, z, legit, dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps);
+				trace_contour(z0, x, y, z, legit, dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps, ierr);
+            if (*ierr != 0) return;
 			}
 			// space through legit points
 			while (j > 0 && (legit == NULL || legit[i][j] != 0.0 && legit[i + 1][ j] != 0.0))
@@ -704,7 +722,8 @@ gr_contour(
 				jLE = j + 1;
 				iGT = i;
 				jGT = j;
-				trace_contour(z0, x, y, z, legit, dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps);
+				trace_contour(z0, x, y, z, legit, dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps, ierr);
+            if (*ierr != 0) return;
 			}
 			// space through legit points
 			while (i < nx_1 && (legit == NULL || legit[i][j] != 0.0 && legit[i][ j + 1] != 0.0))
@@ -719,9 +738,12 @@ gr_contour(
 		int             flag_is_set;
 		for (i = 1; i < nx; i++) {
 			// trace a contour if it hits here
-			flag_is_set = FLAG(i, j, 0);
-			if (flag_is_set < 0)
-				RAISE_ERROR("ran out of storage (internal error)");
+			flag_is_set = FLAG(i, j, 0, ierr);
+         if (*ierr != 0) return;
+			if (flag_is_set < 0) {
+				RAISE_ERROR("ran out of storage (internal error)", ierr);
+            return;
+         }
 			if (!flag_is_set
 			    && (legit == NULL || legit[i][j] != 0.0)
 			    && z[i][j] > z0
@@ -731,13 +753,14 @@ gr_contour(
 				jLE = j;
 				iGT = i;
 				jGT = j;
-				trace_contour(z0, x, y, z, legit, dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps);
+				trace_contour(z0, x, y, z, legit, dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps, ierr);
+            if (*ierr != 0) return;
 			}
 		}
 	}
 	// Free up space.
 	free_space_for_curve();
-	FLAG(nx, ny, 2);
+	FLAG(nx, ny, 2, ierr);
 }
 
 // trace_contour() -- trace_contour a contour line with high values of z to
@@ -754,7 +777,8 @@ trace_contour(double z0,
    	   double **dest_xs_ptr,
    	   double **dest_ys_ptr,
       	long *dest_sz_ptr,
-	      OBJ_PTR gaps
+	      OBJ_PTR gaps,
+	      int *ierr
 )
 {
 	int             i, ii, j, jj;
@@ -788,7 +812,8 @@ trace_contour(double z0,
 	
 		append_segment(x[iLE], y[jLE], z[iLE][jLE], (legit == NULL)? 1.0: legit[iLE][jLE],
 			       x[iGT], y[jGT], z[iGT][jGT], (legit == NULL)? 1.0: legit[iGT][jGT],
-			       z0);
+			       z0, ierr);
+      if (*ierr != 0) return false;
 		// Find the next point to check through a table lookup.
 		locate = 3 * (jGT - jLE) + (iGT - iLE) + 4;
 		i = iLE + i_test[locate];
@@ -797,27 +822,31 @@ trace_contour(double z0,
 	
 		// Did it hit an edge?
 		if (i > nx_1 || i < 0 || j > ny_1 || j < 0) {
-			draw_the_contour(dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps);
+			draw_the_contour(dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps, ierr);
+         if (*ierr != 0) return false;
 			return true;		// all done
 		}
 
 		// Test if retracing an existing contour.  See explanation
 		// above, in grcntour(), just before search starts. 
 		if (locate == 5) {
-			int             already_set = FLAG(iGT, jGT, 1);
+			int             already_set = FLAG(iGT, jGT, 1, ierr);
+         if (*ierr != 0) return false;
 			if (already_set < 0) {
-				RAISE_ERROR("ran out of storage (internal error)");
+				RAISE_ERROR("ran out of storage (internal error)", ierr);
 				return false;
 			}
 			if (already_set) {
-				draw_the_contour(dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps);
+				draw_the_contour(dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps, ierr);
+            if (*ierr != 0) return false;
 				return true;	// all done
 			}
 		}
 
 		// Following new for 2.1.13
 		if (legit != NULL && legit[i][j] == 0.0) {
-			draw_the_contour(dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps);
+			draw_the_contour(dest_len_ptr, dest_xs_ptr, dest_ys_ptr, dest_sz_ptr, gaps, ierr);
+         if (*ierr != 0) return false;
 			return true;		// all done
 		} 
 
@@ -845,14 +874,16 @@ trace_contour(double z0,
 		if (zcentre <= z0) {
 			append_segment(x[iGT], y[jGT], z[iGT][jGT], (legit == NULL)? 1.0: legit[iGT][jGT],
 				       vx, vy, zcentre, legit_diag,
-				       z0);
+				       z0, ierr);
+         if (*ierr != 0) return false;
 			if (z[ii][jj] <= z0) {
 				iLE = ii, jLE = jj;
 				continue;
 			}
 			append_segment(x[ii], y[jj], z[ii][jj], (legit == NULL)? 1.0: legit[ii][jj],
 				       vx, vy, zcentre, legit_diag,
-				       z0);
+				       z0, ierr);
+         if (*ierr != 0) return false;
 			if (z[i][j] <= z0) {
 				iGT = ii, jGT = jj;
 				iLE = i, jLE = j;
@@ -860,24 +891,28 @@ trace_contour(double z0,
 			}
 			append_segment(x[i], y[j], z[i][j], (legit == NULL)? 1.0: legit[i][j],
 				       vx, vy, zcentre, legit_diag,
-				       z0);
+				       z0, ierr);
+         if (*ierr != 0) return false;
 			iGT = i, jGT = j;
 			continue;
 		}
 		append_segment(vx, vy, zcentre, legit_diag,
 			       x[iLE], y[jLE], z[iLE][jLE], (legit == NULL)? 1.0: legit[iLE][jLE],
-			       z0);
+			       z0, ierr);
+      if (*ierr != 0) return false;
 		if (z[i][j] > z0) {
 			iGT = i, jGT = j;
 			continue;
 		}
 		append_segment(vx, vy, zcentre, legit_diag,
 			       x[i], y[j], z[i][j], (legit == NULL)? 1.0: legit[i][j],
-			       z0);
+			       z0, ierr);
+      if (*ierr != 0) return false;
 		if (z[ii][jj] <= z0) {
 			append_segment(vx, vy, zcentre, legit_diag,
 				       x[ii], y[jj], z[ii][jj], (legit == NULL)? 1.0: legit[ii][jj],
-				       z0);
+				       z0, ierr);
+         if (*ierr != 0) return false;
 			iLE = ii;
 			jLE = jj;
 			continue;
@@ -894,12 +929,12 @@ static double   xplot_last, yplot_last;
 static int
 append_segment(double xr, double yr, double zr, double OKr,
 	       double xs, double ys, double zs, double OKs,
-	       double z0)
+	       double z0, int *ierr)
 {
-	if (zr == zs) RAISE_ERROR("Contouring problem: zr = zs, which is illegal");
+   if (zr == zs) { RAISE_ERROR("Contouring problem: zr = zs, which is illegal", ierr); return 0; }
 	double frac = (zr - z0) / (zr - zs);
-	if (frac < 0.0) RAISE_ERROR("Contouring problem: frac < 0");
-	if (frac > 1.0) RAISE_ERROR("Contouring problem: frac > 1");
+	if (frac < 0.0) { RAISE_ERROR("Contouring problem: frac < 0", ierr); return 0; }
+	if (frac > 1.0) { RAISE_ERROR("Contouring problem: frac > 1", ierr); return 0; }
 	double xplot = xr - frac * (xr - xs);
 	double yplot = yr - frac * (yr - ys);
 	// Avoid replot, which I suppose must be possible, given this code
@@ -949,7 +984,8 @@ draw_the_contour(
 	   double **dest_xs_ptr,
 	   double **dest_ys_ptr,
    	long *dest_sz_ptr,
-	   OBJ_PTR gaps)
+	   OBJ_PTR gaps,
+	   int *ierr)
 {
 	if (num_in_curve == 1) {
 		num_in_curve = 0;
@@ -961,11 +997,14 @@ draw_the_contour(
             // PUSH_POINT does num_in_path++
             PUSH_POINT(xcurve[i],ycurve[i]); num_in_path++;
         } else {
-            if (num_in_path > 0 && num_in_path != k) Array_Push(gaps, Integer_New(num_in_path));
+            if (num_in_path > 0 && num_in_path != k) {
+               Array_Push(gaps, Integer_New(num_in_path), ierr);
+               if (*ierr != 0) return;
+            }
             k = num_in_path;
             }
     }
-    Array_Push(gaps, Integer_New(num_in_path));
+    Array_Push(gaps, Integer_New(num_in_path), ierr);
     num_in_curve = 0;
 }
 
@@ -980,7 +1019,7 @@ draw_the_contour(
 // exhausted, return a number <0.
 #define	NBITS		32
 static int
-FLAG(int ni, int nj, int ind)
+FLAG(int ni, int nj, int ind, int *ierr)
 {
 	static bool     flag_storage_exists = false;
 	static unsigned long *flag, mask[NBITS];
@@ -990,8 +1029,8 @@ FLAG(int ni, int nj, int ind)
 	switch (ind) {
 	case -1:
 		// Allocate storage for flag array
-		if (flag_storage_exists)
-			RAISE_ERROR("storage is messed up (internal error)");
+		if (flag_storage_exists) {
+			RAISE_ERROR("storage is messed up (internal error)", ierr); return 0; }
 		size = 1 + ni * nj / NBITS;	// total storage array length
 		flag = ALLOC_N_unsigned_long(size);
 		// Create mask
@@ -1004,14 +1043,14 @@ FLAG(int ni, int nj, int ind)
 		flag_storage_exists = true;
 		return 0;
 	case 2:
-		if (!flag_storage_exists)
-			RAISE_ERROR("No flag storage exists");
+		if (!flag_storage_exists) {
+			RAISE_ERROR("No flag storage exists", ierr); return 0; }
 		free(flag);
 		flag_storage_exists = false;
 		return 0;
 	default:
-		if (!flag_storage_exists)
-			RAISE_ERROR("No flag storage exists");
+		if (!flag_storage_exists) {
+			RAISE_ERROR("No flag storage exists", ierr); return 0; }
 		break;
 	}
 	// ind was not -1 or 2
@@ -1045,23 +1084,27 @@ FLAG(int ni, int nj, int ind)
          OBJ_PTR gaps,
          OBJ_PTR xs, OBJ_PTR ys,  
          OBJ_PTR zs_data, double z_level,
-         OBJ_PTR legit_data, int use_conrec) {
+         OBJ_PTR legit_data, int use_conrec, int *ierr) {
             
       long xlen, ylen, num_zcolumns, num_zrows, num_columns, num_rows;
-      double *x_coords = Vector_Data_for_Read(xs, &xlen);
-      double *y_coords = Vector_Data_for_Read(ys, &ylen);
-      double **zs = Table_Data_for_Read(zs_data, &num_zcolumns, &num_zrows);
-      double **legit = Table_Data_for_Read(legit_data, &num_columns, &num_rows);
+      double *x_coords = Vector_Data_for_Read(xs, &xlen, ierr);
+      if (*ierr != 0) return;
+      double *y_coords = Vector_Data_for_Read(ys, &ylen, ierr);
+      if (*ierr != 0) return;
+      double **zs = Table_Data_for_Read(zs_data, &num_zcolumns, &num_zrows, ierr);
+      if (*ierr != 0) return;
+      double **legit = Table_Data_for_Read(legit_data, &num_columns, &num_rows, ierr);
+      if (*ierr != 0) return;
       double x_limit, y_limit;
 
       if (x_coords == NULL || gaps == OBJ_NIL || zs == NULL || y_coords == NULL) {
-         RAISE_ERROR("Sorry: bad args for make_contour.  Need to provide xs, ys, gaps, and zs.");
+         RAISE_ERROR("Sorry: bad args for make_contour.  Need to provide xs, ys, gaps, and zs.", ierr); return;
       }
       if (xlen != num_columns || ylen != num_rows) {
-         RAISE_ERROR("Sorry: bad args for make_contour.  Needs xs.size == num columns and ys.size == num rows.");
+         RAISE_ERROR("Sorry: bad args for make_contour.  Needs xs.size == num columns and ys.size == num rows.", ierr); return;
       }
       if (num_zcolumns != num_columns || num_zrows != num_rows) {
-         RAISE_ERROR("Sorry: bad args for make_contour.  Needs same dimension zs and legit flags.");
+         RAISE_ERROR("Sorry: bad args for make_contour.  Needs same dimension zs and legit flags.", ierr); return;
       }
             
       // NOTE: contour data is TRANSPOSE of tioga data, so we switch x's and y's in the call
@@ -1072,10 +1115,10 @@ FLAG(int ni, int nj, int ind)
          y_limit = 0.001*(y_coords[ylen-1] - y_coords[0])/ylen;
          if (y_limit < 0) y_limit = -y_limit;
          conrec(zs, 0, num_rows-1, 0, num_columns-1, y_coords, x_coords, 1, &z_level, 
-            dest_len_ptr, dest_ys_ptr, dest_xs_ptr, dest_sz_ptr, gaps, y_limit, x_limit);
+            dest_len_ptr, dest_ys_ptr, dest_xs_ptr, dest_sz_ptr, gaps, y_limit, x_limit, ierr);
       } else {
          gr_contour(y_coords, x_coords, zs, legit, num_rows, num_columns, z_level, 
-            dest_len_ptr, dest_ys_ptr, dest_xs_ptr, dest_sz_ptr, gaps);
+            dest_len_ptr, dest_ys_ptr, dest_xs_ptr, dest_sz_ptr, gaps, ierr);
       }
    }
    
@@ -1085,7 +1128,8 @@ FLAG(int ni, int nj, int ind)
          OBJ_PTR xs, OBJ_PTR ys, // data x coordinates and y coordinates
          OBJ_PTR zs, double z_level, // the table of values and the desired contour level
          OBJ_PTR legit, // the table of flags (nonzero means okay)
-         int method // int == 1 means CONREC
+         int method, // int == 1 means CONREC
+         int *ierr
          ) {
         /* uses Xvec_data and Yvec_data to create a cubic spline interpolant.
         once the spline interpolant is created, it is sampled at the n_pts_to_add in Xs.
@@ -1109,7 +1153,8 @@ FLAG(int ni, int nj, int ind)
       dest_ys_data = ALLOC_N_double(dest_sz);
 
       c_make_contour(p, &dest_len, &dest_xs_data, &dest_ys_data, &dest_sz, 
-         gaps, xs, ys, zs, z_level, legit, method);
+         gaps, xs, ys, zs, z_level, legit, method, ierr);
+      if (*ierr != 0) return OBJ_NIL;
          
       Xvec = Vector_New(dest_len, dest_xs_data);
       Yvec = Vector_New(dest_len, dest_ys_data);
@@ -1117,8 +1162,10 @@ FLAG(int ni, int nj, int ind)
       free(dest_ys_data);
       
       pts_array = Array_New(2);
-      Array_Store(pts_array,0,Xvec);
-      Array_Store(pts_array,1,Yvec);
+      Array_Store(pts_array,0,Xvec,ierr);
+      if (*ierr != 0) return OBJ_NIL;
+      Array_Store(pts_array,1,Yvec,ierr);
+      if (*ierr != 0) return OBJ_NIL;
       return pts_array;
    }
 

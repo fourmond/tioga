@@ -56,16 +56,19 @@ extern void Init_generic(void);
 //#define OBJ_TRUE Py_True
 //#define OBJ_FALSE Py_False
 
-extern OBJ_PTR Call_Function(OBJ_PTR fmkr, ID_PTR fn, OBJ_PTR arg);
+
+// all routines set *ierr nonzero in case of error.
+
+extern OBJ_PTR Call_Function(OBJ_PTR fmkr, ID_PTR fn, OBJ_PTR arg, int *ierr);
 // invokes method given by fn in the object fmkr with the given arg.
 
 extern bool Is_Kind_of_Integer(OBJ_PTR obj);
 extern bool Is_Kind_of_Number(OBJ_PTR obj);
 
-extern double Number_to_double(OBJ_PTR obj);
+extern double Number_to_double(OBJ_PTR obj, int *ierr);
     // returns a C double
     // raises error if obj not a kind of number
-extern long Number_to_int(OBJ_PTR obj);
+extern long Number_to_int(OBJ_PTR obj, int *ierr);
     // returns a C int
     // raises error if obj not a kind of integer
 
@@ -80,69 +83,63 @@ extern OBJ_PTR String_From_Cstring(char *src);
     // returns a new string object initialized from null-terminated Cstring src
 
 
-extern char *String_Ptr(OBJ_PTR obj);
+extern char *String_Ptr(OBJ_PTR obj, int *ierr);
     // returns pointer to storage buffer for string obj
     // tries to convert obj to string if necessary
     // raises error if obj not a kind of string and cannot be converted to one
 
-extern char *CString_Ptr(OBJ_PTR obj);
+extern char *CString_Ptr(OBJ_PTR obj, int *ierr);
     // like String_Ptr, but checks to make sure that there are no NULL chars in the string
     // i.e., raises an exception if String_Len(obj) is not same as strlen(String_Ptr(obj))
 
-extern long String_Len(OBJ_PTR obj);
+extern long String_Len(OBJ_PTR obj, int *ierr);
     // returns int length of contents of string obj
     // tries to convert obj to string if necessary
     // raises error if obj not a kind of string and cannot be converted to one
 
 extern OBJ_PTR Array_New(long len);
     // returns a new array object of length len
-extern long Array_Len(OBJ_PTR obj);
+extern long Array_Len(OBJ_PTR obj, int *ierr);
     // returns length of the array obj
     // tries to convert obj to array if necessary
     // raises error if obj not a kind of array and cannot be converted to one
-extern OBJ_PTR Array_Entry(OBJ_PTR obj, long indx);
+extern OBJ_PTR Array_Entry(OBJ_PTR obj, long indx, int *ierr);
     // returns array obj entry indx
     // tries to convert obj to array if necessary
     // raises error if obj not a kind of array and cannot be converted to one
-extern OBJ_PTR Array_Store(OBJ_PTR obj, long indx, OBJ_PTR val);
+extern OBJ_PTR Array_Store(OBJ_PTR obj, long indx, OBJ_PTR val, int *ierr);
     // sets array obj entry indx to val and then returns val.
     // raises error if obj not a kind of array
-extern OBJ_PTR Array_Push(OBJ_PTR obj, OBJ_PTR val);
+extern OBJ_PTR Array_Push(OBJ_PTR obj, OBJ_PTR val, int *ierr);
     // pushes val onto the end of array obj and then returns val.
     // raises error if obj not a kind of array
 
 
 extern ID_PTR ID_Get(char *name);
     // returns internal ID for the given name
-extern char *ID_Name(ID_PTR id);
+extern char *ID_Name(ID_PTR id, int *ierr);
    // return the name of the given id.
-extern OBJ_PTR Obj_Attr_Get(OBJ_PTR obj, ID_PTR attr_ID);
+extern OBJ_PTR Obj_Attr_Get(OBJ_PTR obj, ID_PTR attr_ID, int *ierr);
     // returns value of the given attr of the obj
-extern OBJ_PTR Obj_Attr_Set(OBJ_PTR obj, ID_PTR attr_ID, OBJ_PTR val);
+extern OBJ_PTR Obj_Attr_Set(OBJ_PTR obj, ID_PTR attr_ID, OBJ_PTR val, int *ierr);
     // sets the specified attr of the obj to val, and then returns val.
     
     
     
-extern OBJ_PTR TEX_PREAMBLE(OBJ_PTR fmkr);
+extern OBJ_PTR TEX_PREAMBLE(OBJ_PTR fmkr, int *ierr);
    // returns the class FigureMaker constant named TEX_PREAMBLE
     
-extern OBJ_PTR COLOR_PREAMBLE(OBJ_PTR fmkr);
+extern OBJ_PTR COLOR_PREAMBLE(OBJ_PTR fmkr, int *ierr);
    // returns the class FigureMaker constant named COLOR_PREAMBLE
 
-
-//#define Obj_Attr_Get_by_StringName(obj,attr_name_string) rb_iv_get(obj,attr_name_string)
-    // returns value of the given attr of the obj (name_string is char *)
-//#define Obj_Attr_Set_by_StringName(obj,attr_name_string,val) rb_iv_set(obj,attr_name_string,val)
-    // sets the specified attr of the obj to val (name_string is char *)
-
-extern void RAISE_ERROR(char *str);
+extern void RAISE_ERROR(char *str, int *ierr); // prints the error message and does *ierr = -1;
 // The following do sprintf to a local string, and then call RAISE_ERROR.
-extern void RAISE_ERROR_s(char *fmt, char *s);
-extern void RAISE_ERROR_ss(char *fmt, char *s1, char *s2);
-extern void RAISE_ERROR_i(char *fmt, int x);
-extern void RAISE_ERROR_ii(char *fmt, int x1, int x2);
-extern void RAISE_ERROR_g(char *fmt, double x);
-extern void RAISE_ERROR_gg(char *fmt, double x1, double x2);
+extern void RAISE_ERROR_s(char *fmt, char *s, int *ierr);
+extern void RAISE_ERROR_ss(char *fmt, char *s1, char *s2, int *ierr);
+extern void RAISE_ERROR_i(char *fmt, int x, int *ierr);
+extern void RAISE_ERROR_ii(char *fmt, int x1, int x2, int *ierr);
+extern void RAISE_ERROR_g(char *fmt, double x, int *ierr);
+extern void RAISE_ERROR_gg(char *fmt, double x1, double x2, int *ierr);
 
 extern void GIVE_WARNING(const char *fmt, const char *str);
    // Unconditionally issues a warning message to standard error.
@@ -158,11 +155,11 @@ extern OBJ_PTR Integer_Vector_New(long len, long *vals);
     // creates a 1D vector and initializes it with given values
     // returns OBJ_PTR for the new vector of integers
 
-extern double *Vector_Data_for_Read(OBJ_PTR obj, long *len_ptr);
+extern double *Vector_Data_for_Read(OBJ_PTR obj, long *len_ptr, int *ierr);
     // returns (double *) pointer to data (read access only)
     // also returns length of vector via len_ptr
 
-extern double **Table_Data_for_Read(OBJ_PTR tbl, long *num_col_ptr, long *num_row_ptr);
+extern double **Table_Data_for_Read(OBJ_PTR tbl, long *num_col_ptr, long *num_row_ptr, int *ierr);
     // returns (double **) pointer to data (read access only)
     // also returns number of cols and rows via num_col_ptr and num_row_ptr
 

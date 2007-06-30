@@ -66,7 +66,7 @@ typedef struct jpg_info {
    int mask_obj_num;
    char *filename;
 } JPG_Info;
-extern void Write_JPG(JPG_Info *xo);
+extern void Write_JPG(JPG_Info *xo, int *ierr);
 extern void Free_JPG(JPG_Info *xo);
 
 typedef struct sampled_info {
@@ -89,7 +89,7 @@ typedef struct sampled_info {
    int lookup_len;
    unsigned char *lookup;
 } Sampled_Info;
-extern void Write_Sampled(Sampled_Info *xo);
+extern void Write_Sampled(Sampled_Info *xo, int *ierr);
 extern void Free_Sampled(Sampled_Info *xo);
 
 #define JPG_SUBTYPE 1

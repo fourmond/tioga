@@ -40,13 +40,13 @@ void Init_generic(void) {
 bool Is_Kind_of_Integer(OBJ_PTR obj) { return rb_obj_is_kind_of(obj,rb_Integer_class); }
 bool Is_Kind_of_Number(OBJ_PTR obj) { return rb_obj_is_kind_of(obj,rb_Numeric_class); }
 
-OBJ_PTR Call_Function(OBJ_PTR fmkr, ID_PTR fn, OBJ_PTR arg) {
+OBJ_PTR Call_Function(OBJ_PTR fmkr, ID_PTR fn, OBJ_PTR arg, int *ierr) {
    return rb_funcall(fmkr, fn, 1, arg);
 }
 
-double Number_to_double(OBJ_PTR obj) { return NUM2DBL(obj); }
+double Number_to_double(OBJ_PTR obj, int *ierr) { return NUM2DBL(obj); }
     
-long Number_to_int(OBJ_PTR obj) { return NUM2INT(obj); }
+long Number_to_int(OBJ_PTR obj, int *ierr) { return NUM2INT(obj); }
 
 OBJ_PTR Integer_New(long val) { return INT2FIX(val); }
 
@@ -56,45 +56,45 @@ OBJ_PTR String_New(char *src, long len) { return rb_str_new(src,len); }
 
 OBJ_PTR String_From_Cstring(char *src) { return rb_str_new2(src); }
 
-char *String_Ptr(OBJ_PTR obj) {
+char *String_Ptr(OBJ_PTR obj, int *ierr) {
    VALUE str = rb_String(obj);
    return RSTRING(str)->ptr; }
 
-long String_Len(OBJ_PTR obj) {
+long String_Len(OBJ_PTR obj, int *ierr) {
    VALUE str = rb_String(obj);
    return RSTRING(str)->len; }
 
-char *CString_Ptr(OBJ_PTR obj) {
+char *CString_Ptr(OBJ_PTR obj, int *ierr) {
    VALUE str = rb_String(obj);
    char *cs = RSTRING(str)->ptr;
    long len = RSTRING(str)->len;
-   if (len != strlen(cs)) RAISE_ERROR("invalid C string; contains NULL character");
+   if (len != strlen(cs)) { RAISE_ERROR("invalid C string; contains NULL character",ierr); return NULL; }
    return cs; }
 
 OBJ_PTR Array_New(long len) { return rb_ary_new2(len); }
 
-long Array_Len(OBJ_PTR obj) { return (RARRAY(rb_Array(obj))->len); }
+long Array_Len(OBJ_PTR obj, int *ierr) { return (RARRAY(rb_Array(obj))->len); }
 
-OBJ_PTR Array_Entry(OBJ_PTR obj, long indx) { return rb_ary_entry(obj,indx); }
+OBJ_PTR Array_Entry(OBJ_PTR obj, long indx, int *ierr) { return rb_ary_entry(obj,indx); }
 
-OBJ_PTR Array_Store(OBJ_PTR obj, long indx, OBJ_PTR val) { rb_ary_store(obj,indx,val); return val; }
+OBJ_PTR Array_Store(OBJ_PTR obj, long indx, OBJ_PTR val, int *ierr) { rb_ary_store(obj,indx,val); return val; }
 
-OBJ_PTR Array_Push(OBJ_PTR obj, OBJ_PTR val) { rb_ary_push(obj,val); return val; }
+OBJ_PTR Array_Push(OBJ_PTR obj, OBJ_PTR val, int *ierr) { rb_ary_push(obj,val); return val; }
 
 ID_PTR ID_Get(char *name) { return rb_intern(name); }
 
-char *ID_Name(ID_PTR id) { return rb_id2name(id); }
+char *ID_Name(ID_PTR id, int *ierr) { return rb_id2name(id); }
 
-OBJ_PTR Obj_Attr_Get(OBJ_PTR obj, ID_PTR attr_ID) { return rb_ivar_get(obj,attr_ID); }
+OBJ_PTR Obj_Attr_Get(OBJ_PTR obj, ID_PTR attr_ID, int *ierr) { return rb_ivar_get(obj,attr_ID); }
 
-OBJ_PTR Obj_Attr_Set(OBJ_PTR obj, ID_PTR attr_ID, OBJ_PTR val) {
+OBJ_PTR Obj_Attr_Set(OBJ_PTR obj, ID_PTR attr_ID, OBJ_PTR val, int *ierr) {
       return rb_ivar_set(obj,attr_ID,val); }
       
       
       
-OBJ_PTR TEX_PREAMBLE(OBJ_PTR fmkr) { return rb_const_get(CLASS_OF(fmkr),ID_Get("TEX_PREAMBLE")); }
+OBJ_PTR TEX_PREAMBLE(OBJ_PTR fmkr, int *ierr) { return rb_const_get(CLASS_OF(fmkr),ID_Get("TEX_PREAMBLE")); }
       
-OBJ_PTR COLOR_PREAMBLE(OBJ_PTR fmkr) { return rb_const_get(CLASS_OF(fmkr),ID_Get("COLOR_PREAMBLE")); }
+OBJ_PTR COLOR_PREAMBLE(OBJ_PTR fmkr, int *ierr) { return rb_const_get(CLASS_OF(fmkr),ID_Get("COLOR_PREAMBLE")); }
 
 
 //#define Obj_Attr_Get_by_StringName(obj,attr_name_string) rb_iv_get(obj,attr_name_string)
@@ -104,43 +104,43 @@ OBJ_PTR COLOR_PREAMBLE(OBJ_PTR fmkr) { return rb_const_get(CLASS_OF(fmkr),ID_Get
 
 void GIVE_WARNING(const char *fmt, const char *str) { rb_warn(fmt,str); }
 
-void RAISE_ERROR(char *str) { rb_raise(rb_eArgError,str); }
+void RAISE_ERROR(char *str, int *ierr) { *ierr = -1; rb_raise(rb_eArgError,str); }
 
 #define err_buff_len 256
-void RAISE_ERROR_s(char *fmt, char *s) {
+void RAISE_ERROR_s(char *fmt, char *s, int *ierr) {
    char buff[err_buff_len];
    sprintf(buff,fmt,s);
-   RAISE_ERROR(buff);
+   RAISE_ERROR(buff,ierr);
 }
 
-void RAISE_ERROR_ss(char *fmt, char *s1, char *s2) {
+void RAISE_ERROR_ss(char *fmt, char *s1, char *s2, int *ierr) {
    char buff[err_buff_len];
    sprintf(buff,fmt,s1,s2);
-   RAISE_ERROR(buff);
+   RAISE_ERROR(buff,ierr);
 }
 
-void RAISE_ERROR_i(char *fmt, int x) {
+void RAISE_ERROR_i(char *fmt, int x, int *ierr) {
    char buff[err_buff_len];
    sprintf(buff,fmt,x);
-   RAISE_ERROR(buff);
+   RAISE_ERROR(buff,ierr);
 }
 
-void RAISE_ERROR_ii(char *fmt, int x1, int x2) {
+void RAISE_ERROR_ii(char *fmt, int x1, int x2, int *ierr) {
    char buff[err_buff_len];
    sprintf(buff,fmt,x1,x2);
-   RAISE_ERROR(buff);
+   RAISE_ERROR(buff,ierr);
 }
 
-void RAISE_ERROR_g(char *fmt, double x) {
+void RAISE_ERROR_g(char *fmt, double x, int *ierr) {
    char buff[err_buff_len];
    sprintf(buff,fmt,x);
-   RAISE_ERROR(buff);
+   RAISE_ERROR(buff,ierr);
 }
 
-void RAISE_ERROR_gg(char *fmt, double x1, double x2) {
+void RAISE_ERROR_gg(char *fmt, double x1, double x2, int *ierr) {
    char buff[err_buff_len];
    sprintf(buff,fmt,x1,x2);
-   RAISE_ERROR(buff);
+   RAISE_ERROR(buff,ierr);
 }
 
 
@@ -171,11 +171,11 @@ void REALLOC_double(double **ptr, long new_len) {
 
 /* generic interface for vectors and tables */
 
-double *Vector_Data_for_Read(OBJ_PTR obj, long *len_ptr) { 
+double *Vector_Data_for_Read(OBJ_PTR obj, long *len_ptr, int *ierr) { 
    return Dvector_Data_for_Read(obj,len_ptr);
 }
 
-double **Table_Data_for_Read(OBJ_PTR tbl, long *num_col_ptr, long *num_row_ptr) {
+double **Table_Data_for_Read(OBJ_PTR tbl, long *num_col_ptr, long *num_row_ptr, int *ierr) {
    return Dtable_Ptr(tbl,num_col_ptr,num_row_ptr);
 }
 

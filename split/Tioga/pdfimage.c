@@ -99,10 +99,10 @@ static bool Is_monochrome(int obj_num)
    return false;
 }
 
-static void Write_Image_From_File(char *filename, int width, int height, char *out_info, int mask_obj_num)
+static void Write_Image_From_File(char *filename, int width, int height, char *out_info, int mask_obj_num, int *ierr)
 {
    FILE *jpg = fopen(filename, "r");
-   if (jpg == NULL) RAISE_ERROR_s("Sorry: cannot open file for showing image (%s)\n", filename);
+   if (jpg == NULL) { RAISE_ERROR_s("Sorry: cannot open file for showing image (%s)\n", filename, ierr); return; }
    unsigned char *buff;
    int len, rd_len;
    int buff_len = 256000;
@@ -129,13 +129,13 @@ static void Write_Image_From_File(char *filename, int width, int height, char *o
    fclose(jpg);
 }
 
-void Write_JPG(JPG_Info *xo)
+void Write_JPG(JPG_Info *xo, int *ierr)
 {
    Write_Image_From_File(xo->filename, xo->width, xo->height, 
-      "\t/Filter /DCTDecode\n\t/ColorSpace /DeviceRGB\n\t/BitsPerComponent 8\n", xo->mask_obj_num);
+      "\t/Filter /DCTDecode\n\t/ColorSpace /DeviceRGB\n\t/BitsPerComponent 8\n", xo->mask_obj_num, ierr);
 }
 
-void Write_Sampled(Sampled_Info *xo)
+void Write_Sampled(Sampled_Info *xo, int *ierr)
 {
    fprintf(OF, "\n\t/Subtype /Image\n");
    fprintf(OF, "\t/Filter /FlateDecode\n\t/Interpolate %s\n", (xo->interpolate)? "true":"false");
@@ -176,8 +176,8 @@ void Write_Sampled(Sampled_Info *xo)
          fprintf(OF, "\t/BitsPerComponent 8\n");
    }
    if (xo->mask_obj_num > 0) {
-      if (xo->image_type == MONO_IMAGE)
-         RAISE_ERROR("Sorry: monochrome images must not have masks");
+      if (xo->image_type == MONO_IMAGE) {
+         RAISE_ERROR("Sorry: monochrome images must not have masks", ierr); return; }
       if (!Is_monochrome(xo->mask_obj_num)) fprintf(OF, "\t/SMask %i 0 R\n", xo->mask_obj_num);
       else fprintf(OF, "\t/Mask %i 0 R\n", xo->mask_obj_num);
    }
@@ -188,12 +188,13 @@ void Write_Sampled(Sampled_Info *xo)
    buffer = ALLOC_N_unsigned_char(new_len);
    if (do_flate_compress(buffer, &new_len, xo->image_data, xo->length) != FLATE_OK) {
       free(buffer);
-      RAISE_ERROR("Error compressing image data");
+      RAISE_ERROR("Error compressing image data", ierr); 
+      return;
    }
    fprintf(OF, "\t/Length %li\n", new_len);
    fprintf(OF, "\t>>\nstream\n");
-   if (fwrite(buffer, 1, new_len, OF) < new_len)
-      RAISE_ERROR("Error writing image data");
+   if (fwrite(buffer, 1, new_len, OF) < new_len) {
+      RAISE_ERROR("Error writing image data", ierr);  return; }
    free(buffer);
    fprintf(OF, "\nendstream\nendobj\n");
 }
@@ -206,17 +207,21 @@ static void Create_Transform_from_Points( // transform maps (0,0), (1,0), and (0
    *a = lrx; *b = lry; *c = ulx; *d = uly;
 }
 
-static void Get_Image_Dest(FM *p, OBJ_PTR image_destination, double *dest)
+static void Get_Image_Dest(FM *p, OBJ_PTR image_destination, double *dest, int *ierr)
 {
-   if (Array_Len(image_destination) != 6)
-      RAISE_ERROR("Sorry: invalid image destination array: must have 6 entries");
+   int len = Array_Len(image_destination,ierr);
+   if (*ierr != 0) return;
+   if (len != 6) {
+      RAISE_ERROR("Sorry: invalid image destination array: must have 6 entries", ierr); return; }
    int i;
    for (i = 0; i < 6; i++) {
-      OBJ_PTR entry = Array_Entry(image_destination, i);
+      OBJ_PTR entry = Array_Entry(image_destination, i, ierr);
+      if (*ierr != 0) return;
       if (i % 2 == 0)
-         dest[i] = convert_figure_to_output_x(p,Number_to_double(entry));
+         dest[i] = convert_figure_to_output_x(p,Number_to_double(entry, ierr));
       else
-         dest[i] = convert_figure_to_output_y(p,Number_to_double(entry));
+         dest[i] = convert_figure_to_output_y(p,Number_to_double(entry, ierr));
+      if (*ierr != 0) return;
    }
 }
 
@@ -244,43 +249,47 @@ static void Show_JPEG(FM *p, char *filename, int width, int height, double *dest
 }
 
 OBJ_PTR c_private_show_jpg(OBJ_PTR fmkr, FM *p, char *filename, 
-   int width, int height, OBJ_PTR image_destination, int mask_obj_num) {
+   int width, int height, OBJ_PTR image_destination, int mask_obj_num, int *ierr) {
    double dest[6];
-   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling show_jpg");
-   Get_Image_Dest(p, image_destination, dest);
+   if (constructing_path) {
+      RAISE_ERROR("Sorry: must finish with current path before calling show_jpg", ierr); return OBJ_NIL; }
+   Get_Image_Dest(p, image_destination, dest, ierr);
+   if (*ierr != 0) return OBJ_NIL;
    Show_JPEG(p, filename, width, height, dest, JPG_SUBTYPE, mask_obj_num);
    return fmkr;
 }
 
 OBJ_PTR c_private_create_image_data(OBJ_PTR fmkr, FM *p, OBJ_PTR table,
             int first_row, int last_row, int first_column, int last_column,
-            double min_val, double max_val, int max_code, int if_below_range, int if_above_range)
+            double min_val, double max_val, int max_code, int if_below_range, int if_above_range, int *ierr)
 {
    long num_cols, num_rows;
-   double **data = Table_Data_for_Read(table, &num_cols, &num_rows);
+   double **data = Table_Data_for_Read(table, &num_cols, &num_rows, ierr);
+   if (*ierr != 0) return OBJ_NIL;
    if (first_column < 0) first_column += num_cols;
    if (first_column < 0 || first_column >= num_cols)
-      RAISE_ERROR_i("Sorry: invalid first_column specification (%i)", first_column);
+      RAISE_ERROR_i("Sorry: invalid first_column specification (%i)", first_column, ierr);
    if (last_column < 0) last_column += num_cols;
    if (last_column < 0 || last_column >= num_cols)
-      RAISE_ERROR_i("Sorry: invalid last_column specification (%i)", last_column);
+      RAISE_ERROR_i("Sorry: invalid last_column specification (%i)", last_column, ierr);
    if (first_row < 0) first_row += num_rows;
    if (first_row < 0 || first_row >= num_rows)
-      RAISE_ERROR_i("Sorry: invalid first_row specification (%i)", first_row);
+      RAISE_ERROR_i("Sorry: invalid first_row specification (%i)", first_row, ierr);
    if (last_row < 0) last_row += num_rows;
    if (last_row < 0 || last_row >= num_rows)
-      RAISE_ERROR_i("Sorry: invalid last_row specification (%i)", last_row);
+      RAISE_ERROR_i("Sorry: invalid last_row specification (%i)", last_row, ierr);
    if (min_val >= max_val)
-      RAISE_ERROR_gg("Sorry: invalid range specification: min %g max %g", min_val, max_val);
+      RAISE_ERROR_gg("Sorry: invalid range specification: min %g max %g", min_val, max_val, ierr);
    if (max_code <= 0 || max_code > 255)
-      RAISE_ERROR_i("Sorry: invalid max_code specification (%i)", max_code);
+      RAISE_ERROR_i("Sorry: invalid max_code specification (%i)", max_code, ierr);
    if (if_below_range < 0 || if_below_range > 255)
-      RAISE_ERROR_i("Sorry: invalid if_below_range specification (%i)", if_below_range);
+      RAISE_ERROR_i("Sorry: invalid if_below_range specification (%i)", if_below_range, ierr);
    if (if_above_range < 0 || if_above_range > 255)
-      RAISE_ERROR_i("Sorry: invalid if_above_range specification (%i)", if_above_range);
+      RAISE_ERROR_i("Sorry: invalid if_above_range specification (%i)", if_above_range, ierr);
    int i, j, k, width = last_column - first_column + 1, height = last_row - first_row + 1;
    int sz = width * height;
-   if (sz <= 0) RAISE_ERROR_ii("Sorry: invalid data specification: width (%i) height (%i)", width, height);
+   if (sz <= 0) RAISE_ERROR_ii("Sorry: invalid data specification: width (%i) height (%i)", width, height, ierr);
+   if (*ierr != 0) return OBJ_NIL;
    char *buff = ALLOC_N_char(sz);
    for (k = 0, i = first_row; i <= last_row; i++) {
       double *row = data[i];
@@ -302,25 +311,27 @@ OBJ_PTR c_private_create_image_data(OBJ_PTR fmkr, FM *p, OBJ_PTR table,
 
 OBJ_PTR c_private_create_monochrome_image_data(OBJ_PTR fmkr, FM *p, OBJ_PTR table,
             int first_row, int last_row, int first_column, int last_column,
-            double boundary, bool reversed)
+            double boundary, bool reversed, int *ierr)
 {
    long num_cols, num_rows;
-   double **data = Table_Data_for_Read(table, &num_cols, &num_rows);
+   double **data = Table_Data_for_Read(table, &num_cols, &num_rows, ierr);
+   if (*ierr != 0) return OBJ_NIL;
    if (first_column < 0) first_column += num_cols;
    if (first_column < 0 || first_column >= num_cols)
-      RAISE_ERROR_i("Sorry: invalid first_column specification (%i)", first_column);
+      RAISE_ERROR_i("Sorry: invalid first_column specification (%i)", first_column, ierr);
    if (last_column < 0) last_column += num_cols;
    if (last_column < 0 || last_column >= num_cols)
-      RAISE_ERROR_i("Sorry: invalid last_column specification (%i)", last_column);
+      RAISE_ERROR_i("Sorry: invalid last_column specification (%i)", last_column, ierr);
    if (first_row < 0) first_row += num_rows;
    if (first_row < 0 || first_row >= num_rows)
-      RAISE_ERROR_i("Sorry: invalid first_row specification (%i)", first_row);
+      RAISE_ERROR_i("Sorry: invalid first_row specification (%i)", first_row, ierr);
    if (last_row < 0) last_row += num_rows;
    if (last_row < 0 || last_row >= num_rows)
-      RAISE_ERROR_i("Sorry: invalid last_row specification (%i)", last_row);
+      RAISE_ERROR_i("Sorry: invalid last_row specification (%i)", last_row, ierr);
    int i, j, k, width = last_column - first_column + 1, height = last_row - first_row + 1, bytes_per_row = (width+7)/8;
    int sz = bytes_per_row * 8 * height;
-   if (sz <= 0) RAISE_ERROR_ii("Sorry: invalid data specification: width (%i) height (%i)", width, height);
+   if (sz <= 0) RAISE_ERROR_ii("Sorry: invalid data specification: width (%i) height (%i)", width, height, ierr);
+   if (*ierr != 0) return OBJ_NIL;
    // to simplify the process, do it in two stages: first get the values and then pack the bits
    char *buff = ALLOC_N_char(sz);
    for (k = 0, i = first_row; i <= last_row; i++) {
@@ -354,17 +365,18 @@ OBJ_PTR c_private_create_monochrome_image_data(OBJ_PTR fmkr, FM *p, OBJ_PTR tabl
 
 OBJ_PTR c_private_show_image(OBJ_PTR fmkr, FM *p, int image_type, double llx, double lly, double lrx, double lry,
     double ulx, double uly, bool interpolate, bool reversed, int w, int h, unsigned char* data, long len, 
-    OBJ_PTR mask_min, OBJ_PTR mask_max, OBJ_PTR hivalue, OBJ_PTR lookup_data, int mask_obj_num)
+    OBJ_PTR mask_min, OBJ_PTR mask_max, OBJ_PTR hivalue, OBJ_PTR lookup_data, int mask_obj_num, int *ierr)
 {
    unsigned char *lookup=NULL;
    int value_mask_min = 256, value_mask_max = 256, lookup_len=0, hival=0;
-   if (constructing_path) RAISE_ERROR("Sorry: must finish with current path before calling show_image");
+   if (constructing_path) { RAISE_ERROR("Sorry: must finish with current path before calling show_image", ierr); return OBJ_NIL; }
    if (image_type == COLORMAP_IMAGE) {
-      value_mask_min = Number_to_int(mask_min);
-      value_mask_max = Number_to_int(mask_max);
-      hival = Number_to_int(hivalue);
-      lookup = (unsigned char *)(String_Ptr(lookup_data));
-      lookup_len = String_Len(lookup_data);
+      value_mask_min = Number_to_int(mask_min, ierr);
+      value_mask_max = Number_to_int(mask_max, ierr);
+      hival = Number_to_int(hivalue, ierr);
+      lookup = (unsigned char *)(String_Ptr(lookup_data, ierr));
+      lookup_len = String_Len(lookup_data, ierr);
+      if (*ierr != 0) return OBJ_NIL;
    }
    
    llx = convert_figure_to_output_x(p,llx);
@@ -390,8 +402,10 @@ OBJ_PTR c_private_show_image(OBJ_PTR fmkr, FM *p, int image_type, double llx, do
    xo->image_type = image_type;
    if (image_type != COLORMAP_IMAGE) xo->lookup = NULL;
    else {
-      if ((hival+1)*3 > lookup_len)
-         RAISE_ERROR_ii("Sorry: color space hival (%i) is too large for length of lookup table (%i)", hival, lookup_len);
+      if ((hival+1)*3 > lookup_len) {
+         RAISE_ERROR_ii("Sorry: color space hival (%i) is too large for length of lookup table (%i)", hival, lookup_len, ierr);
+         return OBJ_NIL;
+      }
       xo->hival = hival;
       lookup_len = (hival+1) * 3;
       xo->lookup = ALLOC_N_unsigned_char(lookup_len);

@@ -27,9 +27,9 @@ static FILE *fp; // for the TeX file
 
 /* TeX text */
 
-OBJ_PTR c_rescale_text(OBJ_PTR fmkr, FM *p, double scaling_factor) {
+OBJ_PTR c_rescale_text(OBJ_PTR fmkr, FM *p, double scaling_factor, int *ierr) {
    double scale = scaling_factor * p->default_text_scale;
-   if (scaling_factor <= 0) RAISE_ERROR("Sorry: text scaling must be positive");
+   if (scaling_factor <= 0) { RAISE_ERROR("Sorry: text scaling must be positive", ierr); return OBJ_NIL; }
    p->default_text_height_dx *= scaling_factor;
    p->default_text_height_dy *= scaling_factor;
    p->default_text_scale = scale;
@@ -77,7 +77,7 @@ static void tex_show_rotated_text(
 }
 
 static void Convert_Frame_Text_Position_To_Output_Location(FM *p, int frame_side, double offset, 
-   double fraction, double *xp, double *yp, double *base_angle, char *text)
+   double fraction, double *xp, double *yp, double *base_angle, char *text, int *ierr)
 {
    double page_x, page_y;
    switch (frame_side) {
@@ -92,8 +92,8 @@ static void Convert_Frame_Text_Position_To_Output_Location(FM *p, int frame_side
          *base_angle = 90;
          break;
       case AT_X_ORIGIN:
-         if (0.0 > p->bounds_xmax || 0.0 < p->bounds_xmin)
-            RAISE_ERROR_s("Sorry: x origin is not part of plot for (%s)", text);
+         if (0.0 > p->bounds_xmax || 0.0 < p->bounds_xmin) {
+            RAISE_ERROR_s("Sorry: x origin is not part of plot for (%s)", text, ierr); return; }
          page_x = convert_figure_to_output_x(p, 0.0);
          if (p->xaxis_reversed) offset = -offset;
          page_x += offset;
@@ -111,36 +111,38 @@ static void Convert_Frame_Text_Position_To_Output_Location(FM *p, int frame_side
          *base_angle = 0;
          break;
       case AT_Y_ORIGIN:
-         if (0.0 > p->bounds_ymax || 0.0 < p->bounds_ymin)
-            RAISE_ERROR_s("Sorry: y origin is not part of plot for (%s)", text);
+         if (0.0 > p->bounds_ymax || 0.0 < p->bounds_ymin) {
+            RAISE_ERROR_s("Sorry: y origin is not part of plot for (%s)", text, ierr); return; }
          page_y = convert_figure_to_output_y(p, 0.0);
          if (p->yaxis_reversed) offset = -offset;
          page_y += offset;
          page_x = p->page_width * (p->frame_left + fraction * p->frame_width);
          *base_angle = 0;
          break;
-      default: RAISE_ERROR_s("Sorry: invalid parameter for frame side in show text (%s)", text);
+      default: 
+         RAISE_ERROR_s("Sorry: invalid parameter for frame side in show text (%s)", text, ierr); 
+         return;
    }
    *xp = p->page_left + page_x; *yp = p->page_bottom + page_y;
 }
        
 OBJ_PTR c_show_rotated_text(OBJ_PTR fmkr, FM *p, char *text, int frame_side, double shift, double fraction,
-   double scale, double angle, int justification, int alignment) {
+   double scale, double angle, int justification, int alignment, int *ierr) {
    double x, y, base_angle, ft_ht = p->default_text_scale * scale * p->default_font_size;
-   Convert_Frame_Text_Position_To_Output_Location(p, frame_side, shift*ft_ht*ENLARGE, fraction, &x, &y, &base_angle, text);
+   Convert_Frame_Text_Position_To_Output_Location(p, frame_side, shift*ft_ht*ENLARGE, fraction, &x, &y, &base_angle, text, ierr);
    tex_show_rotated_text(p, text, x, y, scale, angle + base_angle, justification, alignment);
    return fmkr;
 }
 
          
 OBJ_PTR c_show_rotated_label(OBJ_PTR fmkr, FM *p, char *text, 
-   double xloc, double yloc, double scale, double angle, int justification, int alignment) {
+   double xloc, double yloc, double scale, double angle, int justification, int alignment, int *ierr) {
    tex_show_rotated_text(p, text, convert_figure_to_output_x(p, xloc), convert_figure_to_output_y(p, yloc),
       scale, angle, justification, alignment);
    return fmkr;
 }
    
-OBJ_PTR c_check_label_clip(OBJ_PTR fmkr, FM *p, double x, double y) {
+OBJ_PTR c_check_label_clip(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr) {
    x = convert_figure_to_frame_x(p,x);
    y = convert_figure_to_frame_y(p,y);
    if (x < p->label_left_margin || y < p->label_bottom_margin ||
@@ -161,7 +163,7 @@ static void Get_tex_name(char *ofile, char *filename, int maxlen)
    strcat(ofile, "_figure.txt");
 }
 
-void Open_tex(OBJ_PTR fmkr, char *filename, bool quiet_mode) 
+void Open_tex(OBJ_PTR fmkr, char *filename, bool quiet_mode, int *ierr) 
 {
    char ofile[300];
    Get_tex_name(ofile, filename, 300);
@@ -172,16 +174,15 @@ void Open_tex(OBJ_PTR fmkr, char *filename, bool quiet_mode)
    fprintf(fp,"\\def\\BS{\\phantom{\\Huge\\scalebox{0}[2]{\\hbox{\\rotatebox{180}{O}O}}}}\n"); 
       // graphicx seems to vertically align baseline (B) like center (c), 
       // so we add BS (Big Strut) to make them look the same
-   fmkr = OBJ_NIL; // unused
 }
 
-void Close_tex(OBJ_PTR fmkr, bool quiet_mode)
+void Close_tex(OBJ_PTR fmkr, bool quiet_mode, int *ierr)
 {
    double x, y, xoff, yoff;
    x = bbox_urx - bbox_llx; if (x < 0) x = bbox_urx = bbox_llx = 0;
    y = bbox_ury - bbox_lly; if (y < 0) y = bbox_ury = bbox_lly = 0;
-   xoff = bbox_llx + Get_tex_xoffset(fmkr)*ENLARGE;
-   yoff = bbox_lly + Get_tex_yoffset(fmkr)*ENLARGE;
+   xoff = bbox_llx + Get_tex_xoffset(fmkr,ierr)*ENLARGE;
+   yoff = bbox_lly + Get_tex_yoffset(fmkr,ierr)*ENLARGE;
    fprintf(fp,"\\end{picture}");
    fseek(fp, cur_pos, SEEK_SET);
    fprintf(fp,"\\begin{picture}(%03d,%03d)(%02d,%d)", ROUND(x), ROUND(y), ROUND(xoff), ROUND(yoff));
@@ -189,28 +190,28 @@ void Close_tex(OBJ_PTR fmkr, bool quiet_mode)
 }   
 
 
-static void Write_preview_header(OBJ_PTR fmkr, FILE *file) {
-   fprintf(file, "\\documentclass{%s}\n\n", Get_tex_preview_documentclass(fmkr));   
+static void Write_preview_header(OBJ_PTR fmkr, FILE *file, int *ierr) {
+   fprintf(file, "\\documentclass{%s}\n\n", Get_tex_preview_documentclass(fmkr,ierr));   
    /* we print out the preamble generated from tioga.sty.in */
    fprintf(file, "%% Tioga preamble generated from tioga.sty.in\n");
-   fprintf(file, "%s\n", Get_tex_preview_generated_preamble(fmkr));
+   fprintf(file, "%s\n", Get_tex_preview_generated_preamble(fmkr,ierr));
    fprintf(file, "%% User-specified preamble\n");
-   fprintf(file, "%s\n\n", Get_tex_preamble(fmkr));
+   fprintf(file, "%s\n\n", Get_tex_preamble(fmkr,ierr));
    fprintf(file, "%% Command to format numeric labels on xaxis\n");
-   fprintf(file, "\\newcommand{\\tiogaxaxisnumericlabel}[1]{%s}\n\n", Get_xaxis_numeric_label_tex(fmkr));
+   fprintf(file, "\\newcommand{\\tiogaxaxisnumericlabel}[1]{%s}\n\n", Get_xaxis_numeric_label_tex(fmkr,ierr));
    fprintf(file, "%% Command to format numeric labels on yaxis\n");
-   fprintf(file, "\\newcommand{\\tiogayaxisnumericlabel}[1]{%s}\n\n", Get_yaxis_numeric_label_tex(fmkr));
+   fprintf(file, "\\newcommand{\\tiogayaxisnumericlabel}[1]{%s}\n\n", Get_yaxis_numeric_label_tex(fmkr,ierr));
    fprintf(file, "%% Color constants definitions\n");
-   fprintf(file, "%s\n\n", CString_Ptr(COLOR_PREAMBLE(fmkr)));   
+   fprintf(file, "%s\n\n", CString_Ptr(COLOR_PREAMBLE(fmkr,ierr),ierr)); 
    fprintf(file, "%% Set page margins, page size and orientation.\n");
    fprintf(file, "\t\\usepackage[pdftex,tmargin=0pt,lmargin=0pt,"
 	   "rmargin=0pt,bmargin=0pt,\n");
    fprintf(file, "\tpaperwidth=%s,paperheight=%s,\n", 
-	   Get_tex_preview_paper_width(fmkr),
-	   Get_tex_preview_paper_height(fmkr));
+	   Get_tex_preview_paper_width(fmkr,ierr),
+	   Get_tex_preview_paper_height(fmkr,ierr));
    fprintf(file, "\thoffset=%s,voffset=%s\n", 
-	   Get_tex_preview_hoffset(fmkr),
-	   Get_tex_preview_voffset(fmkr));
+	   Get_tex_preview_hoffset(fmkr,ierr),
+	   Get_tex_preview_voffset(fmkr,ierr));
    fprintf(file, "\t]{geometry}\n");
 
    fprintf(file, "\n%% We need the graphicx package and the calc package.\n");
@@ -220,36 +221,36 @@ static void Write_preview_header(OBJ_PTR fmkr, FILE *file) {
    fprintf(file, "\t\\topskip=0pt\n\n");
 
    /* now, the commands to customize the font used */
-   fprintf(file, "\\settiogafontsize[10pt]{%s}\n", Get_tex_fontsize(fmkr));
-   fprintf(file, "\\settiogafontfamily{\\%s}\n", Get_tex_fontfamily(fmkr));
-   fprintf(file, "\\settiogafontseries{\\%s}\n", Get_tex_fontseries(fmkr));
-   fprintf(file, "\\settiogafontshape{\\%s}\n", Get_tex_fontshape(fmkr));
+   fprintf(file, "\\settiogafontsize[10pt]{%s}\n", Get_tex_fontsize(fmkr,ierr));
+   fprintf(file, "\\settiogafontfamily{\\%s}\n", Get_tex_fontfamily(fmkr,ierr));
+   fprintf(file, "\\settiogafontseries{\\%s}\n", Get_tex_fontseries(fmkr,ierr));
+   fprintf(file, "\\settiogafontshape{\\%s}\n", Get_tex_fontshape(fmkr,ierr));
 }
 
 
-static void Write_figure_command(OBJ_PTR fmkr, char *simple_name, FILE *file) {
+static void Write_figure_command(OBJ_PTR fmkr, char *simple_name, FILE *file, int *ierr) {
    char *minwhitespace;
    
-   if (Get_tex_preview_fullpage(fmkr)) {
-        minwhitespace = Get_tex_preview_minwhitespace(fmkr);
+   if (Get_tex_preview_fullpage(fmkr,ierr)) {
+        minwhitespace = Get_tex_preview_minwhitespace(fmkr,ierr);
         if (minwhitespace == NULL) {
             fprintf(file, "\\tiogafigurefullpage{%s}\n", simple_name); 
         } else {
             fprintf(file, "\\tiogafigurefullpage[%s]{%s}\n", minwhitespace, simple_name); 
         }
    } else {
-       const char * command = Get_tex_preview_tiogafigure_command(fmkr);
+       const char * command = Get_tex_preview_tiogafigure_command(fmkr,ierr);
        if(strcmp(command, "tiogafigureshow")) {
-        fprintf(file, "\\%s{%s}{%s}{%s}\n", Get_tex_preview_tiogafigure_command(fmkr), simple_name, 
-            Get_tex_preview_figure_width(fmkr), Get_tex_preview_figure_height(fmkr)); 
+        fprintf(file, "\\%s{%s}{%s}{%s}\n", Get_tex_preview_tiogafigure_command(fmkr,ierr), simple_name, 
+            Get_tex_preview_figure_width(fmkr,ierr), Get_tex_preview_figure_height(fmkr,ierr)); 
        } else { /* no need for extra arguments for tiogafigureshow */
-        fprintf(file, "\\%s{%s}\n", Get_tex_preview_tiogafigure_command(fmkr), simple_name); 
+        fprintf(file, "\\%s{%s}\n", Get_tex_preview_tiogafigure_command(fmkr,ierr), simple_name); 
        }
    }
 }
 
    
-void Create_wrapper(OBJ_PTR fmkr, char *fname, bool quiet_mode)
+void Create_wrapper(OBJ_PTR fmkr, char *fname, bool quiet_mode, int *ierr)
 {  // create the wrapper TeX file to combine the text and graphics to make a figure
    char *dot;
    char tex_fname[100], base_name[100], simple_name[100];
@@ -271,23 +272,23 @@ void Create_wrapper(OBJ_PTR fmkr, char *fname, bool quiet_mode)
    file = fopen(tex_fname, "w");
    fprintf(file, "%% Tioga preview LaTeX file for %s_figure.pdf and %s_figure.txt\n\n", base_name, base_name);
 
-   Write_preview_header(fmkr, file);
+   Write_preview_header(fmkr, file, ierr);
 
    fprintf(file, "\n%% Here's the page with the figure.\n");
    fprintf(file, "\\begin{document}\n");
-   fprintf(file, "\\pagestyle{%s}\n", Get_tex_preview_pagestyle(fmkr));
+   fprintf(file, "\\pagestyle{%s}\n", Get_tex_preview_pagestyle(fmkr,ierr));
    /* necessary to get the position right */
    fprintf(file, "\\noindent");
-   Write_figure_command(fmkr, simple_name, file);
+   Write_figure_command(fmkr, simple_name, file, ierr);
    fprintf(file, "\\end{document}\n");
    fclose(file);
 }
 
-void Init_tex(void)
+void Init_tex(int *ierr)
 {
 }
 
-void Rename_tex(char *oldname, char *newname)
+void Rename_tex(char *oldname, char *newname, int *ierr)
 {
    char old_ofile[300], new_ofile[300];
    Get_tex_name(old_ofile, oldname, 300);
@@ -295,33 +296,41 @@ void Rename_tex(char *oldname, char *newname)
    rename(old_ofile, new_ofile); // from stdio.h
 }
 
-void private_make_portfolio(char *name, OBJ_PTR fignums, OBJ_PTR fignames)
+void private_make_portfolio(char *name, OBJ_PTR fignums, OBJ_PTR fignames, int *ierr)
 {
     FILE *file;
     int i, len, numfigs, j;
     char tex_fname[256];
     sprintf(tex_fname, "%s.tex", name);
     file = fopen(tex_fname, "w");
-    if (file == NULL)
-       RAISE_ERROR_s("Sorry: can't open %s.\n", tex_fname);
+    if (file == NULL) {
+       RAISE_ERROR_s("Sorry: can't open %s.\n", tex_fname, ierr); return; }
     fprintf(file, "%% Tioga Portfolio %s\n\n", name);
     fprintf(file, "\\documentclass{article}\n");
     fprintf(file, "\\usepackage{pdfpages}\n");
     fprintf(file, "\\begin{document}\n");
     fprintf(file, "%% Start of figures, one per page\n\n");
-    len = Array_Len(fignames);
+    len = Array_Len(fignames,ierr);
     if (fignums == OBJ_NIL) {
         for (i=0; i < len; i++) {
-            fprintf(file, "\\includepdf{%s.pdf}\n", Get_String(fignames, i));
+            fprintf(file, "\\includepdf{%s.pdf}\n", Get_String(fignames, i, ierr));
+            if (*ierr != 0) return;
         }
     } else {
-        numfigs = Array_Len(fignums);
+        numfigs = Array_Len(fignums,ierr);
+        if (*ierr != 0) return;
         for (i=0; i < numfigs; i++) {
-            j = Number_to_int(Array_Entry(fignums,i));
-            if (j >= 0 && j < len) fprintf(file, "\\includepdf{%s.pdf}\n", Get_String(fignames, j));
+            OBJ_PTR n = Array_Entry(fignums,i,ierr);
+            if (*ierr != 0) return;
+            j = Number_to_int(n,ierr);
+            if (j >= 0 && j < len) {
+               fprintf(file, "\\includepdf{%s.pdf}\n", Get_String(fignames, j, ierr));
+               if (*ierr != 0) return;
+            }
             else {
                 fclose(file);
-                RAISE_ERROR("Requested figure numbers must be >= 0 and < num_figures.");
+                RAISE_ERROR("Requested figure numbers must be >= 0 and < num_figures.", ierr);
+                return;
             }
         }
     }

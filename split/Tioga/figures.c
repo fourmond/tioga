@@ -37,44 +37,46 @@
 
 
 #define DBL_ATTR(attr) \
-static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return rb_float_new(p->attr); } \
+static VALUE FM_##attr##_get(VALUE fmkr) { int ierr=0; FM *p = Get_FM(fmkr,&ierr); return (ierr != 0)? OBJ_NIL : rb_float_new(p->attr); } \
 static VALUE FM_##attr##_set(VALUE fmkr, VALUE val) { \
-   FM *p = Get_FM(fmkr); VALUE v = rb_Float(val); p->attr = NUM2DBL(v); return val; }
+   int ierr=0; FM *p = Get_FM(fmkr,&ierr); if (ierr != 0) return OBJ_NIL; VALUE v = rb_Float(val); p->attr = NUM2DBL(v); return val; }
 
 #define INT_ATTR(attr) \
-static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return INT2FIX(p->attr); } \
+static VALUE FM_##attr##_get(VALUE fmkr) { int ierr=0; FM *p = Get_FM(fmkr,&ierr); return (ierr != 0)? OBJ_NIL : INT2FIX(p->attr); } \
 static VALUE FM_##attr##_set(VALUE fmkr, VALUE val) { \
-   FM *p = Get_FM(fmkr); VALUE v = rb_Integer(val); p->attr = NUM2INT(v); return val; }
+   int ierr=0; FM *p = Get_FM(fmkr,&ierr); if (ierr != 0) return OBJ_NIL; VALUE v = rb_Integer(val); p->attr = NUM2INT(v); return val; }
 
 #define VAL_ATTR(attr) \
-static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return p->attr; } \
+static VALUE FM_##attr##_get(VALUE fmkr) { int ierr=0; FM *p = Get_FM(fmkr,&ierr); return (ierr != 0)? OBJ_NIL : p->attr; } \
 static VALUE FM_##attr##_set(VALUE fmkr, VALUE val) { \
-   FM *p = Get_FM(fmkr); p->attr = val; return val; }
+   int ierr=0; FM *p = Get_FM(fmkr,&ierr); if (ierr != 0) return OBJ_NIL; p->attr = val; return val; }
 
 #define BOOL_ATTR(attr) \
-static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return (p->attr)? Qtrue : Qfalse; } \
+static VALUE FM_##attr##_get(VALUE fmkr) { int ierr=0; FM *p = Get_FM(fmkr,&ierr); return (ierr != 0)? OBJ_NIL : ((p->attr)? Qtrue : Qfalse); } \
 static VALUE FM_##attr##_set(VALUE fmkr, VALUE val) { \
-   FM *p = Get_FM(fmkr); p->attr = (val != Qfalse); return val; }
+   int ierr=0; FM *p = Get_FM(fmkr,&ierr); if (ierr != 0) return OBJ_NIL; p->attr = (val != Qfalse); return val; }
 
 #define RO_DBL_ATTR(attr) \
-static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return rb_float_new(p->attr); }
+static VALUE FM_##attr##_get(VALUE fmkr) { int ierr=0; FM *p = Get_FM(fmkr,&ierr); return (ierr != 0)? OBJ_NIL : rb_float_new(p->attr); }
 
 #define RO_INT_ATTR(attr) \
-static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return INT2FIX(p->attr); }
+static VALUE FM_##attr##_get(VALUE fmkr) { int ierr=0; FM *p = Get_FM(fmkr,&ierr); return (ierr != 0)? OBJ_NIL : INT2FIX(p->attr); }
 
 #define RO_VAL_ATTR(attr) \
-static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return p->attr; }
+static VALUE FM_##attr##_get(VALUE fmkr) { int ierr=0; FM *p = Get_FM(fmkr,&ierr); return (ierr != 0)? OBJ_NIL : p->attr; }
 
 #define RO_BOOL_ATTR(attr) \
-static VALUE FM_##attr##_get(VALUE fmkr) { FM *p = Get_FM(fmkr); return (p->attr)? Qtrue : Qfalse; }
+static VALUE FM_##attr##_get(VALUE fmkr) { int ierr=0; FM *p = Get_FM(fmkr,&ierr); return (ierr != 0)? OBJ_NIL : ((p->attr)? Qtrue : Qfalse); }
 
 
 char *data_dir = NULL;
 
 OBJ_PTR cFM; /* the Tioga/FigureMaker class object */
 
-FM *Get_FM(OBJ_PTR fmkr) {
-   return (FM *)Dvector_Data_for_Write(Get_fm_data_attr(fmkr), NULL);
+FM *Get_FM(OBJ_PTR fmkr, int *ierr) {
+   FM *p = (FM *)Dvector_Data_for_Write(Get_fm_data_attr(fmkr, ierr), NULL);
+   if (*ierr != 0) RAISE_ERROR("FigMkr is missing @fm_data",ierr);
+   return p;
 }
 
 /* page attribute accessors */
@@ -268,7 +270,7 @@ static void Set_fm_data_size() {
 #define attr_accessors(attr) attr_reader(attr) attr_writer(attr)
 
 void Init_FigureMaker(void) { 
-     /* called by Ruby when the extension is loaded */
+   /* called by Ruby when the extension is loaded */
 
    /* this function has been modified by Vincent Fourmond for the splitting
       out of libraries more general than Tioga */

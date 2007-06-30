@@ -75,36 +75,36 @@ static void Init_PlotAxis_struct(PlotAxis *s) {
    s->labels = NULL;
 }
 
-static void figure_moveto(OBJ_PTR fmkr, FM *p, double x, double y) // figure coords
+static void figure_moveto(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr) // figure coords
 {
-   c_moveto(fmkr, p, convert_figure_to_output_x(p,x), convert_figure_to_output_y(p,y));
+   c_moveto(fmkr, p, convert_figure_to_output_x(p,x), convert_figure_to_output_y(p,y), ierr);
 }
 
-static void figure_lineto(OBJ_PTR fmkr, FM *p, double x, double y) // figure coords
+static void figure_lineto(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr) // figure coords
 {
-   c_lineto(fmkr, p, convert_figure_to_output_x(p,x), convert_figure_to_output_y(p,y));
+   c_lineto(fmkr, p, convert_figure_to_output_x(p,x), convert_figure_to_output_y(p,y), ierr);
 }
 
 static void figure_join(OBJ_PTR fmkr, FM *p, 
-   double x0, double y0, double x1, double y1) // figure coords
+   double x0, double y0, double x1, double y1, int *ierr) // figure coords
 {
-   figure_moveto(fmkr, p, x0, y0);
-   figure_lineto(fmkr, p, x1, y1);
+   figure_moveto(fmkr, p, x0, y0, ierr);
+   figure_lineto(fmkr, p, x1, y1, ierr);
 }
 
-static void axis_stroke(OBJ_PTR fmkr, FM *p)
+static void axis_stroke(OBJ_PTR fmkr, FM *p, int *ierr)
 {
-   c_stroke(fmkr,p);
+   c_stroke(fmkr,p, ierr);
 }
 
 static void figure_join_and_stroke(OBJ_PTR fmkr, FM *p, 
-   double x0, double y0, double x1, double y1) // figure coords
+   double x0, double y0, double x1, double y1, int *ierr) // figure coords
 {
-   figure_join(fmkr, p, x0, y0, x1, y1);
-   c_stroke(fmkr,p);
+   figure_join(fmkr, p, x0, y0, x1, y1, ierr);
+   c_stroke(fmkr,p, ierr);
 }
 
-static void Get_xaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s)
+static void Get_xaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
 {
    s->type = p->xaxis_type;
    s->other_axis_type = p->yaxis_type;
@@ -121,14 +121,12 @@ static void Get_xaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s)
    s->ticks_outside = p->xaxis_ticks_outside; // inside frame or toward smaller x or y value for specific location
    s->tick_interval = p->xaxis_tick_interval; // set to 0 to use default
    s->min_between_major_ticks = p->xaxis_min_between_major_ticks; // in units of numeric label char heights
-   s->number_of_minor_intervals = p->xaxis_number_of_minor_intervals; // set to 0 to use default
-   
-   s->locations_for_major_ticks = Get_xaxis_locations_for_major_ticks(fmkr);
-   s->locations_for_minor_ticks = Get_xaxis_locations_for_minor_ticks(fmkr);
-
+   s->number_of_minor_intervals = p->xaxis_number_of_minor_intervals; // set to 0 to use default   
+   s->locations_for_major_ticks = Get_xaxis_locations_for_major_ticks(fmkr, ierr);
+   s->locations_for_minor_ticks = Get_xaxis_locations_for_minor_ticks(fmkr, ierr);
    s->use_fixed_pt = p->xaxis_use_fixed_pt;
    s->digits_max = p->xaxis_digits_max;
-   s->tick_labels = Get_xaxis_tick_labels(fmkr);
+   s->tick_labels = Get_xaxis_tick_labels(fmkr, ierr);
    s->numeric_label_decimal_digits = p->xaxis_numeric_label_decimal_digits; // set to negative to use default
    s->numeric_label_scale = p->xaxis_numeric_label_scale;
    s->numeric_label_shift = p->xaxis_numeric_label_shift; // in char heights, positive for out from edge (or toward larger x or y value)
@@ -139,7 +137,7 @@ static void Get_xaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s)
    s->numeric_label_phase = p->xaxis_numeric_label_phase;
 }
 
-static void Get_yaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s)
+static void Get_yaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
 {
    s->type = p->yaxis_type;
    s->other_axis_type = p->xaxis_type;
@@ -157,9 +155,9 @@ static void Get_yaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s)
    s->tick_interval = p->yaxis_tick_interval; // set to 0 to use default
    s->min_between_major_ticks = p->yaxis_min_between_major_ticks; // in units of numeric label char heights
    s->number_of_minor_intervals = p->yaxis_number_of_minor_intervals; // set to 0 to use default   
-   s->locations_for_major_ticks = Get_yaxis_locations_for_major_ticks(fmkr);
-   s->locations_for_minor_ticks = Get_yaxis_locations_for_minor_ticks(fmkr);
-   s->tick_labels = Get_yaxis_tick_labels(fmkr);   
+   s->locations_for_major_ticks = Get_yaxis_locations_for_major_ticks(fmkr, ierr);
+   s->locations_for_minor_ticks = Get_yaxis_locations_for_minor_ticks(fmkr, ierr);
+   s->tick_labels = Get_yaxis_tick_labels(fmkr, ierr);   
    s->use_fixed_pt = p->yaxis_use_fixed_pt;
    s->digits_max = p->yaxis_digits_max;
    s->numeric_label_decimal_digits = p->yaxis_numeric_label_decimal_digits; // set to negative to use default
@@ -174,7 +172,7 @@ static void Get_yaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s)
 
 /*======================================================================*/
 
-static void draw_axis_line(OBJ_PTR fmkr, FM *p, int location, PlotAxis *s)
+static void draw_axis_line(OBJ_PTR fmkr, FM *p, int location, PlotAxis *s, int *ierr)
 {
    switch (location) {
       case LEFT:
@@ -256,11 +254,12 @@ static void draw_axis_line(OBJ_PTR fmkr, FM *p, int location, PlotAxis *s)
          s->top_or_right = false;
          break;
    }
-   c_line_width_set(fmkr, p, s->line_width);
-   figure_join_and_stroke(fmkr, p, s->x0, s->y0, s->x1, s->y1);
+   c_line_width_set(fmkr, p, s->line_width, ierr);
+   figure_join_and_stroke(fmkr, p, s->x0, s->y0, s->x1, s->y1, ierr);
 }
 
-static char *Create_Label(double val, int scale, int prec, bool log_vals, bool use_fixed_pt, char *postfix, PlotAxis *s)
+static char *Create_Label(double val, int scale, int prec, 
+   bool log_vals, bool use_fixed_pt, char *postfix, PlotAxis *s, int *ierr)
 { // val in figure coords
    char buff[100], *string;
    int exponent = ROUND(val);
@@ -305,8 +304,10 @@ static char *Create_Label(double val, int scale, int prec, bool log_vals, bool u
    return string;
 }
 
-char *Get_String(OBJ_PTR ary, int index) {
-   return String_Ptr(Array_Entry(ary,index));
+char *Get_String(OBJ_PTR ary, int index, int *ierr) {
+   OBJ_PTR s = Array_Entry(ary,index,ierr);
+   if (*ierr != 0) return NULL;
+   return String_Ptr(s,ierr);
 }
 
 #define MAX_FIXDIG_POS  6
@@ -314,7 +315,7 @@ char *Get_String(OBJ_PTR ary, int index) {
 #define DIGMAX_DEF   6
 
 static void Pick_Label_Precision(double vmin, double vmax, double tick, bool use_fixed_pt,
-   int *mode, int *prec, int digmax, int *scale) {
+   int *mode, int *prec, int digmax, int *scale, int *ierr) {
    double chosen, notchosen, vmod, t0, shifted;
    int msd, notmsd, np, digmin, digfix;
    *mode = *scale = 0;
@@ -392,7 +393,7 @@ static void Pick_Label_Precision(double vmin, double vmax, double tick, bool use
    
 }
 
-static char **Get_Labels(OBJ_PTR fmkr, FM *p, PlotAxis *s)
+static char **Get_Labels(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
 {
    char **labels = (char **)ALLOC_N_pointer(s->nmajors);
    char postfix[50], *ps;
@@ -401,7 +402,9 @@ static char **Get_Labels(OBJ_PTR fmkr, FM *p, PlotAxis *s)
    j = s->numeric_label_phase;
    if (s->tick_labels==OBJ_NIL) { // create label strings
       int mode, prec, scale;
-      Pick_Label_Precision(s->axis_min, s->axis_max, s->interval, s->use_fixed_pt, &mode, &prec, s->digits_max, &scale);
+      Pick_Label_Precision(s->axis_min, s->axis_max, s->interval, 
+         s->use_fixed_pt, &mode, &prec, s->digits_max, &scale, ierr);
+      if (*ierr != 0) return NULL;
       int i;
       int upper_right = (s->reversed)? 0 : s->nmajors-1;
       int lower_left = (s->reversed)? s->nmajors-1 : 0;
@@ -419,22 +422,29 @@ static char **Get_Labels(OBJ_PTR fmkr, FM *p, PlotAxis *s)
                  s->other_axis_type == AXIS_WITH_TICKS_AND_NUMERIC_LABELS)) {
             labels[i] = NULL;
          } else {
-            labels[i] = Create_Label(s->majors[i], scale, prec, s->log_vals, s->use_fixed_pt, ps, s);
+            labels[i] = Create_Label(s->majors[i], scale, prec, s->log_vals, s->use_fixed_pt, ps, s, ierr);
+            if (*ierr != 0) return NULL;
         }
       }
       s->free_strings_for_labels = true;
    } else { // use the given label strings
-      if (Array_Len(s->tick_labels) != s->nmajors)
-         RAISE_ERROR("Sorry: must have same number of labels as major ticks");
+      int len = Array_Len(s->tick_labels,ierr);
+      if (*ierr != 0) return NULL;
+      if (len != s->nmajors) {
+         RAISE_ERROR("Sorry: must have same number of labels as major ticks", ierr);
+         return NULL;
+      }
       for (i = 0; i < s->nmajors; i++) {
-         labels[i] = Get_String(s->tick_labels, i);
+         labels[i] = Get_String(s->tick_labels, i, ierr);
+         if (*ierr != 0) return NULL;
       }
       s->free_strings_for_labels = false;
    }
    return labels;
 }
          
-static double *Pick_Locations_for_Major_Ticks(double interval, double axis_min, double axis_max, int *num_locations)
+static double *Pick_Locations_for_Major_Ticks(double interval, 
+   double axis_min, double axis_max, int *num_locations, int *ierr)
 {
    double next_tick, prev_tick, starting_tick;
    double *majors;
@@ -462,7 +472,7 @@ static double *Pick_Locations_for_Major_Ticks(double interval, double axis_min, 
    return majors;
 }
 
-static int Pick_Number_of_Minor_Intervals(double length)
+static int Pick_Number_of_Minor_Intervals(double length, int *ierr)
 {
    double t1, fuzz, newlen;
    int np, num_subintervals, inewlen;
@@ -491,7 +501,7 @@ static int Pick_Number_of_Minor_Intervals(double length)
 }
 
 static void Pick_Major_Tick_Interval(OBJ_PTR fmkr, FM *p, 
-      double tick_min, double tick_gap, double length, bool log_vals, double *tick)
+      double tick_min, double tick_gap, double length, bool log_vals, double *tick, int *ierr)
 {
    double t1, t2, tick_reasonable, base_interval;
    int np, i;
@@ -522,17 +532,19 @@ static void Pick_Major_Tick_Interval(OBJ_PTR fmkr, FM *p,
    else { // check the given interval compared to the default
       *tick = ABS(*tick);
       if(*tick < 1.e-4*tick_reasonable) {
-         RAISE_ERROR_g("Sorry: magnitude of specified tick interval (%g) is too small", *tick);
+         RAISE_ERROR_g("Sorry: magnitude of specified tick interval (%g) is too small", *tick, ierr);
+         return;
       }
    }
 }
 
-static void draw_major_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s)
+static void draw_major_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
 {
    s->num_minors = s->number_of_minor_intervals; 
    if (s->locations_for_major_ticks != OBJ_NIL) {
       long len;
-      s->majors = Vector_Data_for_Read(s->locations_for_major_ticks, &len);
+      s->majors = Vector_Data_for_Read(s->locations_for_major_ticks, &len, ierr);
+      if (*ierr != 0) return;
       s->nmajors = len;
       if (len > 1) {
         s->interval = s->majors[1] - s->majors[0];
@@ -543,8 +555,10 @@ static void draw_major_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s)
       double height = ((s->vertical)? p->default_text_height_dy : p->default_text_height_dx);
       double tick_min = s->min_between_major_ticks * height;
       double tick_gap = 10.0 * height;
-      Pick_Major_Tick_Interval(fmkr, p, tick_min, tick_gap, s->length, s->log_vals, &s->interval);
-      s->majors = Pick_Locations_for_Major_Ticks(s->interval, s->axis_min, s->axis_max, &s->nmajors);
+      Pick_Major_Tick_Interval(fmkr, p, tick_min, tick_gap, s->length, s->log_vals, &s->interval, ierr);
+      if (*ierr != 0) return;
+      s->majors = Pick_Locations_for_Major_Ticks(s->interval, s->axis_min, s->axis_max, &s->nmajors, ierr);
+      if (*ierr != 0) return;
       s->free_majors = true;
    }
    int i;
@@ -554,25 +568,31 @@ static void draw_major_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s)
    if (s->ticks_inside) inside = length;
    if (s->ticks_outside) outside = length;
    if (s->top_or_right) { inside = -inside; outside = -outside; }
-   if (s->line_width != s->major_tick_width)
-      c_line_width_set(fmkr, p, s->line_width = s->major_tick_width);
+   if (s->line_width != s->major_tick_width) {
+      c_line_width_set(fmkr, p, s->line_width = s->major_tick_width, ierr);
+      if (*ierr != 0) return;
+   }
    for (i=0; i < s->nmajors; i++) {
       if (s->vertical)
-         figure_join(fmkr, p, s->x0+inside, s->majors[i], s->x0+outside, s->majors[i]);
+         figure_join(fmkr, p, s->x0+inside, s->majors[i], s->x0+outside, s->majors[i], ierr);
       else
-         figure_join(fmkr, p, s->majors[i], s->y0+inside, s->majors[i], s->y0+outside);
+         figure_join(fmkr, p, s->majors[i], s->y0+inside, s->majors[i], s->y0+outside, ierr);
       did_line = true;
+      if (*ierr != 0) return;
    }
-   if (did_line) axis_stroke(fmkr,p);
+   if (did_line) axis_stroke(fmkr,p, ierr);
 }
 
-static void draw_minor_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s)
+static void draw_minor_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
 {
    if (s->number_of_minor_intervals <= 0) {
       if (s->log_vals) {
          double interval = s->majors[1] - s->majors[0];
          s->number_of_minor_intervals = (abs(interval) != 1.0 || s->nmajors > 10)? 1 : 9; 
-      }  else s->number_of_minor_intervals = Pick_Number_of_Minor_Intervals(s->interval);
+      }  else {
+         s->number_of_minor_intervals = Pick_Number_of_Minor_Intervals(s->interval, ierr);
+         if (*ierr != 0) return;
+      }
    }
    int i, j, nsub = s->number_of_minor_intervals;
    double inside=0.0, outside=0.0, length;
@@ -591,17 +611,21 @@ static void draw_minor_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s)
    if (s->ticks_inside) inside = length;
    if (s->ticks_outside) outside = length;
    if (s->top_or_right) { inside = -inside; outside = -outside; }
-   if (s->line_width != s->minor_tick_width)
-      c_line_width_set(fmkr, p, s->line_width = s->minor_tick_width);
+   if (s->line_width != s->minor_tick_width) {
+      c_line_width_set(fmkr, p, s->line_width = s->minor_tick_width, ierr);
+      if (*ierr != 0) return;
+   }
    if (s->locations_for_minor_ticks != OBJ_NIL) {
       long cnt;
-      double *locs = Vector_Data_for_Read(s->locations_for_minor_ticks, &cnt);
+      double *locs = Vector_Data_for_Read(s->locations_for_minor_ticks, &cnt, ierr);
+      if (*ierr != 0) return;
       for (i=0; i < cnt; i++) {
          if (s->vertical)
-            figure_join(fmkr, p, s->x0+inside, locs[i], s->x0+outside, locs[i]);
+            figure_join(fmkr, p, s->x0+inside, locs[i], s->x0+outside, locs[i], ierr);
          else
-            figure_join(fmkr, p, locs[i], s->y0+inside, locs[i], s->y0+outside);
+            figure_join(fmkr, p, locs[i], s->y0+inside, locs[i], s->y0+outside, ierr);
          did_line = true;
+         if (*ierr != 0) return;
       }
    } else {
       for (i=0; i <= s->nmajors; i++) {
@@ -614,52 +638,62 @@ static void draw_minor_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s)
             if (subloc >= next_loc) break;
             if (subloc <= s->axis_min || subloc >= s->axis_max) continue;
             if (s->vertical)
-               figure_join(fmkr, p, s->x0+inside, subloc, s->x0+outside, subloc);
+               figure_join(fmkr, p, s->x0+inside, subloc, s->x0+outside, subloc, ierr);
             else
-               figure_join(fmkr, p, subloc, s->y0+inside, subloc, s->y0+outside);
+               figure_join(fmkr, p, subloc, s->y0+inside, subloc, s->y0+outside, ierr);
             did_line = true;
+            if (*ierr != 0) return;
          }
       }
    }
-   if (did_line) axis_stroke(fmkr,p);
+   if (did_line) axis_stroke(fmkr,p, ierr);
 }
 
-static void show_numeric_label(OBJ_PTR fmkr, FM *p, PlotAxis *s, char *text, int location, double position, double shift)
+static void show_numeric_label(OBJ_PTR fmkr, FM *p, PlotAxis *s, 
+   char *text, int location, double position, double shift, int *ierr)
 { // position is in figure coords and must be converted to frame coords
    double pos = ((!s->reversed)? (position - s->axis_min) : (s->axis_max - position)) / s->length;
    c_show_rotated_text(fmkr, p, text, location, shift, pos, 
-      s->numeric_label_scale, s->numeric_label_angle, s->numeric_label_justification, s->numeric_label_alignment);
+      s->numeric_label_scale, s->numeric_label_angle, s->numeric_label_justification, s->numeric_label_alignment, ierr);
 }
 
-static void draw_numeric_labels(OBJ_PTR fmkr, FM *p, int location, PlotAxis *s)
+static void draw_numeric_labels(OBJ_PTR fmkr, FM *p, int location, PlotAxis *s, int *ierr)
 {
    int i;
    double shift = (s->ticks_outside) ? s->major_tick_length : 0.5; // default shift
    shift += s->numeric_label_shift;
-   s->labels = Get_Labels(fmkr, p, s);
+   s->labels = Get_Labels(fmkr, p, s, ierr);
    for (i=0; i < s->nmajors; i++) {
-      if (s->labels[i] != NULL) show_numeric_label(fmkr, p, s, s->labels[i], location, s->majors[i], shift);
+      if (s->labels[i] != NULL) {
+         show_numeric_label(fmkr, p, s, s->labels[i], location, s->majors[i], shift, ierr);
+         if (*ierr != 0) return;
+      }
    }
 }
 
-static void c_show_side(OBJ_PTR fmkr, FM *p, PlotAxis *s) {
+static void c_show_side(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr) {
    int i;
    if (s->type == AXIS_HIDDEN) return;
    Start_Axis_Standard_State(fmkr, p, 
       s->stroke_color_R, s->stroke_color_G, s->stroke_color_B, 
-      s->line_width * p->default_line_scale);
-      // gsave, set line type and stroke color
-   draw_axis_line(fmkr, p, s->location, s);
+      s->line_width * p->default_line_scale, ierr);
+   if (*ierr != 0) return;
+   draw_axis_line(fmkr, p, s->location, s, ierr);
+   if (*ierr != 0) return;
    if (s->type == AXIS_LINE_ONLY) goto done;
-   draw_major_ticks(fmkr, p, s);
+   draw_major_ticks(fmkr, p, s, ierr);
+   if (*ierr != 0) return;
    if (s->type == AXIS_WITH_MAJOR_TICKS_ONLY) goto done;
    if (s->type == AXIS_WITH_MAJOR_TICKS_AND_NUMERIC_LABELS) {
-      draw_numeric_labels(fmkr, p, s->location, s);
+      draw_numeric_labels(fmkr, p, s->location, s, ierr);
+      if (*ierr != 0) return;
       goto done;
    }
-   draw_minor_ticks(fmkr, p, s);
+   draw_minor_ticks(fmkr, p, s, ierr);
+   if (*ierr != 0) return;
    if (s->type == AXIS_WITH_TICKS_ONLY) goto done;
-   draw_numeric_labels(fmkr, p, s->location, s);
+   draw_numeric_labels(fmkr, p, s->location, s, ierr);
+   if (*ierr != 0) return;
  done:
    End_Axis_Standard_State(); // grestore
    if (s->free_majors) free(s->majors);
@@ -673,104 +707,107 @@ static void c_show_side(OBJ_PTR fmkr, FM *p, PlotAxis *s) {
 }
 
 
-OBJ_PTR c_show_axis(OBJ_PTR fmkr, FM *p, int location)
+OBJ_PTR c_show_axis(OBJ_PTR fmkr, FM *p, int location, int *ierr)
 {
    PlotAxis axis;
    Init_PlotAxis_struct(&axis);
    if (location == LEFT || location == RIGHT || location == AT_X_ORIGIN) {
       if (!p->yaxis_visible) goto done;
-      Get_yaxis_Specs(fmkr, p, &axis);
+      Get_yaxis_Specs(fmkr, p, &axis, ierr);
    } else if (location == TOP || location == BOTTOM || location == AT_Y_ORIGIN) {
       if (!p->xaxis_visible) goto done;
-      Get_xaxis_Specs(fmkr, p, &axis);
+      Get_xaxis_Specs(fmkr, p, &axis, ierr);
    } else RAISE_ERROR_i(
-         "Sorry: invalid 'loc' for axis: must be one of LEFT, RIGHT, TOP, BOTTOM, AT_X_ORIGIN, or AT_Y_ORIGIN: is (%i)", location);
+         "Sorry: invalid 'loc' for axis: must be one of LEFT, RIGHT, TOP, BOTTOM, AT_X_ORIGIN, or AT_Y_ORIGIN: is (%i)", location, ierr);
+   if (*ierr != 0) return OBJ_NIL;
    axis.location = location;
-   c_show_side(fmkr, p, &axis);
+   c_show_side(fmkr, p, &axis, ierr);
  done:
    return fmkr;
 }
       
-OBJ_PTR c_show_edge(OBJ_PTR fmkr, FM *p, int location)
+OBJ_PTR c_show_edge(OBJ_PTR fmkr, FM *p, int location, int *ierr)
 {
    PlotAxis axis;
    Init_PlotAxis_struct(&axis);
    switch (location) {
       case LEFT:
          if (!p->left_edge_visible) goto done;
-         Get_yaxis_Specs(fmkr, p, &axis); axis.type = p->left_edge_type;
+         Get_yaxis_Specs(fmkr, p, &axis, ierr); axis.type = p->left_edge_type;
          break;
       case RIGHT:
          if (!p->right_edge_visible) goto done;
-         Get_yaxis_Specs(fmkr, p, &axis); axis.type = p->right_edge_type;
+         Get_yaxis_Specs(fmkr, p, &axis, ierr); axis.type = p->right_edge_type;
          break;
       case BOTTOM:
          if (!p->bottom_edge_visible) goto done;
-         Get_xaxis_Specs(fmkr, p, &axis); axis.type = p->bottom_edge_type;
+         Get_xaxis_Specs(fmkr, p, &axis, ierr); axis.type = p->bottom_edge_type;
          break;
       case TOP:
          if (!p->top_edge_visible) goto done;
-         Get_xaxis_Specs(fmkr, p, &axis); axis.type = p->top_edge_type;
+         Get_xaxis_Specs(fmkr, p, &axis, ierr); axis.type = p->top_edge_type;
          break;
-      default: RAISE_ERROR_i(
-         "Sorry: invalid 'loc' for edge: must be one of LEFT, RIGHT, TOP, or BOTTOM: is (%i)", location);
+      default: 
+         RAISE_ERROR_i(
+            "Sorry: invalid 'loc' for edge: must be one of LEFT, RIGHT, TOP, or BOTTOM: is (%i)", location, ierr);
    }
+   if (*ierr != 0) return OBJ_NIL;
    axis.location = location;
-   c_show_side(fmkr, p, &axis);
+   c_show_side(fmkr, p, &axis, ierr);
  done:
    return fmkr;
 }
 
 
-OBJ_PTR c_no_title(OBJ_PTR fmkr, FM *p)
+OBJ_PTR c_no_title(OBJ_PTR fmkr, FM *p, int *ierr)
 {
    p->title_visible = false;
    return fmkr;
 }
 
-OBJ_PTR c_no_xlabel(OBJ_PTR fmkr, FM *p)
+OBJ_PTR c_no_xlabel(OBJ_PTR fmkr, FM *p, int *ierr)
 {
    p->xlabel_visible = false;
    return fmkr;
 }
 
-OBJ_PTR c_no_ylabel(OBJ_PTR fmkr, FM *p)
+OBJ_PTR c_no_ylabel(OBJ_PTR fmkr, FM *p, int *ierr)
 {
    p->ylabel_visible = false;
    return fmkr;
 }
 
-OBJ_PTR c_no_xaxis(OBJ_PTR fmkr, FM *p)
+OBJ_PTR c_no_xaxis(OBJ_PTR fmkr, FM *p, int *ierr)
 {
    p->xaxis_visible = false;
    return fmkr;
 }
 
-OBJ_PTR c_no_yaxis(OBJ_PTR fmkr, FM *p)
+OBJ_PTR c_no_yaxis(OBJ_PTR fmkr, FM *p, int *ierr)
 {
    p->yaxis_visible = false;
    return fmkr;
 }
 
-OBJ_PTR c_no_left_edge(OBJ_PTR fmkr, FM *p)
+OBJ_PTR c_no_left_edge(OBJ_PTR fmkr, FM *p, int *ierr)
 {
    p->left_edge_visible = false;
    return fmkr;
 }
 
-OBJ_PTR c_no_right_edge(OBJ_PTR fmkr, FM *p)
+OBJ_PTR c_no_right_edge(OBJ_PTR fmkr, FM *p, int *ierr)
 {
    p->right_edge_visible = false;
    return fmkr;
 }
 
-OBJ_PTR c_no_top_edge(OBJ_PTR fmkr, FM *p)
+OBJ_PTR c_no_top_edge(OBJ_PTR fmkr, FM *p, int *ierr)
 {
    p->top_edge_visible = false;
    return fmkr;
 }
 
-OBJ_PTR c_no_bottom_edge(OBJ_PTR fmkr, FM *p)
+OBJ_PTR c_no_bottom_edge(OBJ_PTR fmkr, FM *p, int *ierr)
 {
    p->bottom_edge_visible = false;
    return fmkr;
