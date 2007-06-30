@@ -67,14 +67,6 @@ typedef struct {
    int location;
 } PlotAxis;
 
-static void Init_PlotAxis_struct(PlotAxis *s) {
-   s->free_majors = s->free_strings_for_labels = false;
-   s->locations_for_major_ticks = s->locations_for_minor_ticks = s->tick_labels = OBJ_NIL;
-   s->stroke_color_R = 0.0; s->stroke_color_G = 0.0; s->stroke_color_B = 0.0; 
-   s->majors = NULL;
-   s->labels = NULL;
-}
-
 static void figure_moveto(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr) // figure coords
 {
    c_moveto(fmkr, p, convert_figure_to_output_x(p,x), convert_figure_to_output_y(p,y), ierr);
@@ -106,6 +98,10 @@ static void figure_join_and_stroke(OBJ_PTR fmkr, FM *p,
 
 static void Get_xaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
 {
+   s->free_majors = s->free_strings_for_labels = false;
+   s->stroke_color_R = 0.0; s->stroke_color_G = 0.0; s->stroke_color_B = 0.0; 
+   s->majors = NULL;
+   s->labels = NULL;
    s->type = p->xaxis_type;
    s->other_axis_type = p->yaxis_type;
    s->line_width = p->xaxis_line_width; // for axis line
@@ -139,6 +135,10 @@ static void Get_xaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
 
 static void Get_yaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
 {
+   s->free_majors = s->free_strings_for_labels = false;
+   s->stroke_color_R = 0.0; s->stroke_color_G = 0.0; s->stroke_color_B = 0.0; 
+   s->majors = NULL;
+   s->labels = NULL;
    s->type = p->yaxis_type;
    s->other_axis_type = p->xaxis_type;
    s->line_width = p->yaxis_line_width; // for axis line
@@ -710,7 +710,6 @@ static void c_show_side(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr) {
 OBJ_PTR c_show_axis(OBJ_PTR fmkr, FM *p, int location, int *ierr)
 {
    PlotAxis axis;
-   Init_PlotAxis_struct(&axis);
    if (location == LEFT || location == RIGHT || location == AT_X_ORIGIN) {
       if (!p->yaxis_visible) goto done;
       Get_yaxis_Specs(fmkr, p, &axis, ierr);
@@ -729,7 +728,6 @@ OBJ_PTR c_show_axis(OBJ_PTR fmkr, FM *p, int location, int *ierr)
 OBJ_PTR c_show_edge(OBJ_PTR fmkr, FM *p, int location, int *ierr)
 {
    PlotAxis axis;
-   Init_PlotAxis_struct(&axis);
    switch (location) {
       case LEFT:
          if (!p->left_edge_visible) goto done;
