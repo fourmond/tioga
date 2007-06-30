@@ -252,9 +252,9 @@ OBJ_PTR c_private_show_jpg(OBJ_PTR fmkr, FM *p, char *filename,
    int width, int height, OBJ_PTR image_destination, int mask_obj_num, int *ierr) {
    double dest[6];
    if (constructing_path) {
-      RAISE_ERROR("Sorry: must finish with current path before calling show_jpg", ierr); return OBJ_NIL; }
+      RAISE_ERROR("Sorry: must finish with current path before calling show_jpg", ierr); RETURN_NIL; }
    Get_Image_Dest(p, image_destination, dest, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    Show_JPEG(p, filename, width, height, dest, JPG_SUBTYPE, mask_obj_num);
    return fmkr;
 }
@@ -265,7 +265,7 @@ OBJ_PTR c_private_create_image_data(OBJ_PTR fmkr, FM *p, OBJ_PTR table,
 {
    long num_cols, num_rows;
    double **data = Table_Data_for_Read(table, &num_cols, &num_rows, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    if (first_column < 0) first_column += num_cols;
    if (first_column < 0 || first_column >= num_cols)
       RAISE_ERROR_i("Sorry: invalid first_column specification (%i)", first_column, ierr);
@@ -289,7 +289,7 @@ OBJ_PTR c_private_create_image_data(OBJ_PTR fmkr, FM *p, OBJ_PTR table,
    int i, j, k, width = last_column - first_column + 1, height = last_row - first_row + 1;
    int sz = width * height;
    if (sz <= 0) RAISE_ERROR_ii("Sorry: invalid data specification: width (%i) height (%i)", width, height, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    char *buff = ALLOC_N_char(sz);
    for (k = 0, i = first_row; i <= last_row; i++) {
       double *row = data[i];
@@ -315,7 +315,7 @@ OBJ_PTR c_private_create_monochrome_image_data(OBJ_PTR fmkr, FM *p, OBJ_PTR tabl
 {
    long num_cols, num_rows;
    double **data = Table_Data_for_Read(table, &num_cols, &num_rows, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    if (first_column < 0) first_column += num_cols;
    if (first_column < 0 || first_column >= num_cols)
       RAISE_ERROR_i("Sorry: invalid first_column specification (%i)", first_column, ierr);
@@ -331,7 +331,7 @@ OBJ_PTR c_private_create_monochrome_image_data(OBJ_PTR fmkr, FM *p, OBJ_PTR tabl
    int i, j, k, width = last_column - first_column + 1, height = last_row - first_row + 1, bytes_per_row = (width+7)/8;
    int sz = bytes_per_row * 8 * height;
    if (sz <= 0) RAISE_ERROR_ii("Sorry: invalid data specification: width (%i) height (%i)", width, height, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    // to simplify the process, do it in two stages: first get the values and then pack the bits
    char *buff = ALLOC_N_char(sz);
    for (k = 0, i = first_row; i <= last_row; i++) {
@@ -369,14 +369,14 @@ OBJ_PTR c_private_show_image(OBJ_PTR fmkr, FM *p, int image_type, double llx, do
 {
    unsigned char *lookup=NULL;
    int value_mask_min = 256, value_mask_max = 256, lookup_len=0, hival=0;
-   if (constructing_path) { RAISE_ERROR("Sorry: must finish with current path before calling show_image", ierr); return OBJ_NIL; }
+   if (constructing_path) { RAISE_ERROR("Sorry: must finish with current path before calling show_image", ierr); RETURN_NIL; }
    if (image_type == COLORMAP_IMAGE) {
       value_mask_min = Number_to_int(mask_min, ierr);
       value_mask_max = Number_to_int(mask_max, ierr);
       hival = Number_to_int(hivalue, ierr);
       lookup = (unsigned char *)(String_Ptr(lookup_data, ierr));
       lookup_len = String_Len(lookup_data, ierr);
-      if (*ierr != 0) return OBJ_NIL;
+      if (*ierr != 0) RETURN_NIL;
    }
    
    llx = convert_figure_to_output_x(p,llx);
@@ -404,7 +404,7 @@ OBJ_PTR c_private_show_image(OBJ_PTR fmkr, FM *p, int image_type, double llx, do
    else {
       if ((hival+1)*3 > lookup_len) {
          RAISE_ERROR_ii("Sorry: color space hival (%i) is too large for length of lookup table (%i)", hival, lookup_len, ierr);
-         return OBJ_NIL;
+         RETURN_NIL;
       }
       xo->hival = hival;
       lookup_len = (hival+1) * 3;

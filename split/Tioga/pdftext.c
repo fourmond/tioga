@@ -249,7 +249,7 @@ OBJ_PTR c_marker_string_info(OBJ_PTR fmkr, FM *p, int fnt, unsigned char *text, 
    ft_ht = ft_height;
    double llx, lly, urx, ury, width;
    GetStringInfo(p, fnt, text, ft_ht, &llx, &lly, &urx, &ury, &width, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    OBJ_PTR result = Array_New(5);
    width = convert_output_to_figure_dx(p,width);
    llx = convert_output_to_figure_dx(p,llx);
@@ -387,25 +387,25 @@ OBJ_PTR c_private_show_marker(
    if (string == OBJ_NIL) {
       if (c < 0 || c > 255) {
          RAISE_ERROR_i("Sorry: invalid character code (%i) : must be between 0 and 255", c, ierr);
-         return OBJ_NIL;
+         RETURN_NIL;
       }
       text = buff; text[0] = c;  text[1] = '\0';
       if (stroke_width != OBJ_NIL) {
          double width = Number_to_double(stroke_width, ierr);
-         if (*ierr != 0) return OBJ_NIL;
+         if (*ierr != 0) RETURN_NIL;
          prev_line_width = p->line_width; // restore it later
          fprintf(TF, "%0.6f w\n", width * ENLARGE);
       }
    } else {
       text = (unsigned char *)(String_Ptr(string,ierr));
-      if (*ierr != 0) return OBJ_NIL;
+      if (*ierr != 0) RETURN_NIL;
    }
    fprintf(TF, "%d Tr\n", mode);
    if (stroke_color != OBJ_NIL &&
          (mode == STROKE || mode == FILL_AND_STROKE || 
             mode == STROKE_AND_CLIP || mode == FILL_STROKE_AND_CLIP)) {
        Unpack_RGB(stroke_color, &stroke_color_R, &stroke_color_G, &stroke_color_B, ierr);
-       if (*ierr != 0) return OBJ_NIL;
+       if (*ierr != 0) RETURN_NIL;
        if (stroke_color_R != p->stroke_color_R ||
            stroke_color_G != p->stroke_color_G ||
            stroke_color_B != p->stroke_color_B) {
@@ -414,14 +414,14 @@ OBJ_PTR c_private_show_marker(
           prev_stroke_color_B = p->stroke_color_B;
           restore_stroke_color = true;
           c_stroke_color_set_RGB(fmkr, p, stroke_color_R, stroke_color_G, stroke_color_B, ierr);
-          if (*ierr != 0) return OBJ_NIL;
+          if (*ierr != 0) RETURN_NIL;
        }
    }
    if (fill_color != OBJ_NIL &&
          (mode == FILL || mode == FILL_AND_STROKE || 
             mode == FILL_AND_CLIP || mode == FILL_STROKE_AND_CLIP)) {
        Unpack_RGB(fill_color, &fill_color_R, &fill_color_G, &fill_color_B, ierr);
-       if (*ierr != 0) return OBJ_NIL;
+       if (*ierr != 0) RETURN_NIL;
        if (fill_color_R != p->fill_color_R ||
            fill_color_G != p->fill_color_G ||
            fill_color_B != p->fill_color_B) {
@@ -430,22 +430,22 @@ OBJ_PTR c_private_show_marker(
           prev_fill_color_B = p->fill_color_B;
           restore_fill_color = true;
           c_fill_color_set_RGB(fmkr, p, fill_color_R, fill_color_G, fill_color_B, ierr);
-          if (*ierr != 0) return OBJ_NIL;
+          if (*ierr != 0) RETURN_NIL;
        }
    }
    if (x == OBJ_NIL) {
       long xlen, ylen;
       xs = Vector_Data_for_Read(x_vec, &xlen, ierr);
-      if (*ierr != 0) return OBJ_NIL;
+      if (*ierr != 0) RETURN_NIL;
       ys = Vector_Data_for_Read(y_vec, &ylen, ierr);
-      if (*ierr != 0) return OBJ_NIL;
-      if (xlen != ylen) { RAISE_ERROR("Sorry: must have same number xs and ys for showing markers", ierr); return OBJ_NIL; }
+      if (*ierr != 0) RETURN_NIL;
+      if (xlen != ylen) { RAISE_ERROR("Sorry: must have same number xs and ys for showing markers", ierr); RETURN_NIL; }
       if (xlen <= 0) return fmkr;
       n = xlen;
    } else {
       xloc = Number_to_double(x, ierr); xs = &xloc;
       yloc = Number_to_double(y, ierr); ys = &yloc;
-      if (*ierr != 0) return OBJ_NIL;
+      if (*ierr != 0) RETURN_NIL;
       n = 1;
    }
    c_rotated_string_at_points(fmkr, p, angle, fnt_num, text, scale, n, xs, ys,
@@ -455,6 +455,6 @@ OBJ_PTR c_private_show_marker(
        c_fill_color_set_RGB(fmkr, p, prev_fill_color_R, prev_fill_color_G, prev_fill_color_B, ierr);
    if (restore_stroke_color) 
        c_stroke_color_set_RGB(fmkr, p, prev_stroke_color_R, prev_stroke_color_G, prev_stroke_color_B, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    return fmkr;
 }

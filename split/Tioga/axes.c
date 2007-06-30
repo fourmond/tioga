@@ -719,7 +719,7 @@ OBJ_PTR c_show_axis(OBJ_PTR fmkr, FM *p, int location, int *ierr)
       Get_xaxis_Specs(fmkr, p, &axis, ierr);
    } else RAISE_ERROR_i(
          "Sorry: invalid 'loc' for axis: must be one of LEFT, RIGHT, TOP, BOTTOM, AT_X_ORIGIN, or AT_Y_ORIGIN: is (%i)", location, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    axis.location = location;
    c_show_side(fmkr, p, &axis, ierr);
  done:
@@ -751,7 +751,7 @@ OBJ_PTR c_show_edge(OBJ_PTR fmkr, FM *p, int location, int *ierr)
          RAISE_ERROR_i(
             "Sorry: invalid 'loc' for edge: must be one of LEFT, RIGHT, TOP, or BOTTOM: is (%i)", location, ierr);
    }
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    axis.location = location;
    c_show_side(fmkr, p, &axis, ierr);
  done:

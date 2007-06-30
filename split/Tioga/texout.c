@@ -29,7 +29,7 @@ static FILE *fp; // for the TeX file
 
 OBJ_PTR c_rescale_text(OBJ_PTR fmkr, FM *p, double scaling_factor, int *ierr) {
    double scale = scaling_factor * p->default_text_scale;
-   if (scaling_factor <= 0) { RAISE_ERROR("Sorry: text scaling must be positive", ierr); return OBJ_NIL; }
+   if (scaling_factor <= 0) { RAISE_ERROR("Sorry: text scaling must be positive", ierr); RETURN_NIL; }
    p->default_text_height_dx *= scaling_factor;
    p->default_text_height_dy *= scaling_factor;
    p->default_text_scale = scale;
@@ -146,8 +146,8 @@ OBJ_PTR c_check_label_clip(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr) {
    x = convert_figure_to_frame_x(p,x);
    y = convert_figure_to_frame_y(p,y);
    if (x < p->label_left_margin || y < p->label_bottom_margin ||
-         1.0 - x < p->label_right_margin || 1.0 - y < p->label_top_margin)  return OBJ_FALSE;
-   return OBJ_TRUE;
+         1.0 - x < p->label_right_margin || 1.0 - y < p->label_top_margin) RETURN_FALSE;
+   RETURN_TRUE;
 }
 
 /* TeX File Management */

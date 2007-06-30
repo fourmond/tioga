@@ -89,7 +89,7 @@ OBJ_PTR c_private_make_spline_interpolated_points(OBJ_PTR fmkr, FM *p,
    
    if (start_clamped) start = Number_to_double(start_slope, ierr);
    if (end_clamped) end = Number_to_double(end_slope, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    
    Ys = ALLOC_N_double(xlen); // Ys are same length as Xs
    
@@ -101,7 +101,7 @@ OBJ_PTR c_private_make_spline_interpolated_points(OBJ_PTR fmkr, FM *p,
    double *Y_data = Vector_Data_for_Read(Yvec_data, &ydlen, ierr);
       if (*ierr != 0) return;
    if (Xs == NULL || Ys == NULL || X_data == NULL || Y_data == NULL || xdlen != ydlen) {
-      RAISE_ERROR("Sorry: bad args",ierr); return OBJ_NIL;
+      RAISE_ERROR("Sorry: bad args",ierr); RETURN_NIL;
    }
    if (xlen == 0) return;
    n_pts_data = xdlen;
@@ -185,7 +185,7 @@ OBJ_PTR c_private_make_steps(OBJ_PTR fmkr, FM *p, OBJ_PTR Xvec_data, OBJ_PTR Yve
       
       c_make_steps(p, &xsteps_len, &xsteps_data, &ysteps_len, &ysteps_data, Xvec_data, Yvec_data,
          xfirst, yfirst, xlast, ylast, ierr);
-      if (*ierr != 0) return OBJ_NIL;
+      if (*ierr != 0) RETURN_NIL;
 
       Xvec = Vector_New(xsteps_len, xsteps_data);
       Yvec = Vector_New(ysteps_len, ysteps_data);
@@ -194,9 +194,9 @@ OBJ_PTR c_private_make_steps(OBJ_PTR fmkr, FM *p, OBJ_PTR Xvec_data, OBJ_PTR Yve
       
       pts_array = Array_New(2);
       Array_Store(pts_array,0,Xvec,ierr);
-      if (*ierr != 0) return OBJ_NIL;
+      if (*ierr != 0) RETURN_NIL;
       Array_Store(pts_array,1,Yvec,ierr);
-      if (*ierr != 0) return OBJ_NIL;
+      if (*ierr != 0) RETURN_NIL;
       return pts_array;
    }
 
@@ -1154,7 +1154,7 @@ FLAG(int ni, int nj, int ind, int *ierr)
 
       c_make_contour(p, &dest_len, &dest_xs_data, &dest_ys_data, &dest_sz, 
          gaps, xs, ys, zs, z_level, legit, method, ierr);
-      if (*ierr != 0) return OBJ_NIL;
+      if (*ierr != 0) RETURN_NIL;
          
       Xvec = Vector_New(dest_len, dest_xs_data);
       Yvec = Vector_New(dest_len, dest_ys_data);
@@ -1163,9 +1163,9 @@ FLAG(int ni, int nj, int ind, int *ierr)
       
       pts_array = Array_New(2);
       Array_Store(pts_array,0,Xvec,ierr);
-      if (*ierr != 0) return OBJ_NIL;
+      if (*ierr != 0) RETURN_NIL;
       Array_Store(pts_array,1,Yvec,ierr);
-      if (*ierr != 0) return OBJ_NIL;
+      if (*ierr != 0) RETURN_NIL;
       return pts_array;
    }
 

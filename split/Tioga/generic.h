@@ -56,6 +56,11 @@ extern void Init_generic(void);
 //#define OBJ_TRUE Py_True
 //#define OBJ_FALSE Py_False
 
+//for python the following will need to increment ref counts
+#define RETURN_NIL return Qnil
+#define RETURN_TRUE return Qtrue
+#define RETURN_FALSE return Qfalse
+
 
 // all routines set *ierr nonzero in case of error.
 

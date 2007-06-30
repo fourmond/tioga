@@ -336,9 +336,9 @@ static void Make_Save_Fname(OBJ_PTR fmkr, char *full_name, char *f_name,
 OBJ_PTR c_get_save_filename(OBJ_PTR fmkr, FM *p, OBJ_PTR name, int *ierr) {
    char full_name[STRLEN];
    char *fname = (name == OBJ_NIL)? NULL : String_Ptr(name, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    Make_Save_Fname(fmkr, full_name, fname, false, false, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    return String_From_Cstring(full_name);
 }
    
@@ -348,33 +348,33 @@ OBJ_PTR c_private_make(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR cmd, int *ierr
    FM saved = *p;
    OBJ_PTR result;
    bool quiet = Get_quiet_mode(fmkr, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    if (!Get_initialized()) {
-      Init_pdf(ierr); if (*ierr != 0) return OBJ_NIL;
-      Init_tex(ierr); if (*ierr != 0) return OBJ_NIL;
+      Init_pdf(ierr); if (*ierr != 0) RETURN_NIL;
+      Init_tex(ierr); if (*ierr != 0) RETURN_NIL;
       Set_initialized();
    }
    char *fn = (name == OBJ_NIL)? NULL : String_Ptr(name,ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    Make_Save_Fname(fmkr, full_name, fn, true, true, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    Open_pdf(fmkr, p, full_name, quiet, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    Open_tex(fmkr, full_name, quiet, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    Write_gsave();
    p->root_figure = true;
    p->in_subplot = false;
    result = Call_Function(fmkr, make_page_ID, cmd, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    Write_grestore();
    if (result == OBJ_FALSE) quiet = true;
    Close_pdf(fmkr, p, quiet, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    Close_tex(fmkr, quiet, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    Create_wrapper(fmkr, full_name, quiet, ierr);
-   if (*ierr != 0) return OBJ_NIL; 
+   if (*ierr != 0) RETURN_NIL; 
    *p = saved;
    return result;
 }
@@ -383,11 +383,11 @@ OBJ_PTR c_private_make(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR cmd, int *ierr
 OBJ_PTR c_private_make_portfolio(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR fignums, OBJ_PTR fignames, int *ierr) {
    char full_name[STRLEN];
    char *fn = (name == OBJ_NIL)? NULL : String_Ptr(name,ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    Make_Save_Fname(fmkr, full_name, fn, true, false, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    private_make_portfolio(full_name, fignums, fignames, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    return String_From_Cstring(full_name);
 }
 
@@ -415,7 +415,7 @@ OBJ_PTR c_set_frame_sides(OBJ_PTR fmkr, FM *p, double left, double right, double
    if (bottom > 1.0 || bottom < 0.0) RAISE_ERROR("Sorry: OBJ_PTR of bottom must be between 0 and 1 for set_frame_sides", ierr);
    if (left >= right) RAISE_ERROR("Sorry: OBJ_PTR of left must be smaller than OBJ_PTR of right for set_frame_sides", ierr);
    if (bottom >= top) RAISE_ERROR("Sorry: OBJ_PTR of bottom must be smaller than OBJ_PTR of top for set_frame_sides", ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    p->frame_left = left;
    p->frame_right = right;
    p->frame_bottom = bottom;
@@ -431,12 +431,12 @@ OBJ_PTR c_private_init_fm_data(OBJ_PTR fmkr, FM *p, int *ierr) {
    p->root_figure = true;
    p->in_subplot = false;
    c_private_set_default_font_size(fmkr, p, 12.0, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    c_set_device_pagesize(fmkr, p, 5 * 72.0 * ENLARGE, 5 * 72.0 * ENLARGE, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    /* default frame */
    c_set_frame_sides(fmkr, p, 0.15, 0.85, 0.85, 0.15, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    /* default bounds */
    p->bounds_left = p->bounds_bottom = p->bounds_xmin = p->bounds_ymin = 0;
    p->bounds_right = p->bounds_top = p->bounds_xmax = p->bounds_ymax = 1;
@@ -604,7 +604,7 @@ OBJ_PTR c_private_init_fm_data(OBJ_PTR fmkr, FM *p, int *ierr) {
 
 OBJ_PTR Get_line_type(OBJ_PTR fmkr, int *ierr) { 
    OBJ_PTR v = Obj_Attr_Get(fmkr, line_type_ID, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    return v;
 }
 
@@ -614,35 +614,35 @@ void Set_line_type(OBJ_PTR fmkr, OBJ_PTR v, int *ierr) {
 
 OBJ_PTR Get_xaxis_locations_for_major_ticks(OBJ_PTR fmkr, int *ierr) { 
    OBJ_PTR v = Obj_Attr_Get(fmkr, xaxis_locations_for_major_ticks_ID, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    return v;
 }
 
 OBJ_PTR Get_xaxis_locations_for_minor_ticks(OBJ_PTR fmkr, int *ierr) { 
    OBJ_PTR v = Obj_Attr_Get(fmkr, xaxis_locations_for_minor_ticks_ID, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    return v;
 }
 
 OBJ_PTR Get_xaxis_tick_labels(OBJ_PTR fmkr, int *ierr) { 
    OBJ_PTR v = Obj_Attr_Get(fmkr, xaxis_tick_labels_ID, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    return v;
 }
 
 OBJ_PTR Get_yaxis_locations_for_major_ticks(OBJ_PTR fmkr, int *ierr) { 
    OBJ_PTR v = Obj_Attr_Get(fmkr, yaxis_locations_for_major_ticks_ID, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    return v;
 }
 OBJ_PTR Get_yaxis_locations_for_minor_ticks(OBJ_PTR fmkr, int *ierr) { 
    OBJ_PTR v = Obj_Attr_Get(fmkr, yaxis_locations_for_minor_ticks_ID, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    return v;
 }
 OBJ_PTR Get_yaxis_tick_labels(OBJ_PTR fmkr, int *ierr) { 
    OBJ_PTR v = Obj_Attr_Get(fmkr, yaxis_tick_labels_ID, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    return v;
 }
 

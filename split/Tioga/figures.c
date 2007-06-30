@@ -39,22 +39,22 @@
 #define DBL_ATTR(attr) \
 static VALUE FM_##attr##_get(VALUE fmkr) { int ierr=0; FM *p = Get_FM(fmkr,&ierr); return (ierr != 0)? OBJ_NIL : rb_float_new(p->attr); } \
 static VALUE FM_##attr##_set(VALUE fmkr, VALUE val) { \
-   int ierr=0; FM *p = Get_FM(fmkr,&ierr); if (ierr != 0) return OBJ_NIL; VALUE v = rb_Float(val); p->attr = NUM2DBL(v); return val; }
+   int ierr=0; FM *p = Get_FM(fmkr,&ierr); if (ierr != 0) RETURN_NIL; VALUE v = rb_Float(val); p->attr = NUM2DBL(v); return val; }
 
 #define INT_ATTR(attr) \
 static VALUE FM_##attr##_get(VALUE fmkr) { int ierr=0; FM *p = Get_FM(fmkr,&ierr); return (ierr != 0)? OBJ_NIL : INT2FIX(p->attr); } \
 static VALUE FM_##attr##_set(VALUE fmkr, VALUE val) { \
-   int ierr=0; FM *p = Get_FM(fmkr,&ierr); if (ierr != 0) return OBJ_NIL; VALUE v = rb_Integer(val); p->attr = NUM2INT(v); return val; }
+   int ierr=0; FM *p = Get_FM(fmkr,&ierr); if (ierr != 0) RETURN_NIL; VALUE v = rb_Integer(val); p->attr = NUM2INT(v); return val; }
 
 #define VAL_ATTR(attr) \
 static VALUE FM_##attr##_get(VALUE fmkr) { int ierr=0; FM *p = Get_FM(fmkr,&ierr); return (ierr != 0)? OBJ_NIL : p->attr; } \
 static VALUE FM_##attr##_set(VALUE fmkr, VALUE val) { \
-   int ierr=0; FM *p = Get_FM(fmkr,&ierr); if (ierr != 0) return OBJ_NIL; p->attr = val; return val; }
+   int ierr=0; FM *p = Get_FM(fmkr,&ierr); if (ierr != 0) RETURN_NIL; p->attr = val; return val; }
 
 #define BOOL_ATTR(attr) \
 static VALUE FM_##attr##_get(VALUE fmkr) { int ierr=0; FM *p = Get_FM(fmkr,&ierr); return (ierr != 0)? OBJ_NIL : ((p->attr)? Qtrue : Qfalse); } \
 static VALUE FM_##attr##_set(VALUE fmkr, VALUE val) { \
-   int ierr=0; FM *p = Get_FM(fmkr,&ierr); if (ierr != 0) return OBJ_NIL; p->attr = (val != Qfalse); return val; }
+   int ierr=0; FM *p = Get_FM(fmkr,&ierr); if (ierr != 0) RETURN_NIL; p->attr = (val != Qfalse); return val; }
 
 #define RO_DBL_ATTR(attr) \
 static VALUE FM_##attr##_get(VALUE fmkr) { int ierr=0; FM *p = Get_FM(fmkr,&ierr); return (ierr != 0)? OBJ_NIL : rb_float_new(p->attr); }

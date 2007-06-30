@@ -323,7 +323,7 @@ OBJ_PTR FM_move_to_point(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y) { int ierr=0;
    return c_move_to_point(fmkr, Get_FM(fmkr, &ierr), Number_to_double(x, &ierr), Number_to_double(y, &ierr), &ierr); }   
 OBJ_PTR FM_append_point_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y) { int ierr=0;
    return c_append_point_to_path(fmkr, Get_FM(fmkr, &ierr), Number_to_double(x, &ierr), Number_to_double(y, &ierr), &ierr); }
-OBJ_PTR FM_bezier_control_points(OBJ_PTR fmkr, VALUE x0, VALUE y0, OBJ_PTR delta_x, OBJ_PTR a, OBJ_PTR b, OBJ_PTR c) { int ierr=0;
+OBJ_PTR FM_bezier_control_points(OBJ_PTR fmkr, OBJ_PTR x0, OBJ_PTR y0, OBJ_PTR delta_x, OBJ_PTR a, OBJ_PTR b, OBJ_PTR c) { int ierr=0;
    return c_bezier_control_points(fmkr, Get_FM(fmkr, &ierr),
       Number_to_double(x0, &ierr), Number_to_double(y0, &ierr), Number_to_double(delta_x, &ierr),
       Number_to_double(a, &ierr), Number_to_double(b, &ierr), Number_to_double(c, &ierr), &ierr);

@@ -214,15 +214,15 @@ OBJ_PTR c_private_axial_shading(OBJ_PTR fmkr, FM *p, double x0, double y0, doubl
    OBJ_PTR colormap, bool extend_start, bool extend_end, int *ierr)
 {
    int len = Array_Len(colormap,ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    if (len != 2) {
-      RAISE_ERROR("Sorry: colormap must be array [hivalue, lookup]", ierr); return OBJ_NIL; }
+      RAISE_ERROR("Sorry: colormap must be array [hivalue, lookup]", ierr); RETURN_NIL; }
    OBJ_PTR hival = Array_Entry(colormap,0,ierr);
    OBJ_PTR lookup = Array_Entry(colormap,1,ierr);
    int hi_value = Number_to_int(hival,ierr);
    int lookup_len = String_Len(lookup,ierr);
    unsigned char *lookup_ptr = (unsigned char *)(String_Ptr(lookup,ierr));
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    c_axial_shading(p, convert_figure_to_output_x(p,x0), convert_figure_to_output_y(p,y0),
       convert_figure_to_output_x(p,x1), convert_figure_to_output_y(p,y1),
       hi_value, lookup_len, lookup_ptr, extend_start, extend_end);
@@ -263,15 +263,15 @@ OBJ_PTR c_private_radial_shading(OBJ_PTR fmkr, FM *p,
         double a, double b, double c, double d, bool extend_start, bool extend_end, int *ierr)
 {
    int len = Array_Len(colormap, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    if (len != 2) {
-      RAISE_ERROR("Sorry: colormap must be array [hivalue, lookup]", ierr); return OBJ_NIL; }
+      RAISE_ERROR("Sorry: colormap must be array [hivalue, lookup]", ierr); RETURN_NIL; }
    OBJ_PTR hival = Array_Entry(colormap, 0, ierr);
    OBJ_PTR lookup = Array_Entry(colormap, 1, ierr);
    int hi_value = Number_to_int(hival,ierr);
    int lookup_len = String_Len(lookup,ierr);
    unsigned char *lookup_ptr = (unsigned char *)(String_Ptr(lookup,ierr));
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    c_radial_shading(p, x0, y0, r0, x1, y1, r1,
       hi_value, lookup_len, lookup_ptr,
       convert_figure_to_output_dx(p,a), convert_figure_to_output_dy(p,b),
@@ -350,10 +350,10 @@ static OBJ_PTR c_create_colormap(FM *p, bool rgb_flag, int length,
 {
    int i;
    if (ps[0] != 0.0 || ps[num_pts-1] != 1.0) {
-      RAISE_ERROR("Sorry: first control point for create colormap must be at 0.0 and last must be at 1.0", ierr); return OBJ_NIL; }
+      RAISE_ERROR("Sorry: first control point for create colormap must be at 0.0 and last must be at 1.0", ierr); RETURN_NIL; }
    for (i = 1; i < num_pts; i++) {
       if (ps[i-1] > ps[i]) {
-         RAISE_ERROR("Sorry: control points for create colormap must be increasing from 0 to 1", ierr); return OBJ_NIL; }
+         RAISE_ERROR("Sorry: control points for create colormap must be increasing from 0 to 1", ierr); RETURN_NIL; }
    }
    int j, buff_len = length * 3, hival = length-1;
    unsigned char *buff;
@@ -375,7 +375,7 @@ static OBJ_PTR c_create_colormap(FM *p, bool rgb_flag, int length,
    OBJ_PTR result = Array_New(2);
    Array_Store(result, 0, Integer_New(hival), ierr);
    Array_Store(result, 1, lookup, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    return result;
 }
 
@@ -403,7 +403,7 @@ OBJ_PTR c_private_create_colormap(OBJ_PTR fmkr, FM *p, bool rgb, int length,
    if (*ierr != 0) return;
    if (p_len < 2 || p_len != c1_len || p_len != c2_len || p_len != c3_len) {
       RAISE_ERROR("Sorry: vectors for create colormap must all be os same length (with at least 2 entries)", ierr);
-      return OBJ_NIL;
+      RETURN_NIL;
    }
    return c_create_colormap(p, rgb, length, p_len, p_ptr, c1_ptr, c2_ptr, c3_ptr, ierr);
 }
@@ -412,10 +412,10 @@ OBJ_PTR c_get_color_from_colormap(OBJ_PTR fmkr, FM *p, OBJ_PTR color_map, double
 { /* x is from 0 to 1.  this returns a vector for the RGB color from the given colormap */
    unsigned char *buff = (unsigned char *)(String_Ptr(color_map,ierr)), r, g, b, i;
    int len = String_Len(color_map,ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    if (len % 3 != 0) {
       RAISE_ERROR("Sorry: color_map length must be a multiple of 3 (for R G B components)", ierr);
-      return OBJ_NIL;
+      RETURN_NIL;
    }
    i = 3 * ROUND(x * ((len/3)-1));
    r = buff[i]; g = buff[i+1]; b = buff[i+2];
@@ -423,7 +423,7 @@ OBJ_PTR c_get_color_from_colormap(OBJ_PTR fmkr, FM *p, OBJ_PTR color_map, double
    Array_Store(result, 0, Float_New(r/255.0), ierr);
    Array_Store(result, 1, Float_New(g/255.0), ierr);
    Array_Store(result, 2, Float_New(b/255.0), ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    return result;
 }
 
@@ -441,7 +441,7 @@ OBJ_PTR c_convert_to_colormap(OBJ_PTR fmkr, FM* p, OBJ_PTR Rs, OBJ_PTR Gs, OBJ_P
    if (*ierr != 0) return;
    if (r_len <= 0 || r_len != g_len || b_len != g_len) {
       RAISE_ERROR("Sorry: vectors for convert_to_colormap must all be of same length", ierr);
-      return OBJ_NIL;
+      RETURN_NIL;
    }
    int i, j, buff_len = r_len * 3;
    unsigned char *buff;
@@ -456,7 +456,7 @@ OBJ_PTR c_convert_to_colormap(OBJ_PTR fmkr, FM* p, OBJ_PTR Rs, OBJ_PTR Gs, OBJ_P
    OBJ_PTR result = Array_New(2);
    Array_Store(result, 0, Integer_New(r_len-1), ierr);
    Array_Store(result, 1, lookup, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    return result;
 }
 
@@ -481,7 +481,7 @@ OBJ_PTR c_hls_to_rgb(OBJ_PTR fmkr, FM *p, OBJ_PTR hls_vec, int *ierr)
 {
    double h, l, s, r, g, b;
    Unpack_HLS(hls_vec, &h, &l, &s, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    convert_hls_to_rgb(h, l, s, &r, &g, &b);
    OBJ_PTR result = Array_New(3);
    Array_Store(result, 0, Float_New(r), ierr);
@@ -497,7 +497,7 @@ OBJ_PTR c_rgb_to_hls(OBJ_PTR fmkr, FM *p, OBJ_PTR rgb_vec, int *ierr)
     /* lightness and saturation are given as numbers from 0 to 1 */
    double h, l, s, r, g, b;
    Unpack_RGB(rgb_vec, &r, &g, &b, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    convert_rgb_to_hls(r, g, b, &h, &l, &s);
    OBJ_PTR result = Array_New(3);
    Array_Store(result, 0, Float_New(h), ierr);
@@ -511,7 +511,7 @@ OBJ_PTR c_title_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
 {
    double r, g, b;
    Unpack_RGB(val, &r, &g, &b, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    p->title_color_R = r;
    p->title_color_G = g;
    p->title_color_B = b;
@@ -537,7 +537,7 @@ OBJ_PTR c_xlabel_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
 {
    double r, g, b;
    Unpack_RGB(val, &r, &g, &b, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    p->xlabel_color_R = r;
    p->xlabel_color_G = g;
    p->xlabel_color_B = b;
@@ -563,7 +563,7 @@ OBJ_PTR c_ylabel_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
 {
    double r, g, b;
    Unpack_RGB(val, &r, &g, &b, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    p->ylabel_color_R = r;
    p->ylabel_color_G = g;
    p->ylabel_color_B = b;
@@ -589,7 +589,7 @@ OBJ_PTR c_xaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
 {
    double r, g, b;
    Unpack_RGB(val, &r, &g, &b, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    p->xaxis_stroke_color_R = r;
    p->xaxis_stroke_color_G = g;
    p->xaxis_stroke_color_B = b;
@@ -613,7 +613,7 @@ OBJ_PTR c_yaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
 {
    double r, g, b;
    Unpack_RGB(val, &r, &g, &b, ierr);
-   if (*ierr != 0) return OBJ_NIL;
+   if (*ierr != 0) RETURN_NIL;
    p->yaxis_stroke_color_R = r;
    p->yaxis_stroke_color_G = g;
    p->yaxis_stroke_color_B = b;
