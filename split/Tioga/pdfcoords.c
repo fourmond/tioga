@@ -35,16 +35,16 @@ void Recalc_Font_Hts(FM *p)
    p->default_text_height_dy = convert_frame_to_figure_dy(p,dy);
 }
 
-OBJ_PTR c_set_subframe(OBJ_PTR fmkr, FM *p, 
+void c_set_subframe(OBJ_PTR fmkr, FM *p, 
    double left_margin, double right_margin, double top_margin, double bottom_margin, int *ierr)
 {
    double x, y, w, h;
    if (left_margin < 0 || right_margin < 0 || top_margin < 0 || bottom_margin < 0) {
-      RAISE_ERROR("Sorry: margins for set_subframe must be non-negative", ierr); RETURN_NIL; }
+      RAISE_ERROR("Sorry: margins for set_subframe must be non-negative", ierr); return; }
    if (left_margin + right_margin >= 1.0) {
-      RAISE_ERROR_gg("Sorry: margins too large: left_margin (%g) right_margin (%g)", left_margin, right_margin, ierr); RETURN_NIL; }
+      RAISE_ERROR_gg("Sorry: margins too large: left_margin (%g) right_margin (%g)", left_margin, right_margin, ierr); return; }
    if (top_margin + bottom_margin >= 1.0) {
-      RAISE_ERROR_gg("Sorry: margins too large: top_margin (%g) bottom_margin (%g)", top_margin, bottom_margin, ierr); RETURN_NIL; }
+      RAISE_ERROR_gg("Sorry: margins too large: top_margin (%g) bottom_margin (%g)", top_margin, bottom_margin, ierr); return; }
    x = p->frame_left += left_margin * p->frame_width;
    p->frame_right -= right_margin * p->frame_width;
    p->frame_top -= top_margin * p->frame_height;
@@ -52,7 +52,6 @@ OBJ_PTR c_set_subframe(OBJ_PTR fmkr, FM *p,
    w = p->frame_width = p->frame_right - p->frame_left;
    h = p->frame_height = p->frame_top - p->frame_bottom;
    Recalc_Font_Hts(p);
-   return fmkr;
 }
 
 
@@ -100,11 +99,48 @@ static void c_set_bounds(FM *p, double left, double right, double top, double bo
    Recalc_Font_Hts(p);
 }
 
-OBJ_PTR c_private_set_bounds(OBJ_PTR fmkr, FM *p, 
-   double left_boundary, double right_boundary, double top_boundary, double bottom_boundary, int *ierr)
+void c_private_set_bounds(OBJ_PTR fmkr, FM *p, 
+         double left, double right, double top, double bottom, int *ierr)
 {
-   c_set_bounds(p, left_boundary, right_boundary, top_boundary, bottom_boundary, ierr);
-   return fmkr;
+   if (constructing_path) {
+      RAISE_ERROR("Sorry: must finish with current path before calling set_bounds", ierr); return; }
+   p->bounds_left = left; p->bounds_right = right;
+   p->bounds_bottom = bottom; p->bounds_top = top;
+   if (left < right) {
+      p->xaxis_reversed = false;
+      p->bounds_xmin = left; p->bounds_xmax = right;
+   } else if (right < left) {
+      p->xaxis_reversed = true;
+      p->bounds_xmin = right; p->bounds_xmax = left;
+   } else { // left == right
+      p->xaxis_reversed = false;
+      if (left > 0.0) {
+        p->bounds_xmin = left * (1.0 - 1e-6); p->bounds_xmax = left * (1.0 + 1e-6);
+      } else if (left < 0.0) {
+        p->bounds_xmin = left * (1.0 + 1e-6); p->bounds_xmax = left * (1.0 - 1e-6);
+      } else {
+        p->bounds_xmin = -1e-6; p->bounds_xmax = 1e-6;
+      }
+   }
+   if (bottom < top) {
+      p->yaxis_reversed = false;
+      p->bounds_ymin = bottom; p->bounds_ymax = top;
+   } else if (top < bottom) {
+      p->yaxis_reversed = true;
+      p->bounds_ymin = top; p->bounds_ymax = bottom;
+   } else { // top == bottom
+      p->yaxis_reversed = false;
+      if (bottom > 0.0) {
+        p->bounds_ymin = bottom * (1.0 - 1e-6); p->bounds_ymax = bottom * (1.0 + 1e-6);
+      } else if (bottom < 0.0) {
+        p->bounds_ymin = bottom * (1.0 + 1e-6); p->bounds_ymax = bottom * (1.0 - 1e-6);
+      } else {
+        p->bounds_xmin = -1e-6; p->bounds_xmax = 1e-6;
+      }
+   }
+   p->bounds_width = p->bounds_xmax - p->bounds_xmin;
+   p->bounds_height = p->bounds_ymax - p->bounds_ymin;
+   Recalc_Font_Hts(p);
 }
 
 
@@ -390,21 +426,18 @@ OBJ_PTR c_convert_output_to_figure_dx(OBJ_PTR fmkr, FM *p, double val, int *ierr
 OBJ_PTR c_convert_output_to_figure_dy(OBJ_PTR fmkr, FM *p, double val, int *ierr)
 { return Float_New(convert_output_to_figure_dy(p,val)); }
 
-OBJ_PTR c_private_set_default_font_size(OBJ_PTR fmkr, FM *p, double size, int *ierr) {
+void c_private_set_default_font_size(OBJ_PTR fmkr, FM *p, double size, int *ierr) {
     p->default_font_size = size;
     Recalc_Font_Hts(p);
-   return fmkr;
 }
 
-OBJ_PTR c_doing_subplot(OBJ_PTR fmkr, FM *p, int *ierr)
+void c_doing_subplot(OBJ_PTR fmkr, FM *p, int *ierr)
 {
    p->in_subplot = true;
-   return fmkr;
 }
 
-OBJ_PTR c_doing_subfigure(OBJ_PTR fmkr, FM *p, int *ierr)
+void c_doing_subfigure(OBJ_PTR fmkr, FM *p, int *ierr)
 {
    p->root_figure = false;
-   return fmkr;
 }
 

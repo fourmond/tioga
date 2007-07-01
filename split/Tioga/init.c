@@ -112,8 +112,8 @@ void Init_IDs(void)
     yaxis_tick_labels_ID = ID_Get("@yaxis_tick_labels");
 }
 
-OBJ_PTR do_cmd(OBJ_PTR fmkr, OBJ_PTR cmd, int *ierr) { 
-   return Call_Function(fmkr, do_cmd_ID, cmd, ierr); }
+void do_cmd(OBJ_PTR fmkr, OBJ_PTR cmd, int *ierr) { 
+   Call_Function(fmkr, do_cmd_ID, cmd, ierr); }
 
 static void Type_Error(OBJ_PTR obj, ID_PTR name_ID, char *expected, int *ierr)
 {
@@ -343,40 +343,36 @@ OBJ_PTR c_get_save_filename(OBJ_PTR fmkr, FM *p, OBJ_PTR name, int *ierr) {
 }
    
    
-OBJ_PTR c_private_make(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR cmd, int *ierr) {
+void c_private_make(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR cmd, int *ierr) {
    char full_name[STRLEN], mod_num_name[STRLEN];
-   FM saved = *p;
    OBJ_PTR result;
    bool quiet = Get_quiet_mode(fmkr, ierr);
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    if (!Get_initialized()) {
-      Init_pdf(ierr); if (*ierr != 0) RETURN_NIL;
-      Init_tex(ierr); if (*ierr != 0) RETURN_NIL;
+      Init_pdf(ierr); if (*ierr != 0) return;
+      Init_tex(ierr); if (*ierr != 0) return;
       Set_initialized();
    }
    char *fn = (name == OBJ_NIL)? NULL : String_Ptr(name,ierr);
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    Make_Save_Fname(fmkr, full_name, fn, true, true, ierr);
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    Open_pdf(fmkr, p, full_name, quiet, ierr);
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    Open_tex(fmkr, full_name, quiet, ierr);
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    Write_gsave();
    p->root_figure = true;
    p->in_subplot = false;
-   result = Call_Function(fmkr, make_page_ID, cmd, ierr);
-   if (*ierr != 0) RETURN_NIL;
+   Call_Function(fmkr, make_page_ID, cmd, ierr);
+   if (*ierr != 0) return;
    Write_grestore();
    if (result == OBJ_FALSE) quiet = true;
    Close_pdf(fmkr, p, quiet, ierr);
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    Close_tex(fmkr, quiet, ierr);
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    Create_wrapper(fmkr, full_name, quiet, ierr);
-   if (*ierr != 0) RETURN_NIL; 
-   *p = saved;
-   return result;
 }
    
       
@@ -392,7 +388,7 @@ OBJ_PTR c_private_make_portfolio(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR fign
 }
 
 
-OBJ_PTR c_set_device_pagesize(OBJ_PTR fmkr, FM *p, double width, double height, int *ierr) { 
+void c_set_device_pagesize(OBJ_PTR fmkr, FM *p, double width, double height, int *ierr) { 
    // sizes in units of 1/720 inch
    p->page_left = 0;
    p->page_right = width;
@@ -404,39 +400,37 @@ OBJ_PTR c_set_device_pagesize(OBJ_PTR fmkr, FM *p, double width, double height, 
    p->clip_right = p->page_right;
    p->clip_top = p->page_top;
    p->clip_bottom = p->page_bottom;
-   return fmkr;
 }
 
 
-OBJ_PTR c_set_frame_sides(OBJ_PTR fmkr, FM *p, double left, double right, double top, double bottom, int *ierr) { // sizes in page coords [0..1]
+void c_set_frame_sides(OBJ_PTR fmkr, FM *p, double left, double right, double top, double bottom, int *ierr) { // sizes in page coords [0..1]
    if (left > 1.0 || left < 0.0) RAISE_ERROR("Sorry: OBJ_PTR of left must be between 0 and 1 for set_frame_sides", ierr);
    if (right > 1.0 || right < 0.0) RAISE_ERROR("Sorry: OBJ_PTR of right must be between 0 and 1 for set_frame_sides", ierr);
    if (top > 1.0 || top < 0.0) RAISE_ERROR("Sorry: OBJ_PTR of top must be between 0 and 1 for set_frame_sides", ierr);
    if (bottom > 1.0 || bottom < 0.0) RAISE_ERROR("Sorry: OBJ_PTR of bottom must be between 0 and 1 for set_frame_sides", ierr);
    if (left >= right) RAISE_ERROR("Sorry: OBJ_PTR of left must be smaller than OBJ_PTR of right for set_frame_sides", ierr);
    if (bottom >= top) RAISE_ERROR("Sorry: OBJ_PTR of bottom must be smaller than OBJ_PTR of top for set_frame_sides", ierr);
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    p->frame_left = left;
    p->frame_right = right;
    p->frame_bottom = bottom;
    p->frame_top = top;
    p->frame_width = right - left;
    p->frame_height = top - bottom;
-   return fmkr;
 }
 
 
-OBJ_PTR c_private_init_fm_data(OBJ_PTR fmkr, FM *p, int *ierr) {
+void c_private_init_fm_data(OBJ_PTR fmkr, FM *p, int *ierr) {
    /* Page */
    p->root_figure = true;
    p->in_subplot = false;
    c_private_set_default_font_size(fmkr, p, 12.0, ierr);
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    c_set_device_pagesize(fmkr, p, 5 * 72.0 * ENLARGE, 5 * 72.0 * ENLARGE, ierr);
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    /* default frame */
    c_set_frame_sides(fmkr, p, 0.15, 0.85, 0.85, 0.15, ierr);
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    /* default bounds */
    p->bounds_left = p->bounds_bottom = p->bounds_xmin = p->bounds_ymin = 0;
    p->bounds_right = p->bounds_top = p->bounds_xmax = p->bounds_ymax = 1;
@@ -595,11 +589,8 @@ OBJ_PTR c_private_init_fm_data(OBJ_PTR fmkr, FM *p, int *ierr) {
    p->legend_alignment = ALIGNED_AT_BASELINE;
    p->legend_justification = LEFT_JUSTIFIED;
    p->debug_verbosity_level = 0;
-
    /* emit a warning by default */
    p->croak_on_nonok_numbers = 1;
-
-   return fmkr;
 }
 
 OBJ_PTR Get_line_type(OBJ_PTR fmkr, int *ierr) { 

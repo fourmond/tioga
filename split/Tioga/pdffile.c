@@ -211,8 +211,8 @@ void Write_grestore(void)
    fprintf(TF, "Q\n");
 }
 
-OBJ_PTR c_pdf_gsave(OBJ_PTR fmkr, FM *p, int *ierr) { Write_gsave(); }
-OBJ_PTR c_pdf_grestore(OBJ_PTR fmkr, FM *p, int *ierr) { Write_grestore(); }
+void c_pdf_gsave(OBJ_PTR fmkr, FM *p, int *ierr) { Write_gsave(); }
+void c_pdf_grestore(OBJ_PTR fmkr, FM *p, int *ierr) { Write_grestore(); }
 
 static void Print_Xref(long int offset) {
    char line[80];

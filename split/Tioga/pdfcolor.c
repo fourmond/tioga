@@ -210,23 +210,22 @@ static void c_axial_shading(FM *p, double x0, double y0, double x1, double y1,
    fprintf(TF, "/Shade%i sh\n", so->shade_num);
 }
       
-OBJ_PTR c_private_axial_shading(OBJ_PTR fmkr, FM *p, double x0, double y0, double x1, double y1,
+void c_private_axial_shading(OBJ_PTR fmkr, FM *p, double x0, double y0, double x1, double y1,
    OBJ_PTR colormap, bool extend_start, bool extend_end, int *ierr)
 {
    int len = Array_Len(colormap,ierr);
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    if (len != 2) {
-      RAISE_ERROR("Sorry: colormap must be array [hivalue, lookup]", ierr); RETURN_NIL; }
+      RAISE_ERROR("Sorry: colormap must be array [hivalue, lookup]", ierr); return; }
    OBJ_PTR hival = Array_Entry(colormap,0,ierr);
    OBJ_PTR lookup = Array_Entry(colormap,1,ierr);
    int hi_value = Number_to_int(hival,ierr);
    int lookup_len = String_Len(lookup,ierr);
    unsigned char *lookup_ptr = (unsigned char *)(String_Ptr(lookup,ierr));
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    c_axial_shading(p, convert_figure_to_output_x(p,x0), convert_figure_to_output_y(p,y0),
       convert_figure_to_output_x(p,x1), convert_figure_to_output_y(p,y1),
       hi_value, lookup_len, lookup_ptr, extend_start, extend_end);
-   return fmkr;
 }
 
 static void c_radial_shading(FM *p, double x0, double y0, double r0, double x1, double y1, double r1,
@@ -257,28 +256,27 @@ static void c_radial_shading(FM *p, double x0, double y0, double r0, double x1, 
 }
 
    
-OBJ_PTR c_private_radial_shading(OBJ_PTR fmkr, FM *p,
+void c_private_radial_shading(OBJ_PTR fmkr, FM *p,
         double x0, double y0, double r0,
         double x1, double y1, double r1, OBJ_PTR colormap,
         double a, double b, double c, double d, bool extend_start, bool extend_end, int *ierr)
 {
    int len = Array_Len(colormap, ierr);
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    if (len != 2) {
-      RAISE_ERROR("Sorry: colormap must be array [hivalue, lookup]", ierr); RETURN_NIL; }
+      RAISE_ERROR("Sorry: colormap must be array [hivalue, lookup]", ierr); return; }
    OBJ_PTR hival = Array_Entry(colormap, 0, ierr);
    OBJ_PTR lookup = Array_Entry(colormap, 1, ierr);
    int hi_value = Number_to_int(hival,ierr);
    int lookup_len = String_Len(lookup,ierr);
    unsigned char *lookup_ptr = (unsigned char *)(String_Ptr(lookup,ierr));
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    c_radial_shading(p, x0, y0, r0, x1, y1, r1,
       hi_value, lookup_len, lookup_ptr,
       convert_figure_to_output_dx(p,a), convert_figure_to_output_dy(p,b),
       convert_figure_to_output_dx(p,c), convert_figure_to_output_dy(p,d),
       convert_figure_to_output_x(p,0.0), convert_figure_to_output_y(p,0.0),
       extend_start, extend_end);
-   return fmkr;
 }
 
 /*  Colormaps
@@ -507,15 +505,14 @@ OBJ_PTR c_rgb_to_hls(OBJ_PTR fmkr, FM *p, OBJ_PTR rgb_vec, int *ierr)
 }
 
 
-OBJ_PTR c_title_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
+void c_title_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
 {
    double r, g, b;
    Unpack_RGB(val, &r, &g, &b, ierr);
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    p->title_color_R = r;
    p->title_color_G = g;
    p->title_color_B = b;
-   return val;
 }
 
 
@@ -533,15 +530,14 @@ OBJ_PTR c_title_color_get(OBJ_PTR fmkr, FM *p, int *ierr) // value is array of [
 }
 
 
-OBJ_PTR c_xlabel_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
+void c_xlabel_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
 {
    double r, g, b;
    Unpack_RGB(val, &r, &g, &b, ierr);
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    p->xlabel_color_R = r;
    p->xlabel_color_G = g;
    p->xlabel_color_B = b;
-   return val;
 }   
    
 
@@ -559,15 +555,14 @@ OBJ_PTR c_xlabel_color_get(OBJ_PTR fmkr, FM *p, int *ierr) // value is array of 
 }
 
 
-OBJ_PTR c_ylabel_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
+void c_ylabel_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
 {
    double r, g, b;
    Unpack_RGB(val, &r, &g, &b, ierr);
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    p->ylabel_color_R = r;
    p->ylabel_color_G = g;
    p->ylabel_color_B = b;
-   return val;
 }
 
 
@@ -585,15 +580,14 @@ OBJ_PTR c_ylabel_color_get(OBJ_PTR fmkr, FM *p, int *ierr) // value is array of 
 }
 
 
-OBJ_PTR c_xaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
+void c_xaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
 {
    double r, g, b;
    Unpack_RGB(val, &r, &g, &b, ierr);
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    p->xaxis_stroke_color_R = r;
    p->xaxis_stroke_color_G = g;
    p->xaxis_stroke_color_B = b;
-   return val;
 }
 
 OBJ_PTR c_xaxis_stroke_color_get(OBJ_PTR fmkr, FM *p, int *ierr) // value is array of [r, g, b] intensities from 0 to 1
@@ -609,15 +603,14 @@ OBJ_PTR c_xaxis_stroke_color_get(OBJ_PTR fmkr, FM *p, int *ierr) // value is arr
    return result;
 }
 
-OBJ_PTR c_yaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
+void c_yaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
 {
    double r, g, b;
    Unpack_RGB(val, &r, &g, &b, ierr);
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    p->yaxis_stroke_color_R = r;
    p->yaxis_stroke_color_G = g;
    p->yaxis_stroke_color_B = b;
-   return val;
 }
 
 

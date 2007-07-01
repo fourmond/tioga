@@ -323,17 +323,17 @@ extern char *data_dir;
 // axes.c
 extern char *Get_String(OBJ_PTR ary, int index, int *ierr);
 
-extern OBJ_PTR c_show_axis(OBJ_PTR fmkr, FM *p, int location, int *ierr);
-extern OBJ_PTR c_show_edge(OBJ_PTR fmkr, FM *p, int location, int *ierr);
-extern OBJ_PTR c_no_title(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_no_xlabel(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_no_ylabel(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_no_xaxis(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_no_yaxis(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_no_left_edge(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_no_right_edge(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_no_top_edge(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_no_bottom_edge(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_show_axis(OBJ_PTR fmkr, FM *p, int location, int *ierr);
+extern void c_show_edge(OBJ_PTR fmkr, FM *p, int location, int *ierr);
+extern void c_no_title(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_no_xlabel(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_no_ylabel(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_no_xaxis(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_no_yaxis(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_no_left_edge(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_no_right_edge(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_no_top_edge(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_no_bottom_edge(OBJ_PTR fmkr, FM *p, int *ierr);
 
 /*======================================================================*/
 // figures.c
@@ -347,7 +347,7 @@ extern void Set_initialized(void);
 extern void Init_IDs(void);
 extern OBJ_PTR Get_fm_data_attr(OBJ_PTR fmkr, int *ierr);
 extern void Initialize_Figure(OBJ_PTR fmkr);
-extern OBJ_PTR do_cmd(OBJ_PTR fmkr, OBJ_PTR cmd, int *ierr);
+extern void do_cmd(OBJ_PTR fmkr, OBJ_PTR cmd, int *ierr);
 extern bool Get_bool(OBJ_PTR obj, ID_PTR name_ID, int *ierr);
 extern int Get_int(OBJ_PTR obj, ID_PTR name_ID, int *ierr);
 extern double Get_double(OBJ_PTR obj, ID_PTR name_ID, int *ierr);
@@ -382,12 +382,12 @@ extern OBJ_PTR Get_yaxis_tick_labels(OBJ_PTR fmkr, int *ierr);
 extern OBJ_PTR Get_yaxis_locations_for_major_ticks(OBJ_PTR fmkr, int *ierr);
 extern OBJ_PTR Get_yaxis_locations_for_minor_ticks(OBJ_PTR fmkr, int *ierr);
 
-extern OBJ_PTR c_private_init_fm_data(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_set_frame_sides(OBJ_PTR fmkr, FM *p, 
+extern void c_private_init_fm_data(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_set_frame_sides(OBJ_PTR fmkr, FM *p, 
    double left, double right, double top, double bottom, int *ierr);
-extern OBJ_PTR c_set_device_pagesize(OBJ_PTR fmkr, FM *p, double width, double height, int *ierr);
+extern void c_set_device_pagesize(OBJ_PTR fmkr, FM *p, double width, double height, int *ierr);
 extern OBJ_PTR c_get_save_filename(OBJ_PTR fmkr, FM *p, OBJ_PTR name, int *ierr);
-extern OBJ_PTR c_private_make(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR cmd, int *ierr);
+extern void c_private_make(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR cmd, int *ierr);
 extern OBJ_PTR c_private_make_portfolio(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR fignums, OBJ_PTR fignames, int *ierr);
 
 /*======================================================================*/
@@ -424,10 +424,10 @@ extern void Write_Shadings(void);
 
 extern void c_stroke_opacity_set(OBJ_PTR fmkr, FM *p, double stroke_opacity, int *ierr);
 extern void c_fill_opacity_set(OBJ_PTR fmkr, FM *p, double fill_opacity, int *ierr);
-extern OBJ_PTR c_private_axial_shading(OBJ_PTR fmkr, FM *p, 
+extern void c_private_axial_shading(OBJ_PTR fmkr, FM *p, 
       double x0, double y0, double x1, double y1,
       OBJ_PTR colormap, bool extend_start, bool extend_end, int *ierr);
-extern OBJ_PTR c_private_radial_shading(OBJ_PTR fmkr, FM *p, 
+extern void c_private_radial_shading(OBJ_PTR fmkr, FM *p, 
       double x0, double y0, double r0,
       double x1, double y1, double r1, OBJ_PTR colormap,
       double a, double b, double c, double d, bool extend_start, bool extend_end, int *ierr);
@@ -437,15 +437,15 @@ extern OBJ_PTR c_get_color_from_colormap(OBJ_PTR fmkr, FM *p, OBJ_PTR color_map,
 extern OBJ_PTR c_convert_to_colormap(OBJ_PTR fmkr, FM* p, OBJ_PTR Rs, OBJ_PTR Gs, OBJ_PTR Bs, int *ierr);
 extern OBJ_PTR c_hls_to_rgb(OBJ_PTR fmkr, FM *p, OBJ_PTR hls_vec, int *ierr);
 extern OBJ_PTR c_rgb_to_hls(OBJ_PTR fmkr, FM *p, OBJ_PTR rgb_vecc_hls_to_rgb, int *ierr);
-extern OBJ_PTR c_title_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR valc_hls_to_rgb, int *ierr);
+extern void c_title_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR valc_hls_to_rgb, int *ierr);
 extern OBJ_PTR c_title_color_get(OBJ_PTR fmkr, FM *pc_hls_to_rgb, int *ierr); // value is array of [r, g, b] intensities from 0 to 1
-extern OBJ_PTR c_xlabel_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR valc_hls_to_rgb, int *ierr);
+extern void c_xlabel_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR valc_hls_to_rgb, int *ierr);
 extern OBJ_PTR c_xlabel_color_get(OBJ_PTR fmkr, FM *pc_hls_to_rgb, int *ierr); // value is array of [r, g, b] intensities from 0 to 1
-extern OBJ_PTR c_ylabel_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR valc_hls_to_rgb, int *ierr);
+extern void c_ylabel_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR valc_hls_to_rgb, int *ierr);
 extern OBJ_PTR c_ylabel_color_get(OBJ_PTR fmkr, FM *pc_hls_to_rgb, int *ierr); // value is array of [r, g, b] intensities from 0 to 1
-extern OBJ_PTR c_xaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR valc_hls_to_rgb, int *ierr);
+extern void c_xaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR valc_hls_to_rgb, int *ierr);
 extern OBJ_PTR c_xaxis_stroke_color_get(OBJ_PTR fmkr, FM *pc_hls_to_rgb, int *ierr); // value is array of [r, g, b] intensities from 0 to 1
-extern OBJ_PTR c_yaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR valc_hls_to_rgb, int *ierr);
+extern void c_yaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR valc_hls_to_rgb, int *ierr);
 extern OBJ_PTR c_yaxis_stroke_color_get(OBJ_PTR fmkr, FM *pc_hls_to_rgb, int *ierr); // value is array of [r, g, b] intensities from 0 to 1
 
 /*======================================================================*/
@@ -460,9 +460,9 @@ extern double convert_output_to_figure_y(FM *p, double y);
 extern double convert_output_to_figure_dy(FM *p, double dy);
 extern double convert_output_to_figure_dx(FM *p, double dx);
 
-extern OBJ_PTR c_set_subframe(OBJ_PTR fmkr, FM *p, 
+extern void c_set_subframe(OBJ_PTR fmkr, FM *p, 
       double left_margin, double right_margin, double top_margin, double bottom_margin, int *ierr);
-extern OBJ_PTR c_private_set_default_font_size(OBJ_PTR fmkr, FM *p, double size, int *ierr);
+extern void c_private_set_default_font_size(OBJ_PTR fmkr, FM *p, double size, int *ierr);
 extern OBJ_PTR c_convert_to_degrees(OBJ_PTR fmkr, FM *p, double dx, double dy, int *ierr); // dx and dy in figure coords
 extern OBJ_PTR c_convert_inches_to_output(OBJ_PTR fmkr, FM *p, double val, int *ierr);
 extern OBJ_PTR c_convert_output_to_inches(OBJ_PTR fmkr, FM *p, double val, int *ierr);
@@ -500,9 +500,9 @@ extern OBJ_PTR c_convert_output_to_figure_x(OBJ_PTR fmkr, FM *p, double val, int
 extern OBJ_PTR c_convert_output_to_figure_y(OBJ_PTR fmkr, FM *p, double val, int *ierr);
 extern OBJ_PTR c_convert_output_to_figure_dx(OBJ_PTR fmkr, FM *p, double val, int *ierr);
 extern OBJ_PTR c_convert_output_to_figure_dy(OBJ_PTR fmkr, FM *p, double val, int *ierr);
-extern OBJ_PTR c_doing_subplot(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_doing_subfigure(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_private_set_bounds(OBJ_PTR fmkr, FM *p, 
+extern void c_doing_subplot(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_doing_subfigure(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_private_set_bounds(OBJ_PTR fmkr, FM *p, 
    double left_boundary, double right_boundary, double top_boundary, double bottom_boundary, int *ierr);
 
 /*======================================================================*/
@@ -516,8 +516,8 @@ extern void Write_grestore(void);
 extern void Close_pdf(OBJ_PTR fmkr, FM *p, bool quiet_mode, int *ierr);
 extern void Rename_pdf(char *oldname, char *newname);
 
-extern OBJ_PTR c_pdf_gsave(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_pdf_grestore(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_pdf_gsave(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_pdf_grestore(OBJ_PTR fmkr, FM *p, int *ierr);
 
 /*======================================================================*/
 // pdfimage.c
@@ -527,7 +527,7 @@ extern OBJ_PTR c_private_create_image_data(OBJ_PTR fmkr, FM *p, OBJ_PTR table,
 extern OBJ_PTR c_private_create_monochrome_image_data(OBJ_PTR fmkr, FM *p, OBJ_PTR table,
             int first_row, int last_row, int first_column, int last_column,
             double boundary, bool reversed, int *ierr);
-extern OBJ_PTR c_private_show_jpg(OBJ_PTR fmkr, FM *p, char *filename, 
+extern void c_private_show_jpg(OBJ_PTR fmkr, FM *p, char *filename, 
    int width, int height, OBJ_PTR image_destination, int mask_obj_num, int *ierr);
 extern OBJ_PTR c_private_show_image(OBJ_PTR fmkr, FM *p, int image_type, double llx, double lly, double lrx, double lry,
     double ulx, double uly, bool interpolate, bool reversed, int w, int h, unsigned char* data, long len, 
@@ -539,91 +539,91 @@ extern void Unpack_RGB(OBJ_PTR rgb, double *rp, double *gp, double *bp, int *ier
 extern void update_bbox(FM *p, double x, double y);
 
 extern void c_stroke_color_set_RGB(OBJ_PTR fmkr, FM *p, double r, double g, double b, int *ierr);
-extern OBJ_PTR c_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR value, int *ierr);
+extern void c_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR value, int *ierr);
 extern OBJ_PTR c_stroke_color_get(OBJ_PTR fmkr, FM *p, int *ierr);
 extern void c_fill_color_set_RGB(OBJ_PTR fmkr, FM *p, double r, double g, double b, int *ierr);
-extern OBJ_PTR c_fill_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR value, int *ierr);
+extern void c_fill_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR value, int *ierr);
 extern OBJ_PTR c_fill_color_get(OBJ_PTR fmkr, FM *p, int *ierr);
 extern void c_line_width_set(OBJ_PTR fmkr, FM *p, double line_width, int *ierr);
-extern OBJ_PTR c_rescale_lines(OBJ_PTR fmkr, FM *p, double scaling_factor, int *ierr);
+extern void c_rescale_lines(OBJ_PTR fmkr, FM *p, double scaling_factor, int *ierr);
 extern void c_line_cap_set(OBJ_PTR fmkr, FM *p, int line_cap, int *ierr);
 extern void c_line_join_set(OBJ_PTR fmkr, FM *p, int line_join, int *ierr);
 extern void c_miter_limit_set(OBJ_PTR fmkr, FM *p, double miter_limit, int *ierr);
-extern OBJ_PTR c_line_type_set(OBJ_PTR fmkr, FM *p, OBJ_PTR line_type, int *ierr);
-extern OBJ_PTR c_update_bbox(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr);
+extern void c_line_type_set(OBJ_PTR fmkr, FM *p, OBJ_PTR line_type, int *ierr);
+extern void c_update_bbox(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr);
 extern OBJ_PTR c_bbox_left(OBJ_PTR fmkr, FM *p, int *ierr);
 extern OBJ_PTR c_bbox_right(OBJ_PTR fmkr, FM *p, int *ierr);
 extern OBJ_PTR c_bbox_top(OBJ_PTR fmkr, FM *p, int *ierr);
 extern OBJ_PTR c_bbox_bottom(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_move_to_point(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr);
-extern OBJ_PTR c_moveto(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr);
-extern OBJ_PTR c_append_point_to_path(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr);
-extern OBJ_PTR c_lineto(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr);
+extern void c_move_to_point(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr);
+extern void c_moveto(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr);
+extern void c_append_point_to_path(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr);
+extern void c_lineto(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr);
 extern OBJ_PTR c_bezier_control_points(OBJ_PTR fmkr, FM *p, 
    double x0, double y0, double delta_x, double a, double b, double c, int *ierr);
-extern OBJ_PTR c_append_curve_to_path(OBJ_PTR fmkr, FM *p, double x1, double y1, 
+extern void c_append_curve_to_path(OBJ_PTR fmkr, FM *p, double x1, double y1, 
    double x2, double y2, double x3, double y3, int *ierr);
-extern OBJ_PTR c_curveto(OBJ_PTR fmkr, FM *p, 
+extern void c_curveto(OBJ_PTR fmkr, FM *p, 
    double x1, double y1, double x2, double y2, double x3, double y3, int *ierr);
-extern OBJ_PTR c_close_path(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_append_arc_to_path(OBJ_PTR fmkr, FM *p, 
+extern void c_close_path(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_append_arc_to_path(OBJ_PTR fmkr, FM *p, 
    double x_start, double y_start, double x_corner, double y_corner,
    double x_end, double y_end, double dx, double dy, int *ierr);
-extern OBJ_PTR c_append_arc(OBJ_PTR fmkr, FM *p, 
+extern void c_append_arc(OBJ_PTR fmkr, FM *p, 
    double x_start, double y_start, double x_corner, double y_corner,
    double x_end, double y_end, double radius, int *ierr);
-extern OBJ_PTR c_append_rect_to_path(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, int *ierr);
-extern OBJ_PTR c_append_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, int *ierr);
-extern OBJ_PTR c_append_rounded_rect_to_path(OBJ_PTR fmkr, FM *p, 
+extern void c_append_rect_to_path(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, int *ierr);
+extern void c_append_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, int *ierr);
+extern void c_append_rounded_rect_to_path(OBJ_PTR fmkr, FM *p, 
    double x, double y, double width, double height, double dx, double dy, int *ierr);
-extern OBJ_PTR c_append_rounded_rect(OBJ_PTR fmkr, FM *p, 
+extern void c_append_rounded_rect(OBJ_PTR fmkr, FM *p, 
    double x, double y, double width, double height, double radius, int *ierr);
-extern OBJ_PTR c_append_oval_to_path(OBJ_PTR fmkr, FM *p, double x, double y, double dx, double dy, double angle, int *ierr);
-extern OBJ_PTR c_append_oval(OBJ_PTR fmkr, FM *p, double x, double y, double dx, double dy, double angle, int *ierr);
-extern OBJ_PTR c_append_circle_to_path(OBJ_PTR fmkr, FM *p, double x, double y, double dx, int *ierr);
-extern OBJ_PTR c_append_points_to_path(OBJ_PTR fmkr, FM *p, OBJ_PTR x_vec, OBJ_PTR y_vec, int *ierr);
-extern OBJ_PTR c_private_append_points_with_gaps_to_path(OBJ_PTR fmkr, FM *p,
+extern void c_append_oval_to_path(OBJ_PTR fmkr, FM *p, double x, double y, double dx, double dy, double angle, int *ierr);
+extern void c_append_oval(OBJ_PTR fmkr, FM *p, double x, double y, double dx, double dy, double angle, int *ierr);
+extern void c_append_circle_to_path(OBJ_PTR fmkr, FM *p, double x, double y, double dx, int *ierr);
+extern void c_append_points_to_path(OBJ_PTR fmkr, FM *p, OBJ_PTR x_vec, OBJ_PTR y_vec, int *ierr);
+extern void c_private_append_points_with_gaps_to_path(OBJ_PTR fmkr, FM *p,
    OBJ_PTR x_vec, OBJ_PTR y_vec, OBJ_PTR gaps, bool do_close, int *ierr);
-extern OBJ_PTR c_stroke(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_close_and_stroke(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_fill(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_discard_path(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_eofill(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_fill_and_stroke(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_eofill_and_stroke(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_close_fill_and_stroke(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_close_eofill_and_stroke(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_clip(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_eoclip(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_fill_and_clip(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_stroke_and_clip(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_fill_stroke_and_clip(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_stroke_line(OBJ_PTR fmkr, FM *p, double x1, double y1, double x2, double y2, int *ierr);
-extern OBJ_PTR c_fill_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, int *ierr);
-extern OBJ_PTR c_stroke_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, int *ierr);
-extern OBJ_PTR c_fill_and_stroke_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, int *ierr);
-extern OBJ_PTR c_clip_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, int *ierr);
-extern OBJ_PTR c_clip_dev_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, int *ierr);
-extern OBJ_PTR c_clip_oval(OBJ_PTR fmkr, FM *p, double x, double y, double dx, double dy, double angle, int *ierr);
-extern OBJ_PTR c_fill_oval(OBJ_PTR fmkr, FM *p, double x, double y, double dx, double dy, double angle, int *ierr);
-extern OBJ_PTR c_stroke_oval(OBJ_PTR fmkr, FM *p, double x, double y, double dx, double dy, double angle, int *ierr);
-extern OBJ_PTR c_fill_and_stroke_oval(OBJ_PTR fmkr, FM *p, double x, double y, double dx, double dy, double angle, int *ierr);
-extern OBJ_PTR c_clip_rounded_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, double dx, double dy, int *ierr);
-extern OBJ_PTR c_fill_rounded_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, double dx, double dy, int *ierr);
-extern OBJ_PTR c_stroke_rounded_rect(OBJ_PTR fmkr, FM *p, 
+extern void c_stroke(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_close_and_stroke(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_fill(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_discard_path(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_eofill(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_fill_and_stroke(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_eofill_and_stroke(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_close_fill_and_stroke(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_close_eofill_and_stroke(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_clip(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_eoclip(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_fill_and_clip(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_stroke_and_clip(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_fill_stroke_and_clip(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_stroke_line(OBJ_PTR fmkr, FM *p, double x1, double y1, double x2, double y2, int *ierr);
+extern void c_fill_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, int *ierr);
+extern void c_stroke_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, int *ierr);
+extern void c_fill_and_stroke_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, int *ierr);
+extern void c_clip_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, int *ierr);
+extern void c_clip_dev_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, int *ierr);
+extern void c_clip_oval(OBJ_PTR fmkr, FM *p, double x, double y, double dx, double dy, double angle, int *ierr);
+extern void c_fill_oval(OBJ_PTR fmkr, FM *p, double x, double y, double dx, double dy, double angle, int *ierr);
+extern void c_stroke_oval(OBJ_PTR fmkr, FM *p, double x, double y, double dx, double dy, double angle, int *ierr);
+extern void c_fill_and_stroke_oval(OBJ_PTR fmkr, FM *p, double x, double y, double dx, double dy, double angle, int *ierr);
+extern void c_clip_rounded_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, double dx, double dy, int *ierr);
+extern void c_fill_rounded_rect(OBJ_PTR fmkr, FM *p, double x, double y, double width, double height, double dx, double dy, int *ierr);
+extern void c_stroke_rounded_rect(OBJ_PTR fmkr, FM *p, 
    double x, double y, double width, double height, double dx, double dy, int *ierr);
-extern OBJ_PTR c_fill_and_stroke_rounded_rect(OBJ_PTR fmkr, FM *p, 
+extern void c_fill_and_stroke_rounded_rect(OBJ_PTR fmkr, FM *p, 
    double x, double y, double width, double height, double dx, double dy, int *ierr);
-extern OBJ_PTR c_clip_circle(OBJ_PTR fmkr, FM *p, double x, double y, double dx, int *ierr);
-extern OBJ_PTR c_fill_circle(OBJ_PTR fmkr, FM *p, double x, double y, double dx, int *ierr);
-extern OBJ_PTR c_stroke_circle(OBJ_PTR fmkr, FM *p, double x, double y, double dx, int *ierr);
-extern OBJ_PTR c_fill_and_stroke_circle(OBJ_PTR fmkr, FM *p, double x, double y, double dx, int *ierr);
-extern OBJ_PTR c_append_frame(OBJ_PTR fmkr, FM *p, bool clip, int *ierr);
-extern OBJ_PTR c_append_frame_to_path(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_fill_frame(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_stroke_frame(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_fill_and_stroke_frame(OBJ_PTR fmkr, FM *p, int *ierr);
-extern OBJ_PTR c_clip_to_frame(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_clip_circle(OBJ_PTR fmkr, FM *p, double x, double y, double dx, int *ierr);
+extern void c_fill_circle(OBJ_PTR fmkr, FM *p, double x, double y, double dx, int *ierr);
+extern void c_stroke_circle(OBJ_PTR fmkr, FM *p, double x, double y, double dx, int *ierr);
+extern void c_fill_and_stroke_circle(OBJ_PTR fmkr, FM *p, double x, double y, double dx, int *ierr);
+extern void c_append_frame(OBJ_PTR fmkr, FM *p, bool clip, int *ierr);
+extern void c_append_frame_to_path(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_fill_frame(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_stroke_frame(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_fill_and_stroke_frame(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_clip_to_frame(OBJ_PTR fmkr, FM *p, int *ierr);
 
 /*======================================================================*/
 // pdftext.c
@@ -636,7 +636,7 @@ extern void Write_Font_Widths(void);
 
 extern OBJ_PTR c_register_font(OBJ_PTR fmkr, FM *p, char *font_name, int *ierr);
 extern OBJ_PTR c_marker_string_info(OBJ_PTR fmkr, FM *p, int fnt, unsigned char *text, double scale, int *ierr);
-extern OBJ_PTR c_private_show_marker(
+extern void c_private_show_marker(
    OBJ_PTR fmkr, FM *p, int int_args, OBJ_PTR stroke_width, OBJ_PTR string,
    OBJ_PTR x, OBJ_PTR y, OBJ_PTR x_vec, OBJ_PTR y_vec,
    double h_scale, double v_scale, double scale, double it_angle, double ascent_angle, double angle,
@@ -651,10 +651,10 @@ extern void Init_tex(int *ierr);
 extern void Rename_tex(char *oldname, char *newname, int *ierr);
 extern void private_make_portfolio(char *filename, OBJ_PTR fignums, OBJ_PTR fignames, int *ierr);
 
-extern OBJ_PTR c_rescale_text(OBJ_PTR fmkr, FM *p, double scaling_factor, int *ierr);
-extern OBJ_PTR c_show_rotated_text(OBJ_PTR fmkr, FM *p, char *text, int frame_side, double shift, double fraction,
+extern void c_rescale_text(OBJ_PTR fmkr, FM *p, double scaling_factor, int *ierr);
+extern void c_show_rotated_text(OBJ_PTR fmkr, FM *p, char *text, int frame_side, double shift, double fraction,
    double scale, double angle, int justification, int alignment, int *ierr);
-extern OBJ_PTR c_show_rotated_label(OBJ_PTR fmkr, FM *p, char *text, 
+extern void c_show_rotated_label(OBJ_PTR fmkr, FM *p, char *text, 
    double xloc, double yloc, double scale, double angle, int justification, int alignment, int *ierr);
 extern OBJ_PTR c_check_label_clip(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr);
 

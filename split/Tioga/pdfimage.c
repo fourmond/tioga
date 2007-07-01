@@ -248,15 +248,14 @@ static void Show_JPEG(FM *p, char *filename, int width, int height, double *dest
    update_bbox(p, lrx+ulx-llx, lry+uly-lly);
 }
 
-OBJ_PTR c_private_show_jpg(OBJ_PTR fmkr, FM *p, char *filename, 
+void c_private_show_jpg(OBJ_PTR fmkr, FM *p, char *filename, 
    int width, int height, OBJ_PTR image_destination, int mask_obj_num, int *ierr) {
    double dest[6];
    if (constructing_path) {
-      RAISE_ERROR("Sorry: must finish with current path before calling show_jpg", ierr); RETURN_NIL; }
+      RAISE_ERROR("Sorry: must finish with current path before calling show_jpg", ierr); return; }
    Get_Image_Dest(p, image_destination, dest, ierr);
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    Show_JPEG(p, filename, width, height, dest, JPG_SUBTYPE, mask_obj_num);
-   return fmkr;
 }
 
 OBJ_PTR c_private_create_image_data(OBJ_PTR fmkr, FM *p, OBJ_PTR table,
@@ -417,7 +416,7 @@ OBJ_PTR c_private_show_image(OBJ_PTR fmkr, FM *p, int image_type, double llx, do
    xo->value_mask_min = value_mask_min;
    xo->value_mask_max = value_mask_max;
    xo->mask_obj_num = mask_obj_num;
-   if (mask_obj_num == -1) return xo->obj_num; // this image is being used as an opacity mask
+   if (mask_obj_num == -1) return Integer_New(xo->obj_num); // this image is being used as an opacity mask
    Create_Transform_from_Points(llx, lly, lrx, lry, ulx, uly, &a, &b, &c, &d, &e, &f);
    fprintf(TF, "q %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f cm /XObj%i Do Q\n", a, b, c, d, e, f, xo->xo_num);
    update_bbox(p, llx, lly);

@@ -27,13 +27,12 @@ static FILE *fp; // for the TeX file
 
 /* TeX text */
 
-OBJ_PTR c_rescale_text(OBJ_PTR fmkr, FM *p, double scaling_factor, int *ierr) {
+void c_rescale_text(OBJ_PTR fmkr, FM *p, double scaling_factor, int *ierr) {
    double scale = scaling_factor * p->default_text_scale;
-   if (scaling_factor <= 0) { RAISE_ERROR("Sorry: text scaling must be positive", ierr); RETURN_NIL; }
+   if (scaling_factor <= 0) { RAISE_ERROR("Sorry: text scaling must be positive", ierr); return; }
    p->default_text_height_dx *= scaling_factor;
    p->default_text_height_dy *= scaling_factor;
    p->default_text_scale = scale;
-   return fmkr;
 }
 
 static int String_Is_Blank(char  *str) {
@@ -126,20 +125,18 @@ static void Convert_Frame_Text_Position_To_Output_Location(FM *p, int frame_side
    *xp = p->page_left + page_x; *yp = p->page_bottom + page_y;
 }
        
-OBJ_PTR c_show_rotated_text(OBJ_PTR fmkr, FM *p, char *text, int frame_side, double shift, double fraction,
+void c_show_rotated_text(OBJ_PTR fmkr, FM *p, char *text, int frame_side, double shift, double fraction,
    double scale, double angle, int justification, int alignment, int *ierr) {
    double x, y, base_angle, ft_ht = p->default_text_scale * scale * p->default_font_size;
    Convert_Frame_Text_Position_To_Output_Location(p, frame_side, shift*ft_ht*ENLARGE, fraction, &x, &y, &base_angle, text, ierr);
    tex_show_rotated_text(p, text, x, y, scale, angle + base_angle, justification, alignment);
-   return fmkr;
 }
 
          
-OBJ_PTR c_show_rotated_label(OBJ_PTR fmkr, FM *p, char *text, 
+void c_show_rotated_label(OBJ_PTR fmkr, FM *p, char *text, 
    double xloc, double yloc, double scale, double angle, int justification, int alignment, int *ierr) {
    tex_show_rotated_text(p, text, convert_figure_to_output_x(p, xloc), convert_figure_to_output_y(p, yloc),
       scale, angle, justification, alignment);
-   return fmkr;
 }
    
 OBJ_PTR c_check_label_clip(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr) {

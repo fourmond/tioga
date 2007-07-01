@@ -64,7 +64,7 @@ extern void Init_generic(void);
 
 // all routines set *ierr nonzero in case of error.
 
-extern OBJ_PTR Call_Function(OBJ_PTR fmkr, ID_PTR fn, OBJ_PTR arg, int *ierr);
+extern void Call_Function(OBJ_PTR fmkr, ID_PTR fn, OBJ_PTR arg, int *ierr);
 // invokes method given by fn in the object fmkr with the given arg.
 
 extern bool Is_Kind_of_Integer(OBJ_PTR obj);
@@ -109,14 +109,14 @@ extern long Array_Len(OBJ_PTR obj, int *ierr);
     // tries to convert obj to array if necessary
     // raises error if obj not a kind of array and cannot be converted to one
 extern OBJ_PTR Array_Entry(OBJ_PTR obj, long indx, int *ierr);
-    // returns array obj entry indx
+    // returns a BORROWED REFERENCE to array obj entry indx
     // tries to convert obj to array if necessary
     // raises error if obj not a kind of array and cannot be converted to one
-extern OBJ_PTR Array_Store(OBJ_PTR obj, long indx, OBJ_PTR val, int *ierr);
-    // sets array obj entry indx to val and then returns val.
+extern void Array_Store(OBJ_PTR obj, long indx, OBJ_PTR val, int *ierr);
+    // sets array obj entry indx to val.
     // raises error if obj not a kind of array
-extern OBJ_PTR Array_Push(OBJ_PTR obj, OBJ_PTR val, int *ierr);
-    // pushes val onto the end of array obj and then returns val.
+extern void Array_Push(OBJ_PTR obj, OBJ_PTR val, int *ierr);
+    // pushes val onto the end of array obj.
     // raises error if obj not a kind of array
 
 
@@ -125,17 +125,17 @@ extern ID_PTR ID_Get(char *name);
 extern char *ID_Name(ID_PTR id, int *ierr);
    // return the name of the given id.
 extern OBJ_PTR Obj_Attr_Get(OBJ_PTR obj, ID_PTR attr_ID, int *ierr);
-    // returns value of the given attr of the obj
-extern OBJ_PTR Obj_Attr_Set(OBJ_PTR obj, ID_PTR attr_ID, OBJ_PTR val, int *ierr);
-    // sets the specified attr of the obj to val, and then returns val.
+    // returns a BORROWED REFERENCE to value of the given attr of the obj
+extern void Obj_Attr_Set(OBJ_PTR obj, ID_PTR attr_ID, OBJ_PTR val, int *ierr);
+    // sets the specified attr of the obj to val.
     
     
     
 extern OBJ_PTR TEX_PREAMBLE(OBJ_PTR fmkr, int *ierr);
-   // returns the class FigureMaker constant named TEX_PREAMBLE
+   // returns a BORROWED REFERENCE to the class FigureMaker constant named TEX_PREAMBLE
     
 extern OBJ_PTR COLOR_PREAMBLE(OBJ_PTR fmkr, int *ierr);
-   // returns the class FigureMaker constant named COLOR_PREAMBLE
+   // returns a BORROWED REFERENCE to the class FigureMaker constant named COLOR_PREAMBLE
 
 extern void RAISE_ERROR(char *str, int *ierr); // prints the error message and does *ierr = -1;
 // The following do sprintf to a local string, and then call RAISE_ERROR.
@@ -153,12 +153,10 @@ extern void GIVE_WARNING(const char *fmt, const char *str);
 /* generic interface for vectors and tables */
 
 extern OBJ_PTR Vector_New(long len, double *vals);
-    // creates a 1D vector and initializes it with given values
-    // returns OBJ_PTR for the new vector of doubles
+    // creates a new 1D vector and initializes it with given values
 
 extern OBJ_PTR Integer_Vector_New(long len, long *vals);
-    // creates a 1D vector and initializes it with given values
-    // returns OBJ_PTR for the new vector of integers
+    // creates a new 1D vector and initializes it with given values
 
 extern double *Vector_Data_for_Read(OBJ_PTR obj, long *len_ptr, int *ierr);
     // returns (double *) pointer to data (read access only)

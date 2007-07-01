@@ -707,107 +707,94 @@ static void c_show_side(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr) {
 }
 
 
-OBJ_PTR c_show_axis(OBJ_PTR fmkr, FM *p, int location, int *ierr)
+void c_show_axis(OBJ_PTR fmkr, FM *p, int location, int *ierr)
 {
    PlotAxis axis;
    if (location == LEFT || location == RIGHT || location == AT_X_ORIGIN) {
-      if (!p->yaxis_visible) goto done;
+      if (!p->yaxis_visible) return;
       Get_yaxis_Specs(fmkr, p, &axis, ierr);
    } else if (location == TOP || location == BOTTOM || location == AT_Y_ORIGIN) {
-      if (!p->xaxis_visible) goto done;
+      if (!p->xaxis_visible) return;
       Get_xaxis_Specs(fmkr, p, &axis, ierr);
    } else RAISE_ERROR_i(
          "Sorry: invalid 'loc' for axis: must be one of LEFT, RIGHT, TOP, BOTTOM, AT_X_ORIGIN, or AT_Y_ORIGIN: is (%i)", location, ierr);
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    axis.location = location;
    c_show_side(fmkr, p, &axis, ierr);
- done:
-   return fmkr;
 }
       
-OBJ_PTR c_show_edge(OBJ_PTR fmkr, FM *p, int location, int *ierr)
+void c_show_edge(OBJ_PTR fmkr, FM *p, int location, int *ierr)
 {
    PlotAxis axis;
    switch (location) {
       case LEFT:
-         if (!p->left_edge_visible) goto done;
+         if (!p->left_edge_visible) return;
          Get_yaxis_Specs(fmkr, p, &axis, ierr); axis.type = p->left_edge_type;
          break;
       case RIGHT:
-         if (!p->right_edge_visible) goto done;
+         if (!p->right_edge_visible) return;
          Get_yaxis_Specs(fmkr, p, &axis, ierr); axis.type = p->right_edge_type;
          break;
       case BOTTOM:
-         if (!p->bottom_edge_visible) goto done;
+         if (!p->bottom_edge_visible) return;
          Get_xaxis_Specs(fmkr, p, &axis, ierr); axis.type = p->bottom_edge_type;
          break;
       case TOP:
-         if (!p->top_edge_visible) goto done;
+         if (!p->top_edge_visible) return;
          Get_xaxis_Specs(fmkr, p, &axis, ierr); axis.type = p->top_edge_type;
          break;
       default: 
          RAISE_ERROR_i(
             "Sorry: invalid 'loc' for edge: must be one of LEFT, RIGHT, TOP, or BOTTOM: is (%i)", location, ierr);
    }
-   if (*ierr != 0) RETURN_NIL;
+   if (*ierr != 0) return;
    axis.location = location;
    c_show_side(fmkr, p, &axis, ierr);
- done:
-   return fmkr;
 }
 
 
-OBJ_PTR c_no_title(OBJ_PTR fmkr, FM *p, int *ierr)
+void c_no_title(OBJ_PTR fmkr, FM *p, int *ierr)
 {
    p->title_visible = false;
-   return fmkr;
 }
 
-OBJ_PTR c_no_xlabel(OBJ_PTR fmkr, FM *p, int *ierr)
+void c_no_xlabel(OBJ_PTR fmkr, FM *p, int *ierr)
 {
    p->xlabel_visible = false;
-   return fmkr;
 }
 
-OBJ_PTR c_no_ylabel(OBJ_PTR fmkr, FM *p, int *ierr)
+void c_no_ylabel(OBJ_PTR fmkr, FM *p, int *ierr)
 {
    p->ylabel_visible = false;
-   return fmkr;
 }
 
-OBJ_PTR c_no_xaxis(OBJ_PTR fmkr, FM *p, int *ierr)
+void c_no_xaxis(OBJ_PTR fmkr, FM *p, int *ierr)
 {
    p->xaxis_visible = false;
-   return fmkr;
 }
 
-OBJ_PTR c_no_yaxis(OBJ_PTR fmkr, FM *p, int *ierr)
+void c_no_yaxis(OBJ_PTR fmkr, FM *p, int *ierr)
 {
    p->yaxis_visible = false;
-   return fmkr;
 }
 
-OBJ_PTR c_no_left_edge(OBJ_PTR fmkr, FM *p, int *ierr)
+void c_no_left_edge(OBJ_PTR fmkr, FM *p, int *ierr)
 {
    p->left_edge_visible = false;
-   return fmkr;
 }
 
-OBJ_PTR c_no_right_edge(OBJ_PTR fmkr, FM *p, int *ierr)
+void c_no_right_edge(OBJ_PTR fmkr, FM *p, int *ierr)
 {
    p->right_edge_visible = false;
-   return fmkr;
 }
 
-OBJ_PTR c_no_top_edge(OBJ_PTR fmkr, FM *p, int *ierr)
+void c_no_top_edge(OBJ_PTR fmkr, FM *p, int *ierr)
 {
    p->top_edge_visible = false;
-   return fmkr;
 }
 
-OBJ_PTR c_no_bottom_edge(OBJ_PTR fmkr, FM *p, int *ierr)
+void c_no_bottom_edge(OBJ_PTR fmkr, FM *p, int *ierr)
 {
    p->bottom_edge_visible = false;
-   return fmkr;
 }
 

@@ -841,7 +841,7 @@ class MyFigures
         t.show_image(
             'jpg' => "data/lucy.jpg", 'width' => 148, 'height' => 164,
             'll' => [0.99, 0.01], 'lr' => [0.01, 0.01], 'ul' => [0.99, 0.99])
-        samples = t.create_monochrome_image_data(build_table(0.1, 0.9), 'boundary' => 0.5)
+        samples = t.create_monochrome_image_data(build_table(0.1, 0.9), 'boundary' => 0.5)        
         dict = Hash.new
         dict['interpolate'] = false
         dict['ll'] = [0.1, 0.1]

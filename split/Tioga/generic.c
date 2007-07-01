@@ -40,8 +40,8 @@ void Init_generic(void) {
 bool Is_Kind_of_Integer(OBJ_PTR obj) { return rb_obj_is_kind_of(obj,rb_Integer_class); }
 bool Is_Kind_of_Number(OBJ_PTR obj) { return rb_obj_is_kind_of(obj,rb_Numeric_class); }
 
-OBJ_PTR Call_Function(OBJ_PTR fmkr, ID_PTR fn, OBJ_PTR arg, int *ierr) {
-   return rb_funcall(fmkr, fn, 1, arg);
+void Call_Function(OBJ_PTR fmkr, ID_PTR fn, OBJ_PTR arg, int *ierr) {
+   rb_funcall(fmkr, fn, 1, arg);
 }
 
 double Number_to_double(OBJ_PTR obj, int *ierr) { return NUM2DBL(obj); }
@@ -77,9 +77,9 @@ long Array_Len(OBJ_PTR obj, int *ierr) { return (RARRAY(rb_Array(obj))->len); }
 
 OBJ_PTR Array_Entry(OBJ_PTR obj, long indx, int *ierr) { return rb_ary_entry(obj,indx); }
 
-OBJ_PTR Array_Store(OBJ_PTR obj, long indx, OBJ_PTR val, int *ierr) { rb_ary_store(obj,indx,val); return val; }
+void Array_Store(OBJ_PTR obj, long indx, OBJ_PTR val, int *ierr) { rb_ary_store(obj,indx,val); }
 
-OBJ_PTR Array_Push(OBJ_PTR obj, OBJ_PTR val, int *ierr) { rb_ary_push(obj,val); return val; }
+void Array_Push(OBJ_PTR obj, OBJ_PTR val, int *ierr) { rb_ary_push(obj,val); }
 
 ID_PTR ID_Get(char *name) { return rb_intern(name); }
 
@@ -87,8 +87,7 @@ char *ID_Name(ID_PTR id, int *ierr) { return rb_id2name(id); }
 
 OBJ_PTR Obj_Attr_Get(OBJ_PTR obj, ID_PTR attr_ID, int *ierr) { return rb_ivar_get(obj,attr_ID); }
 
-OBJ_PTR Obj_Attr_Set(OBJ_PTR obj, ID_PTR attr_ID, OBJ_PTR val, int *ierr) {
-      return rb_ivar_set(obj,attr_ID,val); }
+void Obj_Attr_Set(OBJ_PTR obj, ID_PTR attr_ID, OBJ_PTR val, int *ierr) { rb_ivar_set(obj,attr_ID,val); }
       
       
       

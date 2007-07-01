@@ -366,7 +366,7 @@ static void c_rotated_string_at_points(
    fprintf(TF, "ET\n");
 }
 
-OBJ_PTR c_private_show_marker(
+void c_private_show_marker(
    OBJ_PTR fmkr, FM *p, int int_args, OBJ_PTR stroke_width, OBJ_PTR string,
    OBJ_PTR x, OBJ_PTR y, OBJ_PTR x_vec, OBJ_PTR y_vec,
    double h_scale, double v_scale, double scale, double it_angle, double ascent_angle, double angle,
@@ -387,25 +387,25 @@ OBJ_PTR c_private_show_marker(
    if (string == OBJ_NIL) {
       if (c < 0 || c > 255) {
          RAISE_ERROR_i("Sorry: invalid character code (%i) : must be between 0 and 255", c, ierr);
-         RETURN_NIL;
+         return;
       }
       text = buff; text[0] = c;  text[1] = '\0';
       if (stroke_width != OBJ_NIL) {
          double width = Number_to_double(stroke_width, ierr);
-         if (*ierr != 0) RETURN_NIL;
+         if (*ierr != 0) return;
          prev_line_width = p->line_width; // restore it later
          fprintf(TF, "%0.6f w\n", width * ENLARGE);
       }
    } else {
       text = (unsigned char *)(String_Ptr(string,ierr));
-      if (*ierr != 0) RETURN_NIL;
+      if (*ierr != 0) return;
    }
    fprintf(TF, "%d Tr\n", mode);
    if (stroke_color != OBJ_NIL &&
          (mode == STROKE || mode == FILL_AND_STROKE || 
             mode == STROKE_AND_CLIP || mode == FILL_STROKE_AND_CLIP)) {
        Unpack_RGB(stroke_color, &stroke_color_R, &stroke_color_G, &stroke_color_B, ierr);
-       if (*ierr != 0) RETURN_NIL;
+       if (*ierr != 0) return;
        if (stroke_color_R != p->stroke_color_R ||
            stroke_color_G != p->stroke_color_G ||
            stroke_color_B != p->stroke_color_B) {
@@ -414,14 +414,14 @@ OBJ_PTR c_private_show_marker(
           prev_stroke_color_B = p->stroke_color_B;
           restore_stroke_color = true;
           c_stroke_color_set_RGB(fmkr, p, stroke_color_R, stroke_color_G, stroke_color_B, ierr);
-          if (*ierr != 0) RETURN_NIL;
+          if (*ierr != 0) return;
        }
    }
    if (fill_color != OBJ_NIL &&
          (mode == FILL || mode == FILL_AND_STROKE || 
             mode == FILL_AND_CLIP || mode == FILL_STROKE_AND_CLIP)) {
        Unpack_RGB(fill_color, &fill_color_R, &fill_color_G, &fill_color_B, ierr);
-       if (*ierr != 0) RETURN_NIL;
+       if (*ierr != 0) return;
        if (fill_color_R != p->fill_color_R ||
            fill_color_G != p->fill_color_G ||
            fill_color_B != p->fill_color_B) {
@@ -430,22 +430,23 @@ OBJ_PTR c_private_show_marker(
           prev_fill_color_B = p->fill_color_B;
           restore_fill_color = true;
           c_fill_color_set_RGB(fmkr, p, fill_color_R, fill_color_G, fill_color_B, ierr);
-          if (*ierr != 0) RETURN_NIL;
+          if (*ierr != 0) return;
        }
    }
    if (x == OBJ_NIL) {
       long xlen, ylen;
       xs = Vector_Data_for_Read(x_vec, &xlen, ierr);
-      if (*ierr != 0) RETURN_NIL;
+      if (*ierr != 0) return;
       ys = Vector_Data_for_Read(y_vec, &ylen, ierr);
-      if (*ierr != 0) RETURN_NIL;
-      if (xlen != ylen) { RAISE_ERROR("Sorry: must have same number xs and ys for showing markers", ierr); RETURN_NIL; }
-      if (xlen <= 0) return fmkr;
+      if (*ierr != 0) return;
+      if (xlen != ylen) { 
+         RAISE_ERROR("Sorry: must have same number xs and ys for showing markers", ierr); return; }
+      if (xlen <= 0) return;
       n = xlen;
    } else {
       xloc = Number_to_double(x, ierr); xs = &xloc;
       yloc = Number_to_double(y, ierr); ys = &yloc;
-      if (*ierr != 0) RETURN_NIL;
+      if (*ierr != 0) return;
       n = 1;
    }
    c_rotated_string_at_points(fmkr, p, angle, fnt_num, text, scale, n, xs, ys,
@@ -455,6 +456,4 @@ OBJ_PTR c_private_show_marker(
        c_fill_color_set_RGB(fmkr, p, prev_fill_color_R, prev_fill_color_G, prev_fill_color_B, ierr);
    if (restore_stroke_color) 
        c_stroke_color_set_RGB(fmkr, p, prev_stroke_color_R, prev_stroke_color_G, prev_stroke_color_B, ierr);
-   if (*ierr != 0) RETURN_NIL;
-   return fmkr;
 }

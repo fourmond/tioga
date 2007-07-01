@@ -1979,8 +1979,8 @@ class FigureMaker
         begin
             reset_plot_attrs
             reset_legend_info
-            result = private_make(name, cmd)
-            return result
+            private_make(name, cmd)
+            return true
         rescue Exception => er
             report_error(er, "ERROR while executing command: #{cmd}")
         end
