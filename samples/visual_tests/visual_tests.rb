@@ -37,6 +37,7 @@ class MyPlots
         t.def_figure("Arrows") { arrows }
         t.def_figure("Markers") { marker_position }
         t.def_figure("Lines") { lines_position }
+        t.def_figure("Cap") { lines_cap }
 #         t.def_figure("Greens") { greens }
 #         t.def_figure("Log_Reds") { log_reds }
 #         t.def_figure("Side_by_Side") { side_by_side }
@@ -567,6 +568,34 @@ class MyPlots
         t.show_text('at' => [1,7], 
                     'text' => '\parbox{5cm}{Please check that the ' +
                     "symbols are centered on the lines}")
+      end
+    end
+
+    def lines_cap
+      x = Dvector[0,0,1,1]
+      y = Dvector[0,1,1,0]
+      t.show_plot([-1,4,4,-1]) do
+
+        t.line_width = 3
+        t.line_cap = LINE_CAP_BUTT
+        t.append_points_to_path(x, y)
+
+        x.add!(2)
+        t.move_to_point(2,0)
+        x.shift
+        y.shift
+
+        t.stroke_color = Red
+        t.append_points_to_path(x, y)
+        t.stroke
+
+        t.line_width = 0.1
+        t.stroke_color = Green
+        t.show_polyline([-1,4], [0,0])
+
+        t.show_text('at' => [1,3], 
+                    'text' => '\parbox{5cm}{Please check that the ' +
+                    "red lines don't cross the green one}")
       end
     end
     
