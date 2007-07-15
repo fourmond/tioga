@@ -351,7 +351,7 @@ static void c_rotated_string_at_points(
       if (b == 0 && c == 0 && a == 1 && d == 1) {
          fprintf(TF, "%i %i Td (", idx, idy);
       } else { // need high precision when doing rotations
-         fprintf(TF, "%0.6f %0.6f %0.6f %0.6f %0.6f %0.6f Tm (", a, b, c, d, dx, dy);
+         fprintf(TF, "%0.6f %0.6f %0.6f %0.6f %0.6f %0.6f Tm (", a, b, c, d, x, y);
       }
       while ((char_code = *cp++) != '\0') {
          if (char_code == '\\')
