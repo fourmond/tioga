@@ -38,6 +38,8 @@ class MyPlots
         t.def_figure("Blues") { blues }
         t.def_figure("Reds") { reds }
         t.def_figure("Greens") { greens }
+        t.def_figure("Blues_axes_1") { blues_axes_1 }
+        t.def_figure("Blues_axes_2") { blues_axes_2 }
         t.def_figure("Log_Reds") { log_reds }
         t.def_figure("Side_by_Side") { side_by_side }
         t.def_figure("Two_Ys") { two_yaxes }
@@ -149,6 +151,36 @@ EOD
         ys = @blues
         t.show_plot(plot_boundaries(xs,ys,@margin,-1,1)) { 
             t.show_polyline(xs,ys,Blue) }
+    end
+
+    def blues_axes_1
+      read_data
+      t.title_color = Crimson
+      t.do_box_labels('Blues Plot --- without top and right', 
+                      'Position', '\textcolor[rgb]{0,0,1}{Blues}')
+      show_model_number
+      xs = @positions
+      ys = @blues
+      t.top_edge_visible = false
+      t.right_edge_visible = false
+      t.show_plot(plot_boundaries(xs,ys,@margin,-1,1)) { 
+        t.show_polyline(xs,ys,Blue) }
+    end
+
+    def blues_axes_2
+      read_data
+      t.title_color = Crimson
+      t.do_box_labels('Blues Plot', 
+                      'Position', '\textcolor[rgb]{0,0,1}{Blues}')
+      show_model_number
+      xs = @positions
+      ys = @blues
+      t.top_edge_visible = false
+      t.right_edge_visible = false
+      t.bottom_edge_visible = false
+      t.xaxis_loc = AT_Y_ORIGIN
+      t.show_plot(plot_boundaries(xs,ys,@margin,-1,1)) { 
+        t.show_polyline(xs,ys,Blue) }
     end
     
     def blues_reversed_axes # reverse both axes
