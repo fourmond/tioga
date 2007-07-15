@@ -44,6 +44,7 @@ class MyPlots
         t.def_figure("Side_by_Side") { side_by_side }
         t.def_figure("Two_Ys") { two_yaxes }
         t.def_figure("Legends") { legends }
+        t.def_figure("Two_Ys_with_Legends") { two_yaxes_with_legends }
         t.def_figure("Reds_and_Blues") { reds_blues }
         t.def_figure("Legend_Inside") { legend_inside }
         t.def_figure("Legend_Outside") { legend_outside }
@@ -280,6 +281,32 @@ EOD
             t.yaxis_loc = t.ylabel_side = RIGHT;
             t.left_edge_type = AXIS_HIDDEN; greens }
         show_model_number
+    end
+
+
+    def two_yaxes_with_legends
+      read_data
+      t.do_box_labels('Same X, Different Y\'s', 'Position', nil)
+      t.show_plot_with_legend('legend_left_margin' => 0.65,
+                              'plot_scale' => 1,
+                              'legend_scale' => 1.3,
+                              'plot_right_margin' => 0) { 
+        t.subplot {
+          t.yaxis_loc = t.ylabel_side = LEFT;
+          t.right_edge_type = AXIS_HIDDEN; 
+          t.show_plot(plot_boundaries(@positions,@blues,@margin,-1,1)) {
+            t.show_polyline(@positions,@blues,Blue,'Blues')
+          }
+        }
+        t.subplot {
+          t.yaxis_loc = t.ylabel_side = RIGHT;
+          t.left_edge_type = AXIS_HIDDEN; 
+          t.show_plot(plot_boundaries(@positions,@reds,@margin,-1,1)) {
+            t.show_polyline(@positions,@reds,Red,'Reds')
+          }
+        }
+      }
+      show_model_number
     end
     
     def legend_inside
