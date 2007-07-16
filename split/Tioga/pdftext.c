@@ -237,10 +237,10 @@ static void GetStringInfo(FM *p, int font_number, unsigned char *text, double ft
    }
    urx = llx + width;
    *width_ptr = width * ft_ht * 1e-3;
-   *llx_ptr = llx * ft_ht * 1e-3;
-   *lly_ptr = lly * ft_ht * 1e-3;
-   *urx_ptr = urx * ft_ht * 1e-3;
-   *ury_ptr = ury * ft_ht * 1e-3;
+   *llx_ptr = ft_ht * 1e-3 * llx;
+   *lly_ptr = ft_ht * 1e-3 * lly;
+   *ury_ptr = ft_ht * 1e-3 * ury;
+   *urx_ptr = ft_ht * 1e-3 * (urx-70.0); // adjust for extra white space on right
 }
 
 OBJ_PTR c_marker_string_info(OBJ_PTR fmkr, FM *p, int fnt, unsigned char *text, double scale, int *ierr) {
@@ -280,7 +280,6 @@ static void c_rotated_string_at_points(
    double llx, lly, urx, ury, width, shiftx, shifty, tmp;
    double a=horizontal_scaling, b=0.0, c=0.0, d=vertical_scaling; // the initial transform
    GetStringInfo(p, font_number, text, ft_ht, &llx, &lly, &urx, &ury, &width, ierr);
-   urx -= 0.07*ft_ht; // to compensate for extra white space on right when center markers
    if (*ierr != 0) return;
    // translate according to justification and alignment
    // note that we use the bbox to calculate shifts so 'center' means center of bbox

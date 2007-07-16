@@ -559,10 +559,6 @@ class MyPlots
         dy_down = marker_info[2]
         dx_right = marker_info[3]# - 0.115
         dy_up = marker_info[4]
-        puts dx_left 
-        puts dx_right
-        puts dy_down
-        puts dy_up
         t.stroke_line(dx_left,dy_down,dx_left,dy_up)
         t.stroke_line(dx_right,dy_down,dx_right,dy_up)
         t.stroke_line(dx_left,dy_down,dx_right,dy_down)
