@@ -1622,7 +1622,7 @@ class FigureMaker
         it_angle = get_if_given_else_use_default_dict(dict, 'italic_angle', @marker_defaults)
         ascent_angle = get_if_given_else_use_default_dict(dict, 'ascent_angle', @marker_defaults)
         glyph = 0 if glyph == nil
-        int_args = glyph*100000 + font*1000 + mode*100 + align*10 + just
+        int_args = glyph*100000 + font*1000 + mode*100 + align*10 + (just+1) # min value for just is -1 
             # Ruby limits us to 15 args, so pack some small integers together                
         private_show_marker(int_args, stroke_width, string, x, y, xs, ys,
             h_scale, v_scale, scale, it_angle, ascent_angle, angle, fill_color, stroke_color)                

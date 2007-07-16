@@ -38,6 +38,8 @@ class MyPlots
         t.def_figure("Markers") { marker_position }
         t.def_figure("Lines") { lines_position }
         t.def_figure("Cap") { lines_cap }
+        t.def_figure("show_marker_bbox") {show_marker_bbox}
+        t.def_figure("marker_centered") {marker_centered}
 #         t.def_figure("Greens") { greens }
 #         t.def_figure("Log_Reds") { log_reds }
 #         t.def_figure("Side_by_Side") { side_by_side }
@@ -517,16 +519,68 @@ class MyPlots
                     "symbols are centered on the lines}")
       end
     end
+    
+    
+    def marker_centered
+      
+      t.show_plot([-1,1,1,-1]) do
+        angle = 90
+        scale = 20
+        mrkstr = "\251" # Diamond
+        marker_info = t.marker_string_info(ZapfDingbats, mrkstr, scale)
+        t.show_marker('x' => 0.0, 'y' => 0.0, 
+                      'font' => ZapfDingbats,'string' => mrkstr, "scale" => scale, 'angle' => angle,
+                      'color' => Green)
+        t.stroke_width = 0.1
+        t.stroke_line(0,-1,0,1)
+        t.stroke_line(-1,0,1,0)
+      end
+
+    end
+    
+    
+    def show_marker_bbox
+      
+      t.show_plot([-0.2,1.7,1.3,-0.2]) do
+        angle = 0
+        scale = 20
+        mrkstr = "\251" # Diamond
+        mrkstr = "\250" # Club
+        mrkstr = "\252" # Heart
+        mrkstr = "\072" # Cross
+        mrkstr = "\053"
+        marker_info = t.marker_string_info(ZapfDingbats, mrkstr, scale)
+        t.show_marker('x' => 0.0, 'y' => 0.0, 
+                      'justification' => LEFT, 'alignment' => ALIGNED_AT_BASELINE,
+                      'font' => ZapfDingbats,'string' => mrkstr, "scale" => scale, 'angle' => angle,
+                      'color' => Green)
+        t.stroke_color = Crimson
+        dx_left = marker_info[1]
+        dy_down = marker_info[2]
+        dx_right = marker_info[3]# - 0.115
+        dy_up = marker_info[4]
+        puts dx_left 
+        puts dx_right
+        puts dy_down
+        puts dy_up
+        t.stroke_line(dx_left,dy_down,dx_left,dy_up)
+        t.stroke_line(dx_right,dy_down,dx_right,dy_up)
+        t.stroke_line(dx_left,dy_down,dx_right,dy_down)
+        t.stroke_line(dx_left,dy_up,dx_right,dy_up)
+      end
+    
+    end
 
     def lines_position
       x = Dvector[0,1,2,3,4]
       y = Dvector[0,1,2,3,4]
       #t.do_box_labels("Arrows tests", "Position", "Blues")
       t.show_plot([-1,5,8,-1]) do
-        marker = Circle
+        marker = Diamond
+        angle = 0
         scale = 1
         t.show_marker('Xs' => x, 'Ys' => y,
-                      'marker' => marker, "scale" => scale,
+                      'marker' => marker, "scale" => scale, 'angle' => angle,
                       'color' => Green)
 
 
@@ -538,7 +592,7 @@ class MyPlots
 
         y.add!(1)
         t.show_marker('Xs' => x, 'Ys' => y,
-                      'marker' => marker, "scale" => 0.2,
+                      'marker' => marker, "scale" => 0.2, 'angle' => angle,
                       'color' => Green)
 
         t.line_width = 0.2
@@ -550,7 +604,7 @@ class MyPlots
         y.reverse!
         x.reverse!
         t.show_marker('Xs' => x, 'Ys' => y,
-                      'marker' => marker, "scale" => scale,
+                      'marker' => marker, "scale" => scale, 'angle' => angle,
                       'color' => Green)
 
         t.line_width = 3

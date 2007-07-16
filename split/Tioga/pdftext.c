@@ -261,6 +261,7 @@ OBJ_PTR c_marker_string_info(OBJ_PTR fmkr, FM *p, int fnt, unsigned char *text, 
    Array_Store(result, 2, Float_New(lly), ierr);
    Array_Store(result, 3, Float_New(urx), ierr);
    Array_Store(result, 4, Float_New(ury), ierr);
+   
    return result; 
 }
 
@@ -268,17 +269,18 @@ OBJ_PTR c_marker_string_info(OBJ_PTR fmkr, FM *p, int fnt, unsigned char *text, 
 
 static void c_rotated_string_at_points(
    OBJ_PTR fmkr, FM *p, double rotation, int font_number, unsigned char *text, double scale,
-   int n, double *xs, double *ys, int alignment, int justification, 
+   int n, double *xs, double *ys, int alignment, int just, 
    double horizontal_scaling, double vertical_scaling,
    double italic_angle, double ascent_angle, int *ierr)
 {
    double ft_ht = p->default_text_scale * scale * p->default_font_size * ENLARGE;
-   int i, ft_height = ROUND(ft_ht);
+   int i, ft_height = ROUND(ft_ht), justification = just-1;
    ft_ht = ft_height;
    if (constructing_path) { RAISE_ERROR("Sorry: must not be constructing a path when show marker", ierr); return; }
    double llx, lly, urx, ury, width, shiftx, shifty, tmp;
    double a=horizontal_scaling, b=0.0, c=0.0, d=vertical_scaling; // the initial transform
    GetStringInfo(p, font_number, text, ft_ht, &llx, &lly, &urx, &ury, &width, ierr);
+   urx -= 0.07*ft_ht; // to compensate for extra white space on right when center markers
    if (*ierr != 0) return;
    // translate according to justification and alignment
    // note that we use the bbox to calculate shifts so 'center' means center of bbox
@@ -346,10 +348,12 @@ static void c_rotated_string_at_points(
       update_bbox(p,x+llx2, y+ury2);
       update_bbox(p,x+urx2, y+lly2);
       dx = x - prev_x; dy = y - prev_y;
-      idx = ROUND(dx); idy = ROUND(dy);
-      prev_x = prev_x + idx; prev_y = prev_y + idy;
+      //idx = ROUND(dx); idy = ROUND(dy);
+      //prev_x = prev_x + idx; prev_y = prev_y + idy;
+      prev_x = prev_x + dx; prev_y = prev_y + dy;
       if (b == 0 && c == 0 && a == 1 && d == 1) {
-         fprintf(TF, "%i %i Td (", idx, idy);
+         //fprintf(TF, "%i %i Td (", idx, idy);
+         fprintf(TF, "%0.6f %0.6f Td (", dx, dy);
       } else { // need high precision when doing rotations
          fprintf(TF, "%0.6f %0.6f %0.6f %0.6f %0.6f %0.6f Tm (", a, b, c, d, x, y);
       }

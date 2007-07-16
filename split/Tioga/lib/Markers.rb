@@ -110,7 +110,7 @@ link:images/Marker_Shadow_Effect.png
     def show_marker(dict)
     end
 
-# Returns an array with [_width_, <i>dx_left</i>, <i>dx_right</i>, <i>dy_down</i>, <i>dy_up</i>] given in
+# Returns an array with [_width_, <i>dx_left</i>, <i>dy_down</i>, <i>dx_right</i>, <i>dy_up</i>] given in
 # figure coordinates.  The first is the width in figure x coordinates, the remainder is the bounding box
 # relative to the reference point for showing the string.
    def marker_string_info(font_number, string, scale)
