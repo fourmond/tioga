@@ -4314,6 +4314,49 @@ VALUE dvector_div_bang(VALUE ary, VALUE arg) {
    return dvector_apply_math_op2_bang(ary, arg, do_div);
 }
 
+static char *fill_read_buffer(char **buff_ptr, int *len_ptr, FILE *file) {
+   char *buff, *new_buff;
+   buff = *buff_ptr;
+   int len, i, max_tries, line_len;
+   long filepos = ftell(file);
+   if (filepos == -1) {
+      printf("ftell failed\n");
+      return NULL;
+   }
+   max_tries = 10;
+   for (i = 0; i < max_tries; i++) {
+      len = *len_ptr;
+      buff[len-1] = '1'; // mark the last character position
+      buff = fgets(buff, len, file);
+      if (buff == NULL) return NULL; // end of file
+      if (buff[len-1] != '\0') {
+         if (0) {
+            line_len = strlen(buff);
+            printf("len %i line_len %i\n", len, line_len);
+            if (line_len < 80) {
+               printf("line buff contains: %s\n", buff);
+            } else {
+               printf("line buff ends with: %s\n", buff+line_len-80);
+            }
+         }
+         return buff;
+      }
+      // ran out of room -- make buffer larger and try again
+      len = 10*len + 100;
+      //printf("fill_read_buffer ran out of room -- increase buffer len to %i and try again\n", len);
+      *len_ptr = len;
+      new_buff = (char *)realloc(buff, len);
+      if (new_buff == NULL) break;
+      buff = new_buff;
+      *buff_ptr = buff;
+      if (fseek(file, filepos, SEEK_SET) != 0) {
+         printf("fseek failed\n");
+         return NULL;
+      }
+   }
+   return NULL;
+}
+
 PRIVATE
 /*======================================================================*/ 
 VALUE Read_Dvectors(char *filename, VALUE destinations, int first_row_of_file, int number_of_rows) {
@@ -4322,8 +4365,8 @@ VALUE Read_Dvectors(char *filename, VALUE destinations, int first_row_of_file, i
    Dvector *d;
    double v;
    int last_row_of_file;
-   const int buff_len = 10000;
-   char buff[buff_len], *num_str, *pend, c, *cptr;
+   int buff_len = 100;
+   char *buff, *num_str, *pend, c, *cptr;
    int num_cols = 0, i, row, col, buff_loc, skip = first_row_of_file - 1;
    last_row_of_file = (number_of_rows == -1)? -1 : first_row_of_file + number_of_rows - 1;
    if ((last_row_of_file != -1 && last_row_of_file < first_row_of_file) || filename == NULL) return false;
@@ -4348,15 +4391,21 @@ VALUE Read_Dvectors(char *filename, VALUE destinations, int first_row_of_file, i
    if ((file=fopen(filename,"r")) == NULL) {
       rb_raise(rb_eArgError, "ERROR: read cannot open %s", filename);
    }
+   buff = (char *)malloc(buff_len);
+   if (buff == NULL) {
+      fclose(file);
+      rb_raise(rb_eArgError, "ERROR: allocation of read buffer failed");
+   }
    for (i = 0; i < skip; i++) { /* skip over initial lines */
-      if (fgets(buff, buff_len, file)==NULL) {
+      if (fill_read_buffer(&buff, &buff_len, file)==NULL) {
          fclose(file);
+         free(buff);
          rb_raise(rb_eArgError, "ERROR: read reached end of file before reaching line %i in %s",
             first_row_of_file, filename);
       }
    }
    for (row = 0, i = first_row_of_file; last_row_of_file == -1 || i <= last_row_of_file; row++, i++) {
-      if (fgets(buff, buff_len, file)==NULL) break; /* have reached end of file */
+      if (fill_read_buffer(&buff, &buff_len, file)==NULL) break; /* have reached end of file */
       if (destinations == Qnil) { /* create destinations */
          buff_loc = 0;
          while (true) {
@@ -4379,12 +4428,14 @@ VALUE Read_Dvectors(char *filename, VALUE destinations, int first_row_of_file, i
          while (isspace(buff[buff_loc])) buff_loc++; /* skip leading blanks */
          if (buff[buff_loc] == '\0') {
             fclose(file);
+            free(buff);
             rb_raise(rb_eArgError, "read reached end of line looking for column %i in line %i of %s", col+1, i, filename);
          }
          num_str = buff+buff_loc;
          while (isgraph(buff[buff_loc])) buff_loc++; /* include non-blanks */
          if (buff[buff_loc] == '\0') {
             fclose(file);
+            free(buff);
             rb_raise(rb_eArgError, "ERROR: read reached end of line looking for column %i in line %i of %s", col+1, i, filename);
          }
          col_obj = cols_ptr[col];
@@ -4403,6 +4454,7 @@ VALUE Read_Dvectors(char *filename, VALUE destinations, int first_row_of_file, i
                 v = strtod(num_str,&pend); *cptr = c; buff_loc = pend - buff;
             } else {
                 fclose(file);
+                free(buff);
                 pend[0] = 0;
                 rb_raise(rb_eArgError, "ERROR: unreadable value in file %s in line %i: %s", filename, i , buff+buff_loc);
             }
@@ -4411,6 +4463,7 @@ VALUE Read_Dvectors(char *filename, VALUE destinations, int first_row_of_file, i
          
          if (!is_okay_number(v)) {
             fclose(file);
+            free(buff);
             rb_raise(rb_eArgError, "ERROR: bad value %g in line %i of %s -- %s", v, i, filename, num_str);
          }
          if (row >= d->capa) 
@@ -4423,6 +4476,7 @@ VALUE Read_Dvectors(char *filename, VALUE destinations, int first_row_of_file, i
       }
    }
    fclose(file);
+   free(buff);
    return destinations;
 }
 
@@ -4460,8 +4514,8 @@ VALUE Read_Rows_of_Dvectors(char *filename, VALUE destinations, int first_row_of
    VALUE row_obj, rows_obj, *rows_ptr = NULL;
    Dvector *d;
    double v, *row_data;
-   const int buff_len = 10000;
-   char buff[buff_len], *num_str, *pend, c, *cptr;
+   int buff_len = 1000;
+   char *buff, *num_str, *pend, c, *cptr;
    int num_rows = 0, i, row, col, buff_loc, c_loc, skip = first_row_of_file - 1;
    rows_obj = rb_Array(destinations);
    num_rows = RARRAY(rows_obj)->len;
@@ -4482,16 +4536,23 @@ VALUE Read_Rows_of_Dvectors(char *filename, VALUE destinations, int first_row_of
    if ((file=fopen(filename,"r")) == NULL) {
       rb_raise(rb_eArgError, "ERROR: read_rows cannot open %s", filename);
    }
+   buff = (char *)malloc(buff_len);
+   if (buff == NULL) {
+      fclose(file);
+      rb_raise(rb_eArgError, "ERROR: allocation of read buffer failed");
+   }
    for (i = 0; i < skip; i++) { /* skip over initial lines */
-      if (fgets(buff, buff_len, file)==NULL) {
+      if (fill_read_buffer(&buff, &buff_len, file)==NULL) {
          fclose(file);
+         free(buff);
          rb_raise(rb_eArgError, "ERROR: read_rows reached end of file before reaching line %i in %s",
             first_row_of_file, filename);
       }
    }
    for (row = 0, i = first_row_of_file; row < num_rows; row++, i++) {
-      if (fgets(buff, buff_len, file)==NULL) {
+      if (fill_read_buffer(&buff, &buff_len, file)==NULL) {
          fclose(file);
+         free(buff);
          rb_raise(rb_eArgError, "ERROR: read_rows reached end of file at line %i in %s", i, filename);
       }
       row_obj = rows_ptr[row];
@@ -4522,6 +4583,7 @@ VALUE Read_Rows_of_Dvectors(char *filename, VALUE destinations, int first_row_of
 
          if (!is_okay_number(v)) {
             fclose(file);
+            free(buff);
             rb_raise(rb_eArgError, "ERROR: bad value %g in line i% of file %s", v, i, filename);
          }
          if (col < d->capa) { row_data[col] = v; d->len = col+1; }
@@ -4537,6 +4599,7 @@ VALUE Read_Rows_of_Dvectors(char *filename, VALUE destinations, int first_row_of
       }
    }
    fclose(file);
+   free(buff);
    return destinations;
 }
 
@@ -4562,11 +4625,12 @@ VALUE dvector_read_rows(int argc, VALUE *argv, VALUE klass) {
    return Read_Rows_of_Dvectors(StringValueCStr(argv[0]),argv[1],arg3);
    klass = Qnil;
 }
+
 PRIVATE 
 VALUE Read_Row(char *filename, int row, VALUE row_ary) {
    FILE *file = NULL;
-   const int buff_len = 10000;
-   char buff[buff_len], *num_str, *pend, c, *cptr;
+   int buff_len = 1000;
+   char *buff, *num_str, *pend, c, *cptr;
    int i, col, buff_loc;
    double v;
    if (row <= 0) {
@@ -4575,9 +4639,15 @@ VALUE Read_Row(char *filename, int row, VALUE row_ary) {
    if (filename == NULL || (file=fopen(filename,"r")) == NULL) {
       rb_raise(rb_eArgError, "ERROR: read_row cannot open %s", filename);
    }
+   buff = (char *)malloc(buff_len);
+   if (buff == NULL) {
+      fclose(file);
+      rb_raise(rb_eArgError, "ERROR: allocation of read buffer failed");
+   }
    for (i = 0; i < row; i++) { /* read lines until reach desired row */
-      if (fgets(buff, buff_len, file)==NULL) {
+      if (fill_read_buffer(&buff, &buff_len, file)==NULL) {
          fclose(file);
+         free(buff);
          rb_raise(rb_eArgError, "ERROR: read_row reached end of file before reaching line %i in %s",
             row, filename);
       }
@@ -4586,6 +4656,7 @@ VALUE Read_Row(char *filename, int row, VALUE row_ary) {
    else if (is_a_dvector(row_ary)) dvector_clear(row_ary);
    else {
       fclose(file);
+      free(buff);
       rb_raise(rb_eArgError, "ERROR: destination for read_row must be a Dvector");
    }
    buff_loc = 0;
@@ -4607,6 +4678,7 @@ VALUE Read_Row(char *filename, int row, VALUE row_ary) {
                 v = strtod(num_str,&pend); *cptr = c; buff_loc = pend - buff;
             } else {
                 fclose(file);
+                free(buff);
                 pend[0] = 0;
                 rb_raise(rb_eArgError, "ERROR: unreadable value in file %s in line %i: %s", filename, i , buff+buff_loc);
             }
@@ -4615,11 +4687,13 @@ VALUE Read_Row(char *filename, int row, VALUE row_ary) {
 
       if (!is_okay_number(v)) {
          fclose(file);
+         free(buff);
          rb_raise(rb_eArgError, "ERROR: bad value %g in line %i of file %s", v, i, filename);
       }
       Dvector_Store_Double(row_ary, col, v);
    }
    fclose(file);
+   free(buff);
    return row_ary;
 }
 
