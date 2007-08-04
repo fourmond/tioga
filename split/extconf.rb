@@ -102,6 +102,8 @@ else
   puts "Skipping MacOS-specific files"
 end
 
+# Adding the Tioga directory to search for include files
+add_include_path 'Tioga'
 
 write_makefile
 
