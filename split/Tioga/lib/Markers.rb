@@ -28,7 +28,7 @@ Computer Modern fonts which are likely to be around since they come with TeX.  T
 in the FigureConstants module.  Any character (or string of characters) from any of these fonts can be used as a marker.
 
 Because markers are sent to PDF rather than TeX, they are limited typographically but powerful graphically.
-In addition to specifying color, scale, and rotatation, as you can for TeX text, you can also stretch
+In addition to specifying color, scale, and rotation, as you can for TeX text, you can also stretch
 the characters either along the baseline ('horizontal_scale') or perpendicular to it ('vertical_scale').
 You can slant the individual characters ('italic_angle') or shift the baseline along the text ('ascent_angle').
 Finally, you can specify the 'rendering_mode' for the marker to be any combination of #fill, #stroke, and #clip.
