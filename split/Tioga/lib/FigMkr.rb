@@ -1209,11 +1209,15 @@ class FigureMaker
         dx = dict['dx']
         dx_plus = get_if_given_else_default(dict, 'dx_plus', dx)
         dx_minus = get_if_given_else_default(dict, 'dx_minus', dx)
+        dx_plus = 0 if dx_plus == nil
+        dx_minus = 0 if dx_minus == nil
         dy = dict['dy']
         dy_plus = get_if_given_else_default(dict, 'dy_plus', dy)
         dy_minus = get_if_given_else_default(dict, 'dy_minus', dy)
-        if (dx_plus == nil || dx_minus == nil || dy_plus == nil || dy_minus == nil)
-            raise "Sorry: Must give both 'dx' and 'dy' error ranges for show_error_bar."
+        dy_plus = 0 if dy_plus == nil
+        dy_minus = 0 if dy_minus == nil
+        if (dx_plus == 0 && dy_minus == 0)
+            raise "Sorry: Must give either or both 'dx' and 'dy' error ranges for show_error_bar."
         end
         end_cap = get_if_given_else_default(dict, 'end_cap', 0.15) # end_cap length in default text heights
         x_end_cap = end_cap * self.default_text_height_dy

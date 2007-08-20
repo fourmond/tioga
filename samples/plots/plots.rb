@@ -61,6 +61,8 @@ class MyPlots
         t.def_figure("Blues_reversed_axes") { blues_reversed_axes }
         t.def_figure("Labels") { labels }
         t.def_figure("Error_Bars") { error_bars }
+        t.def_figure("Error_Bars_X") { error_bars_x }
+        t.def_figure("Error_Bars_Y") { error_bars_y }
         t.def_figure("Error_Bars2") { error_bars2 }
         t.def_figure("Arrows") { arrows }
         t.def_figure("Special_Y") { special_y }
@@ -600,6 +602,24 @@ EOD
                 'dx' => 0.2, 'dy' => 0.12)
             t.show_error_bars('x' => xs[@pt1], 'y' => ys[@pt1],
                 'dx' => 0.23, 'dy' => 0.15, 'color' => Crimson)
+        end
+    end
+    
+    def error_bars_y
+        xs = @positions
+        ys = @blues
+        do_labels_plot("Error Bars on Points") do
+            t.show_error_bars('x' => xs[@pt2], 'y' => ys[@pt2], 'dy' => 0.12)
+            t.show_error_bars('x' => xs[@pt1], 'y' => ys[@pt1], 'dy' => 0.15, 'color' => Crimson)
+        end
+    end
+    
+    def error_bars_x
+        xs = @positions
+        ys = @blues
+        do_labels_plot("Error Bars on Points") do
+            t.show_error_bars('x' => xs[@pt2], 'y' => ys[@pt2], 'dx' => 0.2)
+            t.show_error_bars('x' => xs[@pt1], 'y' => ys[@pt1], 'dx' => 0.23, 'color' => Crimson)
         end
     end
     
