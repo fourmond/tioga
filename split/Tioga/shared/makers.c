@@ -1,6 +1,7 @@
 /* makers.c */
 /*
    Copyright (C) 2005  Bill Paxton
+   Copyright (C) 2007  Taro Sato
 
    This file is part of Tioga.
 
@@ -84,7 +85,7 @@ OBJ_PTR c_private_make_spline_interpolated_points(OBJ_PTR fmkr, FM *p,
    long xlen;
    double start=0, end=0, *Ys;
    double *Xs = Vector_Data_for_Read(Xvec, &xlen, ierr);
-      if (*ierr != 0) return;
+      if (*ierr != 0) RETURN_NIL;
    OBJ_PTR Yvec;
    
    if (start_clamped) start = Number_to_double(start_slope, ierr);
@@ -97,13 +98,13 @@ OBJ_PTR c_private_make_spline_interpolated_points(OBJ_PTR fmkr, FM *p,
    double *As, *Bs, *Cs, *Ds;
    long xdlen, ydlen;
    double *X_data = Vector_Data_for_Read(Xvec_data, &xdlen, ierr);
-      if (*ierr != 0) return;
+      if (*ierr != 0) RETURN_NIL;
    double *Y_data = Vector_Data_for_Read(Yvec_data, &ydlen, ierr);
-      if (*ierr != 0) return;
+      if (*ierr != 0) RETURN_NIL;
    if (Xs == NULL || Ys == NULL || X_data == NULL || Y_data == NULL || xdlen != ydlen) {
       RAISE_ERROR("Sorry: bad args",ierr); RETURN_NIL;
    }
-   if (xlen == 0) return;
+   if (xlen == 0) RETURN_NIL;
    n_pts_data = xdlen;
    As = Y_data;
    Bs = ALLOC_N_double(n_pts_data);
@@ -119,86 +120,133 @@ OBJ_PTR c_private_make_spline_interpolated_points(OBJ_PTR fmkr, FM *p,
    return Yvec;
    }
 
-static void c_make_steps(FM *p, 
-         long *xsteps_len_ptr, double **Xs_ptr, 
-         long *ysteps_len_ptr, double **Ys_ptr, 
-         OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
-         double xfirst, double yfirst, double xlast, double ylast, int *ierr){
-      double xnext, xprev, x;
-      int n_pts_to_add;
-      int i, j, n, old_length, new_length;
-      long xlen, ylen, xdlen, ydlen;
-      double *Xs, *Ys;
-      double *X_data = Vector_Data_for_Read(Xvec_data, &xdlen, ierr);
-      if (*ierr != 0) return;
-      double *Y_data = Vector_Data_for_Read(Yvec_data, &ydlen, ierr);
-      if (*ierr != 0) return;
-      if (Xs == NULL || Ys == NULL || X_data == NULL || Y_data == NULL
-            || xdlen != ydlen || xlen != ylen) {
-         RAISE_ERROR("Sorry: bad args for make_steps", ierr);
-         return;
-      }
-      xlen = 0; ylen = 0; // original code was written to append to vectors with lengths > 0
-      n = xdlen;
-      n_pts_to_add = 2*(n+1);
-      old_length = xlen;
-      new_length = old_length + n_pts_to_add;
-      
-      *xsteps_len_ptr = new_length;
-      Xs = ALLOC_N_double(new_length);
-      *Xs_ptr = Xs;
 
-      *ysteps_len_ptr = new_length;
-      Ys = ALLOC_N_double(new_length);
-      *Ys_ptr = Ys;
-      
-      for (i = 0, j = 0; i <= n; i++, j += 2) {
-         xprev = (i==0)? xfirst : X_data[i-1];
-         xnext = (i==n)? xlast : X_data[i];
-         x = 0.5*(xprev + xnext);
-         Xs[j+old_length] = Xs[j+1+old_length] = x;
-         }
-      Ys[0] = yfirst;
-      for (i = 0, j = 1; i < n; i++, j += 2) {
-         Ys[j+old_length] = Ys[j+1+old_length] = Y_data[i];
-         }
-      Ys[n_pts_to_add-1+old_length] = ylast;
-
-      USE_P
-      }
-      
-OBJ_PTR c_private_make_steps(OBJ_PTR fmkr, FM *p, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
-        double xfirst, double yfirst, double xlast, double ylast, int *ierr) {
-        /* adds n_pts_to_add points to Xs and Ys for steps with the given parameters.
-            X_data and Y_data are arrays of n values where n_pts_to_add = 2*(n+1)
-            (xfirst,yfirst) and (xlast,ylast) are extra data points to fix the first and last steps.
-        The X_data plus xfirst and xlast determine the widths of the steps.
-        The Y_data plus yfirst and ylast determine the height of the steps.
-        The steps occur at locations midway between the given x locations. */
-      OBJ_PTR Xvec;
-      OBJ_PTR Yvec;
-      OBJ_PTR dest_xs;
-      OBJ_PTR dest_ys;
-      OBJ_PTR pts_array;
-      long xsteps_len, ysteps_len;
-      double *xsteps_data, *ysteps_data;
-      
-      c_make_steps(p, &xsteps_len, &xsteps_data, &ysteps_len, &ysteps_data, Xvec_data, Yvec_data,
-         xfirst, yfirst, xlast, ylast, ierr);
-      if (*ierr != 0) RETURN_NIL;
-
-      Xvec = Vector_New(xsteps_len, xsteps_data);
-      Yvec = Vector_New(ysteps_len, ysteps_data);
-      free(xsteps_data);
-      free(ysteps_data);
-      
-      pts_array = Array_New(2);
-      Array_Store(pts_array,0,Xvec,ierr);
-      if (*ierr != 0) RETURN_NIL;
-      Array_Store(pts_array,1,Yvec,ierr);
-      if (*ierr != 0) RETURN_NIL;
-      return pts_array;
+/*
+ * Make points xs and ys to define a step function.  x_data and y_data
+ * are arrays from which the step functions are generated.  (xfirst,
+ * yfirst) and (xlast, ylast) are extra data points to fix the first
+ * and last steps.  The x_data plus xfirst and xlast determine the
+ * widths of the steps.  The y_data plus yfirst and ylast determine
+ * the height of the steps.  For CENTERED justification, the steps
+ * occur at locations midway between the given x locations.  For
+ * LEFT_JUSTIFIED, (x_data[i], y_data[i]) and (x_data[i], y_data[i+1])
+ * specifies where steps occurs.  For RIGHT_JUSTIFIED, (x_data[i],
+ * y_data[i]) and (x_data[i], y_data[i-1]) specifies where steps
+ * occurs.
+ *
+ * Aug 24, 2007:
+ *
+ *   TS added 'justification' to control the justification of steps.
+ *   The use of [xy]first and [xy]last might need improvement.
+ */
+static void
+c_make_steps(FM *p,
+             long *xsteps_len_ptr, double **xs_ptr, 
+             long *ysteps_len_ptr, double **ys_ptr, 
+             OBJ_PTR xvec_data, OBJ_PTR yvec_data,
+             double xfirst, double yfirst, double xlast, double ylast,
+             int justification, int *ierr)
+{
+   double xnext, xprev, x;
+   long i, j, length, xdlen, ydlen;
+   double *xs = NULL, *ys = NULL;
+   double *x_data = Vector_Data_for_Read(xvec_data, &xdlen, ierr);
+   if (*ierr != 0) return;
+   double *y_data = Vector_Data_for_Read(yvec_data, &ydlen, ierr);
+   if (*ierr != 0) return;
+   if (x_data == NULL || y_data == NULL || xdlen != ydlen) {
+      RAISE_ERROR("Sorry: bad args for make_steps", ierr);
+      return;
    }
+
+   // allocate memory for arrays to be returned
+   length = 2 * (xdlen + 1) + ((justification != CENTERED) ? 1 : 0);
+
+   *xsteps_len_ptr = length;
+   xs = ALLOC_N_double(length);
+   *xs_ptr = xs;
+
+   *ysteps_len_ptr = length;
+   ys = ALLOC_N_double(length);
+   *ys_ptr = ys;
+
+   // fill the arrays
+   switch (justification) {
+   case CENTERED:
+      for (i = 0, j = 0; i <= xdlen; ++i, j += 2) {
+         xprev = (i == 0) ? xfirst : x_data[i - 1];
+         xnext = (i == xdlen) ? xlast : x_data[i];
+         x = 0.5 * (xprev + xnext);
+         xs[j] = xs[j + 1] = x;
+      }
+      ys[0] = yfirst;
+      for (i = 0, j = 1; i < xdlen; ++i, j += 2) {
+         ys[j] = ys[j + 1] = y_data[i];
+      }
+      ys[length - 1] = ylast;
+      break;
+   case LEFT_JUSTIFIED:
+      xs[0] = xfirst;
+      for (i = 0, j = 1; i <= xdlen; ++i, j += 2) {
+         xs[j] = xs[j + 1] = (i == xdlen) ? xlast : x_data[i];
+      }
+      ys[0] = ys[1] = yfirst;
+      for (i = 0, j = 2; i < xdlen; ++i, j += 2) {
+         ys[j] = ys[j + 1] = y_data[i];
+      }
+      ys[length - 1] = ylast;
+      break;
+   case RIGHT_JUSTIFIED:
+      for (i = 0, j = 0; i <= xdlen; ++i, j += 2) {
+         xs[j] = xs[j + 1] = (i == 0) ? xfirst : x_data[i - 1];
+      }
+      xs[length - 1] = xlast;
+      ys[0] = yfirst;
+      for (i = 0, j = 1; i <= xdlen; ++i, j += 2) {
+         ys[j] = ys[j + 1] = (i == xdlen) ? ylast : y_data[i];
+      }
+      break;
+   default:
+      RAISE_ERROR_i("Sorry: unsupported justification specified (%d)",
+                    justification, ierr);
+      return;
+   }
+
+   /* TS: I don't understand the use of the macro USE_P here, which
+      translates to p = NULL; For now, I'll comment out. */
+   //USE_P
+}
+
+
+OBJ_PTR
+c_private_make_steps(OBJ_PTR fmkr, FM *p, OBJ_PTR xvec_data, OBJ_PTR yvec_data,
+                     double xfirst, double yfirst, double xlast, double ylast,
+                     int justification, int *ierr)
+{
+   OBJ_PTR xvec;
+   OBJ_PTR yvec;
+   OBJ_PTR pts_array;
+   long xsteps_len = 0, ysteps_len = 0;
+   double *xsteps_data = NULL, *ysteps_data = NULL;
+
+   c_make_steps(p, &xsteps_len, &xsteps_data, &ysteps_len, &ysteps_data,
+                xvec_data, yvec_data, xfirst, yfirst, xlast, ylast,
+                justification, ierr);
+   if (*ierr != 0) RETURN_NIL;
+
+   xvec = Vector_New(xsteps_len, xsteps_data);
+   yvec = Vector_New(ysteps_len, ysteps_data);
+   free(xsteps_data);
+   free(ysteps_data);
+
+   pts_array = Array_New(2);
+   Array_Store(pts_array, 0, xvec, ierr);
+   if (*ierr != 0) RETURN_NIL;
+   Array_Store(pts_array, 1, yvec, ierr);
+   if (*ierr != 0) RETURN_NIL;
+   return pts_array;
+}
+
 
 /*
 CONREC: A Contouring Subroutine
@@ -520,7 +568,7 @@ static int conrec(double **d,
 // globals to this file
 static int      nx_1, ny_1, iGT, jGT, iLE, jLE;
 
-static void     free_space_for_curve();
+static void     free_space_for_curve(void);
 static void     get_space_for_curve(int *ierr);
 static void     draw_the_contour(
             	long *dest_len_ptr,
@@ -556,7 +604,7 @@ static bool     curve_storage_exists = false;
 
 
 static void
-free_space_for_curve()
+free_space_for_curve(void)
 {
 	if (curve_storage_exists) {
 		free(xcurve);
@@ -684,7 +732,7 @@ gr_contour(
             if (*ierr != 0) return;
 			}
 			// space through legit points
-			while (i > 0 && (legit == NULL || legit[i][j] != 0.0 && legit[i][ j - 1] != 0.0))
+			while (i > 0 && (legit == NULL || (legit[i][j] != 0.0 && legit[i][ j - 1] != 0.0)))
 				i--;
 		}
 	}
@@ -705,7 +753,7 @@ gr_contour(
             if (*ierr != 0) return;
 			}
 			// space through legit points
-			while (j > 0 && (legit == NULL || legit[i][j] != 0.0 && legit[i + 1][ j] != 0.0))
+			while (j > 0 && (legit == NULL || (legit[i][j] != 0.0 && legit[i + 1][ j] != 0.0)))
 				j--;
 		}
 	}
@@ -726,7 +774,7 @@ gr_contour(
             if (*ierr != 0) return;
 			}
 			// space through legit points
-			while (i < nx_1 && (legit == NULL || legit[i][j] != 0.0 && legit[i][ j + 1] != 0.0))
+			while (i < nx_1 && (legit == NULL || (legit[i][j] != 0.0 && legit[i][ j + 1] != 0.0)))
 				i++;
 		}
 	}
