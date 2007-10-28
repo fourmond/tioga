@@ -749,7 +749,34 @@ EOT
       cols2 = [Dvector[-1.2, -1.3, -1.2], Dvector[2.4, 2.4, 0.0],
                Dvector[0.0, 3.5, 0.0]]
       assert_equal(cols, cols2)
+    end
 
+    def test_fast_fancy_read 
+      stream = StringIO.new(FANCY_READ_TEXT)
+      cols = Dvector.fast_fancy_read(stream, {
+                                       'sep' => /\s+/,
+                                       'comments' => /^\s*\#/,
+                                       'skip_first' => 0,
+                                       'index_col' => false,
+                                       'remove_space' => true,
+                                       'default'=> 0.0})
+      cols2 = [Dvector[1.2, 1.3, 1.2], Dvector[2.4, 2.4, 0.0],
+               Dvector[0.0, 3.5, 0.0]]
+      3.times do |i|
+        assert_equal(cols[i], cols2[i])
+      end
+
+      stream = StringIO.new(FANCY_READ_TEXT_2)
+      cols = Dvector.fast_fancy_read(stream, {
+                                       'sep' => /\s+/,
+                                       'comments' => /^\s*\#/,
+                                       'skip_first' => 0,
+                                       'index_col' => false,
+                                       'remove_space' => true,
+                                       'default'=> 0.0})
+      cols2 = [Dvector[-1.2, -1.3, -1.2], Dvector[2.4, 2.4, 0.0],
+               Dvector[0.0, 3.5, 0.0]]
+      assert_equal(cols, cols2)
     end
 
     def test_compute_formula

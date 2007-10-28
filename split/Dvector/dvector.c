@@ -5228,6 +5228,122 @@ static VALUE dvector_convolve(VALUE self, VALUE kernel, VALUE middle)
   return retval;
 }
 
+
+/*
+  :call-seq:
+  Dvector.fast_fancy_read(stream, options) => Array_of_Dvectors
+  
+  Reads data from an IO stream and separate it into columns of data
+  according to the _options_, a hash holding the following elements
+  (compulsory, but you can use FANCY_READ_DEFAULTS:
+  * 'sep': a regular expression that separate the entries
+  * 'comments': any line matching this will be skipped
+  * 'skip_first': skips that many lines before reading anything
+  * 'index_col': if true, the first column returned contains the
+    number of the line read
+  * 'remove_space': whether to remove spaces at the beginning of a line
+  * 'default':  what to put when nothing was found but a number must be used
+*/
+static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
+{
+  /* First, we read up options: */
+  double def = rb_num2dbl(rb_hash_aref(options, 
+				       rb_str_new2("default")));
+  int remove_space = RTEST(rb_hash_aref(options, 
+					rb_str_new2("remove_space")));
+  int index_col = RTEST(rb_hash_aref(options, 
+				     rb_str_new2("index_col")));
+  long skip_first = FIX2LONG(rb_hash_aref(options, 
+					  rb_str_new2("skip_first")));
+  VALUE sep = rb_hash_aref(options, rb_str_new2("sep"));
+  VALUE comments = rb_hash_aref(options, rb_str_new2("comments"));
+
+  /* Then, some various variables: */
+  VALUE line;
+  /* The line is not a blank line: */
+  VALUE blank = rb_reg_new("\\S", 2, 0);
+  ID chomp_id = rb_intern("chomp!");
+  ID gets_id = rb_intern("gets");
+  long line_number = 0;
+
+  /* Now come the fun part - rudimentary array management */
+  int nb_vectors = 0;		/* The number of vectors currently created */
+  int current_size = 10;	/* The number of slots available */
+  VALUE * vectors = ALLOC_N(VALUE, current_size);
+  long index = 0;		/* The current index in the vectors */
+
+  /* The return value */
+  VALUE ary;
+
+  /* We use a real gets so we can also rely on StringIO, for instance */
+  while(RTEST(line = rb_funcall(stream, gets_id, 0))) {
+    VALUE pre = Qnil, post, match;
+    int col = 0;
+    line_number++;
+    /* Whether we should skip the line... */
+    if(skip_first >= line_number)
+      continue;
+
+    /* Then we check if it is a blank line... */
+    if(! RTEST(rb_reg_match(blank, line)))
+      continue;
+    /* ... or a comment line */
+    if(RTEST(rb_reg_match(comments, line)))
+      continue;
+
+    /* Then, we remove the newline: */
+    post = line;
+    rb_funcall(post, chomp_id, 0);
+
+    /* We iterate over the different portions between
+       matches
+    */
+    while(RTEST(post)) {
+      const char * a;
+      char * b;
+      if(RTEST(rb_reg_match(sep, post))) {
+	match = rb_gv_get("$~");
+	pre = rb_reg_match_pre(match);
+	post = rb_reg_match_post(match);
+      }
+      else {
+	pre = post;
+	post = Qnil;
+      }
+      a = StringValueCStr(pre);
+      double c = strtod(a, &b);
+      if(b == a) 
+	c = def;
+      if(col >= nb_vectors) {
+	int i;
+	nb_vectors++;
+	/* We need to create a new vector */
+	if(col >= current_size) { /* Increase the available size */
+	  current_size += 5;
+	  REALLOC_N(vectors, VALUE, current_size);
+	}
+	vectors[col] = Dvector_Create();
+	double * vals = Dvector_Data_Resize(vectors[col], index);
+	/* Filling it with the default value */
+	for(i = 0; i < index; i++) {
+	  vals[i] = def;
+	}
+      }
+      Dvector_Push_Double(vectors[col], c);
+      col++;
+    }
+    /* Now, we finish the line */
+    for(; col < nb_vectors; col++)
+      Dvector_Push_Double(vectors[col], def);
+    index++;
+  }
+  /* Now, we make up the array */
+  ary = rb_ary_new4(nb_vectors, vectors);
+  free(vectors);
+  return ary;
+}
+
+
 /* 
  * Document-class: Dobjects::Dvector
  *
@@ -5542,6 +5658,11 @@ void Init_Dvector() {
 
    /* simple convolution */
    rb_define_method(cDvector, "convolve", dvector_convolve, 2);
+
+   /* Fast fancy read: */
+   rb_define_singleton_method(cDvector, "fast_fancy_read", 
+			      dvector_fast_fancy_read, 2);
+
 
    dvector_output_fs = Qnil;
    rb_global_variable(&dvector_output_fs);
