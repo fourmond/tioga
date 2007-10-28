@@ -67,7 +67,9 @@ OBJ_PTR FM_private_make_steps(OBJ_PTR fmkr, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data
      OBJ_PTR xfirst, OBJ_PTR yfirst, OBJ_PTR xlast, OBJ_PTR ylast) { int ierr=0;
    return c_private_make_steps(fmkr, Get_FM(fmkr, &ierr), Xvec_data, Yvec_data,
       Number_to_double(xfirst, &ierr), Number_to_double(yfirst, &ierr), 
-      Number_to_double(xlast, &ierr), Number_to_double(ylast, &ierr), &ierr); }
+      Number_to_double(xlast, &ierr), Number_to_double(ylast, &ierr), 
+      CENTERED, /* by default, CENTERED */
+      &ierr); }
 OBJ_PTR FM_private_make_spline_interpolated_points(OBJ_PTR fmkr, 
       OBJ_PTR Xvec, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
       OBJ_PTR start_slope, OBJ_PTR end_slope) { int ierr=0;
