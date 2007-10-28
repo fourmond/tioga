@@ -5323,6 +5323,8 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
 	  REALLOC_N(vectors, VALUE, current_size);
 	}
 	vectors[col] = Dvector_Create();
+	/* We make sure it is not swept away */
+	rb_gc_register_address(&vectors[col]);
 	double * vals = Dvector_Data_Resize(vectors[col], index);
 	/* Filling it with the default value */
 	for(i = 0; i < index; i++) {
@@ -5339,6 +5341,8 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
   }
   /* Now, we make up the array */
   ary = rb_ary_new4(nb_vectors, vectors);
+  for(index = 0; index < nb_vectors; index++)
+    rb_gc_unregister_address(&vectors[index]);
   free(vectors);
   return ary;
 }
