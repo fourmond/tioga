@@ -1,0 +1,2 @@
+This directory is here to provide profiling for Dvector's functions,
+as dvector_fast_fancy_read doesn't work the way I thought it should.
