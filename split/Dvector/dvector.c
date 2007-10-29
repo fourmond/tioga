@@ -310,6 +310,23 @@ PRIVATE VALUE make_new_dvector(VALUE klass, long len, long capa) {
    return ary;
 }
 
+/* Makes a Dvector with the given data. No additional capacity. */
+PRIVATE VALUE make_dvector_from_data(VALUE klass, long len, double * data) {
+  VALUE ary = dvector_alloc(klass);
+  Dvector *d = Get_Dvector(ary);
+  if (len < 0) {
+    rb_raise(rb_eArgError, "negative dvector size (or size too big)");
+  }
+  d->len = len;
+  if (len == 0) len++;
+  d->ptr = ALLOC_N(double, len);
+  MEMCPY(d->ptr, data, double, len);
+  d->capa = len;
+  /* we set dirty to 0 */
+  d->dirty = 0;
+  return ary;
+}
+
 PRIVATE VALUE dvector_new2(long len, long capa) {
    return make_new_dvector(cDvector, len, capa);
 }
@@ -5235,7 +5252,7 @@ static VALUE dvector_convolve(VALUE self, VALUE kernel, VALUE middle)
   
   Reads data from an IO stream and separate it into columns of data
   according to the _options_, a hash holding the following elements
-  (compulsory, but you can use FANCY_READ_DEFAULTS:
+  (compulsory, but you can use FANCY_READ_DEFAULTS):
   * 'sep': a regular expression that separate the entries
   * 'comments': any line matching this will be skipped
   * 'skip_first': skips that many lines before reading anything
@@ -5243,6 +5260,13 @@ static VALUE dvector_convolve(VALUE self, VALUE kernel, VALUE middle)
     number of the line read
   * 'remove_space': whether to remove spaces at the beginning of a line
   * 'default':  what to put when nothing was found but a number must be used
+
+  As a side note, the read time is highly non-linear, which suggests that
+  the read is memory-allocation/copying-limited, at least for big files.
+
+  An internal memory allocation with aggressive policy should solve that,
+  that is, not using directly Dvectors (and it would be way faster to store
+  anyway).
 */
 static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
 {
@@ -5266,18 +5290,24 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
   ID gets_id = rb_intern("gets");
   long line_number = 0;
 
-  /* Now come the fun part - rudimentary array management */
+  /* 
+     Now come the fun part - rudimentary vectors management 
+   */
   int nb_vectors = 0;		/* The number of vectors currently created */
   int current_size = 10;	/* The number of slots available */
-  VALUE * vectors = ALLOC_N(VALUE, current_size);
+  double ** vectors = ALLOC_N(double *, current_size);
   long index = 0;		/* The current index in the vectors */
+  int allocated_size = 5004;	/* The size available in the vectors */
+
+
+  int i;
 
   /* The return value */
   VALUE ary;
 
   /* We use a real gets so we can also rely on StringIO, for instance */
   while(RTEST(line = rb_funcall(stream, gets_id, 0))) {
-    VALUE pre = Qnil, post, match;
+    VALUE pre, post, match;
     int col = 0;
     line_number++;
     /* Whether we should skip the line... */
@@ -5315,34 +5345,41 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
       if(b == a) 
 	c = def;
       if(col >= nb_vectors) {
-	int i;
 	nb_vectors++;
 	/* We need to create a new vector */
 	if(col >= current_size) { /* Increase the available size */
 	  current_size += 5;
-	  REALLOC_N(vectors, VALUE, current_size);
+	  REALLOC_N(vectors, double * , current_size);
 	}
-	vectors[col] = Dvector_Create();
-	/* We make sure it is not swept away */
-	rb_gc_register_address(&vectors[col]);
-	double * vals = Dvector_Data_Resize(vectors[col], index);
+	
+	double * vals = vectors[col] = ALLOC_N(double, allocated_size);
 	/* Filling it with the default value */
 	for(i = 0; i < index; i++) {
 	  vals[i] = def;
 	}
       }
-      Dvector_Push_Double(vectors[col], c);
+      vectors[col][index] = c;
       col++;
     }
     /* Now, we finish the line */
     for(; col < nb_vectors; col++)
-      Dvector_Push_Double(vectors[col], def);
+      vectors[col][index] = def;
     index++;
+    /* Now, we reallocate memory if necessary */
+    if(index >= allocated_size) {
+      allocated_size *= 2;	/* We double the size */
+      for(col = 0; col < nb_vectors; col++)
+	REALLOC_N(vectors[col], double, allocated_size);
+    }
   }
   /* Now, we make up the array */
-  ary = rb_ary_new4(nb_vectors, vectors);
-  for(index = 0; index < nb_vectors; index++)
-    rb_gc_unregister_address(&vectors[index]);
+  ary = rb_ary_new();
+  for(i = 0; i < nb_vectors; i++) {
+    /* We create a vector */
+    rb_ary_store(ary, i, make_dvector_from_data(cDvector, index, vectors[i]));
+    /* And free the memory */
+    free(vectors[i]);
+  }
   free(vectors);
   return ary;
 }
