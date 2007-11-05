@@ -6,4 +6,10 @@ INCLUDE=-I/usr/lib/ruby/1.8/x86_64-linux/ -I.. -I../..
 profile_fancy_read: ../dvector.c profile_fancy_read.c
 	gcc -g -O0 -pg $(LIB) $(INCLUDE) -o $@ $^ 
 clean:
-	-rm profile_fancy_read
+	-rm profile_fancy_read fancy_read 
+
+fancy_read: ../dvector.c fancy_read.c
+	gcc -g -O2 $(LIB) $(INCLUDE) -o $@ $^ 
+
+prepare_file: prepare_file.c
+	gcc -g -O2 -o $@ $^ 
