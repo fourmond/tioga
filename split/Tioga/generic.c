@@ -58,16 +58,16 @@ OBJ_PTR String_From_Cstring(char *src) { return rb_str_new2(src); }
 
 char *String_Ptr(OBJ_PTR obj, int *ierr) {
    VALUE str = rb_String(obj);
-   return RSTRING(str)->ptr; }
+   return StringValuePtr(str); }
 
 long String_Len(OBJ_PTR obj, int *ierr) {
    VALUE str = rb_String(obj);
-   return RSTRING(str)->len; }
+   return RSTRING_LEN(str); }
 
 char *CString_Ptr(OBJ_PTR obj, int *ierr) {
    VALUE str = rb_String(obj);
-   char *cs = RSTRING(str)->ptr;
-   long len = RSTRING(str)->len;
+   char *cs = StringValuePtr(str);
+   long len = RSTRING_LEN(str);
    if (len != strlen(cs)) { RAISE_ERROR("invalid C string; contains NULL character",ierr); return NULL; }
    return cs; }
 

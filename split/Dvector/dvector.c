@@ -5284,8 +5284,8 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
 
   /* Then, some various variables: */
   VALUE line;
-  /* The line is not a blank line: */
-  VALUE blank = rb_reg_new("\\S", 2, 0);
+/*   /\* The line is not a blank line: *\/ */
+/*   VALUE blank = rb_reg_new("\\S", 2, 0); */
   ID chomp_id = rb_intern("chomp!");
   ID gets_id = rb_intern("gets");
   long line_number = 0;
@@ -5314,9 +5314,9 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
     if(skip_first >= line_number)
       continue;
 
-    /* Then we check if it is a blank line... */
-    if(! RTEST(rb_reg_match(blank, line)))
-      continue;
+/*     /\* Then we check if it is a blank line... *\/ */
+/*     if(! RTEST(rb_reg_match(blank, line))) */
+/*       continue; */
     /* ... or a comment line */
     if(RTEST(rb_reg_match(comments, line)))
       continue;

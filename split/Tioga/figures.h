@@ -400,7 +400,7 @@ extern OBJ_PTR c_private_make_contour(OBJ_PTR fmkr, FM *p,
          int method, // method == 1 means CONREC
          int *ierr);
 extern OBJ_PTR c_private_make_steps(OBJ_PTR fmkr, FM *p, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
-   double xfirst, double yfirst, double xlast, double ylast, int *ierr);
+				    double xfirst, double yfirst, double xlast, double ylast, int justification, int *ierr);
         /* adds n_pts_to_add points to Xs and Ys for steps with the given parameters.
             X_data and Y_data are arrays of n values where n_pts_to_add = 2*(n+1)
             (xfirst,yfirst) and (xlast,ylast) are extra data points to fix the first and last steps.

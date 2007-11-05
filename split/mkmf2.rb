@@ -918,7 +918,18 @@ module Mkmf2
 
   # Now, the infrastructure for dealing with include and library
   # directories:
-  @@include_path = [Mkmf2.config_var("rubylibdir"),
+  if CONFIG.key?('rubyhdrdir')
+    @@include_path = [
+                      Mkmf2.config_var("rubyhdrdir")+"/ruby",
+                      Mkmf2.config_var("rubyhdrdir"),
+                      Mkmf2.config_var("rubyhdrdir") + "/" + 
+                      Mkmf2.config_var("arch")
+                     ] 
+  else
+    @@include_path = [ Mkmf2.config_var("rubylibdir") ]
+  end
+
+  @@include_path += [
                     Mkmf2.config_var("archdir"),
                     '.',
                     File.join('.','include')
