@@ -5258,7 +5258,8 @@ static VALUE dvector_convolve(VALUE self, VALUE kernel, VALUE middle)
   * 'skip_first': skips that many lines before reading anything
   * 'index_col': if true, the first column returned contains the
     number of the line read
-  * 'remove_space': whether to remove spaces at the beginning of a line
+  * 'remove_space': whether to remove spaces at the beginning of a line. *This 
+    option is currently not implemented !*
   * 'default':  what to put when nothing was found but a number must be used
 
   As a side note, the read time is highly non-linear, which suggests that
@@ -5284,8 +5285,7 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
 
   /* Then, some various variables: */
   VALUE line;
-/*   /\* The line is not a blank line: *\/ */
-/*   VALUE blank = rb_reg_new("\\S", 2, 0); */
+
   ID chomp_id = rb_intern("chomp!");
   ID gets_id = rb_intern("gets");
   long line_number = 0;
@@ -5308,17 +5308,25 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
   /* We use a real gets so we can also rely on StringIO, for instance */
   while(RTEST(line = rb_funcall(stream, gets_id, 0))) {
     VALUE pre, post, match;
+    const char * line_ptr;
     int col = 0;
     line_number++;
     /* Whether we should skip the line... */
     if(skip_first >= line_number)
       continue;
 
-/*     /\* Then we check if it is a blank line... *\/ */
-/*     if(! RTEST(rb_reg_match(blank, line))) */
-/*       continue; */
+    /* We check for a blank line using isspace: */
+    line_ptr = StringValueCStr(line);
+    while(line_ptr && *line_ptr) {
+      if(! isspace(*line_ptr))
+	break;
+      line_ptr++;
+    }
+    if(! *line_ptr)
+      continue;			/* We found a blank line  */
+
     /* ... or a comment line */
-    if(RTEST(rb_reg_match(comments, line)))
+    if(RTEST(comments) && RTEST(rb_reg_match(comments, line))) 
       continue;
 
     /* Then, we remove the newline: */

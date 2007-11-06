@@ -6,7 +6,6 @@ require 'benchmark'
 require 'stringio'
 require 'tempfile'
 
-
 Benchmark.bm do |x|
   # We first create a 'dummy file':
   f = Tempfile.new("data")
