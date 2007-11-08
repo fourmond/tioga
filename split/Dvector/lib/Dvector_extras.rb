@@ -56,6 +56,19 @@ module Dobjects
       'remove_space' => true ,# removes spaces at the beginning of the lines
     }
 
+    # This function is a wrapper for #fast_fancy_read that reflects the
+    # look-and-feel of #old_fancy_read
+    def Dvector.fancy_read(stream, cols = nil, opts = {}) # :doc:
+      o = FANCY_READ_DEFAULTS.dup
+      o.update(opts)
+      
+      res = Dvector.fast_fancy_read(stream, o)
+      if cols
+        return cols.map {|i| res[i] }
+      else
+        return res
+      end
+    end
 
     # This function reads in +stream+ (can an IO object or a String,
     # in which case it represents the name of a file to be opened)
@@ -72,7 +85,7 @@ module Dobjects
     # 'index_col':: if set to true, the first column contains the
     #               indices of the corresponding lines (0 for first and so on)
 
-    def Dvector.fancy_read(stream, cols = nil, opts = {}) # :doc:
+    def Dvector.old_fancy_read(stream, cols = nil, opts = {}) # :doc:
       # first, we turn the stream into a real IO stream
       if stream.is_a?(String)
         stream = File.open(stream)
