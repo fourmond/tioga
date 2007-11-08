@@ -725,9 +725,10 @@ EOT
 # some comments
 
 # and a blank line above
--1.2  2.4
--1.3 2.4\t3.5
--1.2
+   # note the initial whitespace, stripped by default:
+  -1.2  2.4
+ -1.3 2.4\t3.5
+   -1.2
 EOT
 
     def test_fancy_read 

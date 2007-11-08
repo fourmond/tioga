@@ -5264,6 +5264,8 @@ static VALUE dvector_convolve(VALUE self, VALUE kernel, VALUE middle)
 
   As a side note, the read time is highly non-linear, which suggests that
   the read is memory-allocation/copying-limited, at least for big files.
+  Well, the read time is non-linear for 
+
 
   An internal memory allocation with aggressive policy should solve that,
   that is, not using directly Dvectors (and it would be way faster to store
@@ -5324,6 +5326,8 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
     }
     if(! *line_ptr)
       continue;			/* We found a blank line  */
+    if(remove_space)		/* We replace the contents of the line  */
+      line = rb_str_new2(line_ptr);
 
     /* ... or a comment line */
     if(RTEST(comments) && RTEST(rb_reg_match(comments, line))) 

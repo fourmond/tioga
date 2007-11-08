@@ -19,7 +19,21 @@ Benchmark.bm do |x|
     stream = File.open(f.path)
     Dobjects::Dvector.fancy_read(stream, nil, 'default'=> 0.0).size
   end
+  x.report("fancy_read(100000, 2nd):") do 
+    stream = File.open(f.path)
+    Dobjects::Dvector.fancy_read(stream, nil, 'default'=> 0.0).size
+  end
   x.report("fast_fancy_read(100000):") do 
+    stream = File.open(f.path)
+    Dobjects::Dvector.fast_fancy_read(stream, {
+                                        'sep' => /\s+/,
+                                        'comments' => /^\s*\#/,
+                                        'skip_first' => 0,
+                                        'index_col' => false,
+                                        'remove_space' => true,
+                                        'default'=> 0.0}).size
+  end
+  x.report("fast_fancy_read(100000, 2nd):") do 
     stream = File.open(f.path)
     Dobjects::Dvector.fast_fancy_read(stream, {
                                         'sep' => /\s+/,

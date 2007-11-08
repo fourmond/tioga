@@ -61,8 +61,20 @@ module Dobjects
     def Dvector.fancy_read(stream, cols = nil, opts = {}) # :doc:
       o = FANCY_READ_DEFAULTS.dup
       o.update(opts)
+
+      if stream.is_a?(String)
+        stream = File.open(stream)
+      end
+      raise ArgumentError.new("'stream' should have a gets method") unless 
+        stream.respond_to? :gets
       
       res = Dvector.fast_fancy_read(stream, o)
+
+      # Adding the index columns if necessary
+      if o["index_col"] 
+        res.unshift(Dvector.new(res[0].length) { |i| i})
+      end
+
       if cols
         return cols.map {|i| res[i] }
       else
@@ -83,7 +95,8 @@ module Dobjects
     # 'skip_first':: how many lines to skip at the beginning of the file,
     # 'default':: the value taken for missing elements
     # 'index_col':: if set to true, the first column contains the
-    #               indices of the corresponding lines (0 for first and so on)
+    #               indices of the elements (starting from 0 for
+    #               first and so on)
 
     def Dvector.old_fancy_read(stream, cols = nil, opts = {}) # :doc:
       # first, we turn the stream into a real IO stream
