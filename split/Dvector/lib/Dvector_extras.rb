@@ -68,6 +68,8 @@ module Dobjects
       raise ArgumentError.new("'stream' should have a gets method") unless 
         stream.respond_to? :gets
       
+      o['sep'] = Regexp.new(o['sep']) unless o['sep'].is_a? Regexp
+      
       res = Dvector.fast_fancy_read(stream, o)
 
       # Adding the index columns if necessary
