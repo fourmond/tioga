@@ -261,7 +261,7 @@ static void draw_axis_line(OBJ_PTR fmkr, FM *p, int location, PlotAxis *s, int *
 static char *Create_Label(double val, int scale, int prec, 
    bool log_vals, bool use_fixed_pt, char *postfix, PlotAxis *s, int *ierr)
 { // val in figure coords
-   char buff[100], *string;
+   char buff[100], form[100], *string;
    int exponent = ROUND(val);
    buff[0] = 0;
    if (log_vals && use_fixed_pt) {   /* Logarithmic */
@@ -269,14 +269,13 @@ static char *Create_Label(double val, int scale, int prec,
      val = pow(10.0, exponent);
      pow_val = pow(10.0, sav_val);
      if (exponent < 0) {
-        char form[60];
         int numdig = ABS(exponent)+1; 
-        sprintf(form, (s->vertical)? "\\tiogayaxisnumericlabel{%%.%df}" : "\\tiogaxaxisnumericlabel{%%.%df}", numdig);
-        sprintf(buff, form, pow_val);
+        snprintf(form, sizeof(form), (s->vertical)? "\\tiogayaxisnumericlabel{%%.%df}" : "\\tiogaxaxisnumericlabel{%%.%df}", numdig);
+        snprintf(buff, sizeof(buff), form, pow_val);
      } else if (abs(val - pow_val) > 0.1) {
-        sprintf(buff, (s->vertical)? "\\tiogayaxisnumericlabel{%0.2f}" : "\\tiogaxaxisnumericlabel{%0.2f}", pow_val);
+        snprintf(buff, sizeof(buff), (s->vertical)? "\\tiogayaxisnumericlabel{%0.2f}" : "\\tiogaxaxisnumericlabel{%0.2f}", pow_val);
      } else {
-        sprintf(buff,  (s->vertical)? "\\tiogayaxisnumericlabel{%d}" : "\\tiogaxaxisnumericlabel{%d}", (int) val);
+        snprintf(buff, sizeof(buff), (s->vertical)? "\\tiogayaxisnumericlabel{%d}" : "\\tiogaxaxisnumericlabel{%d}", (int) val);
      }
    } else if (log_vals) {
      /* Exponential, i.e. 10^-1, 1, 10, 10^2, etc */
@@ -284,9 +283,8 @@ static char *Create_Label(double val, int scale, int prec,
      if (abs_diff > 0.1) sprintf(buff,  (s->vertical)? "\\tiogayaxisnumericlabel{10^{%0.1f}}" : "\\tiogaxaxisnumericlabel{10^{%0.1f}}", val);
      else if (exponent == 0) strcpy(buff, "1");
      else if (exponent == 1) strcpy(buff, "10");
-     else sprintf(buff,  (s->vertical)? "\\tiogayaxisnumericlabel{10^{%d}}" : "\\tiogaxaxisnumericlabel{10^{%d}}", exponent);
+     else snprintf(buff, sizeof(buff),  (s->vertical)? "\\tiogayaxisnumericlabel{10^{%d}}" : "\\tiogaxaxisnumericlabel{10^{%d}}", exponent);
    } else {   /* Linear */
-      char form[10];
       double scale2;
       int precis = s->numeric_label_decimal_digits; //  use this precision if it is >= 0
       if (precis >= 0) prec = precis;
@@ -294,8 +292,8 @@ static char *Create_Label(double val, int scale, int prec,
       /* This is necessary to prevent labels like "-0.0" on some systems */
       scale2 = pow(10., prec);
       val = floor((val * scale2) + .5) / scale2;
-      sprintf(form, (s->vertical)?  "\\tiogayaxisnumericlabel{%%.%df}" : "\\tiogaxaxisnumericlabel{%%.%df}", (int) prec);
-      sprintf(buff, form, val);
+      snprintf(form, sizeof(form), (s->vertical)?  "\\tiogayaxisnumericlabel{%%.%df}" : "\\tiogaxaxisnumericlabel{%%.%df}", (int) prec);
+      snprintf(buff, sizeof(buff), form, val);
    }
    int len = strlen(buff);
    if (postfix != NULL) { strcpy(buff+len, postfix); len = strlen(buff); }
