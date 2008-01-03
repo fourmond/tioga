@@ -217,7 +217,7 @@ void c_pdf_grestore(OBJ_PTR fmkr, FM *p, int *ierr) { Write_grestore(); }
 static void Print_Xref(long int offset) {
    char line[80];
    int i, len;
-   sprintf(line, "%li", offset);
+   snprintf(line,sizeof(line), "%li", offset);
    len = strlen(line);
    for (i=0; i < 10-len; i++) fputc('0', OF);
    fprintf(OF, "%s 00000 n \n", line);

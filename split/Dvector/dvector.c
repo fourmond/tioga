@@ -1447,7 +1447,7 @@ PRIVATE VALUE dvector_join(VALUE ary, VALUE sep) {
    }
    result = rb_str_buf_new(len);
    for (i=0; i < d->len; i++) {
-      sprintf(buff, "%g", d->ptr[i]);
+      snprintf(buff,sizeof(buff), "%g", d->ptr[i]);
       tmp = rb_str_new2(buff);
       if (i > 0 && !NIL_P(sep)) rb_str_buf_append(result, sep);
       rb_str_buf_append(result, tmp);

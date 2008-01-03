@@ -254,11 +254,11 @@ void Create_wrapper(OBJ_PTR fmkr, char *fname, bool quiet_mode, int *ierr)
    FILE *file;
    if ((dot=strrchr(fname,'.')) != NULL) {
       strncpy(base_name, fname, dot-fname); base_name[dot-fname] = '\0';
-      sprintf(tex_fname, "%s.tex", base_name);
+      snprintf(tex_fname, sizeof(tex_fname), "%s.tex", base_name);
       }
    else {
       strcpy(base_name, fname);
-      sprintf(tex_fname, "%s.tex", fname);
+      snprintf(tex_fname, sizeof(tex_fname), "%s.tex", fname);
       }
    if ((dot=strrchr(base_name,'/')) != NULL) {
       strcpy(simple_name, dot+1);
@@ -298,7 +298,7 @@ void private_make_portfolio(char *name, OBJ_PTR fignums, OBJ_PTR fignames, int *
     FILE *file;
     int i, len, numfigs, j;
     char tex_fname[256];
-    sprintf(tex_fname, "%s.tex", name);
+    snprintf(tex_fname, sizeof(tex_fname), "%s.tex", name);
     file = fopen(tex_fname, "w");
     if (file == NULL) {
        RAISE_ERROR_s("Sorry: can't open %s.\n", tex_fname, ierr); return; }

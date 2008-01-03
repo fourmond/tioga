@@ -108,37 +108,37 @@ void RAISE_ERROR(char *str, int *ierr) { *ierr = -1; rb_raise(rb_eArgError,str);
 #define err_buff_len 256
 void RAISE_ERROR_s(char *fmt, char *s, int *ierr) {
    char buff[err_buff_len];
-   sprintf(buff,fmt,s);
+   snprintf(buff,sizeof(buff),fmt,s);
    RAISE_ERROR(buff,ierr);
 }
 
 void RAISE_ERROR_ss(char *fmt, char *s1, char *s2, int *ierr) {
    char buff[err_buff_len];
-   sprintf(buff,fmt,s1,s2);
+   snprintf(buff,sizeof(buff),fmt,s1,s2);
    RAISE_ERROR(buff,ierr);
 }
 
 void RAISE_ERROR_i(char *fmt, int x, int *ierr) {
    char buff[err_buff_len];
-   sprintf(buff,fmt,x);
+   snprintf(buff,sizeof(buff),fmt,x);
    RAISE_ERROR(buff,ierr);
 }
 
 void RAISE_ERROR_ii(char *fmt, int x1, int x2, int *ierr) {
    char buff[err_buff_len];
-   sprintf(buff,fmt,x1,x2);
+   snprintf(buff,sizeof(buff),fmt,x1,x2);
    RAISE_ERROR(buff,ierr);
 }
 
 void RAISE_ERROR_g(char *fmt, double x, int *ierr) {
    char buff[err_buff_len];
-   sprintf(buff,fmt,x);
+   snprintf(buff,sizeof(buff),fmt,x);
    RAISE_ERROR(buff,ierr);
 }
 
 void RAISE_ERROR_gg(char *fmt, double x1, double x2, int *ierr) {
    char buff[err_buff_len];
-   sprintf(buff,fmt,x1,x2);
+   snprintf(buff,sizeof(buff),fmt,x1,x2);
    RAISE_ERROR(buff,ierr);
 }
 

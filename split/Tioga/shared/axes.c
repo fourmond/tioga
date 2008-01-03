@@ -280,7 +280,7 @@ static char *Create_Label(double val, int scale, int prec,
    } else if (log_vals) {
      /* Exponential, i.e. 10^-1, 1, 10, 10^2, etc */
      double abs_diff = fabs(val - exponent);
-     if (abs_diff > 0.1) sprintf(buff,  (s->vertical)? "\\tiogayaxisnumericlabel{10^{%0.1f}}" : "\\tiogaxaxisnumericlabel{10^{%0.1f}}", val);
+     if (abs_diff > 0.1) snprintf(buff, sizeof(buff), (s->vertical)? "\\tiogayaxisnumericlabel{10^{%0.1f}}" : "\\tiogaxaxisnumericlabel{10^{%0.1f}}", val);
      else if (exponent == 0) strcpy(buff, "1");
      else if (exponent == 1) strcpy(buff, "10");
      else snprintf(buff, sizeof(buff),  (s->vertical)? "\\tiogayaxisnumericlabel{10^{%d}}" : "\\tiogaxaxisnumericlabel{10^{%d}}", exponent);
@@ -409,7 +409,7 @@ static char **Get_Labels(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
       for (i = 0; i < s->nmajors; i++) {
          ps = NULL;
          if (i == upper_right && !s->log_vals && mode && scale)
-            sprintf(ps = postfix, 
+	   snprintf(ps = postfix, sizeof(postfix), 
                 (s->vertical)? "$\\times$\\tiogayaxisnumericlabel{10^{%d}}" : "$\\times$\\tiogaxaxisnumericlabel{10^{%d}}", 
                 scale);
          if ((i+j) % k != 0) {
