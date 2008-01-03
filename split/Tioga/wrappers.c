@@ -31,32 +31,32 @@
 OBJ_PTR FM_show_axis(OBJ_PTR fmkr, OBJ_PTR loc) { int ierr=0;
    c_show_axis(fmkr, Get_FM(fmkr, &ierr), Number_to_int(loc, &ierr), &ierr); RETURN_NIL; } 
 OBJ_PTR FM_show_edge(OBJ_PTR fmkr, OBJ_PTR loc) { int ierr=0;
-   c_show_edge(fmkr, Get_FM(fmkr, &ierr), Number_to_int(loc, &ierr), &ierr); }
-OBJ_PTR FM_no_title(OBJ_PTR fmkr) { int ierr=0; c_no_title(fmkr, Get_FM(fmkr, &ierr), &ierr); }
-OBJ_PTR FM_no_xlabel(OBJ_PTR fmkr) { int ierr=0; c_no_xlabel(fmkr, Get_FM(fmkr, &ierr), &ierr); }
-OBJ_PTR FM_no_ylabel(OBJ_PTR fmkr) { int ierr=0; c_no_ylabel(fmkr, Get_FM(fmkr, &ierr), &ierr); }
-OBJ_PTR FM_no_xaxis(OBJ_PTR fmkr) { int ierr=0; c_no_xaxis(fmkr, Get_FM(fmkr, &ierr), &ierr); }
-OBJ_PTR FM_no_yaxis(OBJ_PTR fmkr) { int ierr=0; c_no_yaxis(fmkr, Get_FM(fmkr, &ierr), &ierr); }
-OBJ_PTR FM_no_left_edge(OBJ_PTR fmkr) { int ierr=0; c_no_left_edge(fmkr, Get_FM(fmkr, &ierr), &ierr); }
-OBJ_PTR FM_no_right_edge(OBJ_PTR fmkr) { int ierr=0; c_no_right_edge(fmkr, Get_FM(fmkr, &ierr), &ierr); }
-OBJ_PTR FM_no_top_edge(OBJ_PTR fmkr) { int ierr=0; c_no_top_edge(fmkr, Get_FM(fmkr, &ierr), &ierr); }
-OBJ_PTR FM_no_bottom_edge(OBJ_PTR fmkr) { int ierr=0; c_no_bottom_edge(fmkr, Get_FM(fmkr, &ierr), &ierr); }
+   c_show_edge(fmkr, Get_FM(fmkr, &ierr), Number_to_int(loc, &ierr), &ierr); RETURN_NIL; }
+OBJ_PTR FM_no_title(OBJ_PTR fmkr) { int ierr=0; c_no_title(fmkr, Get_FM(fmkr, &ierr), &ierr); RETURN_NIL; }
+OBJ_PTR FM_no_xlabel(OBJ_PTR fmkr) { int ierr=0; c_no_xlabel(fmkr, Get_FM(fmkr, &ierr), &ierr); RETURN_NIL; }
+OBJ_PTR FM_no_ylabel(OBJ_PTR fmkr) { int ierr=0; c_no_ylabel(fmkr, Get_FM(fmkr, &ierr), &ierr); RETURN_NIL; }
+OBJ_PTR FM_no_xaxis(OBJ_PTR fmkr) { int ierr=0; c_no_xaxis(fmkr, Get_FM(fmkr, &ierr), &ierr); RETURN_NIL; }
+OBJ_PTR FM_no_yaxis(OBJ_PTR fmkr) { int ierr=0; c_no_yaxis(fmkr, Get_FM(fmkr, &ierr), &ierr); RETURN_NIL; }
+OBJ_PTR FM_no_left_edge(OBJ_PTR fmkr) { int ierr=0; c_no_left_edge(fmkr, Get_FM(fmkr, &ierr), &ierr); RETURN_NIL; }
+OBJ_PTR FM_no_right_edge(OBJ_PTR fmkr) { int ierr=0; c_no_right_edge(fmkr, Get_FM(fmkr, &ierr), &ierr); RETURN_NIL; }
+OBJ_PTR FM_no_top_edge(OBJ_PTR fmkr) { int ierr=0; c_no_top_edge(fmkr, Get_FM(fmkr, &ierr), &ierr); RETURN_NIL; }
+OBJ_PTR FM_no_bottom_edge(OBJ_PTR fmkr) { int ierr=0; c_no_bottom_edge(fmkr, Get_FM(fmkr, &ierr), &ierr); RETURN_NIL;}
 
 // init.c
 OBJ_PTR FM_private_init_fm_data(OBJ_PTR fmkr) { int ierr=0; 
-   c_private_init_fm_data(fmkr, Get_FM(fmkr, &ierr), &ierr); }
+   c_private_init_fm_data(fmkr, Get_FM(fmkr, &ierr), &ierr); RETURN_NIL; }
 OBJ_PTR FM_set_frame_sides(OBJ_PTR fmkr, OBJ_PTR left, OBJ_PTR right, OBJ_PTR top, OBJ_PTR bottom) { int ierr=0;
    c_set_frame_sides(fmkr, Get_FM(fmkr, &ierr),
       Number_to_double(left, &ierr), Number_to_double(right, &ierr), 
-      Number_to_double(top, &ierr), Number_to_double(bottom, &ierr), &ierr); }
+      Number_to_double(top, &ierr), Number_to_double(bottom, &ierr), &ierr); RETURN_NIL;}
 OBJ_PTR FM_set_device_pagesize(OBJ_PTR fmkr, OBJ_PTR width, OBJ_PTR height) { int ierr=0;
-   c_set_device_pagesize(fmkr, Get_FM(fmkr, &ierr), Number_to_double(width, &ierr), Number_to_double(height, &ierr), &ierr); }
+   c_set_device_pagesize(fmkr, Get_FM(fmkr, &ierr), Number_to_double(width, &ierr), Number_to_double(height, &ierr), &ierr); RETURN_NIL;}
 OBJ_PTR FM_get_save_filename(OBJ_PTR fmkr, OBJ_PTR name) { int ierr=0;
    return c_get_save_filename(fmkr, Get_FM(fmkr, &ierr), name, &ierr); }
 OBJ_PTR FM_private_make(OBJ_PTR fmkr, OBJ_PTR name, OBJ_PTR cmd) { int ierr=0;
-   c_private_make(fmkr, Get_FM(fmkr, &ierr), name, cmd, &ierr); }
+   c_private_make(fmkr, Get_FM(fmkr, &ierr), name, cmd, &ierr); RETURN_NIL; }
 OBJ_PTR FM_private_make_portfolio(OBJ_PTR fmkr, OBJ_PTR name, OBJ_PTR fignums, OBJ_PTR fignames) { int ierr=0;
-   c_private_make_portfolio(fmkr, Get_FM(fmkr, &ierr), name, fignums, fignames, &ierr); }
+   c_private_make_portfolio(fmkr, Get_FM(fmkr, &ierr), name, fignums, fignames, &ierr); RETURN_NIL; }
 
 // makers.c
 OBJ_PTR FM_private_make_contour(OBJ_PTR fmkr, OBJ_PTR gaps,
@@ -86,7 +86,7 @@ OBJ_PTR FM_private_axial_shading(
    OBJ_PTR colormap, OBJ_PTR extend_start, OBJ_PTR extend_end) { int ierr=0;
       c_private_axial_shading(fmkr, Get_FM(fmkr, &ierr), Number_to_double(x0, &ierr), Number_to_double(y0, &ierr),
             Number_to_double(x1, &ierr), Number_to_double(y1, &ierr), colormap, 
-            extend_start == OBJ_TRUE, extend_end == OBJ_TRUE, &ierr); }
+            extend_start == OBJ_TRUE, extend_end == OBJ_TRUE, &ierr); RETURN_NIL; }
 OBJ_PTR FM_private_radial_shading(OBJ_PTR fmkr,
         OBJ_PTR x0, OBJ_PTR y0, OBJ_PTR r0,
         OBJ_PTR x1, OBJ_PTR y1, OBJ_PTR r1, OBJ_PTR colormap,
@@ -95,7 +95,7 @@ OBJ_PTR FM_private_radial_shading(OBJ_PTR fmkr,
       Number_to_double(x0, &ierr), Number_to_double(y0, &ierr), Number_to_double(r0, &ierr),
       Number_to_double(x1, &ierr), Number_to_double(y1, &ierr), Number_to_double(r1, &ierr), colormap,
       Number_to_double(a, &ierr), Number_to_double(b, &ierr), Number_to_double(c, &ierr), Number_to_double(d, &ierr),
-      extend_start == OBJ_TRUE, extend_end == OBJ_TRUE, &ierr); }
+      extend_start == OBJ_TRUE, extend_end == OBJ_TRUE, &ierr); RETURN_NIL; }
 OBJ_PTR FM_private_create_colormap(OBJ_PTR fmkr, OBJ_PTR rgb_flag,
     OBJ_PTR length, OBJ_PTR Ps, OBJ_PTR C1s, OBJ_PTR C2s, OBJ_PTR C3s) { int ierr=0;
        return c_private_create_colormap(fmkr, Get_FM(fmkr, &ierr), rgb_flag != OBJ_FALSE, Number_to_int(length, &ierr), Ps, C1s, C2s, C3s, &ierr); }
@@ -210,7 +210,7 @@ OBJ_PTR FM_convert_output_to_figure_dx(OBJ_PTR fmkr, OBJ_PTR v) { int ierr=0;
 OBJ_PTR FM_convert_output_to_figure_dy(OBJ_PTR fmkr, OBJ_PTR v) { int ierr=0;
    return c_convert_output_to_figure_dy(fmkr, Get_FM(fmkr, &ierr), Number_to_double(v, &ierr), &ierr); RETURN_NIL; }
 OBJ_PTR FM_doing_subplot(OBJ_PTR fmkr) { int ierr=0; c_doing_subplot(fmkr, Get_FM(fmkr, &ierr), &ierr); RETURN_NIL; }
-OBJ_PTR FM_doing_subfigure(OBJ_PTR fmkr) { int ierr=0; c_doing_subfigure(fmkr, Get_FM(fmkr, &ierr), &ierr); }
+OBJ_PTR FM_doing_subfigure(OBJ_PTR fmkr) { int ierr=0; c_doing_subfigure(fmkr, Get_FM(fmkr, &ierr), &ierr); RETURN_NIL; }
 OBJ_PTR FM_private_set_bounds(OBJ_PTR fmkr, OBJ_PTR left, OBJ_PTR right, OBJ_PTR top, OBJ_PTR bottom) { int ierr=0;
    c_private_set_bounds(fmkr, Get_FM(fmkr, &ierr), Number_to_double(left, &ierr), Number_to_double(right, &ierr),
       Number_to_double(top, &ierr), Number_to_double(bottom, &ierr), &ierr); RETURN_NIL; }
@@ -343,10 +343,12 @@ OBJ_PTR FM_append_arc_to_path(OBJ_PTR fmkr, OBJ_PTR x_start, OBJ_PTR y_start, OB
       Number_to_double(x_corner, &ierr), Number_to_double(y_corner, &ierr),
       Number_to_double(x_end, &ierr), Number_to_double(y_end, &ierr), 
       Number_to_double(dx, &ierr), Number_to_double(dy, &ierr), &ierr);
+   RETURN_NIL;
 }
 OBJ_PTR FM_append_rect_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR width, OBJ_PTR height) { int ierr=0;
    c_append_rect_to_path(fmkr, Get_FM(fmkr, &ierr), Number_to_double(x, &ierr), Number_to_double(y, &ierr), 
       Number_to_double(width, &ierr), Number_to_double(height, &ierr), &ierr);
+   RETURN_NIL;
 }
 OBJ_PTR FM_append_rounded_rect_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, 
    OBJ_PTR width, OBJ_PTR height, OBJ_PTR dx, OBJ_PTR dy) { int ierr=0; // dx and dy are converted to output coords and smaller is used as radius
@@ -354,6 +356,7 @@ OBJ_PTR FM_append_rounded_rect_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y,
       Number_to_double(x, &ierr), Number_to_double(y, &ierr),
       Number_to_double(width, &ierr), Number_to_double(height, &ierr), 
       Number_to_double(dx, &ierr), Number_to_double(dy, &ierr), &ierr);
+   RETURN_NIL;
 }
 OBJ_PTR FM_append_oval_to_path(OBJ_PTR fmkr, OBJ_PTR x, OBJ_PTR y, OBJ_PTR dx, OBJ_PTR dy, OBJ_PTR angle) { int ierr=0;
    c_append_oval_to_path(fmkr, Get_FM(fmkr, &ierr),
