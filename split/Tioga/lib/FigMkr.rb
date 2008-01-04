@@ -21,6 +21,7 @@
 =end
 
 require 'Tioga/FigureConstants.rb'
+require 'Tioga/Utils.rb'
 
 module Tioga
 class FigureMaker
@@ -298,7 +299,34 @@ class FigureMaker
         @fm_data = Dvector.new(@@fm_data_size)
         reset_figures
     end
-    
+
+
+    # Gets the width of the measured text
+    def get_text_width(name, default = 1.0)
+      if @measures.key? name
+        return @measures[name][0]
+      else
+        return default
+      end
+    end
+
+    # Gets the width of the measured text
+    def get_text_height(name, default = 1.0)
+      if @measures.key? name
+        return @measures[name][1]
+      else
+        return default
+      end
+    end
+
+    # Gets the depth of the measured text
+    def get_text_depth(name, default = 1.0)
+      if @measures.key? name
+        return @measures[name][2]
+      else
+        return default
+      end
+    end
 
     def reset_state        
         reset_figures
@@ -1676,7 +1704,7 @@ class FigureMaker
    
     @@keys_for_show_text = FigureMaker.make_name_lookup_hash([
         'text', 'side', 'loc', 'position', 'pos', 'x', 'y',
-        'shift', 'scale', 'color', 'angle', 'alignment', 'justification', 'at', 'point'])
+        'shift', 'scale', 'color', 'angle', 'alignment', 'justification', 'at', 'point', 'measure'])
     def show_text(dict)
         check_dict(dict, @@keys_for_show_text, 'show_text')
         text = dict['text']
@@ -1694,6 +1722,10 @@ class FigureMaker
                 raise "Sorry: 'color' must be array of [r,g,b] intensities for show_text"
             end 
             text = sprintf("\\textcolor[rgb]{%0.2f,%0.2f,%0.2f}{%s}", r, g, b, text)
+            if dict.key? 'measure' # Wrap it in a measure call.
+              text = "\\tiogameasure{#{dict['measure']}}{#{text}}"
+            end
+          
         end
         just = get_if_given_else_default(dict, 'justification', self.justification)
         align = get_if_given_else_default(dict, 'alignment', self.alignment)
@@ -1921,11 +1953,20 @@ class FigureMaker
     end
 
     
+    # We wrap the call so that if the keys of @measures
+    # did change during the call, we call it again.
     def make_pdf(num) # returns pdf name if successful, false if failed.
+      puts "Make pdf #{num}"
+        old_measure_keys = @measures.keys
         num = get_num_for_pdf(num)
         result = start_making_pdf(num)
         return unless result
-        return @figure_pdfs[num] = finish_making_pdf(@figure_names[num])
+        @figure_pdfs[num] = finish_making_pdf(@figure_names[num])
+        # If the keys have changed, we run that again.
+        if @measures.keys != old_measure_keys
+          make_pdf(num)
+        end
+        return @figure_pdfs[num]
     end
     
     
@@ -2096,18 +2137,17 @@ class FigureMaker
       # * third, closing the standard input of pdflatex will remove
       #   painful bugs, when pdflatex gets interrupted but waits
       #   for an input for which it didn't prompt.
-      @measures = {}
       IO::popen(syscmd, "r+") do |f|
         f.close_write           # We don't need that.
         log = File.open(logname, "w")
         for line in f
           log.print line
           if line =~ /^(.*)\[(\d)\]=(.+pt)/
-            name = $1
+            n = $1
             num = $2.to_i
             dim = Utils::tex_dimension_to_bp($3)
-            @measures[name] ||= []
-            @measures[name][num] = dim
+            @measures[n] ||= []
+            @measures[n][num] = dim
           end
         end
       end

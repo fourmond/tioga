@@ -57,7 +57,11 @@ class MyFigures
         t.def_figure("Colors2") { colors2 }
         t.def_figure("Colors3") { colors3 }
         t.def_figure("Colors4") { colors4 }
+
+
+        t.def_figure("Text_size") { text_size }
         
+
         hues
         
         t.def_enter_page_function { enter_page }
@@ -315,6 +319,29 @@ class MyFigures
                 'alignment' => ALIGNED_AT_MIDHEIGHT,
                 'scale' => 0.7, 'angle' => t.convert_to_degrees(dx,dy)) 
         end
+    end
+
+    # In this example, we show how we can use measures of the text
+    # transparently with Tioga:
+    def text_size
+      t.stroke_rect(0,0,1,1)
+      hls = t.rgb_to_hls(Red)
+      angles = 10
+      delta = 360.0/angles
+      equation = '\int_{-\infty}^{\infty} \! e^{-x^{2}}\, \! dx = \sqrt{\pi}'
+      text = '\parbox{15em}{\begin{displaymath}' + equation + '\end{displaymath}}'
+      text = "Biniou"
+      text = "$\\displaystyle #{equation}$"
+      t.show_text('text' => text, 'color' => Red, 'x' => 0.5, 
+                  'y' => 0.5,
+                  'alignment' => ALIGNED_AT_MIDHEIGHT,
+                  'scale' => 0.7 , 'measure' => 'box')
+      
+      
+      figure_width = 0.2;
+      figure_width = t.
+        convert_output_to_page_dx(t.convert_inches_to_output(t.get_text_width('box')/72.0)) # Divide by 72 to get inches
+      t.stroke_rect(0.5 - figure_width/2, 0.3, figure_width, 0.3)
     end
     
     def gradient_colormap
