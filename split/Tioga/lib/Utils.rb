@@ -54,7 +54,7 @@ module Tioga
     }
 
     # Returns the value of the given TeX dimension in postscript points.
-    def tex_dimension_to_bp(dim)
+    def self.tex_dimension_to_bp(dim)
       for unit, val in DIMENSION_CONVERSION
         if dim =~ /^\s*([\d.]+)\s*#{unit}$/
           return $1.to_f * val
@@ -67,6 +67,10 @@ module Tioga
         return $1.to_f * DIMENSION_CONVERSION["cm"] 
       end
       raise "'#{dim}' is not a valid TeX dimension"
+    end
+
+    def tex_dimension_to_bp(dim)
+      return Utils::tex_dimension_to_bp(dim)
     end
 
 

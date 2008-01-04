@@ -142,3 +142,16 @@
 % personnaly doubt it would really come in useful ;-)...
 \newcommand\tiogasetfont{\reset@font\SetTiogaFontInfo%
 \selectfont}%
+
+
+% This commands typesets its second argument while sending to the
+% standard output successively the width, height and depth of the
+% box produced.
+%
+% These informations are collected when Tioga runs pdflatex.
+\newlength{\tiogatempdim}
+\newcommand{\tiogameasure}[2]{%
+\settowidth{\tiogatempdim}{#2}\typeout{#1[0]=\the\tiogatempdim}%
+\settoheight{\tiogatempdim}{#2}\typeout{#1[1]=\the\tiogatempdim}%
+\settodepth{\tiogatempdim}{#2}\typeout{#1[2]=\the\tiogatempdim}%
+{#2}}

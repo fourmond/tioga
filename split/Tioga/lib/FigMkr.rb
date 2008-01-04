@@ -136,6 +136,10 @@ class FigureMaker
 
     # Whether or not do do multithreading for parallel pdflatex calls
     attr_accessor :multithreads_okay_for_tioga
+
+
+    # Returns the values measured during the pdflatex run.
+    attr_reader :measures
     
     
     
@@ -269,7 +273,9 @@ class FigureMaker
         
         # multithreads by default
         @multithreads_okay_for_tioga = true
-        
+
+        # The values measured during the pdflatex run
+        @measures = {}
     end
     
 
@@ -2066,21 +2072,48 @@ class FigureMaker
    
     
     def finish_making_pdf(name) # returns pdfname if succeeds, false if fails.
-        pdflatex = FigureMaker.pdflatex
-        quiet = @quiet_mode
-        run_directory = @run_dir
-        if (@save_dir == nil)
-            syscmd = "#{pdflatex} -interaction nonstopmode #{name}.tex > pdflatex.log 2>&1"
-        else
-            syscmd = "cd #{@save_dir}; #{pdflatex} -interaction nonstopmode #{name}.tex > pdflatex.log 2>&1"
+      pdflatex = FigureMaker.pdflatex
+      quiet = @quiet_mode
+      run_directory = @run_dir
+      
+      if (@save_dir == nil)
+        logname = "pdflatex.log"
+      else
+        logname = "#{@save_dir}/pdflatex.log"
+      end
+      
+      if (@save_dir == nil)
+        syscmd = "#{pdflatex} -interaction nonstopmode #{name}.tex"
+      else
+        syscmd = "cd #{@save_dir}; #{pdflatex} -interaction nonstopmode #{name}.tex"
+      end
+      # Now fun begins:
+      # We use IO::popen for three reasons:
+      # * first, we want to be able to read back information from
+      #   pdflatex (see \tiogameasure)
+      # * second, this way of doing should be portable to win, while
+      #   the > trick might not be that much...
+      # * third, closing the standard input of pdflatex will remove
+      #   painful bugs, when pdflatex gets interrupted but waits
+      #   for an input for which it didn't prompt.
+      @measures = {}
+      IO::popen(syscmd, "r+") do |f|
+        f.close_write           # We don't need that.
+        log = File.open(logname, "w")
+        for line in f
+          log.print line
+          if line =~ /^(.*)\[(\d)\]=(.+pt)/
+            name = $1
+            num = $2.to_i
+            dim = Utils::tex_dimension_to_bp($3)
+            @measures[name] ||= []
+            @measures[name][num] = dim
+          end
         end
-        result = system(syscmd)
+      end
+        
+      result = $?
         if !result
-            if (@save_dir == nil)
-                logname = "pdflatex.log"
-            else
-                logname = "#{@save_dir}/pdflatex.log"
-            end
             puts "ERROR: #{pdflatex} failed."
             file = File.open(logname)
             if file == nil
