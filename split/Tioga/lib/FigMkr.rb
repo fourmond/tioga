@@ -139,11 +139,6 @@ class FigureMaker
     attr_accessor :multithreads_okay_for_tioga
 
 
-    # Returns the values measured during the pdflatex run.
-    attr_reader :measures
-    
-    
-    
     # old preview attributes -- to be removed later
     
             attr_accessor :model_number
@@ -277,6 +272,9 @@ class FigureMaker
 
         # The values measured during the pdflatex run
         @measures = {}
+        # And some context information to provide accurate information
+        # Hash name -> {hash: scale}
+        @measures_context = {}
     end
     
 
@@ -301,31 +299,59 @@ class FigureMaker
     end
 
 
-    # Gets the width of the measured text
-    def get_text_width(name, default = 1.0)
-      if @measures.key? name
-        return @measures[name][0]
+    # Returns informations about the size of the named element.
+    # Returns a hash:
+    # * 'width' : the width of the box in figure coordinates
+    # * 'height': the height of the box in figure coordinates
+    # * 'just'  : the justification used
+    # * 'align' : the vertical alignment used
+    # * 'angle' : the angle used
+    # * 'scale' : the *total* scale used/
+    def get_text_size(name, default = 1.0)
+      if @measures_context.key? name
+        info =  @measures_context[name].dup
       else
-        return default
+        info = { 
+          'scale' => nil,
+          'angle' => nil, 
+          'justification' => nil,
+          'align' => nil,
+        }
       end
-    end
+      if @measures.key? name
+        scale =  @measures_context[name]['scale']
+        width = @measures[name][0] * scale
+        height = (@measures[name][1] + @measures[name][2]) * scale
 
-    # Gets the width of the measured text
-    def get_text_height(name, default = 1.0)
-      if @measures.key? name
-        return @measures[name][1]
-      else
-        return default
-      end
-    end
+        # Sizes in points.
+        info['original_width']  = width
+        info['original_height'] = height
 
-    # Gets the depth of the measured text
-    def get_text_depth(name, default = 1.0)
-      if @measures.key? name
-        return @measures[name][2]
+        # Now, we rotate the coordinates if necessary:
+        angle = @measures_context[name]['angle']
+        if angle != 0
+          c = Math::cos(PI * angle/180)
+          s = Math::sin(PI * angle/180)
+          xs = Dvector.new
+          ys = Dvector.new 
+          for x,y in [[0,0], [width, height], [width, 0], [0, height]]
+            xs.push(c * x - s * y)
+            ys.push(c * y + s * x)
+          end
+          width = xs.max - xs.min
+          height = ys.max - ys.min
+        end
+        info['width'] = 
+          convert_output_to_figure_dx(convert_inches_to_output(width)/72.0)
+        info['height'] = 
+          convert_output_to_figure_dy(convert_inches_to_output(height)/72.0)
       else
-        return default
+        info.update({
+          'width'  => default,
+          'height' => default,
+        })
       end
+      return info
     end
 
     def reset_state        
@@ -1714,7 +1740,7 @@ class FigureMaker
         scale = get_if_given_else_default(dict, 'scale', 1)
         color = dict['color'] # color is [r,g,b] array.  this adds \textcolor[rgb]{r,g,b}{...}
         if color != nil
-            if !color.kind_of?Array
+            if !color.kind_of? Array
                 raise "Sorry: 'color' must be array of [r,g,b] intensities for show_text (#{color})"
             end
             r = color[0]; g = color[1]; b = color[2];
@@ -1730,6 +1756,17 @@ class FigureMaker
         just = get_if_given_else_default(dict, 'justification', self.justification)
         align = get_if_given_else_default(dict, 'alignment', self.alignment)
         angle = get_if_given_else_default(dict, 'angle', 0)
+
+      
+        if dict.key? 'measure' # save additional informations:
+          @measures_context[dict['measure']] = {
+            'scale' => scale * self.default_text_scale,
+            'angle' => angle, 
+            'justification' => just,
+            'align' => align,
+          }
+        end
+
         loc = alt_names(dict, 'loc', 'side')
         if (loc == nil)
             at = alt_names(dict, 'at', 'point')
@@ -1956,7 +1993,6 @@ class FigureMaker
     # We wrap the call so that if the keys of @measures
     # did change during the call, we call it again.
     def make_pdf(num) # returns pdf name if successful, false if failed.
-      puts "Make pdf #{num}"
         old_measure_keys = @measures.keys
         num = get_num_for_pdf(num)
         result = start_making_pdf(num)

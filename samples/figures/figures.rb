@@ -325,23 +325,29 @@ class MyFigures
     # transparently with Tioga:
     def text_size
       t.stroke_rect(0,0,1,1)
-      hls = t.rgb_to_hls(Red)
-      angles = 10
-      delta = 360.0/angles
+      t.rescale(0.5)
+
       equation = '\int_{-\infty}^{\infty} \! e^{-x^{2}}\, \! dx = \sqrt{\pi}'
-      text = '\parbox{15em}{\begin{displaymath}' + equation + '\end{displaymath}}'
-      text = "Biniou"
-      text = "$\\displaystyle #{equation}$"
-      t.show_text('text' => text, 'color' => Red, 'x' => 0.5, 
-                  'y' => 0.5,
-                  'alignment' => ALIGNED_AT_MIDHEIGHT,
-                  'scale' => 0.7 , 'measure' => 'box')
-      
-      
-      figure_width = 0.2;
-      figure_width = t.
-        convert_output_to_page_dx(t.convert_inches_to_output(t.get_text_width('box')/72.0)) # Divide by 72 to get inches
-      t.stroke_rect(0.5 - figure_width/2, 0.3, figure_width, 0.3)
+      text = "\\fbox{$\\displaystyle #{equation}$}"
+
+      nb = 5
+      nb.times do |i|
+        scale = 0.5 + i * 0.2
+        angle = i * 37
+        x = (i+1)/(nb+1.0)
+        y = x
+        color = [1.0 - i * 0.2, i*0.2, 0]
+        t.show_text('text' => text, 'color' => color, 'x' => x, 
+                    'y' => x,
+                    'alignment' => ALIGNED_AT_MIDHEIGHT,
+                    'scale' => scale , 'measure' => "box#{i}", 
+                    'angle' => angle )
+        size = t.get_text_size("box#{i}")
+        w = size['width']
+        h = size['height']
+        t.stroke_color = color
+        t.stroke_rect(x - w/2, x - h/2, w, h)
+      end
     end
     
     def gradient_colormap
