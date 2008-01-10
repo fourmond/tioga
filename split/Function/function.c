@@ -966,6 +966,65 @@ static VALUE function_fuzzy_substract(VALUE self, VALUE op)
   return rb_float_new(fuzz);
 }
 
+/* 
+  call-seq:
+    f.bound_values(xmin, xmax, ymin, ymax)
+
+   This function browses the points inside the Function and stores in
+   the resulting new function only points which are within boundaries,
+   and the points just next to them (so the general direction on the sides
+   looks fine).
+
+   Make sure _xmin_ < _xmax_ and _ymin_ < _ymax_, else you simply won't
+   get any output.
+ */
+static VALUE function_bound_values(VALUE self, 
+				   VALUE vxmin, VALUE vxmax,
+				   VALUE vymin, VALUE vymax)
+{
+  long ss = function_sanity_check(self);
+  const double *xs = Dvector_Data_for_Read(get_x_vector(self),NULL);
+  const double *ys = Dvector_Data_for_Read(get_y_vector(self),NULL);
+  double xmin = NUM2DBL(vxmin);
+  double xmax = NUM2DBL(vxmax);
+  double ymin = NUM2DBL(vymin);
+  double ymax = NUM2DBL(vymax);
+
+  /* Now, two dvectors for writing: */
+  VALUE x_out = rb_funcall(cDvector, idNew, 0);
+  VALUE y_out = rb_funcall(cDvector, idNew, 0);
+
+  /* No forward computation of the size of the targets, meaning
+     memory allocation penalty.
+  */
+  
+  int last_point_in = 0; 	/* Whether the last point was in */
+  long i;
+  for(i = 0; i < ss; i++) {
+    double x = xs[i];
+    double y = ys[i];
+    if( (xmin <= x) && (xmax >= x) && (ymin <= y) && (ymax >= y)) {
+      if(! last_point_in) {
+	last_point_in = 1;
+	if(i) {			/* Not for the first element */
+	  Dvector_Push_Double(x_out, xs[i-1]);
+	  Dvector_Push_Double(y_out, ys[i-1]);
+	}
+      }
+      Dvector_Push_Double(x_out, x);
+      Dvector_Push_Double(y_out, y);
+    }
+    else {			/* Outside boundaries */
+      if(last_point_in) {
+	last_point_in = 0;
+	Dvector_Push_Double(x_out, x);
+	Dvector_Push_Double(y_out, y);
+      }
+    }
+  }
+  return Function_Create(x_out, y_out);
+}
+
 /*
   Document-class: Dobjects::Function
 
@@ -1049,6 +1108,10 @@ void Init_Function()
   rb_define_method(cFunction, "fuzzy_sub!", 
 		   function_fuzzy_substract, 1); /* Substraction */
   
+
+  /* Boundary operations */
+  rb_define_method(cFunction, "bound_values", 
+		   function_bound_values, 4); /* Substraction */
 
 
   /* a few more methods better written in pure Ruby */

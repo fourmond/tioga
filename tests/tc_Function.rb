@@ -115,5 +115,29 @@ class TestFunction < Test::Unit::TestCase
     assert_equal(g.y,  Dvector[0,0,-1])
   end
 
+  def test_bounds
+    x = Dvector[1,2,3,4,5]
+    y = Dvector[0,4,3,4,2]
+    
+    f = Function.new(x,y)
+
+    # First, big boundaries
+    g = f.bound_values(0, 10, 0, 10)
+    assert_equal(f.x, g.x)
+    assert_equal(f.y, g.y)
+
+    # Too small boundaries
+    g = f.bound_values(0,0,0,0)
+    assert_equal(0, g.size)
+
+    # Real boundaries, but taking the sides make so
+    # that we have the same in the end that at the beginning
+    g = f.bound_values(2,4,0,10)
+    assert_equal(f.x, g.x)
+    assert_equal(f.y, g.y)
+
+    # It really should be fine.
+  end
+
   # There is unfortunately no simple way to test the interpolations...
 end
