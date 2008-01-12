@@ -2,6 +2,8 @@
 
 require './mkmf2.rb'
 
+$CFLAGS += " -O2 -Wall "
+
 # Now, if you want to install the include file, you need to
 # set the EXTCONF_RB_INCLUDE
 if ENV.key?("EXTCONF_RB_INCLUDE")

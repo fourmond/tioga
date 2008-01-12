@@ -425,8 +425,8 @@ void Init_FigureMaker(void) {
 /* text */
    rb_define_method(cFM, "private_set_default_font_size", FM_private_set_default_font_size, 1);
    rb_define_method(cFM, "rescale_text", FM_rescale_text, 1);
-   rb_define_method(cFM, "show_rotated_text", FM_show_rotated_text, 8);
-   rb_define_method(cFM, "show_rotated_label", FM_show_rotated_label, 7);
+   rb_define_method(cFM, "show_rotated_text", FM_show_rotated_text, 9);
+   rb_define_method(cFM, "show_rotated_label", FM_show_rotated_label, 8);
    rb_define_method(cFM, "check_label_clip", FM_check_label_clip, 2);
 /* path construction */
    rb_define_method(cFM, "move_to_point", FM_move_to_point, 2);

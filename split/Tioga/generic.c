@@ -198,3 +198,50 @@ OBJ_PTR Integer_Vector_New(long len, long *vals) {
 int do_flate_compress(unsigned char *new_ptr, unsigned long *new_len_ptr, unsigned char *ptr, long len) {
    return flate_compress(new_ptr, new_len_ptr, ptr, len); }
 
+/* Hash-related functions: */
+
+OBJ_PTR Hash_New() 
+{
+  return rb_hash_new();
+}
+
+OBJ_PTR Hash_Get_Obj_Obj(OBJ_PTR hash, OBJ_PTR key)
+{
+  return rb_hash_aref(hash, key);
+}
+
+
+OBJ_PTR Hash_Get_Obj(OBJ_PTR hash, const char * key)
+{
+  return rb_hash_aref(hash, rb_str_new2(key));
+}
+
+void Hash_Set_Obj(OBJ_PTR hash, const char * key, OBJ_PTR value)
+{
+  rb_hash_aset(hash, rb_str_new2(key), value);
+}
+
+void Hash_Set_Obj_Obj(OBJ_PTR hash, OBJ_PTR key, OBJ_PTR value)
+{
+  rb_hash_aset(hash, key, value);
+}
+
+double Hash_Get_Double(OBJ_PTR hash, const char * key)
+{
+  int err;
+  return Number_to_double(Hash_Get_Obj(hash, key), &err);
+}
+    /* Same as Hash_Get_Obj, but returns a double */
+void Hash_Set_Double(OBJ_PTR hash, const char * key, double value)
+{
+  Hash_Set_Obj(hash, key, Float_New(value));
+}
+void Hash_Delete(OBJ_PTR hash, const char * key)
+{
+  rb_hash_delete(hash, rb_str_new2(key));
+}
+
+bool Hash_Has_Key(OBJ_PTR hash, const char * key)
+{
+  return RTEST(rb_funcall(hash,rb_intern("has_key?"), 1, rb_str_new2(key)));
+}

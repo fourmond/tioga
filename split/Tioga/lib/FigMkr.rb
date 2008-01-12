@@ -1780,7 +1780,8 @@ class FigureMaker
             if (xloc == nil || yloc == nil)
                 raise "Sorry: Must supply a location for show_text"
             end
-            show_rotated_label(text, xloc, yloc, scale, angle, just, align)
+            show_rotated_label(text, xloc, yloc, scale, angle, just, align, 
+                               dict['measure'])
             return
         end
         position = alt_names(dict, 'position', 'pos')
@@ -1807,10 +1808,12 @@ class FigureMaker
             else
                 raise "Sorry: 'loc' must be LEFT, RIGHT, TOP, BOTTOM, AT_X_ORIGIN, or AT_Y_ORIGIN for show_text"
             end
-            show_rotated_label(text, xloc, yloc, scale, angle, just, align)
+            show_rotated_label(text, xloc, yloc, scale, angle, just, align,
+                               dict['measure'])
             return
         end
-        show_rotated_text(text, loc, shift, position, scale, angle, just, align)
+        show_rotated_text(text, loc, shift, position, scale, angle, just, 
+                          align, dict['measure'])
     end
     
     

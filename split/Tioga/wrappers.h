@@ -244,9 +244,8 @@ extern OBJ_PTR FM_private_show_marker(OBJ_PTR fmkr, OBJ_PTR integer_args, OBJ_PT
 // texout.c
 extern OBJ_PTR FM_rescale_text(OBJ_PTR fmkr, OBJ_PTR scaling);
 extern OBJ_PTR FM_show_rotated_text(OBJ_PTR fmkr, OBJ_PTR text, OBJ_PTR frame_side, OBJ_PTR shift,
-    OBJ_PTR fraction, OBJ_PTR scale, OBJ_PTR angle, OBJ_PTR justification, OBJ_PTR alignment);
-extern OBJ_PTR FM_show_rotated_label(OBJ_PTR fmkr, OBJ_PTR text,
-    OBJ_PTR xloc, OBJ_PTR yloc, OBJ_PTR scale, OBJ_PTR angle, OBJ_PTR justification, OBJ_PTR alignment);
+				    OBJ_PTR fraction, OBJ_PTR scale, OBJ_PTR angle, OBJ_PTR justification, OBJ_PTR alignment, OBJ_PTR measure_name);
+extern OBJ_PTR FM_show_rotated_label(OBJ_PTR fmkr, OBJ_PTR text, OBJ_PTR xloc, OBJ_PTR yloc, OBJ_PTR scale, OBJ_PTR angle, OBJ_PTR justification, OBJ_PTR alignment, OBJ_PTR measure_name);
 extern OBJ_PTR FM_check_label_clip(OBJ_PTR fmkr, OBJ_PTR xloc, OBJ_PTR yloc);
 
 

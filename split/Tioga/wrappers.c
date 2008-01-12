@@ -464,12 +464,12 @@ OBJ_PTR FM_private_show_marker(
 OBJ_PTR FM_rescale_text(OBJ_PTR fmkr, OBJ_PTR scaling_factor) { int ierr=0;
    c_rescale_text(fmkr, Get_FM(fmkr, &ierr), Number_to_double(scaling_factor, &ierr), &ierr); RETURN_NIL; }
 OBJ_PTR FM_show_rotated_text(OBJ_PTR fmkr, OBJ_PTR text, OBJ_PTR frame_side, OBJ_PTR shift,
-   OBJ_PTR fraction, OBJ_PTR scale, OBJ_PTR angle, OBJ_PTR justification, OBJ_PTR alignment) { int ierr=0;
+			     OBJ_PTR fraction, OBJ_PTR scale, OBJ_PTR angle, OBJ_PTR justification, OBJ_PTR alignment, OBJ_PTR measure_name) { int ierr=0;
    c_show_rotated_text(fmkr, Get_FM(fmkr, &ierr), String_Ptr(text, &ierr), Number_to_int(frame_side, &ierr), Number_to_double(shift, &ierr),
       Number_to_double(fraction, &ierr), Number_to_double(scale, &ierr), Number_to_double(angle, &ierr), 
       Number_to_int(justification, &ierr), Number_to_int(alignment, &ierr), &ierr); RETURN_NIL; }
 OBJ_PTR FM_show_rotated_label(OBJ_PTR fmkr, OBJ_PTR text,
-   OBJ_PTR xloc, OBJ_PTR yloc, OBJ_PTR scale, OBJ_PTR angle, OBJ_PTR justification, OBJ_PTR alignment) { int ierr=0;
+			      OBJ_PTR xloc, OBJ_PTR yloc, OBJ_PTR scale, OBJ_PTR angle, OBJ_PTR justification, OBJ_PTR alignment, OBJ_PTR measure_name) { int ierr=0;
    c_show_rotated_label(fmkr, Get_FM(fmkr, &ierr), String_Ptr(text, &ierr), Number_to_double(xloc, &ierr), Number_to_double(yloc, &ierr),
       Number_to_double(scale, &ierr), Number_to_double(angle, &ierr), Number_to_int(justification, &ierr), Number_to_int(alignment, &ierr), &ierr);
    RETURN_NIL; }

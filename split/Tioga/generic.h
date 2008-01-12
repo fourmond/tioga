@@ -67,6 +67,41 @@ extern void Init_generic(void);
 extern void Call_Function(OBJ_PTR fmkr, ID_PTR fn, OBJ_PTR arg, int *ierr);
 // invokes method given by fn in the object fmkr with the given arg.
 
+
+/* Interfaces for callbacks */
+/* Not implemented yet, don't use ! */
+extern bool Is_Kind_of_Callback(OBJ_PTR obj); /* True if obj is a callback
+						 function */
+extern OBJ_PTR Use_Callback(OBJ_PTR callback, int nb, OBJ_PTR * args, int *ierr);
+/* 
+   Calls the callback callback with an array of nb arguments (args). args
+   can be NULL. The return value should be correctly allocated (means the
+   reference count should count the return value).
+*/
+
+/* Hash-related functions */
+/* We deal only with *string* hashes ! That is enough to give us */
+
+extern bool Is_Kind_of_Hash(OBJ_PTR obj); /* Whether obj is a hash */
+extern OBJ_PTR Hash_New();		  /* Returns a freshly-baked hash */
+extern OBJ_PTR Hash_Get_Obj(OBJ_PTR hash, const char * key);
+    /* Returns the value for key */
+extern OBJ_PTR Hash_Get_Obj_Obj(OBJ_PTR hash, OBJ_PTR key);
+    /* Same thing as Hash_Get_Obj, but takes an object for a key */
+extern void Hash_Set_Obj(OBJ_PTR hash, const char * key, OBJ_PTR value);
+    /* Sets the value for key */
+extern void Hash_Set_Obj_Obj(OBJ_PTR hash, OBJ_PTR key, OBJ_PTR value);
+    /* Same thing as Hash_Set_Obj, but takes an object for a key */
+extern double Hash_Get_Double(OBJ_PTR hash, const char * key);
+    /* Same as Hash_Get_Obj, but returns a double */
+extern void Hash_Set_Double(OBJ_PTR hash, const char * key, double value);
+    /* Same as Hash_Set_Obj, but takes a double */
+extern void Hash_Delete(OBJ_PTR hash, const char * key);
+    /* Deletes key */
+extern bool Hash_Has_Key(OBJ_PTR hash, const char * key);
+    /* Returns true if the key has been set. */
+
+
 extern bool Is_Kind_of_Integer(OBJ_PTR obj);
 extern bool Is_Kind_of_Number(OBJ_PTR obj);
 
