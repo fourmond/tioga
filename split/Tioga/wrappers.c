@@ -467,11 +467,11 @@ OBJ_PTR FM_show_rotated_text(OBJ_PTR fmkr, OBJ_PTR text, OBJ_PTR frame_side, OBJ
 			     OBJ_PTR fraction, OBJ_PTR scale, OBJ_PTR angle, OBJ_PTR justification, OBJ_PTR alignment, OBJ_PTR measure_name) { int ierr=0;
    c_show_rotated_text(fmkr, Get_FM(fmkr, &ierr), String_Ptr(text, &ierr), Number_to_int(frame_side, &ierr), Number_to_double(shift, &ierr),
       Number_to_double(fraction, &ierr), Number_to_double(scale, &ierr), Number_to_double(angle, &ierr), 
-      Number_to_int(justification, &ierr), Number_to_int(alignment, &ierr), &ierr); RETURN_NIL; }
+		       Number_to_int(justification, &ierr), Number_to_int(alignment, &ierr), measure_name, &ierr); RETURN_NIL; }
 OBJ_PTR FM_show_rotated_label(OBJ_PTR fmkr, OBJ_PTR text,
 			      OBJ_PTR xloc, OBJ_PTR yloc, OBJ_PTR scale, OBJ_PTR angle, OBJ_PTR justification, OBJ_PTR alignment, OBJ_PTR measure_name) { int ierr=0;
    c_show_rotated_label(fmkr, Get_FM(fmkr, &ierr), String_Ptr(text, &ierr), Number_to_double(xloc, &ierr), Number_to_double(yloc, &ierr),
-      Number_to_double(scale, &ierr), Number_to_double(angle, &ierr), Number_to_int(justification, &ierr), Number_to_int(alignment, &ierr), &ierr);
+      Number_to_double(scale, &ierr), Number_to_double(angle, &ierr), Number_to_int(justification, &ierr), Number_to_int(alignment, &ierr), measure_name, &ierr);
    RETURN_NIL; }
 OBJ_PTR FM_check_label_clip(OBJ_PTR fmkr, OBJ_PTR xloc, OBJ_PTR yloc) { int ierr=0;
    return c_check_label_clip(fmkr, Get_FM(fmkr, &ierr), Number_to_double(xloc, &ierr), Number_to_double(yloc, &ierr), &ierr); }

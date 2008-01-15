@@ -301,6 +301,9 @@ typedef struct {
 
     /* Whether to complain about out non ok numbers in paths */
     int croak_on_nonok_numbers;
+
+    /* For the text measuring trick, we need a hash here.  */
+    OBJ_PTR measures_info;
     
 /* PRIVATE -- not to be included in the user interface */
     double clip_left, clip_right, clip_top, clip_bottom; // in output coords
@@ -653,9 +656,9 @@ extern void private_make_portfolio(char *filename, OBJ_PTR fignums, OBJ_PTR fign
 
 extern void c_rescale_text(OBJ_PTR fmkr, FM *p, double scaling_factor, int *ierr);
 extern void c_show_rotated_text(OBJ_PTR fmkr, FM *p, char *text, int frame_side, double shift, double fraction,
-   double scale, double angle, int justification, int alignment, int *ierr);
+				double scale, double angle, int justification, int alignment, OBJ_PTR measure_name, int *ierr);
 extern void c_show_rotated_label(OBJ_PTR fmkr, FM *p, char *text, 
-   double xloc, double yloc, double scale, double angle, int justification, int alignment, int *ierr);
+   double xloc, double yloc, double scale, double angle, int justification, int alignment, OBJ_PTR measure_name, int *ierr);
 extern OBJ_PTR c_check_label_clip(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr);
 
 /*======================================================================*/

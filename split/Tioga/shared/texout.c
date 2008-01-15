@@ -46,11 +46,32 @@ static int String_Is_Blank(char  *str) {
    return 0;
    }
 
-static void tex_show_rotated_text(
-   FM *p, char *text, double x, double y, double scale, double angle, int justification, int alignment)
+/* 
+   Returns the hash where a given measure is stored,
+   creating it if necessary. The attribute measures_info *must be set* !
+   This function can return OBJ_NIL.
+*/
+static OBJ_PTR Get_Measure_Hash(FM * p, OBJ_PTR measure_name)
+{
+  OBJ_PTR value;
+  if(measure_name == OBJ_NIL) {
+    return OBJ_NIL;
+  }
+  if(! Hash_Has_Key_Obj(p->measures_info, measure_name)) {
+    value = Hash_New();
+    Hash_Set_Obj_Obj(p->measures_info, measure_name, value);
+  }
+  else 
+    value = Hash_Get_Obj_Obj(p->measures_info, measure_name);
+  return value;
+}
+
+
+static void tex_show_rotated_text(FM *p, char *text, double x, double y, double scale, double angle, int justification, int alignment, OBJ_PTR measure_name)
 {  // x and y are the device coords for the reference point of the text
    char ref, jst;
    double ft_ht, sz;
+   OBJ_PTR measures = Get_Measure_Hash(p, measure_name);
    if (String_Is_Blank(text)) return; /* blank strings break TeX! */
    scale *= p->default_text_scale;
    ft_ht = scale * p->default_font_size;
@@ -126,17 +147,17 @@ static void Convert_Frame_Text_Position_To_Output_Location(FM *p, int frame_side
 }
        
 void c_show_rotated_text(OBJ_PTR fmkr, FM *p, char *text, int frame_side, double shift, double fraction,
-   double scale, double angle, int justification, int alignment, int *ierr) {
+			 double scale, double angle, int justification, int alignment, OBJ_PTR measure_name, int *ierr) {
    double x, y, base_angle, ft_ht = p->default_text_scale * scale * p->default_font_size;
    Convert_Frame_Text_Position_To_Output_Location(p, frame_side, shift*ft_ht*ENLARGE, fraction, &x, &y, &base_angle, text, ierr);
-   tex_show_rotated_text(p, text, x, y, scale, angle + base_angle, justification, alignment);
+   tex_show_rotated_text(p, text, x, y, scale, angle + base_angle, justification, alignment, measure_name);
 }
 
          
 void c_show_rotated_label(OBJ_PTR fmkr, FM *p, char *text, 
-   double xloc, double yloc, double scale, double angle, int justification, int alignment, int *ierr) {
+   double xloc, double yloc, double scale, double angle, int justification, int alignment, OBJ_PTR measure_name, int *ierr) {
    tex_show_rotated_text(p, text, convert_figure_to_output_x(p, xloc), convert_figure_to_output_y(p, yloc),
-      scale, angle, justification, alignment);
+			 scale, angle, justification, alignment, measure_name);
 }
    
 OBJ_PTR c_check_label_clip(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr) {

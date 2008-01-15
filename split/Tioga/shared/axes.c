@@ -652,7 +652,7 @@ static void show_numeric_label(OBJ_PTR fmkr, FM *p, PlotAxis *s,
 { // position is in figure coords and must be converted to frame coords
    double pos = ((!s->reversed)? (position - s->axis_min) : (s->axis_max - position)) / s->length;
    c_show_rotated_text(fmkr, p, text, location, shift, pos, 
-      s->numeric_label_scale, s->numeric_label_angle, s->numeric_label_justification, s->numeric_label_alignment, ierr);
+		       s->numeric_label_scale, s->numeric_label_angle, s->numeric_label_justification, s->numeric_label_alignment, OBJ_NIL, ierr);
 }
 
 static void draw_numeric_labels(OBJ_PTR fmkr, FM *p, int location, PlotAxis *s, int *ierr)

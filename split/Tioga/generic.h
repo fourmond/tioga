@@ -82,7 +82,6 @@ extern OBJ_PTR Use_Callback(OBJ_PTR callback, int nb, OBJ_PTR * args, int *ierr)
 /* Hash-related functions */
 /* We deal only with *string* hashes ! That is enough to give us */
 
-extern bool Is_Kind_of_Hash(OBJ_PTR obj); /* Whether obj is a hash */
 extern OBJ_PTR Hash_New();		  /* Returns a freshly-baked hash */
 extern OBJ_PTR Hash_Get_Obj(OBJ_PTR hash, const char * key);
     /* Returns the value for key */
@@ -99,6 +98,8 @@ extern void Hash_Set_Double(OBJ_PTR hash, const char * key, double value);
 extern void Hash_Delete(OBJ_PTR hash, const char * key);
     /* Deletes key */
 extern bool Hash_Has_Key(OBJ_PTR hash, const char * key);
+    /* Returns true if the key has been set. */
+extern bool Hash_Has_Key_Obj(OBJ_PTR hash, OBJ_PTR key);
     /* Returns true if the key has been set. */
 
 

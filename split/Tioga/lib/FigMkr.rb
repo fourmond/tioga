@@ -138,7 +138,6 @@ class FigureMaker
     # Whether or not do do multithreading for parallel pdflatex calls
     attr_accessor :multithreads_okay_for_tioga
 
-
     # old preview attributes -- to be removed later
     
             attr_accessor :model_number
@@ -270,11 +269,17 @@ class FigureMaker
         # multithreads by default
         @multithreads_okay_for_tioga = true
 
+
+      # The following attributes are not to be used, as they will
+      # be deprecated as soon as the equivalent C code is operational
         # The values measured during the pdflatex run
         @measures = {}
         # And some context information to provide accurate information
         # Hash name -> {hash: scale}
         @measures_context = {}
+
+        # We *must* initialize the measures_info hash.
+        self.measures_info = {}
     end
     
 

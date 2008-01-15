@@ -241,7 +241,14 @@ void Hash_Delete(OBJ_PTR hash, const char * key)
   rb_hash_delete(hash, rb_str_new2(key));
 }
 
+
 bool Hash_Has_Key(OBJ_PTR hash, const char * key)
 {
-  return RTEST(rb_funcall(hash,rb_intern("has_key?"), 1, rb_str_new2(key)));
+  return Hash_Has_Key_Obj(hash, rb_str_new2(key));
 }
+
+bool Hash_Has_Key_Obj(OBJ_PTR hash, OBJ_PTR key)
+{
+  return RTEST(rb_funcall(hash,rb_intern("has_key?"), 1, key));
+}
+

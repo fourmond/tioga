@@ -250,6 +250,23 @@ FM *Get_FM(OBJ_PTR fmkr, int *ierr) {
 /* Warning on non-ok numbers */
    BOOL_ATTR(croak_on_nonok_numbers)
 
+static VALUE FM_measures_info_get(VALUE fmkr) 
+{ 
+  int ierr=0; 
+  FM *p = Get_FM(fmkr,&ierr); 
+  return (ierr != 0)? OBJ_NIL : p->measures_info; 
+}
+
+static VALUE FM_measures_info_set(VALUE fmkr, VALUE hash) 
+{ 
+  int ierr=0; 
+  FM *p = Get_FM(fmkr,&ierr); 
+  if(ierr) 
+    return OBJ_NIL;
+  p->measures_info = hash;
+  return hash;
+}
+
 
 bool Get_initialized() {
    OBJ_PTR v = rb_cv_get(cFM, "@@initialized");
@@ -313,7 +330,9 @@ void Init_FigureMaker(void) {
    rb_define_method(cFM, "get_save_filename", FM_get_save_filename, 1);
    rb_define_method(cFM, "private_make_portfolio", FM_private_make_portfolio, 3);
    rb_define_method(cFM, "private_init_fm_data", FM_private_init_fm_data, 0);
-      
+
+   /* The measures_info hash */
+   attr_accessors(measures_info);
    
 /* page attribute accessors */
    attr_reader(root_figure)
