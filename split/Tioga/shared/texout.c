@@ -94,13 +94,16 @@ static void tex_show_rotated_text(OBJ_PTR fmkr, FM *p, char *text,
       fprintf(fp,"\\put(%d,%d){\\scalebox{%.2f}{\\makebox(0,0)[%c%c]{",
             ROUND(x), ROUND(y), scale, jst, ref);
    if(measure_name != OBJ_NIL)
-     fprintf(fp, "\\tiogameasure{%s}{\\tiogasetfont", 
+     fprintf(fp, "{\\tiogameasure{%s}{\\tiogasetfont{}", 
 	     CString_Ptr(measure_name,&dummy));
    else
-     fprintf(fp, "{\\tiogasetfont");
-   
-   fprintf(fp, (alignment == ALIGNED_AT_BASELINE)? "{%s\\BS" : "{%s", text);
-   fprintf(fp, angle != 0? "}}}}}}\n" : "}}}}}\n");
+     fprintf(fp, "{{\\tiogasetfont{}");
+
+   /* Moving the \BS out of the potential \tiogameasure input, so it does
+      not disturb the measure.
+   */
+   fprintf(fp, (alignment == ALIGNED_AT_BASELINE)? "%s}\\BS" : "%s}", text);
+   fprintf(fp, angle != 0? "}}}}}\n" : "}}}}\n");
 
    /* Now, we save measures informations if applicable*/
    if(measures != OBJ_NIL) {

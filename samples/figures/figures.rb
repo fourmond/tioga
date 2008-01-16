@@ -18,6 +18,7 @@ class MyFigures
         @figure_maker = FigureMaker.default
                 
         t.save_dir = 'figures_out'
+        # t.autocleanup = false
         t.def_eval_function { |str| eval(str) }
 
         t.def_figure("Icon") { icon }
@@ -58,6 +59,8 @@ class MyFigures
         t.def_figure("Colors3") { colors3 }
         t.def_figure("Colors4") { colors4 }
 
+
+        t.def_figure("Tex_Fonts") { tex_fonts }
 
         t.def_figure("Text_size") { text_size }
         t.def_figure("Text_size_with_rotation") { text_size_with_rotation }
@@ -211,6 +214,23 @@ class MyFigures
             t.show_marker('font' => i+1, 'text' => 'abc', 'at' => [0.5+dx, 0.5+dy], 'scale' => 1.25)
         end
     end
+
+
+    def tex_fonts
+      background
+      t.show_text('text' => 'Various fonts (currently not working)', 
+                  'side' => TOP, 'shift' => 0.6,
+                  'justification' => CENTERED, 
+                  'scale' => 0.9, 'position' => 0.5)
+      
+      t.show_text('text' => 'Default font',
+                  'x' => 0.02, 'y' => 0.93,
+                  'justification' => LEFT_JUSTIFIED )
+      t.tex_fontfamily = "sfdefault"
+      t.show_text('text' => 'Default sans serif',
+                  'x' => 0.02, 'y' => 0.86,
+                  'justification' => LEFT_JUSTIFIED )
+    end
     
     def rounded_rect
         t.show_text('text' => 'append\_rounded\_rect\_to\_path', 'side' => TOP, 'shift' => 0.6,
@@ -333,11 +353,42 @@ class MyFigures
       # We try demonstration various positions/
       
       tries = [
-               {'x' => 0, 'y' => 0,
+               {
+                 'text' => 'Using side/position instead of X and Y', 
+                 'side' => TOP, 'shift' => 0.6,
+                 'justification' => CENTERED, 
+                 'scale' => 2, 'position' => 0.5
+               },
+               {
+                 'x' => 0.2, 'y' => 0.8,
                  'justification' => LEFT_JUSTIFIED,
                  'alignment' => ALIGNED_AT_TOP,
-                 'scale' => 1,
-               }]
+                 'scale' => 4,
+                 'text' => 'top left'
+               },
+               {
+                 'x' => 0.3, 'y' => 0.5,
+                 'justification' => RIGHT_JUSTIFIED,
+                 'alignment' => ALIGNED_AT_BOTTOM,
+                 'scale' => 2,
+                 'text' => 'bottom right'
+               },
+               {
+                 'x' => 0.3, 'y' => 0.2,
+                 'justification' => CENTERED,
+                 'alignment' => ALIGNED_AT_BASELINE,
+                 'scale' => 2.3,
+                 'text' => 'centered \raise-.5ex\hbox{b}aseline'
+               },
+               {
+                 'x' => 0.7, 'y' => 0.6,
+                 'justification' => LEFT_JUSTIFIED,
+                 'alignment' => ALIGNED_AT_MIDHEIGHT,
+                 'scale' => 2,
+                 'text' => 'left mid-height'
+               },
+               
+              ]
       i = 0
       for try in tries
         a = { 'text' => text,
@@ -347,6 +398,7 @@ class MyFigures
         a.update(try)
         t.show_text(a)
         size = t.get_text_size("box#{i}")
+        i += 1
 
         # We draw a box around the text:
         if size.key? 'width'
@@ -356,11 +408,17 @@ class MyFigures
             xs << t.convert_output_to_figure_x(10*x)
             ys << t.convert_output_to_figure_y(10*y)
           end
-          p size
           xs << xs[0]
           ys << ys[0]
           t.show_polyline(xs,ys, Red, nil, Line_Type_Dot)
         end
+        t.show_marker({
+                        'x' => try['x'],
+                        'y' => try['y'],
+                        'marker' => MarkerConstants::Times,
+                        'scale' => 0.6,
+                        'color' => Green
+                      })
       end
     end
 
