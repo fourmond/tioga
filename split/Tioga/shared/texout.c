@@ -46,6 +46,23 @@ static int String_Is_Blank(char  *str) {
    return 0;
    }
 
+static OBJ_PTR Get_Measure_Hash(OBJ_PTR fmkr, OBJ_PTR measure_name)
+{
+  OBJ_PTR value;
+  int i;
+  OBJ_PTR measures_info = Obj_Attr_Get(fmkr, measures_info_ID, &i);
+  if(measure_name == OBJ_NIL) {
+    return OBJ_NIL;
+  }
+  if(! Hash_Has_Key_Obj(measures_info, measure_name)) {
+    value = Hash_New();
+    Hash_Set_Obj_Obj(measures_info, measure_name, value);
+  }
+  else 
+    value = Hash_Get_Obj_Obj(measures_info, measure_name);
+  return value;
+}
+
 
 static void tex_show_rotated_text(OBJ_PTR fmkr, FM *p, char *text, 
 				  double x, double y, double scale, 

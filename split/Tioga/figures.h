@@ -390,7 +390,8 @@ extern OBJ_PTR c_get_save_filename(OBJ_PTR fmkr, FM *p, OBJ_PTR name, int *ierr)
 extern void c_private_make(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR cmd, int *ierr);
 extern OBJ_PTR c_private_make_portfolio(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR fignums, OBJ_PTR fignames, int *ierr);
 
-extern OBJ_PTR Get_Measure_Hash(OBJ_PTR fmkr, OBJ_PTR measure_name);
+/* The ID of the measures_info instance variable */
+extern ID_PTR measures_info_ID;
 
 /*======================================================================*/
 // makers.c
