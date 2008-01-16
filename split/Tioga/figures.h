@@ -302,9 +302,6 @@ typedef struct {
     /* Whether to complain about out non ok numbers in paths */
     int croak_on_nonok_numbers;
 
-    /* For the text measuring trick, we need a hash here.  */
-    OBJ_PTR measures_info;
-    
 /* PRIVATE -- not to be included in the user interface */
     double clip_left, clip_right, clip_top, clip_bottom; // in output coords
 } FM;
@@ -392,6 +389,8 @@ extern void c_set_device_pagesize(OBJ_PTR fmkr, FM *p, double width, double heig
 extern OBJ_PTR c_get_save_filename(OBJ_PTR fmkr, FM *p, OBJ_PTR name, int *ierr);
 extern void c_private_make(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR cmd, int *ierr);
 extern OBJ_PTR c_private_make_portfolio(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR fignums, OBJ_PTR fignames, int *ierr);
+
+extern OBJ_PTR Get_Measure_Hash(OBJ_PTR fmkr, OBJ_PTR measure_name);
 
 /*======================================================================*/
 // makers.c
@@ -660,6 +659,9 @@ extern void c_show_rotated_text(OBJ_PTR fmkr, FM *p, char *text, int frame_side,
 extern void c_show_rotated_label(OBJ_PTR fmkr, FM *p, char *text, 
    double xloc, double yloc, double scale, double angle, int justification, int alignment, OBJ_PTR measure_name, int *ierr);
 extern OBJ_PTR c_check_label_clip(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr);
+extern void c_save_measure(OBJ_PTR fmkr, OBJ_PTR measure_name, 
+			   double width, double height, double depth);
+
 
 /*======================================================================*/
 

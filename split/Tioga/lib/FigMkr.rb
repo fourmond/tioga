@@ -35,6 +35,8 @@ class FigureMaker
 
     # The tag used for cvs export 
     CVS_TAG = "rel_1_6"         # now manually cheating...
+
+    # TODO: swicth to the model used for ctioga.
     
     # Version now uses the CVS_TAG to create the version number. CVS_TAG should
     # look like 'rel_1_1_0' for the 1.1.0 release. 
@@ -137,6 +139,9 @@ class FigureMaker
 
     # Whether or not do do multithreading for parallel pdflatex calls
     attr_accessor :multithreads_okay_for_tioga
+
+    # An accessor for @measures_info:
+    attr_accessor :measures_info
 
     # old preview attributes -- to be removed later
     
@@ -270,16 +275,13 @@ class FigureMaker
         @multithreads_okay_for_tioga = true
 
 
-      # The following attributes are not to be used, as they will
-      # be deprecated as soon as the equivalent C code is operational
-        # The values measured during the pdflatex run
+        # The values of the sizes measured during the pdflatex run
+        # we need to keep track of them so we can decide how many times
+        # we'll run pdflatex.
         @measures = {}
-        # And some context information to provide accurate information
-        # Hash name -> {hash: scale}
-        @measures_context = {}
 
         # We *must* initialize the measures_info hash.
-        self.measures_info = {}
+        @measures_info = {}
     end
     
 
@@ -311,53 +313,18 @@ class FigureMaker
     # * 'just'  : the justification used
     # * 'align' : the vertical alignment used
     # * 'angle' : the angle used
-    # * 'scale' : the *total* scale used/
+    # * 'scale' : the *total* scale used.
+    #
+    # If the measurement did not take place yet, the width, height,
+    # and other attributes will be missing. Look for those.
     def get_text_size(name, default = 1.0)
-      if @measures_context.key? name
-        info =  @measures_context[name].dup
+      if self.measures_info.key? name
+        return self.measures_info[name]
       else
-        info = { 
-          'scale' => nil,
-          'angle' => nil, 
-          'justification' => nil,
-          'align' => nil,
-        }
+        return {}               # Empty hash
       end
-      if @measures.key? name
-        scale =  @measures_context[name]['scale']
-        width = @measures[name][0] * scale
-        height = (@measures[name][1] + @measures[name][2]) * scale
-
-        # Sizes in points.
-        info['original_width']  = width
-        info['original_height'] = height
-
-        # Now, we rotate the coordinates if necessary:
-        angle = @measures_context[name]['angle']
-        if angle != 0
-          c = Math::cos(PI * angle/180)
-          s = Math::sin(PI * angle/180)
-          xs = Dvector.new
-          ys = Dvector.new 
-          for x,y in [[0,0], [width, height], [width, 0], [0, height]]
-            xs.push(c * x - s * y)
-            ys.push(c * y + s * x)
-          end
-          width = xs.max - xs.min
-          height = ys.max - ys.min
-        end
-        info['width'] = 
-          convert_output_to_figure_dx(convert_inches_to_output(width)/72.0)
-        info['height'] = 
-          convert_output_to_figure_dy(convert_inches_to_output(height)/72.0)
-      else
-        info.update({
-          'width'  => default,
-          'height' => default,
-        })
-      end
-      return info
     end
+
 
     def reset_state        
         reset_figures
@@ -1753,24 +1720,10 @@ class FigureMaker
                 raise "Sorry: 'color' must be array of [r,g,b] intensities for show_text"
             end 
             text = sprintf("\\textcolor[rgb]{%0.2f,%0.2f,%0.2f}{%s}", r, g, b, text)
-            if dict.key? 'measure' # Wrap it in a measure call.
-              text = "\\tiogameasure{#{dict['measure']}}{#{text}}"
-            end
-          
         end
         just = get_if_given_else_default(dict, 'justification', self.justification)
         align = get_if_given_else_default(dict, 'alignment', self.alignment)
         angle = get_if_given_else_default(dict, 'angle', 0)
-
-      
-        if dict.key? 'measure' # save additional informations:
-          @measures_context[dict['measure']] = {
-            'scale' => scale * self.default_text_scale,
-            'angle' => angle, 
-            'justification' => just,
-            'align' => align,
-          }
-        end
 
         loc = alt_names(dict, 'loc', 'side')
         if (loc == nil)
@@ -1786,7 +1739,7 @@ class FigureMaker
                 raise "Sorry: Must supply a location for show_text"
             end
             show_rotated_label(text, xloc, yloc, scale, angle, just, align, 
-                               dict['measure'])
+                               dict['measure'] || nil)
             return
         end
         position = alt_names(dict, 'position', 'pos')
@@ -2005,8 +1958,13 @@ class FigureMaker
         num = get_num_for_pdf(num)
         result = start_making_pdf(num)
         return unless result
+        begin
         @figure_pdfs[num] = finish_making_pdf(@figure_names[num])
         # If the keys have changed, we run that again.
+        rescue Exception => e
+          p e, e.backtrace
+        end
+          
         if @measures.keys != old_measure_keys
           make_pdf(num)
         end
@@ -2181,6 +2139,8 @@ class FigureMaker
       # * third, closing the standard input of pdflatex will remove
       #   painful bugs, when pdflatex gets interrupted but waits
       #   for an input for which it didn't prompt.
+
+      @measures = {}
       IO::popen(syscmd, "r+") do |f|
         f.close_write           # We don't need that.
         log = File.open(logname, "w")
@@ -2195,6 +2155,12 @@ class FigureMaker
           end
         end
       end
+
+      # Now passing the saved measures to the C code.
+      for key, val in @measures
+        # p @fm_data
+        private_save_measure(key, *val)
+      end
         
       result = $?
         if !result
@@ -2205,9 +2171,7 @@ class FigureMaker
             else
                 reporting = false; linecount = 0
                 file.each_line do |line|
-                    firstchar = line[0..0]
-                    comparison = (firstchar <=> '!')
-                    reporting = true if comparison == 0
+                    reporting = true if line =~ /^!/
                     if reporting
                         puts line
                         linecount = linecount + 1

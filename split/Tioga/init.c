@@ -63,6 +63,7 @@ static ID_PTR xaxis_tick_labels_ID;
 static ID_PTR yaxis_locations_for_major_ticks_ID;
 static ID_PTR yaxis_locations_for_minor_ticks_ID;
 static ID_PTR yaxis_tick_labels_ID;
+static ID_PTR measures_info_ID;
 
 
 void Init_IDs(void)
@@ -110,6 +111,7 @@ void Init_IDs(void)
     yaxis_locations_for_major_ticks_ID = ID_Get("@yaxis_locations_for_major_ticks");
     yaxis_locations_for_minor_ticks_ID = ID_Get("@yaxis_locations_for_minor_ticks");
     yaxis_tick_labels_ID = ID_Get("@yaxis_tick_labels");
+    measures_info_ID = ID_Get("@measures_info");
 }
 
 void do_cmd(OBJ_PTR fmkr, OBJ_PTR cmd, int *ierr) { 
@@ -638,4 +640,24 @@ OBJ_PTR Get_yaxis_tick_labels(OBJ_PTR fmkr, int *ierr) {
 }
 
 
-
+/* 
+   Returns the hash where a given measure is stored,
+   creating it if necessary. The attribute measures_info *must be set* !
+   This function can return OBJ_NIL.
+*/
+OBJ_PTR Get_Measure_Hash(OBJ_PTR fmkr, OBJ_PTR measure_name)
+{
+  OBJ_PTR value;
+  int i;
+  OBJ_PTR measures_info = Obj_Attr_Get(fmkr, measures_info_ID, &i);
+  if(measure_name == OBJ_NIL) {
+    return OBJ_NIL;
+  }
+  if(! Hash_Has_Key_Obj(measures_info, measure_name)) {
+    value = Hash_New();
+    Hash_Set_Obj_Obj(measures_info, measure_name, value);
+  }
+  else 
+    value = Hash_Get_Obj_Obj(measures_info, measure_name);
+  return value;
+}

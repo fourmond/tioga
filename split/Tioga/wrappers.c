@@ -475,3 +475,15 @@ OBJ_PTR FM_show_rotated_label(OBJ_PTR fmkr, OBJ_PTR text,
    RETURN_NIL; }
 OBJ_PTR FM_check_label_clip(OBJ_PTR fmkr, OBJ_PTR xloc, OBJ_PTR yloc) { int ierr=0;
    return c_check_label_clip(fmkr, Get_FM(fmkr, &ierr), Number_to_double(xloc, &ierr), Number_to_double(yloc, &ierr), &ierr); }
+
+
+OBJ_PTR FM_save_measure(OBJ_PTR fmkr, OBJ_PTR measure_name, 
+			OBJ_PTR width, OBJ_PTR height, OBJ_PTR depth)
+{
+  int ierr;
+  c_save_measure(fmkr, measure_name, 
+		 Number_to_double(width,&ierr), 
+		 Number_to_double(height,&ierr),
+		 Number_to_double(depth,&ierr));
+  return OBJ_NIL;
+}

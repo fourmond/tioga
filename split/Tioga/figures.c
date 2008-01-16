@@ -75,7 +75,7 @@ OBJ_PTR cFM; /* the Tioga/FigureMaker class object */
 
 FM *Get_FM(OBJ_PTR fmkr, int *ierr) {
    FM *p = (FM *)Dvector_Data_for_Write(Get_fm_data_attr(fmkr, ierr), NULL);
-   if (*ierr != 0) RAISE_ERROR("FigMkr is missing @fm_data",ierr);
+   if (*ierr != 0) RAISE_ERROR("FigMkr is missing @fm_data", ierr);
    return p;
 }
 
@@ -250,24 +250,6 @@ FM *Get_FM(OBJ_PTR fmkr, int *ierr) {
 /* Warning on non-ok numbers */
    BOOL_ATTR(croak_on_nonok_numbers)
 
-static VALUE FM_measures_info_get(VALUE fmkr) 
-{ 
-  int ierr=0; 
-  FM *p = Get_FM(fmkr,&ierr); 
-  return (ierr != 0)? OBJ_NIL : p->measures_info; 
-}
-
-static VALUE FM_measures_info_set(VALUE fmkr, VALUE hash) 
-{ 
-  int ierr=0; 
-  FM *p = Get_FM(fmkr,&ierr); 
-  if(ierr) 
-    return OBJ_NIL;
-  p->measures_info = hash;
-  return hash;
-}
-
-
 bool Get_initialized() {
    OBJ_PTR v = rb_cv_get(cFM, "@@initialized");
    return v != OBJ_FALSE && v != OBJ_NIL;
@@ -331,9 +313,6 @@ void Init_FigureMaker(void) {
    rb_define_method(cFM, "private_make_portfolio", FM_private_make_portfolio, 3);
    rb_define_method(cFM, "private_init_fm_data", FM_private_init_fm_data, 0);
 
-   /* The measures_info hash */
-   attr_accessors(measures_info);
-   
 /* page attribute accessors */
    attr_reader(root_figure)
    attr_reader(in_subplot)
@@ -447,6 +426,8 @@ void Init_FigureMaker(void) {
    rb_define_method(cFM, "show_rotated_text", FM_show_rotated_text, 9);
    rb_define_method(cFM, "show_rotated_label", FM_show_rotated_label, 8);
    rb_define_method(cFM, "check_label_clip", FM_check_label_clip, 2);
+/* text measurements */
+   rb_define_method(cFM, "private_save_measure", FM_save_measure, 4);
 /* path construction */
    rb_define_method(cFM, "move_to_point", FM_move_to_point, 2);
    rb_define_method(cFM, "append_point_to_path", FM_append_point_to_path, 2);

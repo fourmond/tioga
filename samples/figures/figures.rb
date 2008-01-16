@@ -60,6 +60,7 @@ class MyFigures
 
 
         t.def_figure("Text_size") { text_size }
+        t.def_figure("Text_size_with_rotation") { text_size_with_rotation }
         
 
         hues
@@ -324,6 +325,48 @@ class MyFigures
     # In this example, we show how we can use measures of the text
     # transparently with Tioga:
     def text_size
+      t.stroke_rect(0,0,1,1)
+      t.rescale(0.5)
+      
+      
+      text = "box"
+      # We try demonstration various positions/
+      
+      tries = [
+               {'x' => 0, 'y' => 0,
+                 'justification' => LEFT_JUSTIFIED,
+                 'alignment' => ALIGNED_AT_TOP,
+                 'scale' => 1,
+               }]
+      i = 0
+      for try in tries
+        a = { 'text' => text,
+          'scale' => 1, 
+          'measure' => "box#{i}"
+        }
+        a.update(try)
+        t.show_text(a)
+        size = t.get_text_size("box#{i}")
+
+        # We draw a box around the text:
+        if size.key? 'width'
+          xs = Dvector.new
+          ys = Dvector.new
+          for x,y in size['points']
+            xs << t.convert_output_to_figure_x(10*x)
+            ys << t.convert_output_to_figure_y(10*y)
+          end
+          p size
+          xs << xs[0]
+          ys << ys[0]
+          t.show_polyline(xs,ys, Red, nil, Line_Type_Dot)
+        end
+      end
+    end
+
+    # In this example, we show how we can use measures of the text
+    # transparently with Tioga:
+    def text_size_with_rotation
       t.stroke_rect(0,0,1,1)
       t.rescale(0.5)
 

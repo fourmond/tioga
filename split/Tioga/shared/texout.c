@@ -46,32 +46,16 @@ static int String_Is_Blank(char  *str) {
    return 0;
    }
 
-/* 
-   Returns the hash where a given measure is stored,
-   creating it if necessary. The attribute measures_info *must be set* !
-   This function can return OBJ_NIL.
-*/
-static OBJ_PTR Get_Measure_Hash(FM * p, OBJ_PTR measure_name)
-{
-  OBJ_PTR value;
-  if(measure_name == OBJ_NIL) {
-    return OBJ_NIL;
-  }
-  if(! Hash_Has_Key_Obj(p->measures_info, measure_name)) {
-    value = Hash_New();
-    Hash_Set_Obj_Obj(p->measures_info, measure_name, value);
-  }
-  else 
-    value = Hash_Get_Obj_Obj(p->measures_info, measure_name);
-  return value;
-}
 
-
-static void tex_show_rotated_text(FM *p, char *text, double x, double y, double scale, double angle, int justification, int alignment, OBJ_PTR measure_name)
+static void tex_show_rotated_text(OBJ_PTR fmkr, FM *p, char *text, 
+				  double x, double y, double scale, 
+				  double angle, int justification, 
+				  int alignment, OBJ_PTR measure_name)
 {  // x and y are the device coords for the reference point of the text
    char ref, jst;
    double ft_ht, sz;
-   OBJ_PTR measures = Get_Measure_Hash(p, measure_name);
+   int dummy;
+   OBJ_PTR measures = Get_Measure_Hash(fmkr, measure_name);
    if (String_Is_Blank(text)) return; /* blank strings break TeX! */
    scale *= p->default_text_scale;
    ft_ht = scale * p->default_font_size;
@@ -87,13 +71,30 @@ static void tex_show_rotated_text(FM *p, char *text, double x, double y, double 
    bbox_urx = MAX(bbox_urx, x + sz);
    bbox_ury = MAX(bbox_ury, y + sz);
    if (angle != 0.0)
-      fprintf(fp,"\\put(%d,%d){\\rotatebox{%.1f}{\\scalebox{%.2f}{\\makebox(0,0)[%c%c]{\\tiogasetfont",
+      fprintf(fp,"\\put(%d,%d){\\rotatebox{%.1f}{\\scalebox{%.2f}{\\makebox(0,0)[%c%c]{",
             ROUND(x), ROUND(y), angle, scale, jst, ref);
    else
-      fprintf(fp,"\\put(%d,%d){\\scalebox{%.2f}{\\makebox(0,0)[%c%c]{\\tiogasetfont",
+      fprintf(fp,"\\put(%d,%d){\\scalebox{%.2f}{\\makebox(0,0)[%c%c]{",
             ROUND(x), ROUND(y), scale, jst, ref);
+   if(measure_name != OBJ_NIL)
+     fprintf(fp, "\\tiogameasure{%s}{\\tiogasetfont", 
+	     CString_Ptr(measure_name,&dummy));
+   else
+     fprintf(fp, "{\\tiogasetfont");
+   
    fprintf(fp, (alignment == ALIGNED_AT_BASELINE)? "{%s\\BS" : "{%s", text);
-   fprintf(fp, angle != 0? "}}}}}\n" : "}}}}\n");
+   fprintf(fp, angle != 0? "}}}}}}\n" : "}}}}}\n");
+
+   /* Now, we save measures informations if applicable*/
+   if(measures != OBJ_NIL) {
+     Hash_Set_Double(measures, "scale", scale);
+     /* [xy]anchor are saved in postscript points */
+     Hash_Set_Double(measures, "xanchor", ROUND(x) / ENLARGE);
+     Hash_Set_Double(measures, "yanchor", ROUND(y) / ENLARGE);
+     Hash_Set_Double(measures, "angle", angle);
+     Hash_Set_Double(measures, "just", justification);
+     Hash_Set_Double(measures, "align", alignment);
+   }
 }
 
 static void Convert_Frame_Text_Position_To_Output_Location(FM *p, int frame_side, double offset, 
@@ -150,13 +151,13 @@ void c_show_rotated_text(OBJ_PTR fmkr, FM *p, char *text, int frame_side, double
 			 double scale, double angle, int justification, int alignment, OBJ_PTR measure_name, int *ierr) {
    double x, y, base_angle, ft_ht = p->default_text_scale * scale * p->default_font_size;
    Convert_Frame_Text_Position_To_Output_Location(p, frame_side, shift*ft_ht*ENLARGE, fraction, &x, &y, &base_angle, text, ierr);
-   tex_show_rotated_text(p, text, x, y, scale, angle + base_angle, justification, alignment, measure_name);
+   tex_show_rotated_text(fmkr, p, text, x, y, scale, angle + base_angle, justification, alignment, measure_name);
 }
 
          
 void c_show_rotated_label(OBJ_PTR fmkr, FM *p, char *text, 
    double xloc, double yloc, double scale, double angle, int justification, int alignment, OBJ_PTR measure_name, int *ierr) {
-   tex_show_rotated_text(p, text, convert_figure_to_output_x(p, xloc), convert_figure_to_output_y(p, yloc),
+   tex_show_rotated_text(fmkr, p, text, convert_figure_to_output_x(p, xloc), convert_figure_to_output_y(p, yloc),
 			 scale, angle, justification, alignment, measure_name);
 }
    
@@ -357,3 +358,129 @@ void private_make_portfolio(char *name, OBJ_PTR fignums, OBJ_PTR fignames, int *
 }
 
 
+/* 
+   Stores and transforms measures as printed by pdflatex.
+
+   Takes sizes in bp.
+
+*/
+void c_save_measure(OBJ_PTR fmkr, OBJ_PTR measure_name, 
+		    double width, double height, double depth)
+{
+  double angle, scale;
+  int just, align;
+  /* Page coordinates in bp before applying rotation ! */
+  double xl,xr,yt,yb;
+  double xa,ya;
+  OBJ_PTR measures = Get_Measure_Hash(fmkr, measure_name);
+  int dummy;
+
+  /* The following really should not happen */
+  if(measures == OBJ_NIL) {
+    fprintf(stderr, "Warning: got hash = OBJ_NIL in %s, line %d\n",
+	    __FILE__, __LINE__);
+    return;
+  }
+
+  /* Storing measured sizes  */
+  Hash_Set_Double(measures, "tex_measured_width", width);
+  Hash_Set_Double(measures, "tex_measured_height", height);
+  Hash_Set_Double(measures, "tex_measured_depth", depth);
+
+  angle = Hash_Get_Double(measures, "angle");
+  scale = Hash_Get_Double(measures, "scale");
+  just = Hash_Get_Double(measures, "just");
+  align = Hash_Get_Double(measures, "align");
+  
+  /* Setting the appropriate scale */
+  width *= scale;
+  height *= scale;
+  depth *= scale;
+  /* Now setting the width and height in  */
+  Hash_Set_Double(measures, "width", width);
+  Hash_Set_Double(measures, "height", height);
+  Hash_Set_Double(measures, "depth", depth);
+
+  xa = Hash_Get_Double(measures, "xanchor");
+  ya = Hash_Get_Double(measures, "yanchor");
+  
+  /* Now, we try to compute the precise position of
+     the points of the box surrounding the text.
+  */
+
+  /* First, before rotation: */
+  switch(just) {
+  case 1:			/* Right-justified */
+    xr = xa;
+    xl = xa - width;
+    break;
+  case 0:			/* Centered */
+    xr = xa + width/2;
+    xl = xa - width/2;
+    break;
+  case -1:			/* Left-justified */
+    xl = xa;
+    xr = xa + width;
+    break;
+  default:
+    fprintf(stderr, "Invalid justification = %d at %s, line %d\n",
+	    just, __FILE__, __LINE__);
+    xl = xa;
+    xr = xa + width/2;
+  }
+
+  /* First, before rotation: */
+  switch(align) {
+  case ALIGNED_AT_BASELINE:
+    yt = ya + height;
+    yb = ya - depth;
+    break;
+  case ALIGNED_AT_BOTTOM:
+    yt = ya + height + depth;
+    yb = ya;
+    break;
+  case ALIGNED_AT_TOP:
+    yb = ya - height - depth;
+    yt = ya;
+    break;
+  default:			/* Centered */
+    yb = ya - 0.5*(height + depth);
+    yt = ya + 0.5*(height + depth);
+  }
+
+  /* Now, rotation */
+  if(angle == 0.0) {
+    /* xbl = x of 'bottom left' */
+    Hash_Set_Double(measures, "xbl", xl);
+    Hash_Set_Double(measures, "ybl", yb);
+    Hash_Set_Double(measures, "xtl", xl);
+    Hash_Set_Double(measures, "ytl", yt);
+    Hash_Set_Double(measures, "xbr", xr);
+    Hash_Set_Double(measures, "ybr", yb);
+    Hash_Set_Double(measures, "xtr", xr);
+    Hash_Set_Double(measures, "ytr", yt);
+  }
+  else {
+    /* Not currently supported */
+  }
+  
+  /* We transform coordinates into an array 
+     (topleft, topright,  botright, botleft)
+     of arrays (xy) of doubles */
+  OBJ_PTR points = Array_New(0);
+  OBJ_PTR current_point;
+  int i;
+  for(i = 0; i < 8; i++) {
+    char buf[4];
+    if(! (i % 2)) {
+      current_point = Array_New(0);
+      Array_Push(points, current_point, &dummy);
+    }
+    snprintf(buf, sizeof(buf), "%c%c%c", 
+	     (i%2 ? 'y' : 'x'),
+	     (i/4 ? 't' : 'b'),
+	     ((i >= 2) && (i < 6) ? 'r' : 'l'));
+    Array_Push(current_point, Hash_Get_Obj(measures, buf), &dummy);
+  }
+  Hash_Set_Obj(measures, "points", points);
+}
