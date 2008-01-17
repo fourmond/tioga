@@ -481,12 +481,30 @@ void c_save_measure(OBJ_PTR fmkr, OBJ_PTR measure_name,
     Hash_Set_Double(measures, "ytr", yt);
   }
   else {
-    /* Not currently supported */
+    double s = - sin(angle * PI/180);
+    double c = cos(angle * PI/180);
+    Hash_Set_Double(measures, "xbl", 
+		    xa + (xl-xa)*c + (yb - ya) * s);
+    Hash_Set_Double(measures, "ybl",
+		    ya - (xl-xa)*s + (yb - ya) * c);
+    Hash_Set_Double(measures, "xtl", 
+		    xa + (xl-xa)*c + (yt - ya) * s);
+    Hash_Set_Double(measures, "ytl",
+		    ya - (xl-xa)*s + (yt - ya) * c);
+    Hash_Set_Double(measures, "xbr", 
+		    xa + (xr-xa)*c + (yb - ya) * s);
+    Hash_Set_Double(measures, "ybr",
+		    ya - (xr-xa)*s + (yb - ya) * c);
+    Hash_Set_Double(measures, "xtr", 
+		    xa + (xr-xa)*c + (yt - ya) * s);
+    Hash_Set_Double(measures, "ytr",
+		    ya - (xr-xa)*s + (yt - ya) * c);
   }
   
   /* We transform coordinates into an array 
      (topleft, topright,  botright, botleft)
-     of arrays (xy) of doubles */
+     of arrays (xy) of doubles 
+  */
   OBJ_PTR points = Array_New(0);
   OBJ_PTR current_point;
   int i;

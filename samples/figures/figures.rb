@@ -348,10 +348,6 @@ class MyFigures
       t.stroke_rect(0,0,1,1)
       t.rescale(0.5)
       
-      
-      text = "box"
-      # We try demonstration various positions/
-      
       tries = [
                {
                  'text' => 'Using side/position instead of X and Y', 
@@ -387,12 +383,35 @@ class MyFigures
                  'scale' => 2,
                  'text' => 'left mid-height'
                },
+               {
+                 'x' => 0.7, 'y' => 0.9,
+                 'justification' => CENTERED,
+                 'alignment' => ALIGNED_AT_MIDHEIGHT,
+                 'scale' => 2,
+                 'text' => 'rotated',
+                 'angle' => -30
+               },
+               {
+                 'x' => 0.5, 'y' => 0.4,
+                 'justification' => RIGHT_JUSTIFIED,
+                 'alignment' => ALIGNED_AT_BASELINE,
+                 'scale' => 2,
+                 'text' => 'a right-justified rotated text',
+                 'angle' => 12
+               },
+               {
+                 'x' => 1, 'y' => 0.4,
+                 'justification' => LEFT_JUSTIFIED,
+                 'alignment' => ALIGNED_AT_TOP,
+                 'scale' => 2,
+                 'text' => 'a left-justified rotated text',
+                 'angle' => 240
+               },
                
               ]
       i = 0
       for try in tries
-        a = { 'text' => text,
-          'scale' => 1, 
+        a = { 'scale' => 1, 
           'measure' => "box#{i}"
         }
         a.update(try)
