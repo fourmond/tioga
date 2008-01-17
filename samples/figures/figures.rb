@@ -463,10 +463,18 @@ class MyFigures
                     'scale' => scale , 'measure' => "box#{i}", 
                     'angle' => angle )
         size = t.get_text_size("box#{i}")
-        w = size['width']
-        h = size['height']
-        t.stroke_color = color
-        t.stroke_rect(x - w/2, x - h/2, w, h)
+        if size.key? 'points'
+          xs = Dvector.new
+          ys = Dvector.new
+          for x,y in size['points']
+            xs << t.convert_output_to_figure_x(10*x)
+            ys << t.convert_output_to_figure_y(10*y)
+          end
+          t.stroke_color = color
+          t.line_type = Line_Type_Dashes
+          t.stroke_rect(xs.min, ys.min,
+                        (xs.max - xs.min),(ys.max - ys.min))
+        end
       end
     end
     
