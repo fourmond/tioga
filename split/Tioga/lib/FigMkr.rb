@@ -31,23 +31,20 @@ class FigureMaker
     @@default_figure_maker = nil
     @@which_pdflatex = nil
     @@initialized = false  # set true by the C code when first make a figure
-    
 
-    # The tag used for cvs export 
-    CVS_TAG = "rel_1_6"         # now manually cheating...
+    # This URL will contain tioga-(...) when it is exported from the
+    # SVN repository. This is where we'll look for version information.
+    SVN_URL = '$HeadURL$'
 
-    # TODO: swicth to the model used for ctioga.
-    
-    # Version now uses the CVS_TAG to create the version number. CVS_TAG should
-    # look like 'rel_1_1_0' for the 1.1.0 release. 
+    TIOGA_VERSION = if SVN_URL =~ /releases\/tioga\/Tioga\s+-([^\/]+)/
+                       $1
+                     else
+                       "SVN version"
+                     end
+
+
     def FigureMaker.version
-      CVS_TAG =~ /\D+(.*?)\s*\$?$/
-      version = $1.tr("-_", "..")
-      if version.length > 0
-        return version
-      else
-        return "SVN $Revision$"    # Can't do better than that.
-      end
+      TIOGA_VERSION
     end
 
 

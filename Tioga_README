@@ -20,7 +20,7 @@ This is the README for the Tioga kernel, version 1.6, March 17, 2007.
 
 << What's new >>
 
-   Version 1.7 adds an option in legends for markers without any line;
+    Version 1.7 adds an option in legends for markers without any line;
 just call save_legend_info with 'line_type' => 'None' in addition to
 the marker information.  It is also now possible to give a 'legend' argument
 to show_marker.  The value of the arg can be either a legend dictionary
@@ -28,8 +28,22 @@ or simply the legend text in which case defaults will be supplied for
 the rest.  There is an example of this in samples/plots.rb
 in the Legend_Outside figure.
 
+    It saw a very significant improvement in that you can now query
+the exact size of a text typeset by LaTeX, with the function text_size. Please
+have a look at its documentation, and at the Text_size and 
+Text_size_with_rotation samples in samples/figures/figures.rb.
 
-  
+    The code base was quite moved around so as to facilitate work on a 
+Python version that would share as much code as possible with the Ruby one;
+this should not bring user-visible changes (apart, maybe, from compilation
+problems, but we hope not).
+
+    Some bug fixes, including potential stack overflows (unprotected
+snprintfs), and some new methods of Function. Dvector.fancy_read has been
+reimplemented in C and benchmarked: it should be around three times faster
+than before.
+
+    Code should now compile cleanly with Ruby 1.9.
 
 << Quick Installation of Tioga >>
 
