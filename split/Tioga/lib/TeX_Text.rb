@@ -213,8 +213,25 @@ link:images/Framebox.png
 Returns information about the text measure named _name_. It returns a hash
 with the following information:
 
-  TODO!!!!!!!!!!!!!!!!!!!!!!!!!
-  Convert all output to 1/10 postscript points !!!
+ * _[xy][tb][lr]_ the X/Y coordinates of the Top/Bottom Left/Right point of the
+   box around the text (top, left, right and bottom are relative to the text
+   natural orientation)
+ * _just_ the text justification
+ * _angle_ the text's angle, in degrees
+ * _tex_measured_depth_, _tex_measured_height_, tex_measured_width_, the
+   text's depth, width and height as measured by TeX,
+  (does not take scaling into accound)
+ * _xanchor_, _yanchor_: the page coordinates of the position of the text
+   (the ones that were given to #show_text)
+ * _points_ an array of (x,y) coordinates of the points that make the box,
+   in the order bottom left, bottom right, top right, top left.
+ * _depth_, _width_, _height_ : the size of the text.
+ * _align_ the alignment of the text
+
+All the measures are given in postscript points, which means you need
+to multiply by 10 before using the with 
+Page_Frame_Bounds#convert_output_to_figure_x 
+Page_Frame_Bounds#convert_output_to_figure_y. See the example
 
 Please make sure you test the presence of one key before using it, as
 any code using measures has to run *twice*: one first time to typeset the
@@ -257,6 +274,8 @@ hash will be empty.
         end
       end
     end
+
+link:images/Text_size_with_rotation.png
 
 =end
 
