@@ -61,6 +61,10 @@ With double quotes, Ruby uses backslash for a variety of escape characters such 
 so the backslashes for TeX need to be entered as \\ pairs to be safe.
 Compare '$\nu\sim\tau$' to the equivalent form "$\\\\nu\\\\sim\\\\tau$" and the incorrect form "$\nu\sim\tau$".
 
+Starting from Tioga 1.7, Tioga can measure the TeX text it typesets. For
+that purpose, provide #show_text with a 'measure' dictionnary entry that
+serves as a key to retrieve the information using #get_text_size.   
+
 Dictionary Entries
     'text'            => a_string        # to be processed by TeX
     'side'            => a_side          # TOP, BOTTOM, LEFT, or RIGHT
@@ -77,7 +81,8 @@ Dictionary Entries
     'angle'           => a_float         # degrees to rotate.  default 0
     'alignment'       => an_alignment    # see discussion of alignment
     'justification'   => a_justification # see discussion of justification
-
+    'measure'         => a_string        # the name of the measure
+     
 Examples
 
     def math_typesetting
@@ -202,6 +207,60 @@ link:images/Framebox.png
 
 =end
     def show_text(dict)
+    end
+
+=begin rdoc
+Returns information about the text measure named _name_. It returns a hash
+with the following information:
+
+  TODO!!!!!!!!!!!!!!!!!!!!!!!!!
+  Convert all output to 1/10 postscript points !!!
+
+Please make sure you test the presence of one key before using it, as
+any code using measures has to run *twice*: one first time to typeset the
+text and ask LaTeX for information about its size, and the second time to
+actually use the information. You don't need to call the code twice as it
+is done automatically, but keep in mind that in the first run, the returned
+hash will be empty.
+
+    def text_size_with_rotation
+      t.stroke_rect(0,0,1,1)
+      t.rescale(0.5)
+
+      equation = '\int_{-\infty}^{\infty} \! e^{-x^{2}}\, \! dx = \sqrt{\pi}'
+      text = "\\fbox{$\\displaystyle #{equation}$}"
+
+      nb = 5
+      nb.times do |i|
+        scale = 0.5 + i * 0.2
+        angle = i * 37
+        x = (i+1)/(nb+1.0)
+        y = x
+        color = [1.0 - i * 0.2, i*0.2, 0]
+        t.show_text('text' => text, 'color' => color, 'x' => x, 
+                    'y' => x,
+                    'alignment' => ALIGNED_AT_MIDHEIGHT,
+                    'scale' => scale , 'measure' => "box#{i}", 
+                    'angle' => angle )
+        size = t.get_text_size("box#{i}")
+        if size.key? 'points'
+          xs = Dvector.new
+          ys = Dvector.new
+          for x,y in size['points']
+            xs << t.convert_output_to_figure_x(x)
+            ys << t.convert_output_to_figure_y(y)
+          end
+          t.stroke_color = color
+          t.line_type = Line_Type_Dashes
+          t.stroke_rect(xs.min, ys.min,
+                        (xs.max - xs.min),(ys.max - ys.min))
+        end
+      end
+    end
+
+=end
+
+    def get_text_size(name)
     end
 
 # Changes the default_text_scale attribute by multiplying it times _scale_.
