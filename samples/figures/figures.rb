@@ -434,9 +434,10 @@ class MyFigures
         t.show_marker({
                         'x' => try['x'],
                         'y' => try['y'],
-                        'marker' => MarkerConstants::Times,
+                        'marker' => MarkerConstants::Plus,
                         'scale' => 0.6,
-                        'color' => Green
+                        'color' => Green,
+                        'angle' => try['angle'] || 0
                       })
       end
     end
