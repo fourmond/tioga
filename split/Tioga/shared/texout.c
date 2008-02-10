@@ -166,12 +166,21 @@ static void Convert_Frame_Text_Position_To_Output_Location(FM *p, int frame_side
    }
    *xp = p->page_left + page_x; *yp = p->page_bottom + page_y;
 }
-       
-void c_show_rotated_text(OBJ_PTR fmkr, FM *p, char *text, int frame_side, double shift, double fraction,
-			 double scale, double angle, int justification, int alignment, OBJ_PTR measure_name, int *ierr) {
-   double x, y, base_angle, ft_ht = p->default_text_scale * scale * p->default_font_size;
-   Convert_Frame_Text_Position_To_Output_Location(p, frame_side, shift*ft_ht*ENLARGE, fraction, &x, &y, &base_angle, text, ierr);
-   tex_show_rotated_text(fmkr, p, text, x, y, scale, angle + base_angle, justification, alignment, measure_name);
+
+
+void c_show_rotated_text(OBJ_PTR fmkr, FM *p, char *text, int frame_side,
+                         double shift, double fraction, double scale,
+                         double angle, int justification, int alignment,
+                         OBJ_PTR measure_name, int *ierr)
+{
+   double x = 0, y = 0, base_angle = 0;
+   double ft_ht = p->default_text_scale * scale * p->default_font_size;
+   Convert_Frame_Text_Position_To_Output_Location(p, frame_side,
+                                                  shift * ft_ht * ENLARGE,
+                                                  fraction, &x, &y,
+                                                  &base_angle, text, ierr);
+   tex_show_rotated_text(fmkr, p, text, x, y, scale, angle + base_angle,
+                         justification, alignment, measure_name);
 }
 
          
@@ -384,8 +393,8 @@ void private_make_portfolio(char *name, OBJ_PTR fignums, OBJ_PTR fignames, int *
    Takes sizes in bp.
 
 */
-void c_save_measure(OBJ_PTR fmkr, OBJ_PTR measure_name, 
-		    double width, double height, double depth)
+void c_private_save_measure(OBJ_PTR fmkr, OBJ_PTR measure_name,
+                            double width, double height, double depth)
 {
   double angle, scale;
   int just, align;
@@ -506,7 +515,7 @@ void c_save_measure(OBJ_PTR fmkr, OBJ_PTR measure_name,
      of arrays (xy) of doubles 
   */
   OBJ_PTR points = Array_New(0);
-  OBJ_PTR current_point;
+  OBJ_PTR current_point = NULL;
   int i;
   for(i = 0; i < 8; i++) {
     char buf[4];
