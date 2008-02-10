@@ -250,9 +250,9 @@ extern OBJ_PTR FM_check_label_clip(OBJ_PTR fmkr, OBJ_PTR xloc, OBJ_PTR yloc);
 
 
 /* For saving results of text measurements. */
-extern OBJ_PTR FM_save_measure(OBJ_PTR fmkr, OBJ_PTR measure_name, 
-			       OBJ_PTR width, OBJ_PTR height, 
-			       OBJ_PTR depth); 
+extern OBJ_PTR FM_private_save_measure(OBJ_PTR fmkr, OBJ_PTR measure_name,
+                                       OBJ_PTR width, OBJ_PTR height, 
+                                       OBJ_PTR depth); 
 
 
 #endif   /* __wrappers_H__ */

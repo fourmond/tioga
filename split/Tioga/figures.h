@@ -660,8 +660,8 @@ extern void c_show_rotated_text(OBJ_PTR fmkr, FM *p, char *text, int frame_side,
 extern void c_show_rotated_label(OBJ_PTR fmkr, FM *p, char *text, 
    double xloc, double yloc, double scale, double angle, int justification, int alignment, OBJ_PTR measure_name, int *ierr);
 extern OBJ_PTR c_check_label_clip(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr);
-extern void c_save_measure(OBJ_PTR fmkr, OBJ_PTR measure_name, 
-			   double width, double height, double depth);
+extern void c_private_save_measure(OBJ_PTR fmkr, OBJ_PTR measure_name, 
+                                   double width, double height, double depth);
 
 
 /*======================================================================*/

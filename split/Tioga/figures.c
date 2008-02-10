@@ -427,7 +427,7 @@ void Init_FigureMaker(void) {
    rb_define_method(cFM, "show_rotated_label", FM_show_rotated_label, 8);
    rb_define_method(cFM, "check_label_clip", FM_check_label_clip, 2);
 /* text measurements */
-   rb_define_method(cFM, "private_save_measure", FM_save_measure, 4);
+   rb_define_method(cFM, "private_save_measure", FM_private_save_measure, 4);
 /* path construction */
    rb_define_method(cFM, "move_to_point", FM_move_to_point, 2);
    rb_define_method(cFM, "append_point_to_path", FM_append_point_to_path, 2);
