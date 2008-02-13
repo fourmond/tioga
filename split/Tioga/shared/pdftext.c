@@ -22,11 +22,14 @@
 #include "figures.h"
 #include "pdfs.h"
 
-void Init_Font_Dictionary(void) {
+
+void
+Init_Font_Dictionary(void)
+{
    int i, num_fonts = num_pdf_standard_fonts;
    Font_Dictionary *font_info;
    for (i = 0; i < num_fonts; i++) {
-      font_info = (Font_Dictionary *)calloc(1,sizeof(Font_Dictionary));
+      font_info = (Font_Dictionary *)calloc(1, sizeof(Font_Dictionary));
       font_info->afm = &afm_array[i];
       font_info->font_num = font_info->afm->font_num;
       font_info->in_use = false;
@@ -35,34 +38,38 @@ void Init_Font_Dictionary(void) {
    }
 }
 
-static void Write_Font_Dictionary(FILE *file, Old_Font_Dictionary *fi) {
+
+static void
+Write_Font_Dictionary(FILE *file, Old_Font_Dictionary *fi)
+{
    int i;
    fprintf(file, "{\n");
    fprintf(file, "\t%i, // font_num\n", fi->font_num);
    fprintf(file, "\t\"%s\", // font_name\n", fi->font_name);
    fprintf(file, "\t%4i, // firstChar\n", fi->firstChar);
    fprintf(file, "\t%4i, // lastChar\n", fi->lastChar);
-   
+
    fprintf(file, "\t{ // char_width\n");
-   for (i=0; i<255; i++) fprintf(file, "\t\t%4i, // %i\n", fi->char_width[i], i);
+   for (i=0; i<255; i++)
+      fprintf(file, "\t\t%4i, // %i\n", fi->char_width[i], i);
    fprintf(file, "\t\t%4i }, // char_width\n", fi->char_width[255]);
-   
+
    fprintf(file, "\t{ // char_llx\n");
    for (i=0; i<255; i++) fprintf(file, "\t\t%4i, // %i\n", fi->char_llx[i], i);
    fprintf(file, "\t\t%4i }, // char_llx\n", fi->char_llx[255]);
-   
+
    fprintf(file, "\t{ // char_lly\n");
    for (i=0; i<255; i++) fprintf(file, "\t\t%4i, // %i\n", fi->char_lly[i], i);
    fprintf(file, "\t\t4%i }, // char_lly\n", fi->char_lly[255]);
-   
+
    fprintf(file, "\t{ // char_urx\n");
    for (i=0; i<255; i++) fprintf(file, "\t\t%4i, // %i\n", fi->char_urx[i], i);
    fprintf(file, "\t\t%4i }, // char_urx\n", fi->char_urx[255]);
-   
+
    fprintf(file, "\t{ // char_ury\n");
    for (i=0; i<255; i++) fprintf(file, "\t\t%4i, // %i\n", fi->char_ury[i], i);
    fprintf(file, "\t\t%4i }, // char_ury\n", fi->char_ury[255]);
-   
+
    fprintf(file, "\t%i, // flags\n", fi->flags);
    fprintf(file, "\t%i, // fnt_llx\n", fi->fnt_llx);
    fprintf(file, "\t%i, // fnt_lly\n", fi->fnt_lly);
@@ -77,12 +84,17 @@ static void Write_Font_Dictionary(FILE *file, Old_Font_Dictionary *fi) {
    fprintf(file, "} // %s\n", fi->font_name);
 }
 
-static void WriteFontDictsToFile(void) {
+
+static void
+WriteFontDictsToFile(void)
+{
    Old_Font_Dictionary *font_info;
    FILE *file;
    file = fopen("pdf_font_dicts.c", "w");
-   fprintf(file, "Font_Dict_Array font_dictionaries[] = { // afm info for PDF fonts \n");
-   for (font_info = old_font_dictionaries; font_info != NULL; font_info = font_info->next) {
+   fprintf(file, "Font_Dict_Array font_dictionaries[]"
+           " = { // afm info for PDF fonts \n");
+   for (font_info = old_font_dictionaries; font_info != NULL;
+        font_info = font_info->next) {
       Write_Font_Dictionary(file, font_info);
       if (font_info->next != NULL) fprintf(file, ",\n");
    }
@@ -90,7 +102,9 @@ static void WriteFontDictsToFile(void) {
    fclose(file);
 }
 
-static void Record_Font_In_Use(Font_Dictionary *font_info, int font_number)
+
+static void
+Record_Font_In_Use(Font_Dictionary *font_info, int font_number)
 {
    if (font_info->in_use) return;
    font_info->afm->font_num = font_number;
@@ -102,11 +116,16 @@ static void Record_Font_In_Use(Font_Dictionary *font_info, int font_number)
    }
 }
 
+
 #define DEBUG 0
 #define MAXSTR 100
-static Font_Dictionary *GetFontDict(char *font_name, int font_number, int *ierr) {
+
+static Font_Dictionary *
+GetFontDict(char *font_name, int font_number, int *ierr)
+{
    Font_Dictionary *font_info;
-   for (font_info = font_dictionaries; font_info != NULL; font_info = font_info->next) {
+   for (font_info = font_dictionaries; font_info != NULL;
+        font_info = font_info->next) {
       if (strcmp(font_name, font_info->afm->font_name) == 0) {
          Record_Font_In_Use(font_info, font_number);
          return font_info;
@@ -116,38 +135,51 @@ static Font_Dictionary *GetFontDict(char *font_name, int font_number, int *ierr)
    return NULL;
 }
 
-static Font_Dictionary *GetFontInfo(int font_number, int *ierr)
+
+static Font_Dictionary *
+GetFontInfo(int font_number, int *ierr)
 {
    Font_Dictionary *f;
    for (f = font_dictionaries; f != NULL; f = f->next) {
-      if (f->font_num == font_number) { Record_Font_In_Use(f, font_number); return f; }
+      if (f->font_num == font_number) {
+         Record_Font_In_Use(f, font_number);
+         return f;
+      }
    }
    if (font_number > 0 && font_number <= num_predefined_fonts)
       return GetFontDict(predefined_Fonts[font_number], font_number, ierr);
    return NULL;
 }
 
-OBJ_PTR c_register_font(OBJ_PTR fmkr, FM *p, char *font_name, int *ierr) {
+
+OBJ_PTR
+c_register_font(OBJ_PTR fmkr, FM *p, char *font_name, int *ierr)
+{
    Font_Dictionary *f;
    int i;
    for (f = font_dictionaries; f != NULL; f = f->next) {
-      if (strcmp(f->afm->font_name, font_name)==0) return f->afm->font_num;
+      if (strcmp(f->afm->font_name, font_name) == 0)
+         return Integer_New(f->afm->font_num);
    }
    for (i = 1; i <= num_predefined_fonts; i++) {
       if (strcmp(predefined_Fonts[i], font_name)==0) {
          f = GetFontDict(font_name, i, ierr);
-         if (f == NULL) RAISE_ERROR_s("Error in reading font metrics for %s", font_name, ierr);
-         return i;
+         if (f == NULL)
+            RAISE_ERROR_s("Error in reading font metrics for %s", font_name,
+                          ierr);
+         return Integer_New(i);
       }
    }
    f = GetFontDict(font_name, next_available_font_number, ierr);
-   if (f == NULL) RAISE_ERROR_s("Error in reading font metrics for %s", font_name, ierr);
+   if (f == NULL) RAISE_ERROR_s("Error in reading font metrics for %s",
+                                font_name, ierr);
    next_available_font_number++;
    return Integer_New(next_available_font_number); 
 }
 
 
-bool Used_Any_Fonts(void)
+bool
+Used_Any_Fonts(void)
 {
    Font_Dictionary *f;
    for (f = font_dictionaries; f != NULL; f = f->next) {
@@ -156,7 +188,9 @@ bool Used_Any_Fonts(void)
    return false;
 }
 
-void Clear_Fonts_In_Use_Flags(void)
+
+void
+Clear_Fonts_In_Use_Flags(void)
 {
    Font_Dictionary *f;
    for (f = font_dictionaries; f != NULL; f = f->next) {
@@ -164,22 +198,29 @@ void Clear_Fonts_In_Use_Flags(void)
    }
 }
 
-void Write_Font_Descriptors(void)
+
+void
+Write_Font_Descriptors(void)
 {
    Font_Dictionary *f;
    for (f = font_dictionaries; f != NULL; f = f->next) {
       if (!f->in_use || f->font_num <= num_pdf_standard_fonts) continue;
       Record_Object_Offset(f->descriptor_obj_num);
-      fprintf(OF, "%i 0 obj << /Type /FontDescriptor /FontName /%s\n", f->descriptor_obj_num, f->afm->font_name);
+      fprintf(OF, "%i 0 obj << /Type /FontDescriptor /FontName /%s\n",
+              f->descriptor_obj_num, f->afm->font_name);
       fprintf(OF, "           /Flags %i /FontBBox [ %i %i %i %i ]\n",
-         f->afm->flags, f->afm->fnt_llx, f->afm->fnt_lly, f->afm->fnt_urx, f->afm->fnt_ury);
-      fprintf(OF, "           /ItalicAngle %i /Ascent %i /Descent %i /CapHeight %i /StemV %i\n",
-         f->afm->italicAngle, f->afm->ascent, f->afm->descent, f->afm->capHeight, f->afm->stemV);
+              f->afm->flags, f->afm->fnt_llx, f->afm->fnt_lly, f->afm->fnt_urx,
+              f->afm->fnt_ury);
+      fprintf(OF, "           /ItalicAngle %i /Ascent %i /Descent %i "
+              "/CapHeight %i /StemV %i\n", f->afm->italicAngle, f->afm->ascent,
+              f->afm->descent, f->afm->capHeight, f->afm->stemV);
       fprintf(OF, ">> endobj\n");
    }
 }
 
-void Write_Font_Widths(void)
+
+void
+Write_Font_Widths(void)
 {
    Font_Dictionary *f;
    int i, cnt = 0;
@@ -189,37 +230,49 @@ void Write_Font_Widths(void)
       fprintf(OF, "%i 0 obj [\n    ", f->widths_obj_num);
       for (i = f->afm->firstChar; i <= f->afm->lastChar; i++) {
          fprintf(OF, "%i ", f->afm->char_width[i]);
-         if (++cnt % 16 == 0)  fprintf(OF, "\n    ");
+         if (++cnt % 16 == 0) fprintf(OF, "\n    ");
       }
       fprintf(OF, "\n] endobj\n");
    }
 }
 
-void Write_Font_Dictionaries(void)
+
+void
+Write_Font_Dictionaries(void)
 {
-   if (0) WriteFontDictsToFile();  // creates pdf_font_dicts.c 
+   if (0) WriteFontDictsToFile(); // creates pdf_font_dicts.c 
    Font_Dictionary *f;
    for (f = font_dictionaries; f != NULL; f = f->next) {
       if (!f->in_use) continue;
       Record_Object_Offset(f->obj_num);
-      fprintf(OF, "%i 0 obj << /Type /Font /Subtype /Type1 /BaseFont /%s", f->obj_num, f->afm->font_name);
-      if (strcmp(f->afm->font_name,"Symbol")!=0 && strcmp(f->afm->font_name,"ZapfDingbats")!=0)
+      fprintf(OF, "%i 0 obj << /Type /Font /Subtype /Type1 /BaseFont /%s",
+              f->obj_num, f->afm->font_name);
+      if (strcmp(f->afm->font_name,"Symbol") != 0
+          && strcmp(f->afm->font_name,"ZapfDingbats") != 0)
          fprintf(OF, " /Encoding /MacRomanEncoding\n");
       else
          fprintf(OF, "\n");
       if (f->font_num > num_pdf_standard_fonts)
-         fprintf(OF, "           /FirstChar %i /LastChar %i /Widths %i 0 R /FontDescriptor %i 0 R\n",
-            f->afm->firstChar, f->afm->lastChar, f->widths_obj_num, f->descriptor_obj_num);
+         fprintf(OF, "           /FirstChar %i /LastChar %i /Widths %i 0 R "
+                 "/FontDescriptor %i 0 R\n", f->afm->firstChar,
+                 f->afm->lastChar, f->widths_obj_num, f->descriptor_obj_num);
       fprintf(OF, ">> endobj\n");
    }
 }
 
-static void GetStringInfo(FM *p, int font_number, unsigned char *text, double ft_ht,
-      double *llx_ptr, double *lly_ptr, double *urx_ptr, double *ury_ptr, double *width_ptr, int *ierr) {
+
+static void
+GetStringInfo(FM *p, int font_number, unsigned char *text, double ft_ht,
+              double *llx_ptr, double *lly_ptr, double *urx_ptr,
+              double *ury_ptr, double *width_ptr, int *ierr)
+{
    Font_Dictionary *fontinfo = GetFontInfo(font_number, ierr);
    if (*ierr != 0) return;
    if (fontinfo == NULL) {
-      RAISE_ERROR_i("Sorry: invalid font number (%i): must register font before use it.", font_number, ierr); return; }
+      RAISE_ERROR_i("Sorry: invalid font number (%i): "
+                    "must register font before use it.", font_number, ierr);
+      return;
+   }
    unsigned char *c_ptr = text, c;
    double width = 0, llx, lly, urx, ury;
    if (fontinfo == NULL || text == NULL || text[0] == '\0') {
@@ -240,89 +293,123 @@ static void GetStringInfo(FM *p, int font_number, unsigned char *text, double ft
    *llx_ptr = ft_ht * 1e-3 * llx;
    *lly_ptr = ft_ht * 1e-3 * lly;
    *ury_ptr = ft_ht * 1e-3 * ury;
-   *urx_ptr = ft_ht * 1e-3 * (urx-70.0); // adjust for extra white space on right
+   *urx_ptr = ft_ht * 1e-3 * (urx - 70.0); // adjust for extra white
+                                           // space on right
 }
 
-OBJ_PTR c_marker_string_info(OBJ_PTR fmkr, FM *p, int fnt, unsigned char *text, double scale, int *ierr) {
-   double ft_ht = p->default_text_scale * scale * p->default_font_size * ENLARGE;
+
+OBJ_PTR
+c_marker_string_info(OBJ_PTR fmkr, FM *p, int fnt, unsigned char *text,
+                     double scale, int *ierr)
+{
+   double ft_ht = (p->default_text_scale * scale * p->default_font_size
+                   * ENLARGE);
    int ft_height = ROUND(ft_ht);
    ft_ht = ft_height;
    double llx, lly, urx, ury, width;
    GetStringInfo(p, fnt, text, ft_ht, &llx, &lly, &urx, &ury, &width, ierr);
    if (*ierr != 0) RETURN_NIL;
    OBJ_PTR result = Array_New(5);
-   width = convert_output_to_figure_dx(p,width);
-   llx = convert_output_to_figure_dx(p,llx);
-   urx = convert_output_to_figure_dx(p,urx);
-   lly = convert_output_to_figure_dy(p,lly);
-   ury = convert_output_to_figure_dy(p,ury);
+   width = convert_output_to_figure_dx(p, width);
+   llx = convert_output_to_figure_dx(p, llx);
+   urx = convert_output_to_figure_dx(p, urx);
+   lly = convert_output_to_figure_dy(p, lly);
+   ury = convert_output_to_figure_dy(p, ury);
    Array_Store(result, 0, Float_New(width), ierr);
    Array_Store(result, 1, Float_New(llx), ierr);
    Array_Store(result, 2, Float_New(lly), ierr);
    Array_Store(result, 3, Float_New(urx), ierr);
    Array_Store(result, 4, Float_New(ury), ierr);
-   
-   return result; 
+   return result;
 }
+
 
 #define TRANSFORM_VEC(dx,dy) tmp = dx; dx = (dx) * a + (dy) * c; dy = tmp * b + (dy) * d;
 
-static void c_rotated_string_at_points(
-   OBJ_PTR fmkr, FM *p, double rotation, int font_number, unsigned char *text, double scale,
-   int n, double *xs, double *ys, int alignment, int just, 
-   double horizontal_scaling, double vertical_scaling,
-   double italic_angle, double ascent_angle, int *ierr)
+
+static void
+c_rotated_string_at_points(OBJ_PTR fmkr, FM *p, double rotation,
+                           int font_number, unsigned char *text, double scale,
+                           int n, double *xs, double *ys, int alignment,
+                           int just, double horizontal_scaling,
+                           double vertical_scaling, double italic_angle,
+                           double ascent_angle, int *ierr)
 {
-   double ft_ht = p->default_text_scale * scale * p->default_font_size * ENLARGE;
-   int i, ft_height = ROUND(ft_ht), justification = just-1;
+   double ft_ht = (p->default_text_scale * scale * p->default_font_size
+                   * ENLARGE);
+   int i, ft_height = ROUND(ft_ht), justification = just - 1;
    ft_ht = ft_height;
-   if (constructing_path) { RAISE_ERROR("Sorry: must not be constructing a path when show marker", ierr); return; }
+   if (constructing_path) {
+      RAISE_ERROR("Sorry: must not be constructing a path when show marker",
+                  ierr);
+      return;
+   }
    double llx, lly, urx, ury, width, shiftx, shifty, tmp;
-   double a=horizontal_scaling, b=0.0, c=0.0, d=vertical_scaling; // the initial transform
-   GetStringInfo(p, font_number, text, ft_ht, &llx, &lly, &urx, &ury, &width, ierr);
+   // the initial transform
+   double a = horizontal_scaling, b = 0.0, c = 0.0, d = vertical_scaling;
+   GetStringInfo(p, font_number, text, ft_ht, &llx, &lly, &urx, &ury, &width,
+                 ierr);
    if (*ierr != 0) return;
    // translate according to justification and alignment
-   // note that we use the bbox to calculate shifts so 'center' means center of bbox
+   // note that we use the bbox to calculate shifts so 'center' means
+   // center of bbox
    if (italic_angle != 0) {
       double skew = sin(italic_angle / RADIANS_TO_DEGREES);
-      c -= skew*a; d -= skew*b;
+      c -= skew * a;
+      d -= skew * b;
    }
    if (ascent_angle != 0) { 
       double skew = sin(ascent_angle / RADIANS_TO_DEGREES);
-      a += skew*c; b += skew*d;
+      a += skew * c;
+      b += skew * d;
    }
    if (rotation != 0) {
       double xa, xb, xc, xd; // new transform
-      double cs = cos(rotation / RADIANS_TO_DEGREES), sn = sin(rotation / RADIANS_TO_DEGREES);
-      xa = cs*a + sn*c; xb = cs*b + sn*d; xc = -sn*a + cs*c; xd = -sn*b + cs*d;
-      a = xa; b = xb; c = xc; d = xd;
+      double cs = cos(rotation / RADIANS_TO_DEGREES);
+      double sn = sin(rotation / RADIANS_TO_DEGREES);
+      xa = cs * a + sn * c;
+      xb = cs * b + sn * d;
+      xc = -sn * a + cs * c;
+      xd = -sn * b + cs * d;
+      a = xa;
+      b = xb;
+      c = xc;
+      d = xd;
    }
    switch (justification) {
-      case LEFT_JUSTIFIED: shiftx = 0; break;
-      case CENTERED: shiftx = -(urx+llx)/2; break;  // CENTERED for marker means centered on BBOX
+      case LEFT_JUSTIFIED:
+         shiftx = 0; break;
+      case CENTERED: // CENTERED for marker means centered on BBOX
+         shiftx = -(urx + llx) / 2;
+         break;
       case RIGHT_JUSTIFIED: 
          shiftx = -width;
-         // the following hack compensates for Arrowhead bbox in ZaphDingbats
-         // needed to make tip of arrowhead fall on the reference point correctly
-         if (font_number == 14 && strlen((char *)text) == 1 && text[0] == 0344) {
+         // the following hack compensates for Arrowhead bbox in
+         // ZaphDingbats needed to make tip of arrowhead fall on the
+         // reference point correctly
+         if (font_number == 14 && strlen((char *)text) == 1
+             && text[0] == 0344) {
             shiftx *= 0.9;
          }
          break;
       default: 
-         RAISE_ERROR_i("Sorry: invalid setting for marker justification (%i)", justification, ierr);
+         RAISE_ERROR_i("Sorry: invalid setting for marker justification (%i)",
+                       justification, ierr);
          return;
    }
    switch (alignment) {
       case ALIGNED_AT_TOP: shifty = -ury; break;
-      case ALIGNED_AT_MIDHEIGHT: shifty = -(ury+lly)/2; break;
+      case ALIGNED_AT_MIDHEIGHT: shifty = -(ury + lly)/2; break;
       case ALIGNED_AT_BASELINE: shifty = 0; break;
       case ALIGNED_AT_BOTTOM: shifty = -lly; break;
       default: 
-         RAISE_ERROR_i("Sorry: invalid setting for marker alignment (%i)", alignment, ierr);
+         RAISE_ERROR_i("Sorry: invalid setting for marker alignment (%i)",
+                       alignment, ierr);
          return;
    }
    // transform the bbox
-   double llx2 = llx, lly2 = lly, urx2 = urx, ury2 = ury; // if we're rotated we'll need all 4 corners of bbox
+   // if we're rotated we'll need all 4 corners of bbox
+   double llx2 = llx, lly2 = lly, urx2 = urx, ury2 = ury;
    TRANSFORM_VEC(llx, lly)
    TRANSFORM_VEC(urx, ury)
    TRANSFORM_VEC(llx2, ury2)
@@ -330,22 +417,21 @@ static void c_rotated_string_at_points(
    TRANSFORM_VEC(shiftx, shifty)
    fprintf(TF, "BT /F%i %i Tf\n", font_number, ft_height);
    if (0 && horizontal_scaling != 1.0) {
-      fprintf(TF, "%d Tz\n", ROUND(100*ABS(horizontal_scaling)));
+      fprintf(TF, "%d Tz\n", ROUND(100 * ABS(horizontal_scaling)));
    }
-   double x, y, prev_x=0, prev_y=0, dx, dy;
-   int idx, idy;
+   double x, y, prev_x = 0, prev_y = 0, dx, dy;
+   //int idx, idy;
    for (i = 0; i < n; i++) {
       unsigned char *cp = text, char_code;
-      x = convert_figure_to_output_x(p,xs[i]) + shiftx;
-      y = convert_figure_to_output_y(p,ys[i]) + shifty;
-      if(!is_okay_number(x) || ! is_okay_number(y))
-            continue; /* we forget this point if at least one coordinate is not
-		     'real'
-		  */
-      update_bbox(p,x+llx, y+lly);
-      update_bbox(p,x+urx, y+ury);
-      update_bbox(p,x+llx2, y+ury2);
-      update_bbox(p,x+urx2, y+lly2);
+      x = convert_figure_to_output_x(p, xs[i]) + shiftx;
+      y = convert_figure_to_output_y(p, ys[i]) + shifty;
+      if(!is_okay_number(x) || !is_okay_number(y))
+         continue; // we forget this point if at least one coordinate
+                   // is not 'real'
+      update_bbox(p, x + llx, y + lly);
+      update_bbox(p, x + urx, y + ury);
+      update_bbox(p, x + llx2, y + ury2);
+      update_bbox(p, x + urx2, y + lly2);
       dx = x - prev_x; dy = y - prev_y;
       //idx = ROUND(dx); idy = ROUND(dy);
       //prev_x = prev_x + idx; prev_y = prev_y + idy;
@@ -353,8 +439,10 @@ static void c_rotated_string_at_points(
       if (b == 0 && c == 0 && a == 1 && d == 1) {
          //fprintf(TF, "%i %i Td (", idx, idy);
          fprintf(TF, "%0.6f %0.6f Td (", dx, dy);
-      } else { // need high precision when doing rotations
-         fprintf(TF, "%0.6f %0.6f %0.6f %0.6f %0.6f %0.6f Tm (", a, b, c, d, x, y);
+      } 
+      else { // need high precision when doing rotations
+         fprintf(TF, "%0.6f %0.6f %0.6f %0.6f %0.6f %0.6f Tm (",
+                 a, b, c, d, x, y);
       }
       while ((char_code = *cp++) != '\0') {
          if (char_code == '\\')
@@ -369,19 +457,25 @@ static void c_rotated_string_at_points(
    fprintf(TF, "ET\n");
 }
 
-void c_private_show_marker(
-   OBJ_PTR fmkr, FM *p, int int_args, OBJ_PTR stroke_width, OBJ_PTR string,
-   OBJ_PTR x, OBJ_PTR y, OBJ_PTR x_vec, OBJ_PTR y_vec,
-   double h_scale, double v_scale, double scale, double it_angle, double ascent_angle, double angle,
-   OBJ_PTR fill_color, OBJ_PTR stroke_color, int *ierr) {
+
+void
+c_private_show_marker(OBJ_PTR fmkr, FM *p, int int_args,
+                      OBJ_PTR stroke_width, OBJ_PTR string,
+                      OBJ_PTR x, OBJ_PTR y, OBJ_PTR x_vec, OBJ_PTR y_vec,
+                      double h_scale, double v_scale, double scale,
+                      double it_angle, double ascent_angle, double angle,
+                      OBJ_PTR fill_color, OBJ_PTR stroke_color, int *ierr)
+{
    int c, alignment, justification, fnt_num, n, mode;
    unsigned char *text = NULL, buff[2];
    double *xs, *ys, xloc, yloc, prev_line_width = -1;
    bool restore_fill_color = false, restore_stroke_color = false;
-   double stroke_color_R=0.0, stroke_color_G=0.0, stroke_color_B=0.0;
-   double prev_stroke_color_R, prev_stroke_color_G, prev_stroke_color_B;
-   double fill_color_R=0.0, fill_color_G=0.0, fill_color_B=0.0;
-   double prev_fill_color_R, prev_fill_color_G, prev_fill_color_B;
+   double stroke_color_R = 0.0, stroke_color_G = 0.0, stroke_color_B = 0.0;
+   double prev_stroke_color_R = 0.0, prev_stroke_color_G = 0.0,
+      prev_stroke_color_B = 0.0;
+   double fill_color_R = 0.0, fill_color_G = 0.0, fill_color_B = 0.0;
+   double prev_fill_color_R = 0.0, prev_fill_color_G = 0.0,
+      prev_fill_color_B = 0.0;
    c = int_args / 100000; int_args -= c * 100000;
    fnt_num = int_args / 1000; int_args -= fnt_num * 1000;
    mode = int_args / 100; int_args -= mode * 100;
@@ -389,52 +483,58 @@ void c_private_show_marker(
    justification = int_args;
    if (string == OBJ_NIL) {
       if (c < 0 || c > 255) {
-         RAISE_ERROR_i("Sorry: invalid character code (%i) : must be between 0 and 255", c, ierr);
+         RAISE_ERROR_i("Sorry: invalid character code (%i) : "
+                       "must be between 0 and 255", c, ierr);
          return;
       }
-      text = buff; text[0] = c;  text[1] = '\0';
+      text = buff; text[0] = c; text[1] = '\0';
       if (stroke_width != OBJ_NIL) {
          double width = Number_to_double(stroke_width, ierr);
          if (*ierr != 0) return;
          prev_line_width = p->line_width; // restore it later
          fprintf(TF, "%0.6f w\n", width * ENLARGE);
       }
-   } else {
-      text = (unsigned char *)(String_Ptr(string,ierr));
+   }
+   else {
+      text = (unsigned char *)(String_Ptr(string, ierr));
       if (*ierr != 0) return;
    }
    fprintf(TF, "%d Tr\n", mode);
    if (stroke_color != OBJ_NIL &&
-         (mode == STROKE || mode == FILL_AND_STROKE || 
-            mode == STROKE_AND_CLIP || mode == FILL_STROKE_AND_CLIP)) {
-       Unpack_RGB(stroke_color, &stroke_color_R, &stroke_color_G, &stroke_color_B, ierr);
-       if (*ierr != 0) return;
-       if (stroke_color_R != p->stroke_color_R ||
-           stroke_color_G != p->stroke_color_G ||
-           stroke_color_B != p->stroke_color_B) {
-          prev_stroke_color_R = p->stroke_color_R;
-          prev_stroke_color_G = p->stroke_color_G;
-          prev_stroke_color_B = p->stroke_color_B;
-          restore_stroke_color = true;
-          c_stroke_color_set_RGB(fmkr, p, stroke_color_R, stroke_color_G, stroke_color_B, ierr);
-          if (*ierr != 0) return;
-       }
+       (mode == STROKE || mode == FILL_AND_STROKE
+        || mode == STROKE_AND_CLIP || mode == FILL_STROKE_AND_CLIP)) {
+      Unpack_RGB(stroke_color, &stroke_color_R, &stroke_color_G,
+                 &stroke_color_B, ierr);
+      if (*ierr != 0) return;
+      if (stroke_color_R != p->stroke_color_R
+          || stroke_color_G != p->stroke_color_G
+          || stroke_color_B != p->stroke_color_B) {
+         prev_stroke_color_R = p->stroke_color_R;
+         prev_stroke_color_G = p->stroke_color_G;
+         prev_stroke_color_B = p->stroke_color_B;
+         restore_stroke_color = true;
+         c_stroke_color_set_RGB(fmkr, p, stroke_color_R, stroke_color_G,
+                                stroke_color_B, ierr);
+         if (*ierr != 0) return;
+      }
    }
    if (fill_color != OBJ_NIL &&
-         (mode == FILL || mode == FILL_AND_STROKE || 
-            mode == FILL_AND_CLIP || mode == FILL_STROKE_AND_CLIP)) {
-       Unpack_RGB(fill_color, &fill_color_R, &fill_color_G, &fill_color_B, ierr);
-       if (*ierr != 0) return;
-       if (fill_color_R != p->fill_color_R ||
-           fill_color_G != p->fill_color_G ||
-           fill_color_B != p->fill_color_B) {
-          prev_fill_color_R = p->fill_color_R;
-          prev_fill_color_G = p->fill_color_G;
-          prev_fill_color_B = p->fill_color_B;
-          restore_fill_color = true;
-          c_fill_color_set_RGB(fmkr, p, fill_color_R, fill_color_G, fill_color_B, ierr);
-          if (*ierr != 0) return;
-       }
+       (mode == FILL || mode == FILL_AND_STROKE
+        || mode == FILL_AND_CLIP || mode == FILL_STROKE_AND_CLIP)) {
+      Unpack_RGB(fill_color, &fill_color_R, &fill_color_G, &fill_color_B,
+                 ierr);
+      if (*ierr != 0) return;
+      if (fill_color_R != p->fill_color_R
+          || fill_color_G != p->fill_color_G
+          || fill_color_B != p->fill_color_B) {
+         prev_fill_color_R = p->fill_color_R;
+         prev_fill_color_G = p->fill_color_G;
+         prev_fill_color_B = p->fill_color_B;
+         restore_fill_color = true;
+         c_fill_color_set_RGB(fmkr, p, fill_color_R, fill_color_G,
+                              fill_color_B, ierr);
+         if (*ierr != 0) return;
+      }
    }
    if (x == OBJ_NIL) {
       long xlen, ylen;
@@ -443,20 +543,27 @@ void c_private_show_marker(
       ys = Vector_Data_for_Read(y_vec, &ylen, ierr);
       if (*ierr != 0) return;
       if (xlen != ylen) { 
-         RAISE_ERROR("Sorry: must have same number xs and ys for showing markers", ierr); return; }
+         RAISE_ERROR("Sorry: must have same number xs and ys "
+                     "for showing markers", ierr);
+         return;
+      }
       if (xlen <= 0) return;
       n = xlen;
-   } else {
+   }
+   else {
       xloc = Number_to_double(x, ierr); xs = &xloc;
       yloc = Number_to_double(y, ierr); ys = &yloc;
       if (*ierr != 0) return;
       n = 1;
    }
    c_rotated_string_at_points(fmkr, p, angle, fnt_num, text, scale, n, xs, ys,
-      alignment, justification, h_scale, v_scale, it_angle, ascent_angle, ierr);
+                              alignment, justification, h_scale, v_scale,
+                              it_angle, ascent_angle, ierr);
    if (prev_line_width >= 0) c_line_width_set(fmkr, p, prev_line_width, ierr);
    if (restore_fill_color)
-       c_fill_color_set_RGB(fmkr, p, prev_fill_color_R, prev_fill_color_G, prev_fill_color_B, ierr);
-   if (restore_stroke_color) 
-       c_stroke_color_set_RGB(fmkr, p, prev_stroke_color_R, prev_stroke_color_G, prev_stroke_color_B, ierr);
+      c_fill_color_set_RGB(fmkr, p, prev_fill_color_R, prev_fill_color_G,
+                           prev_fill_color_B, ierr);
+   if (restore_stroke_color)
+      c_stroke_color_set_RGB(fmkr, p, prev_stroke_color_R, prev_stroke_color_G,
+                             prev_stroke_color_B, ierr);
 }
