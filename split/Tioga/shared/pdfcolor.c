@@ -22,9 +22,11 @@
 #include "figures.h"
 #include "pdfs.h"
 
+
 /* functions */
 
-void Free_Functions()
+void
+Free_Functions()
 {
    Function_Info *fo;
    while (functions_list != NULL) {
@@ -35,7 +37,9 @@ void Free_Functions()
    }
 }
 
-static void Write_Sampled_Function(Function_Info *fo, int *ierr)
+
+static void
+Write_Sampled_Function(Function_Info *fo, int *ierr)
 {
    fprintf(OF, "%i 0 obj << /FunctionType 0\n", fo->obj_num);
    fprintf(OF, "\t/Domain [0 1]\n");
@@ -45,11 +49,15 @@ static void Write_Sampled_Function(Function_Info *fo, int *ierr)
    fprintf(OF, "\t/Order 1\n");
    fprintf(OF, "\t/Length %i\n\t>>\nstream\n", fo->lookup_len);
    if (fwrite(fo->lookup, 1, fo->lookup_len, OF) < fo->lookup_len) {
-      RAISE_ERROR("Error writing function sample data", ierr); return; }
+      RAISE_ERROR("Error writing function sample data", ierr);
+      return;
+   }
    fprintf(OF, "\nendstream\nendobj\n");
 }
 
-void Write_Functions(int *ierr)
+
+void
+Write_Functions(int *ierr)
 {
    Function_Info *fo;
    for (fo = functions_list; fo != NULL; fo = fo->next) {
@@ -58,7 +66,9 @@ void Write_Functions(int *ierr)
    }
 }
 
-static int create_function(int hival, int lookup_len, unsigned char *lookup)
+
+static int
+create_function(int hival, int lookup_len, unsigned char *lookup)
 {
    Function_Info *fo = (Function_Info *)calloc(1,sizeof(Function_Info));
    fo->next = functions_list;
@@ -71,23 +81,29 @@ static int create_function(int hival, int lookup_len, unsigned char *lookup)
    return fo->obj_num;
 }
 
+
 /* Opacity */
 
-void Free_Stroke_Opacities(void)
+void
+Free_Stroke_Opacities(void)
 {
    Stroke_Opacity_State *p;
    while (stroke_opacities != NULL) {
-      p = stroke_opacities;  stroke_opacities = p->next; free(p);
+      p = stroke_opacities; 
+      stroke_opacities = p->next;
+      free(p);
    }
 }
 
-static int Get_Stroke_Opacity_XGS(double stroke_opacity)
+
+static int
+Get_Stroke_Opacity_XGS(double stroke_opacity)
 {
    Stroke_Opacity_State *p;
    for (p = stroke_opacities; p != NULL; p = p->next) {
       if (p->stroke_opacity == stroke_opacity) return p->gs_num;
    }
-   p = (Stroke_Opacity_State *)calloc(1,sizeof(Stroke_Opacity_State));
+   p = (Stroke_Opacity_State *)calloc(1, sizeof(Stroke_Opacity_State));
    p->stroke_opacity = stroke_opacity;
    p->gs_num = next_available_gs_number++;
    p->obj_num = next_available_object_number++;
@@ -96,31 +112,42 @@ static int Get_Stroke_Opacity_XGS(double stroke_opacity)
    return p->gs_num;
 }
 
-void c_stroke_opacity_set(OBJ_PTR fmkr, FM *p, double stroke_opacity, int *ierr)
+
+void
+c_stroke_opacity_set(OBJ_PTR fmkr, FM *p, double stroke_opacity, int *ierr)
 {  // /GSi gs for ExtGState obj with /CS set to stroke opacity val
    if (constructing_path) {
-      RAISE_ERROR("Sorry: must not be constructing a path when change stroke opacity", ierr); return; }
+      RAISE_ERROR("Sorry: must not be constructing a path when change stroke"
+                  " opacity", ierr);
+      return;
+   }
    if (stroke_opacity == p->stroke_opacity) return;
    int gs_num = Get_Stroke_Opacity_XGS(stroke_opacity);
    fprintf(TF, "/GS%i gs\n", gs_num);
    p->stroke_opacity = stroke_opacity;
 }
 
-void Free_Fill_Opacities(void)
+
+void
+Free_Fill_Opacities(void)
 {
    Fill_Opacity_State *p;
    while (fill_opacities != NULL) {
-      p = fill_opacities;  fill_opacities = p->next; free(p);
+      p = fill_opacities;
+      fill_opacities = p->next;
+      free(p);
    }
 }
 
-static int Get_Fill_Opacity_XGS(double fill_opacity)
+
+static int
+Get_Fill_Opacity_XGS(double fill_opacity)
 {
    Fill_Opacity_State *p;
    for (p = fill_opacities; p != NULL; p = p->next) {
       if (p->fill_opacity == fill_opacity) return p->gs_num;
    }
-   p = (Fill_Opacity_State *)calloc(1,sizeof(Fill_Opacity_State));
+   p = (Fill_Opacity_State *)calloc(1, sizeof(Fill_Opacity_State));
    p->fill_opacity = fill_opacity;
    p->gs_num = next_available_gs_number++;
    p->obj_num = next_available_object_number++;
@@ -129,37 +156,50 @@ static int Get_Fill_Opacity_XGS(double fill_opacity)
    return p->gs_num;
 }
 
-void c_fill_opacity_set(OBJ_PTR fmkr, FM *p, double fill_opacity, int *ierr)
+
+void
+c_fill_opacity_set(OBJ_PTR fmkr, FM *p, double fill_opacity, int *ierr)
 {  // /GSi gs for ExtGState obj with /cs set to fill opacity val
    if (constructing_path) {
-      RAISE_ERROR("Sorry: must not be constructing a path when change fill opacity", ierr); return; }
+      RAISE_ERROR("Sorry: must not be constructing a path when change fill "
+                  "opacity", ierr);
+      return;
+   }
    if (fill_opacity == p->fill_opacity) return;
    int gs_num = Get_Fill_Opacity_XGS(fill_opacity);
    fprintf(TF, "/GS%i gs\n", gs_num);
    p->fill_opacity = fill_opacity;
 }
 
-void Write_Stroke_Opacity_Objects(void)
+
+void
+Write_Stroke_Opacity_Objects(void)
 {
    Stroke_Opacity_State *p;
    for (p = stroke_opacities; p != NULL; p = p->next) {
       Record_Object_Offset(p->obj_num);
-      fprintf(OF, "%2i 0 obj << /Type /ExtGState /CA %g >> endobj\n", p->obj_num, p->stroke_opacity);
+      fprintf(OF, "%2i 0 obj << /Type /ExtGState /CA %g >> endobj\n",
+              p->obj_num, p->stroke_opacity);
    }
 }
 
-void Write_Fill_Opacity_Objects(void)
+
+void
+Write_Fill_Opacity_Objects(void)
 {
    Fill_Opacity_State *p;
    for (p = fill_opacities; p != NULL; p = p->next) {
       Record_Object_Offset(p->obj_num);
-      fprintf(OF, "%2i 0 obj << /Type /ExtGState /ca %g >> endobj\n", p->obj_num, p->fill_opacity);
+      fprintf(OF, "%2i 0 obj << /Type /ExtGState /ca %g >> endobj\n",
+              p->obj_num, p->fill_opacity);
    }
 }
 
+
 /* Shading */
 
-void Free_Shadings()
+void
+Free_Shadings()
 {
    Shading_Info *so;
    while (shades_list != NULL) {
@@ -169,7 +209,9 @@ void Free_Shadings()
    }
 }
 
-void Write_Shadings(void)
+
+void
+Write_Shadings(void)
 {
    Shading_Info *so;
    for (so = shades_list; so != NULL; so = so->next) {
@@ -177,13 +219,17 @@ void Write_Shadings(void)
       fprintf(OF, "%i 0 obj <<\n", so->obj_num);
       if (so->axial) {
          fprintf(OF, "\t/ShadingType 2\n\t/Coords [%0.2f %0.2f %0.2f %0.2f]\n",
-            so->x0, so->y0, so->x1, so->y1);
-      } else {
-         fprintf(OF, "\t/ShadingType 3\n\t/Coords [%0.2f %0.2f %0.2f %0.2f %0.2f %0.2f]\n",
-            so->x0, so->y0, so->r0, so->x1, so->y1, so->r1);
+                 so->x0, so->y0, so->x1, so->y1);
       }
-      if (so->extend_start || so->extend_end) fprintf(OF, "\t/Extend [ %s %s ]\n",
-         (so->extend_start)? "true" : "false", (so->extend_end)? "true" : "false");
+      else {
+         fprintf(OF, "\t/ShadingType 3\n\t/Coords "
+                 "[%0.2f %0.2f %0.2f %0.2f %0.2f %0.2f]\n",
+                 so->x0, so->y0, so->r0, so->x1, so->y1, so->r1);
+      }
+      if (so->extend_start || so->extend_end)
+         fprintf(OF, "\t/Extend [ %s %s ]\n",
+                 (so->extend_start)? "true" : "false",
+                 (so->extend_end)? "true" : "false");
       fprintf(OF, "\t/ColorSpace /DeviceRGB\n");
       fprintf(OF, "\t/Function %i 0 R\n", so->function);
       fprintf(OF, ">> endobj\n");
@@ -191,10 +237,12 @@ void Write_Shadings(void)
 }
 
 
-static void c_axial_shading(FM *p, double x0, double y0, double x1, double y1,
-      int hival, int lookup_len, unsigned char *lookup, bool extend_start, bool extend_end)
+static void
+c_axial_shading(FM *p, double x0, double y0, double x1, double y1,
+                int hival, int lookup_len, unsigned char *lookup,
+                bool extend_start, bool extend_end)
 {
-   Shading_Info *so = (Shading_Info *)calloc(1,sizeof(Shading_Info));
+   Shading_Info *so = (Shading_Info *)calloc(1, sizeof(Shading_Info));
    so->next = shades_list;
    shades_list = so;
    so->shade_num = next_available_shade_number++;
@@ -209,30 +257,40 @@ static void c_axial_shading(FM *p, double x0, double y0, double x1, double y1,
    so->extend_end = extend_end;
    fprintf(TF, "/Shade%i sh\n", so->shade_num);
 }
+
       
-void c_private_axial_shading(OBJ_PTR fmkr, FM *p, double x0, double y0, double x1, double y1,
-   OBJ_PTR colormap, bool extend_start, bool extend_end, int *ierr)
+void
+c_private_axial_shading(OBJ_PTR fmkr, FM *p, double x0, double y0, double x1,
+                        double y1, OBJ_PTR colormap, bool extend_start,
+                        bool extend_end, int *ierr)
 {
-   int len = Array_Len(colormap,ierr);
+   int len = Array_Len(colormap, ierr);
    if (*ierr != 0) return;
    if (len != 2) {
-      RAISE_ERROR("Sorry: colormap must be array [hivalue, lookup]", ierr); return; }
-   OBJ_PTR hival = Array_Entry(colormap,0,ierr);
-   OBJ_PTR lookup = Array_Entry(colormap,1,ierr);
-   int hi_value = Number_to_int(hival,ierr);
-   int lookup_len = String_Len(lookup,ierr);
-   unsigned char *lookup_ptr = (unsigned char *)(String_Ptr(lookup,ierr));
+      RAISE_ERROR("Sorry: colormap must be array [hivalue, lookup]", ierr);
+      return;
+   }
+   OBJ_PTR hival = Array_Entry(colormap, 0, ierr);
+   OBJ_PTR lookup = Array_Entry(colormap, 1, ierr);
+   int hi_value = Number_to_int(hival, ierr);
+   int lookup_len = String_Len(lookup, ierr);
+   unsigned char *lookup_ptr = (unsigned char *)(String_Ptr(lookup, ierr));
    if (*ierr != 0) return;
-   c_axial_shading(p, convert_figure_to_output_x(p,x0), convert_figure_to_output_y(p,y0),
-      convert_figure_to_output_x(p,x1), convert_figure_to_output_y(p,y1),
-      hi_value, lookup_len, lookup_ptr, extend_start, extend_end);
+   c_axial_shading(p, convert_figure_to_output_x(p, x0),
+                   convert_figure_to_output_y(p, y0),
+                   convert_figure_to_output_x(p, x1),
+                   convert_figure_to_output_y(p, y1),
+                   hi_value, lookup_len, lookup_ptr, extend_start, extend_end);
 }
 
-static void c_radial_shading(FM *p, double x0, double y0, double r0, double x1, double y1, double r1,
-      int hival, int lookup_len, unsigned char *lookup,
-      double a, double b, double c, double d, double e, double f, bool extend_start, bool extend_end)
+
+static void 
+c_radial_shading(FM *p, double x0, double y0, double r0, double x1, double y1,
+                 double r1, int hival, int lookup_len, unsigned char *lookup,
+                 double a, double b, double c, double d, double e, double f,
+                 bool extend_start, bool extend_end)
 {
-   Shading_Info *so = (Shading_Info *)calloc(1,sizeof(Shading_Info));
+   Shading_Info *so = (Shading_Info *)calloc(1, sizeof(Shading_Info));
    so->next = shades_list;
    shades_list = so;
    so->shade_num = next_available_shade_number++;
@@ -249,40 +307,49 @@ static void c_radial_shading(FM *p, double x0, double y0, double r0, double x1, 
    so->extend_end = extend_end;
    if (a != 1.0 || b != 0.0 || c != 0.0 || d != 1.0 || e != 0 || f != 0) {
       fprintf(TF, "q %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f cm /Shade%i sh Q\n",
-         a, b, c, d, e, f, so->shade_num);
-   } else {
+              a, b, c, d, e, f, so->shade_num);
+   }
+   else {
       fprintf(TF, "/Shade%i sh\n", so->shade_num);
    }
 }
 
    
-void c_private_radial_shading(OBJ_PTR fmkr, FM *p,
-        double x0, double y0, double r0,
-        double x1, double y1, double r1, OBJ_PTR colormap,
-        double a, double b, double c, double d, bool extend_start, bool extend_end, int *ierr)
+void
+c_private_radial_shading(OBJ_PTR fmkr, FM *p,
+                         double x0, double y0, double r0,
+                         double x1, double y1, double r1, OBJ_PTR colormap,
+                         double a, double b, double c, double d,
+                         bool extend_start, bool extend_end, int *ierr)
 {
    int len = Array_Len(colormap, ierr);
    if (*ierr != 0) return;
    if (len != 2) {
-      RAISE_ERROR("Sorry: colormap must be array [hivalue, lookup]", ierr); return; }
+      RAISE_ERROR("Sorry: colormap must be array [hivalue, lookup]", ierr);
+      return;
+   }
    OBJ_PTR hival = Array_Entry(colormap, 0, ierr);
    OBJ_PTR lookup = Array_Entry(colormap, 1, ierr);
-   int hi_value = Number_to_int(hival,ierr);
-   int lookup_len = String_Len(lookup,ierr);
-   unsigned char *lookup_ptr = (unsigned char *)(String_Ptr(lookup,ierr));
+   int hi_value = Number_to_int(hival, ierr);
+   int lookup_len = String_Len(lookup, ierr);
+   unsigned char *lookup_ptr = (unsigned char *)(String_Ptr(lookup, ierr));
    if (*ierr != 0) return;
    c_radial_shading(p, x0, y0, r0, x1, y1, r1,
-      hi_value, lookup_len, lookup_ptr,
-      convert_figure_to_output_dx(p,a), convert_figure_to_output_dy(p,b),
-      convert_figure_to_output_dx(p,c), convert_figure_to_output_dy(p,d),
-      convert_figure_to_output_x(p,0.0), convert_figure_to_output_y(p,0.0),
-      extend_start, extend_end);
+                    hi_value, lookup_len, lookup_ptr,
+                    convert_figure_to_output_dx(p, a),
+                    convert_figure_to_output_dy(p, b),
+                    convert_figure_to_output_dx(p, c),
+                    convert_figure_to_output_dy(p, d),
+                    convert_figure_to_output_x(p, 0.0),
+                    convert_figure_to_output_y(p, 0.0),
+                    extend_start, extend_end);
 }
 
-/*  Colormaps
-*/
 
-static double clr_value(double n1, double n2, double hue)  // from plplot plctrl.c
+/* Colormaps */
+
+static double
+clr_value(double n1, double n2, double hue)  // from plplot plctrl.c
 {
    double val;
    while (hue >= 360.) hue -= 360.;
@@ -291,10 +358,13 @@ static double clr_value(double n1, double n2, double hue)  // from plplot plctrl
    else if (hue < 180.) val = n2;
    else if (hue < 240.) val = n1 + (n2 - n1) * (240. - hue) / 60.;
    else val = n1;
-   return (val);
+   return val;
 }
 
-static void convert_hls_to_rgb(double h, double l, double s, double *p_r, double *p_g, double *p_b)  // from plplot plctrl.c
+
+static void
+convert_hls_to_rgb(double h, double l, double s, double *p_r, double *p_g,
+                   double *p_b)  // from plplot plctrl.c
 {
    double m1, m2;
    if (l <= .5) m2 = l * (s + 1.);
@@ -305,33 +375,38 @@ static void convert_hls_to_rgb(double h, double l, double s, double *p_r, double
    *p_b = clr_value(m1, m2, h - 120.);
 }
 
-static void convert_rgb_to_hls(double r, double g, double b, double *p_h, double *p_l, double *p_s)  // from plplot plctrl.c
+
+static void
+convert_rgb_to_hls(double r, double g, double b, double *p_h, double *p_l,
+                   double *p_s)  // from plplot plctrl.c
 {
    double h, l, s, d, rc, gc, bc, rgb_min, rgb_max;
    rgb_min = MIN( r, MIN( g, b ));
    rgb_max = MAX( r, MAX( g, b ));
-   l = (rgb_min+rgb_max) / 2.0;
+   l = (rgb_min + rgb_max) / 2.0;
    if (rgb_min == rgb_max) s = h = 0;
    else {
       d = rgb_max - rgb_min;
       if (l < 0.5) s = 0.5 * d / l;
-      else s = 0.5* d / (1.-l);
-      rc = (rgb_max-r) / d;
-      gc = (rgb_max-g) / d;
-      bc = (rgb_max-b) / d;
-      if (r == rgb_max) h = bc-gc;
-      else if (g == rgb_max) h = rc-bc+2;
-      else h = gc-rc-2;
-      h = h*60;
-      if (h <  0) h = h+360;
-      else if (h >= 360) h = h-360;
+      else s = 0.5 * d / (1.-l);
+      rc = (rgb_max - r) / d;
+      gc = (rgb_max - g) / d;
+      bc = (rgb_max - b) / d;
+      if (r == rgb_max) h = bc - gc;
+      else if (g == rgb_max) h = rc - bc + 2;
+      else h = gc - rc - 2;
+      h = h * 60;
+      if (h <  0) h = h + 360;
+      else if (h >= 360) h = h - 360;
    }
    *p_h = h;
    *p_l = l;
    *p_s = s;
 }
 
-static double linear_interpolate(int num_pts, double *xs, double *ys, double x)
+
+static double
+linear_interpolate(int num_pts, double *xs, double *ys, double x)
 {
    int i;
    if (num_pts == 1) return ys[0];
@@ -343,17 +418,25 @@ static double linear_interpolate(int num_pts, double *xs, double *ys, double x)
    return ys[num_pts-1];
 }
 
-static OBJ_PTR c_create_colormap(FM *p, bool rgb_flag, int length,
-   int num_pts, double *ps, double *c1s, double *c2s, double *c3s, int *ierr)
+
+static OBJ_PTR
+c_create_colormap(FM *p, bool rgb_flag, int length, int num_pts, double *ps,
+                  double *c1s, double *c2s, double *c3s, int *ierr)
 {
    int i;
    if (ps[0] != 0.0 || ps[num_pts-1] != 1.0) {
-      RAISE_ERROR("Sorry: first control point for create colormap must be at 0.0 and last must be at 1.0", ierr); RETURN_NIL; }
+      RAISE_ERROR("Sorry: first control point for create colormap must be "
+                  "at 0.0 and last must be at 1.0", ierr);
+      RETURN_NIL;
+   }
    for (i = 1; i < num_pts; i++) {
       if (ps[i-1] > ps[i]) {
-         RAISE_ERROR("Sorry: control points for create colormap must be increasing from 0 to 1", ierr); RETURN_NIL; }
+         RAISE_ERROR("Sorry: control points for create colormap must be "
+                     "increasing from 0 to 1", ierr);
+         RETURN_NIL;
+      }
    }
-   int j, buff_len = length * 3, hival = length-1;
+   int j, buff_len = length * 3, hival = length - 1;
    unsigned char *buff;
    buff = ALLOC_N_unsigned_char(buff_len);
    for (j = 0, i = 0; j < length; j++) {
@@ -377,42 +460,63 @@ static OBJ_PTR c_create_colormap(FM *p, bool rgb_flag, int length,
    return result;
 }
 
-OBJ_PTR c_private_create_colormap(OBJ_PTR fmkr, FM *p, bool rgb, int length, 
-   OBJ_PTR Ps, OBJ_PTR C1s, OBJ_PTR C2s, OBJ_PTR C3s, int *ierr)
+
+/* 
+ * create mappings from 'position' (0 to 1) to color (in HLS or RGB
+ * color spaces)
+ *
+ * the length parameter determines the number of entries in the color
+ * map (any integer between 2 and 256).
+ *
+ * for rgb, the colors are given as (red, green, blue) intensities
+ * from 0.0 to 1.0
+ *
+ * for hls, the colors are given as (hue, lightness, saturation)
+ * lightness and saturation given as values from 0.0 to 1.0 hue given
+ * as degrees (0 to 360) around the color wheel from
+ * red->green->blue->red
+ *
+ * Ps are the locations in (0 to 1) for the control points -- in
+ * increasing order
+ *
+ * must have Ps[0] == 0.0 and Ps[num_ps-1] == 1.0
+ */
+OBJ_PTR
+c_private_create_colormap(OBJ_PTR fmkr, FM *p, bool rgb, int length, 
+                          OBJ_PTR Ps, OBJ_PTR C1s, OBJ_PTR C2s, OBJ_PTR C3s,
+                          int *ierr)
 {
-        /* 
-            create mappings from 'position' (0 to 1) to color (in HLS or RGB color spaces)
-            the length parameter determines the number of entries in the color map (any integer between 2 and 256).
-            for rgb, the colors are given as (red, green, blue) intensities from 0.0 to 1.0
-            for hls, the colors are given as (hue, lightness, saturation)
-                lightness and saturation given as values from 0.0 to 1.0
-                hue given as degrees (0 to 360) around the color wheel from red->green->blue->red
-            Ps are the locations in (0 to 1) for the control points -- in increasing order
-            must have Ps[0] == 0.0 and Ps[num_ps-1] == 1.0
-        */
    long p_len, c1_len, c2_len, c3_len;
    double *p_ptr = Vector_Data_for_Read(Ps, &p_len, ierr);
-   if (*ierr != 0) return;
+   if (*ierr != 0) RETURN_NIL;
    double *c1_ptr = Vector_Data_for_Read(C1s, &c1_len, ierr);
-   if (*ierr != 0) return;
+   if (*ierr != 0) RETURN_NIL;
    double *c2_ptr = Vector_Data_for_Read(C2s, &c2_len, ierr);
-   if (*ierr != 0) return;
+   if (*ierr != 0) RETURN_NIL;
    double *c3_ptr = Vector_Data_for_Read(C3s, &c3_len, ierr);
-   if (*ierr != 0) return;
+   if (*ierr != 0) RETURN_NIL;
    if (p_len < 2 || p_len != c1_len || p_len != c2_len || p_len != c3_len) {
-      RAISE_ERROR("Sorry: vectors for create colormap must all be os same length (with at least 2 entries)", ierr);
+      RAISE_ERROR("Sorry: vectors for create colormap must all be os same "
+                  "length (with at least 2 entries)", ierr);
       RETURN_NIL;
    }
-   return c_create_colormap(p, rgb, length, p_len, p_ptr, c1_ptr, c2_ptr, c3_ptr, ierr);
+   return c_create_colormap(p, rgb, length, p_len, p_ptr, c1_ptr, c2_ptr,
+                            c3_ptr, ierr);
 }
+
             
-OBJ_PTR c_get_color_from_colormap(OBJ_PTR fmkr, FM *p, OBJ_PTR color_map, double x, int *ierr)
-{ /* x is from 0 to 1.  this returns a vector for the RGB color from the given colormap */
-   unsigned char *buff = (unsigned char *)(String_Ptr(color_map,ierr)), r, g, b, i;
+OBJ_PTR
+c_get_color_from_colormap(OBJ_PTR fmkr, FM *p, OBJ_PTR color_map, double x,
+                          int *ierr)
+{  // x is from 0 to 1.  this returns a vector for the RGB color from
+   // the given colormap
+   unsigned char *buff = (unsigned char *)(String_Ptr(color_map,ierr));
+   unsigned char r, g, b, i;
    int len = String_Len(color_map,ierr);
    if (*ierr != 0) RETURN_NIL;
    if (len % 3 != 0) {
-      RAISE_ERROR("Sorry: color_map length must be a multiple of 3 (for R G B components)", ierr);
+      RAISE_ERROR("Sorry: color_map length must be a multiple of 3 "
+                  "(for R G B components)", ierr);
       RETURN_NIL;
    }
    i = 3 * ROUND(x * ((len/3)-1));
@@ -425,20 +529,31 @@ OBJ_PTR c_get_color_from_colormap(OBJ_PTR fmkr, FM *p, OBJ_PTR color_map, double
    return result;
 }
 
-OBJ_PTR c_convert_to_colormap(OBJ_PTR fmkr, FM* p, OBJ_PTR Rs, OBJ_PTR Gs, OBJ_PTR Bs, int *ierr)
+
+/* 
+ * this creates an arbitrary mapping from positions to colors given as
+ * (r,g,b) triples
+ *
+ * the colormap size is set to the length of the vectors 
+ *
+ * the Rs, Gs, and Bs are VALUEs from 0 to 1 representing the
+ * intensity of the color component
+ */
+OBJ_PTR
+c_convert_to_colormap(OBJ_PTR fmkr, FM* p, OBJ_PTR Rs, OBJ_PTR Gs, OBJ_PTR Bs,
+                      int *ierr)
 {
-        /* this creates an arbitrary mapping from positions to colors given as (r,g,b) triples */
-        /* the colormap size is set to the length of the vectors */
-        /* the Rs, Gs, and Bs are VALUEs from 0 to 1 representing the intensity of the color component */
+
    long r_len, g_len, b_len;
    double *r_ptr = Vector_Data_for_Read(Rs, &r_len, ierr);
-   if (*ierr != 0) return;
+   if (*ierr != 0) RETURN_NIL;
    double *g_ptr = Vector_Data_for_Read(Gs, &g_len, ierr);
-   if (*ierr != 0) return;
+   if (*ierr != 0) RETURN_NIL;
    double *b_ptr = Vector_Data_for_Read(Bs, &b_len, ierr);
-   if (*ierr != 0) return;
+   if (*ierr != 0) RETURN_NIL;
    if (r_len <= 0 || r_len != g_len || b_len != g_len) {
-      RAISE_ERROR("Sorry: vectors for convert_to_colormap must all be of same length", ierr);
+      RAISE_ERROR("Sorry: vectors for convert_to_colormap must all be of "
+                  "same length", ierr);
       RETURN_NIL;
    }
    int i, j, buff_len = r_len * 3;
@@ -458,26 +573,40 @@ OBJ_PTR c_convert_to_colormap(OBJ_PTR fmkr, FM* p, OBJ_PTR Rs, OBJ_PTR Gs, OBJ_P
    return result;
 }
 
-static void Unpack_HLS(OBJ_PTR hls, double *hp, double *lp, double *sp, int *ierr)
+
+static void
+Unpack_HLS(OBJ_PTR hls, double *hp, double *lp, double *sp, int *ierr)
 {
-   int len = Array_Len(hls,ierr);
+   int len = Array_Len(hls, ierr);
    if (*ierr != 0) return;
    if (len != 3) {
-      RAISE_ERROR("Sorry: invalid hls array: must have 3 entries", ierr); return; }
+      RAISE_ERROR("Sorry: invalid hls array: must have 3 entries", ierr);
+      return;
+   }
    OBJ_PTR entry = Array_Entry(hls, 0, ierr); if (*ierr != 0) return;
    double h = Number_to_double(entry, ierr); if (*ierr != 0) return;
    entry = Array_Entry(hls, 1, ierr); if (*ierr != 0) return;
    double l = Number_to_double(entry, ierr); if (*ierr != 0) return;
    entry = Array_Entry(hls, 2, ierr); if (*ierr != 0) return;
    double s = Number_to_double(entry, ierr); if (*ierr != 0) return;
-   if (l < 0.0 || l > 1.0) { RAISE_ERROR_g("Sorry: invalid lightness (%g) for hls: must be between 0 and 1", l, ierr); return; }
-   if (s < 0.0 || s > 1.0) { RAISE_ERROR_g("Sorry: invalid saturation (%g) for hls: must be between 0 and 1", s, ierr); return; }
+   if (l < 0.0 || l > 1.0) {
+      RAISE_ERROR_g("Sorry: invalid lightness (%g) for hls: must be between 0 "
+                    "and 1", l, ierr);
+      return;
+   }
+   if (s < 0.0 || s > 1.0) {
+      RAISE_ERROR_g("Sorry: invalid saturation (%g) for hls: must be between "
+                    "0 and 1", s, ierr);
+      return;
+   }
    *hp = h; *lp = l; *sp = s;
 }
 
-OBJ_PTR c_hls_to_rgb(OBJ_PTR fmkr, FM *p, OBJ_PTR hls_vec, int *ierr)
+
+OBJ_PTR
+c_hls_to_rgb(OBJ_PTR fmkr, FM *p, OBJ_PTR hls_vec, int *ierr)
 {
-   double h, l, s, r, g, b;
+   double h = 0.0, l = 0.0, s = 0.0, r = 0.0, g = 0.0, b = 0.0;
    Unpack_HLS(hls_vec, &h, &l, &s, ierr);
    if (*ierr != 0) RETURN_NIL;
    convert_hls_to_rgb(h, l, s, &r, &g, &b);
@@ -488,11 +617,19 @@ OBJ_PTR c_hls_to_rgb(OBJ_PTR fmkr, FM *p, OBJ_PTR hls_vec, int *ierr)
    return result; 
 }
 
-OBJ_PTR c_rgb_to_hls(OBJ_PTR fmkr, FM *p, OBJ_PTR rgb_vec, int *ierr)
+
+
+OBJ_PTR
+c_rgb_to_hls(OBJ_PTR fmkr, FM *p, OBJ_PTR rgb_vec, int *ierr)
 {
-    /* hue is given as an angle from 0 to 360 around the color wheel.
-        0, 60, 120, 180, 240, and 300 are respectively red, yellow, green, cyan, blue, and magenta. */
-    /* lightness and saturation are given as numbers from 0 to 1 */
+   /*
+    * hue is given as an angle from 0 to 360 around the color wheel.
+    *
+    * 0, 60, 120, 180, 240, and 300 are respectively red, yellow,
+    * green, cyan, blue, and magenta.
+    *
+    * lightness and saturation are given as numbers from 0 to 1
+    */
    double h, l, s, r, g, b;
    Unpack_RGB(rgb_vec, &r, &g, &b, ierr);
    if (*ierr != 0) RETURN_NIL;
@@ -501,11 +638,12 @@ OBJ_PTR c_rgb_to_hls(OBJ_PTR fmkr, FM *p, OBJ_PTR rgb_vec, int *ierr)
    Array_Store(result, 0, Float_New(h), ierr);
    Array_Store(result, 1, Float_New(l), ierr);
    Array_Store(result, 2, Float_New(s), ierr);
-   return result; 
+   return result;
 }
 
 
-void c_title_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
+void
+c_title_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
 {
    double r, g, b;
    Unpack_RGB(val, &r, &g, &b, ierr);
@@ -516,8 +654,11 @@ void c_title_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
 }
 
 
-OBJ_PTR c_title_color_get(OBJ_PTR fmkr, FM *p, int *ierr) // value is array of [r, g, b] intensities from 0 to 1
-{  // r g b RG
+OBJ_PTR
+c_title_color_get(OBJ_PTR fmkr, FM *p, int *ierr)
+{  
+   // value is array of [r, g, b] intensities from 0 to 1
+   // r g b RG
    double r, g, b;
    r = p->title_color_R;
    g = p->title_color_G;
@@ -530,7 +671,8 @@ OBJ_PTR c_title_color_get(OBJ_PTR fmkr, FM *p, int *ierr) // value is array of [
 }
 
 
-void c_xlabel_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
+void
+c_xlabel_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
 {
    double r, g, b;
    Unpack_RGB(val, &r, &g, &b, ierr);
@@ -538,11 +680,14 @@ void c_xlabel_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
    p->xlabel_color_R = r;
    p->xlabel_color_G = g;
    p->xlabel_color_B = b;
-}   
-   
+}
 
-OBJ_PTR c_xlabel_color_get(OBJ_PTR fmkr, FM *p, int *ierr) // value is array of [r, g, b] intensities from 0 to 1
-{  // r g b RG
+
+OBJ_PTR
+c_xlabel_color_get(OBJ_PTR fmkr, FM *p, int *ierr)
+{
+   // value is array of [r, g, b] intensities from 0 to 1
+   // r g b RG
    double r, g, b;
    r = p->xlabel_color_R;
    g = p->xlabel_color_G;
@@ -555,7 +700,8 @@ OBJ_PTR c_xlabel_color_get(OBJ_PTR fmkr, FM *p, int *ierr) // value is array of 
 }
 
 
-void c_ylabel_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
+void
+c_ylabel_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
 {
    double r, g, b;
    Unpack_RGB(val, &r, &g, &b, ierr);
@@ -566,8 +712,11 @@ void c_ylabel_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
 }
 
 
-OBJ_PTR c_ylabel_color_get(OBJ_PTR fmkr, FM *p, int *ierr) // value is array of [r, g, b] intensities from 0 to 1
-{  // r g b RG
+OBJ_PTR
+c_ylabel_color_get(OBJ_PTR fmkr, FM *p, int *ierr)
+{  
+   // value is array of [r, g, b] intensities from 0 to 1
+   // r g b RG
    double r, g, b;
    r = p->ylabel_color_R;
    g = p->ylabel_color_G;
@@ -580,7 +729,8 @@ OBJ_PTR c_ylabel_color_get(OBJ_PTR fmkr, FM *p, int *ierr) // value is array of 
 }
 
 
-void c_xaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
+void
+c_xaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
 {
    double r, g, b;
    Unpack_RGB(val, &r, &g, &b, ierr);
@@ -590,8 +740,12 @@ void c_xaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
    p->xaxis_stroke_color_B = b;
 }
 
-OBJ_PTR c_xaxis_stroke_color_get(OBJ_PTR fmkr, FM *p, int *ierr) // value is array of [r, g, b] intensities from 0 to 1
-{  // r g b RG
+
+OBJ_PTR
+c_xaxis_stroke_color_get(OBJ_PTR fmkr, FM *p, int *ierr) 
+{  
+   // value is array of [r, g, b] intensities from 0 to 1
+   // r g b RG
    double r, g, b;
    r = p->xaxis_stroke_color_R;
    g = p->xaxis_stroke_color_G;
@@ -603,7 +757,9 @@ OBJ_PTR c_xaxis_stroke_color_get(OBJ_PTR fmkr, FM *p, int *ierr) // value is arr
    return result;
 }
 
-void c_yaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
+
+void
+c_yaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
 {
    double r, g, b;
    Unpack_RGB(val, &r, &g, &b, ierr);
@@ -614,8 +770,11 @@ void c_yaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
 }
 
 
-OBJ_PTR c_yaxis_stroke_color_get(OBJ_PTR fmkr, FM *p, int *ierr) // value is array of [r, g, b] intensities from 0 to 1
-{  // r g b RG
+OBJ_PTR
+c_yaxis_stroke_color_get(OBJ_PTR fmkr, FM *p, int *ierr) 
+{  
+   // value is array of [r, g, b] intensities from 0 to 1
+   // r g b RG
    double r, g, b;
    r = p->yaxis_stroke_color_R;
    g = p->yaxis_stroke_color_G;
