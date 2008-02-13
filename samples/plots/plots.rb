@@ -72,6 +72,8 @@ class MyPlots
         t.def_figure("Sampled_Data") { sampled_data }
         t.def_figure("Contours") { samples_with_contours }
 
+        t.def_figure("Greens_clipped") { greens_clipped }
+
         t.model_number = -1
         
         t.def_enter_page_function { enter_page }
@@ -244,6 +246,21 @@ EOD
         greens_min = -4
         greens_max = -0.01
         boundaries = plot_boundaries(xs,ys,@margin,greens_min,greens_max)
+        t.show_plot(boundaries) { t.show_polyline(xs,ys,Green) }
+    end
+
+
+    # Same thing as green, but with X/Y clipped:
+    def greens_clipped
+        read_data
+        show_model_number
+        t.do_box_labels('Greens Plot Clipped', 'Position', 
+                        '\textcolor[rgb]{0,0.5,0}{Greens, clipped}')
+        xs = @positions
+        ys = @greens
+        greens_min = -4
+        greens_max = -0.01
+        boundaries = [ 1, 4, 0, -4 ]
         t.show_plot(boundaries) { t.show_polyline(xs,ys,Green) }
     end
     
