@@ -4601,7 +4601,7 @@ VALUE Read_Rows_of_Dvectors(char *filename, VALUE destinations, int first_row_of
          if (!is_okay_number(v)) {
             fclose(file);
             free(buff);
-            rb_raise(rb_eArgError, "ERROR: bad value %g in line i% of file %s", v, i, filename);
+            rb_raise(rb_eArgError, "ERROR: bad value %g in line %i of file %s", v, i, filename);
          }
          if (col < d->capa) { row_data[col] = v; d->len = col+1; }
          else {

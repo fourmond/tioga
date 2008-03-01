@@ -1434,7 +1434,7 @@ class MyFigures
         t.set_portrait
         background
         t.rescale(0.45)
-        dy = -t.default_text_height_dy * 1.7
+        dy = -t.default_text_height_dy * 1.95
         t.fill_color = Black
         x = 0.24; y = y_init = 0.94
         list = [ 'Arrow', 'Arrowhead', 'Asterisk', 'Bar', 'BarThick', 'BarThin', 'Box', 'Bullet', 

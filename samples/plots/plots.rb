@@ -246,7 +246,9 @@ EOD
         greens_min = -4
         greens_max = -0.01
         boundaries = plot_boundaries(xs,ys,@margin,greens_min,greens_max)
-        t.show_plot(boundaries) { t.show_polyline(xs,ys,Green) }
+        t.show_plot(boundaries) { 
+            t.show_polyline(xs,ys,Green) 
+         }
     end
 
 

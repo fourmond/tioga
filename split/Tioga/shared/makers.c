@@ -243,13 +243,14 @@ c_make_steps(FM *p,
 OBJ_PTR
 c_private_make_steps(OBJ_PTR fmkr, FM *p, OBJ_PTR xvec_data, OBJ_PTR yvec_data,
                      double xfirst, double yfirst, double xlast, double ylast,
-                     int justification, int *ierr)
+                     int *ierr)
 {
   OBJ_PTR xvec;
   OBJ_PTR yvec;
   OBJ_PTR pts_array;
   long xsteps_len = 0, ysteps_len = 0;
   double *xsteps_data = NULL, *ysteps_data = NULL;
+   int justification=CENTERED;
 
   c_make_steps(p, &xsteps_len, &xsteps_data, &ysteps_len, &ysteps_data,
                xvec_data, yvec_data, xfirst, yfirst, xlast, ylast,

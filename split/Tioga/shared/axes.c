@@ -564,7 +564,7 @@ static void draw_major_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
    bool did_line = false;
    length = s->major_tick_length * ((s->vertical)? p->default_text_height_dx : p->default_text_height_dy);
    if (s->ticks_inside) inside = length;
-   if (s->ticks_outside) outside = length;
+   if (s->ticks_outside) outside = -length;
    if (s->top_or_right) { inside = -inside; outside = -outside; }
    if (s->line_width != s->major_tick_width) {
       c_line_width_set(fmkr, p, s->line_width = s->major_tick_width, ierr);
@@ -607,7 +607,7 @@ static void draw_minor_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
    if (s->log_vals && nsub > 9) nsub = 9;
    length = s->minor_tick_length * ((s->vertical)? p->default_text_height_dx : p->default_text_height_dy);
    if (s->ticks_inside) inside = length;
-   if (s->ticks_outside) outside = length;
+   if (s->ticks_outside) outside = -length;
    if (s->top_or_right) { inside = -inside; outside = -outside; }
    if (s->line_width != s->minor_tick_width) {
       c_line_width_set(fmkr, p, s->line_width = s->minor_tick_width, ierr);
@@ -635,10 +635,12 @@ static void draw_minor_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
             double subloc = loc + ((!s->log_vals) ? (j * subinterval) : log_subintervals[j-1]);
             if (subloc >= next_loc) break;
             if (subloc <= s->axis_min || subloc >= s->axis_max) continue;
-            if (s->vertical)
+            if (s->vertical) {
                figure_join(fmkr, p, s->x0+inside, subloc, s->x0+outside, subloc, ierr);
-            else
+            }
+            else {
                figure_join(fmkr, p, subloc, s->y0+inside, subloc, s->y0+outside, ierr);
+            }
             did_line = true;
             if (*ierr != 0) return;
          }
