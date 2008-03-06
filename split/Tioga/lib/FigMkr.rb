@@ -36,7 +36,7 @@ class FigureMaker
     # SVN repository. This is where we'll look for version information.
     SVN_URL = '$HeadURL$'
 
-    TIOGA_VERSION = if SVN_URL =~ /releases\/tioga\/Tioga\s+-([^\/]+)/
+    TIOGA_VERSION = if SVN_URL =~ /releases\/tioga\/Tioga%20([^\/]+)/
                        $1
                      else
                        "SVN version"
@@ -2101,7 +2101,9 @@ class FigureMaker
     
     
     def finish_1_pdf(num,report)
+      old_measure_keys = @measures.keys
       pdfname = finish_making_pdf(@figure_names[num])
+
       if pdfname != false
         @figure_pdfs[num] = pdfname
         report_number_and_name(num,pdfname) if report
