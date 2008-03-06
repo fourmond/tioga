@@ -2,7 +2,7 @@
 
 require './mkmf2.rb'
 
-$CFLAGS += " -O2 -Wall "
+$CFLAGS += " -O2 -g -Wall -Werror-implicit-function-declaration"
 
 # Now, if you want to install the include file, you need to
 # set the EXTCONF_RB_INCLUDE

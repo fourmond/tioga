@@ -1,6 +1,8 @@
+/* -*- c-basic-offset: 3; -*- */
 /* wrappers.c */
 /*
    Copyright (C) 2007  Bill Paxton
+             (C) 2008  Vincent Fourmond
 
    This file is part of Tioga.
 
@@ -29,7 +31,15 @@
 
 // axes.c
 OBJ_PTR FM_show_axis(OBJ_PTR fmkr, OBJ_PTR loc) { int ierr=0;
-   c_show_axis(fmkr, Get_FM(fmkr, &ierr), Number_to_int(loc, &ierr), &ierr); RETURN_NIL; } 
+   /* Now choosing between c_show_axis_generic and c_show_axis */
+   if(Is_Kind_of_Integer(loc))	/* A simple location */
+      c_show_axis(fmkr, Get_FM(fmkr, &ierr), 
+		  Number_to_int(loc, &ierr), &ierr);
+   else				/* A hash */
+      c_show_axis_generic(fmkr, Get_FM(fmkr, &ierr), loc, &ierr);
+   RETURN_NIL; 
+} 
+
 OBJ_PTR FM_show_edge(OBJ_PTR fmkr, OBJ_PTR loc) { int ierr=0;
    c_show_edge(fmkr, Get_FM(fmkr, &ierr), Number_to_int(loc, &ierr), &ierr); RETURN_NIL; }
 OBJ_PTR FM_no_title(OBJ_PTR fmkr) { int ierr=0; c_no_title(fmkr, Get_FM(fmkr, &ierr), &ierr); RETURN_NIL; }

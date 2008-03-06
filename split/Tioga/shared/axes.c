@@ -1,3 +1,4 @@
+/* -*- c-basic-offset: 3; -*- */
 /* axes.c */
 /*
    Copyright (C) 2005  Bill Paxton
@@ -20,6 +21,16 @@
 */
 #include "figures.h"
 #include "pdfs.h"
+
+/* 
+   Here is my (Vincent) big TODO-list for the axes stuff:
+   * provide a way to reliably get the location from major/minor
+     ticks for a given axis, so users can build lines/grids that build on
+     top of that (or rather under it ;-)...)
+   * let the users choose between the current way to pick up ticks position
+     and another, such as the one I'm using in SciYAG, which seems to give
+     results that are more according to my expectations.
+ */
 
 typedef struct {
    int type;
@@ -172,6 +183,11 @@ static void Get_yaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
 
 /*======================================================================*/
 
+/* This value is used internally to make sure that the system does not
+   try to interpret the location of the axis and modify things.
+*/
+#define AXIS_FREE_LOCATION 1000
+
 static void draw_axis_line(OBJ_PTR fmkr, FM *p, int location, PlotAxis *s, int *ierr)
 {
    switch (location) {
@@ -253,6 +269,10 @@ static void draw_axis_line(OBJ_PTR fmkr, FM *p, int location, PlotAxis *s, int *
          s->other_axis_reversed = p->yaxis_reversed;
          s->top_or_right = false;
          break;
+      case AXIS_FREE_LOCATION:
+	 /* Nothing to be done here. */
+	 break;
+        
    }
    c_line_width_set(fmkr, p, s->line_width, ierr);
    figure_join_and_stroke(fmkr, p, s->x0, s->y0, s->x1, s->y1, ierr);
@@ -302,6 +322,7 @@ static char *Create_Label(double val, int scale, int prec,
    return string;
 }
 
+/* vincent: I wonder what this function is doing here ;-)...  */
 char *Get_String(OBJ_PTR ary, int index, int *ierr) {
    OBJ_PTR s = Array_Entry(ary,index,ierr);
    if (*ierr != 0) return NULL;
@@ -539,6 +560,7 @@ static void Pick_Major_Tick_Interval(OBJ_PTR fmkr, FM *p,
 static void draw_major_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
 {
    s->num_minors = s->number_of_minor_intervals; 
+   /* TODO: the following code should move to a dedicated function */
    if (s->locations_for_major_ticks != OBJ_NIL) {
       long len;
       s->majors = Vector_Data_for_Read(s->locations_for_major_ticks, &len, ierr);
@@ -706,22 +728,6 @@ static void c_show_side(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr) {
    }
 }
 
-
-void c_show_axis(OBJ_PTR fmkr, FM *p, int location, int *ierr)
-{
-   PlotAxis axis;
-   if (location == LEFT || location == RIGHT || location == AT_X_ORIGIN) {
-      if (!p->yaxis_visible) return;
-      Get_yaxis_Specs(fmkr, p, &axis, ierr);
-   } else if (location == TOP || location == BOTTOM || location == AT_Y_ORIGIN) {
-      if (!p->xaxis_visible) return;
-      Get_xaxis_Specs(fmkr, p, &axis, ierr);
-   } else RAISE_ERROR_i(
-         "Sorry: invalid 'loc' for axis: must be one of LEFT, RIGHT, TOP, BOTTOM, AT_X_ORIGIN, or AT_Y_ORIGIN: is (%i)", location, ierr);
-   if (*ierr != 0) return;
-   axis.location = location;
-   c_show_side(fmkr, p, &axis, ierr);
-}
       
 void c_show_edge(OBJ_PTR fmkr, FM *p, int location, int *ierr)
 {
@@ -798,3 +804,185 @@ void c_no_bottom_edge(OBJ_PTR fmkr, FM *p, int *ierr)
    p->bottom_edge_visible = false;
 }
 
+
+/* Prepares the PlotAxis object for a standard use.
+   Returns 1 if the corresponding axis is marked as 
+   visible and 0 if not.
+
+   This function will be used later to get the exact same PlotAxis
+   object so as to get information about the ticks, for instance.
+*/
+static int prepare_standard_PlotAxis(OBJ_PTR fmkr, FM *p, 
+				     int location, PlotAxis * axis, 
+				     int *ierr)
+{
+   axis->location = location;
+   if (location == LEFT || location == RIGHT || location == AT_X_ORIGIN) {
+      Get_yaxis_Specs(fmkr, p, axis, ierr);
+      if (!p->yaxis_visible) return 0;
+   } 
+   else if (location == TOP || location == BOTTOM || location == AT_Y_ORIGIN) {
+      Get_xaxis_Specs(fmkr, p, axis, ierr);
+      if (!p->xaxis_visible) return 0;
+   } 
+   else 
+      RAISE_ERROR_i("Sorry: invalid 'loc' for axis: must be one of LEFT,"
+		    "RIGHT, TOP, BOTTOM, AT_X_ORIGIN, or AT_Y_ORIGIN: is (%i)",
+		    location, ierr);
+   if (*ierr != 0) 
+      return 0;
+   return 1;
+}
+
+
+void c_show_axis(OBJ_PTR fmkr, FM *p, int location, int *ierr)
+{
+   PlotAxis axis;
+   if(prepare_standard_PlotAxis(fmkr, p, location, &axis, ierr)) {
+      c_show_side(fmkr, p, &axis, ierr);
+   }
+}
+
+
+/* This function does nearly the same job as c_show_axis, but takes
+   a full hash instead of getting information from the FigureMaker object,
+   it retrieves them from the axis_spec hash. Following keys are
+   understood:
+   - location: position, as in show_axis. Can be omitted, if you
+     provide the position yourself
+   - style: if set, copies style from the x or y axis, depending on the
+     first letter of this string-like object.
+
+   This function bypasses the axis_visible checks. Use with caution !
+*/
+void c_show_axis_generic(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec, int *ierr)
+{
+   PlotAxis axis;
+   /* Our job will be to convert the axis_spec hash into
+      a PlotAxis object
+   */
+
+   /* First, we get default from the location or from style.
+      Too many things need to be checked if we don't get default values
+      from a given point
+   */
+   if(Hash_Has_Key(axis_spec, "location")) {
+      int location = Number_to_int(Hash_Get_Obj(axis_spec, "location"), ierr); 
+      if (location == LEFT || location == RIGHT || location == AT_X_ORIGIN) {
+	 Get_yaxis_Specs(fmkr, p, &axis, ierr); 
+      } 
+      else if (location == TOP || location == BOTTOM || 
+	       location == AT_Y_ORIGIN) {
+	 Get_xaxis_Specs(fmkr, p, &axis, ierr);
+      } 
+      axis.location = location;
+   }
+   else {
+      if(Hash_Has_Key(axis_spec, "style")) {
+	 const char * val = String_Ptr(Hash_Get_Obj(axis_spec, "style"), ierr);
+	 switch(val[0]) {
+	 case 'x':
+	 case 'X':
+	    Get_xaxis_Specs(fmkr, p, &axis, ierr);
+	    break;
+	 case 'y':
+	 case 'Y':
+	    Get_yaxis_Specs(fmkr, p, &axis, ierr);
+	    break;
+	 default:
+	    RAISE_ERROR_s("show_axis: 'style' %s not understood", val, ierr);
+	    return;
+	 }
+      }
+      else {
+	 RAISE_ERROR("show_axis: you must specify either "
+		     "'location' or 'style'", ierr);
+      }
+      axis.location = AXIS_FREE_LOCATION;
+   }
+
+   if (*ierr != 0) return;
+
+   /* Now, we override values of PlotAxis with the ones found in the
+      dictionary. */
+   
+   if(axis.location == AXIS_FREE_LOCATION) {
+      if(Hash_Has_Key(axis_spec, "from") && Hash_Has_Key(axis_spec, "to")) {
+	 long dummy; 
+	 double *from = Vector_Data_for_Read(Hash_Get_Obj(axis_spec, "from"), 
+					     &dummy, ierr);
+	 double *to = Vector_Data_for_Read(Hash_Get_Obj(axis_spec, "to"),
+					   &dummy, ierr);
+	 axis.x0 = from[0];
+	 axis.x1 = to[0];
+	 axis.y0 = from[1];
+	 axis.y1 = to[1];
+
+	 /* We now determine various parameters attached to the axis:
+	    * its length
+	    * its min/max boundaries
+	    * whether it is reversed
+	  */
+	 if(axis.y0 != axis.y1) {
+	    if(axis.x0 != axis.x1) {
+	       RAISE_ERROR("show_axis: sorry, axes must be horizontal or "
+			   "vertical", ierr);
+	    }
+	    else {
+	       if(axis.y0 > axis.y1) {
+		  axis.reversed = true;
+		  axis.axis_min = axis.y1;
+		  axis.axis_max = axis.y0;
+		  axis.length = axis.y0 - axis.y1;
+	       }
+	       else {
+		  axis.reversed = false;
+		  axis.axis_min = axis.y0;
+		  axis.axis_max = axis.y1;
+		  axis.length = axis.y1 - axis.y0;
+	       }
+	    }
+	 }
+	 else {
+	    if(axis.x0 > axis.x1) {
+	       axis.reversed = true;
+	       axis.axis_min = axis.x1;
+	       axis.axis_max = axis.x0;
+	       axis.length = axis.x0 - axis.x1;
+	    }
+	    else {
+	       axis.reversed = false;
+	       axis.axis_min = axis.x0;
+	       axis.axis_max = axis.x1;
+	       axis.length = axis.x1 - axis.x0;
+	    }
+	 }
+      }
+      else {
+	 RAISE_ERROR("show_axis: either 'location' or 'to' and 'from'", ierr);
+      }
+   }
+
+   /* Some generic overrides */
+   if(Hash_Has_Key(axis_spec, "type"))
+      axis.type = Number_to_int(Hash_Get_Obj(axis_spec, "type"), ierr);
+
+   if(Hash_Has_Key(axis_spec, "ticks_inside")) {
+      OBJ_PTR val = Hash_Get_Obj(axis_spec, "ticks_inside");
+      if(val == OBJ_NIL || val == OBJ_FALSE) 
+	 axis.ticks_inside = false;
+      else
+	 axis.ticks_inside = true;
+   }
+
+   if(Hash_Has_Key(axis_spec, "ticks_outside")) {
+      OBJ_PTR val = Hash_Get_Obj(axis_spec, "ticks_outside");
+      if(val == OBJ_NIL || val == OBJ_FALSE) 
+	 axis.ticks_outside = false;
+      else
+	 axis.ticks_outside = true;
+   }
+   
+   
+   c_show_side(fmkr, p, &axis, ierr);
+}

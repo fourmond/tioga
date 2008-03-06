@@ -188,6 +188,9 @@ class X_and_Y_Axes < Doc < FigureMaker
 # yaxis_visible is +true+, then the axis is shown using the current y axis settings.
 # If _loc_ is  +TOP+, +BOTTOM+,  or +AT_Y_ORIGIN+, and xaxis_visible is +true+, then
 # the axis is shown using the current x axis settings.
+#
+# Starting from Tioga 1.8, it is possible to give a hash to #show_axis that
+# specifies quite a fair bit of information. More to come later.
    def show_axis(loc)
    end
 

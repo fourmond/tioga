@@ -74,6 +74,10 @@ class MyPlots
 
         t.def_figure("Greens_clipped") { greens_clipped }
 
+
+        # Starting to play with axes specifications
+        t.def_figure("Axes_fun") { axes_fun }
+
         t.model_number = -1
         
         t.def_enter_page_function { enter_page }
@@ -871,6 +875,24 @@ EOD
             end
         end
     end
+
+    # This plot is to demonstrate the new power of #show_axis.
+    def axes_fun
+      t.do_box_labels("Splines", "Position", "Average Count")
+      xs = Dvector[ 1.0, 2.0, 5.0, 6.0, 7.0, 8.0, 10.0, 13.0, 17.0 ]
+      ys = Dvector[ 3.0, 3.7, 3.9, 4.2, 5.7, 6.6,  7.1,  6.7,  4.5 ]
+      t.show_plot([-1, 19, 8, 2]) do
+        spec = {
+          'style' => "x",
+          'from' => [8,3],
+          'to' => [8,7],
+          'type' => AXIS_WITH_TICKS_ONLY,
+          'ticks_outside' => true,
+        }
+        t.show_axis(spec)
+      end
+    end
+
 
 
 end
