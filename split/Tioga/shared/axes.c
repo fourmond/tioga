@@ -183,10 +183,12 @@ static void Get_yaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
 
 /*======================================================================*/
 
-/* This value is used internally to make sure that the system does not
-   try to interpret the location of the axis and modify things.
-*/
+/* 
+   Internal values for axis locations.
+ */
 #define AXIS_FREE_LOCATION 1000
+#define AXIS_FREE_LOCATION_HORIZ 1002
+#define AXIS_FREE_LOCATION_VERT 1001
 
 static void draw_axis_line(OBJ_PTR fmkr, FM *p, int location, PlotAxis *s, int *ierr)
 {
@@ -673,10 +675,42 @@ static void draw_minor_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
 
 static void show_numeric_label(OBJ_PTR fmkr, FM *p, PlotAxis *s, 
    char *text, int location, double position, double shift, int *ierr)
-{ // position is in figure coords and must be converted to frame coords
-   double pos = ((!s->reversed)? (position - s->axis_min) : (s->axis_max - position)) / s->length;
-   c_show_rotated_text(fmkr, p, text, location, shift, pos, 
-		       s->numeric_label_scale, s->numeric_label_angle, s->numeric_label_justification, s->numeric_label_alignment, OBJ_NIL, ierr);
+{ 
+   if(location == AXIS_FREE_LOCATION_HORIZ || 
+      location == AXIS_FREE_LOCATION_VERT) {
+      /* We convert the tick position into frame position */
+      double x,y, ft_ht = p->default_text_scale * 
+	 s->numeric_label_scale * p->default_font_size;
+      double angle;
+      /* Defaults to angle = +90, left side of the axis */
+      if(location == AXIS_FREE_LOCATION_VERT) {
+	 y = position;
+	 x = s->x0 + convert_output_to_figure_dx(p,(s->reversed ? 1.0 : -1.0) *
+						 ft_ht * ENLARGE * shift);
+	    
+				      
+	 angle = 90;
+      }
+      else {
+	 angle = 0;
+	 x = position;
+	 y = s->y0 + convert_output_to_figure_dy(p,(s->reversed ? 1.0 : -1.0) *
+						 ft_ht * ENLARGE * shift);
+      }
+
+      c_show_rotated_label(fmkr, p, text, x, y, 
+			   s->numeric_label_scale, 
+			   s->numeric_label_angle + angle, 
+			   s->numeric_label_justification, 
+			   s->numeric_label_alignment, OBJ_NIL, ierr);
+      
+   }
+   else {
+      // position is in figure coords and must be converted to frame coords
+      double pos = ((!s->reversed)? (position - s->axis_min) : (s->axis_max - position)) / s->length;
+      c_show_rotated_text(fmkr, p, text, location, shift, pos, 
+			  s->numeric_label_scale, s->numeric_label_angle, s->numeric_label_justification, s->numeric_label_alignment, OBJ_NIL, ierr);
+   }
 }
 
 static void draw_numeric_labels(OBJ_PTR fmkr, FM *p, int location, PlotAxis *s, int *ierr)
@@ -941,6 +975,7 @@ void c_show_axis_generic(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec, int *ierr)
 		  axis.axis_max = axis.y1;
 		  axis.length = axis.y1 - axis.y0;
 	       }
+	       axis.location = AXIS_FREE_LOCATION_VERT;
 	    }
 	 }
 	 else {
@@ -956,6 +991,7 @@ void c_show_axis_generic(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec, int *ierr)
 	       axis.axis_max = axis.x1;
 	       axis.length = axis.x1 - axis.x0;
 	    }
+	    axis.location = AXIS_FREE_LOCATION_HORIZ;
 	 }
       }
       else {
