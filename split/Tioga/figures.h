@@ -335,6 +335,9 @@ extern void c_no_right_edge(OBJ_PTR fmkr, FM *p, int *ierr);
 extern void c_no_top_edge(OBJ_PTR fmkr, FM *p, int *ierr);
 extern void c_no_bottom_edge(OBJ_PTR fmkr, FM *p, int *ierr);
 extern void c_show_axis_generic(OBJ_PTR fmkr, FM *p, OBJ_PTR dict, int *ierr);
+extern OBJ_PTR c_axis_get_information(OBJ_PTR fmkr, FM *p, 
+				      OBJ_PTR axis_spec, int *ierr);
+
 
 /*======================================================================*/
 // figures.c

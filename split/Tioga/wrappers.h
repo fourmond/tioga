@@ -45,6 +45,8 @@ extern OBJ_PTR FM_no_left_edge(OBJ_PTR fmkr);
 extern OBJ_PTR FM_no_right_edge(OBJ_PTR fmkr);
 extern OBJ_PTR FM_no_top_edge(OBJ_PTR fmkr);
 extern OBJ_PTR FM_no_bottom_edge(OBJ_PTR fmkr);
+extern OBJ_PTR FM_axis_information(OBJ_PTR fmkr, OBJ_PTR loc);
+
 
 /*======================================================================*/
 // init.c

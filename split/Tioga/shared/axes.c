@@ -191,7 +191,9 @@ static void Get_yaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
  */
 #define AXIS_FREE_LOCATION 1000
 
-static void draw_axis_line(OBJ_PTR fmkr, FM *p, int location, PlotAxis *s, int *ierr)
+/* Prepares the various coordinates according to the axis location */
+static void prepare_axis_coordinates(OBJ_PTR fmkr, FM *p, 
+				     int location, PlotAxis *s, int *ierr)
 {
    switch (location) {
       case LEFT:
@@ -275,8 +277,13 @@ static void draw_axis_line(OBJ_PTR fmkr, FM *p, int location, PlotAxis *s, int *
       case AXIS_FREE_LOCATION:
 	 /* Nothing to be done here. */
 	 break;
-        
-   }
+    }
+}
+
+static void draw_axis_line(OBJ_PTR fmkr, FM *p, int location, 
+			   PlotAxis *s, int *ierr)
+{
+   prepare_axis_coordinates(fmkr, p, location, s, ierr);
    c_line_width_set(fmkr, p, s->line_width, ierr);
    figure_join_and_stroke(fmkr, p, s->x0, s->y0, s->x1, s->y1, ierr);
 }
@@ -560,10 +567,11 @@ static void Pick_Major_Tick_Interval(OBJ_PTR fmkr, FM *p,
    }
 }
 
-static void draw_major_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
+/* This functions fills the majors attribute of the PlotAxis object
+   with the position of major ticks
+*/
+static void compute_major_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
 {
-   s->num_minors = s->number_of_minor_intervals; 
-   /* TODO: the following code should move to a dedicated function */
    if (s->locations_for_major_ticks != OBJ_NIL) {
       long len;
       s->majors = Vector_Data_for_Read(s->locations_for_major_ticks, &len, ierr);
@@ -584,6 +592,16 @@ static void draw_major_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
       if (*ierr != 0) return;
       s->free_majors = true;
    }
+}
+
+static void draw_major_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
+{
+   s->num_minors = s->number_of_minor_intervals; 
+
+   /* Get the major ticks position in s->majors */
+   compute_major_ticks(fmkr, p, s, ierr);
+   if(*ierr != 0) return;
+
    int i;
    double inside=0.0, outside=0.0, length;
    bool did_line = false;
@@ -727,6 +745,20 @@ static void draw_numeric_labels(OBJ_PTR fmkr, FM *p, int location, PlotAxis *s, 
    }
 }
 
+/* Frees all temporarily allocated memory */
+static void free_allocated_memory(PlotAxis *s)
+{
+   int i;
+   if (s->free_majors) free(s->majors);
+   if (s->labels != NULL) {
+      if (s->free_strings_for_labels) {
+         for (i = 0; i < s->nmajors; i++)
+            if (s->labels[i] != NULL) free(s->labels[i]);
+      }
+      free(s->labels);
+   }
+}
+
 static void c_show_side(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr) {
    int i;
    if (s->type == AXIS_HIDDEN) return;
@@ -752,14 +784,7 @@ static void c_show_side(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr) {
    if (*ierr != 0) return;
  done:
    End_Axis_Standard_State(); // grestore
-   if (s->free_majors) free(s->majors);
-   if (s->labels != NULL) {
-      if (s->free_strings_for_labels) {
-         for (i = 0; i < s->nmajors; i++)
-            if (s->labels[i] != NULL) free(s->labels[i]);
-      }
-      free(s->labels);
-   }
+   free_allocated_memory(s);
 }
 
       
@@ -877,25 +902,13 @@ void c_show_axis(OBJ_PTR fmkr, FM *p, int location, int *ierr)
    }
 }
 
-
-/* This function does nearly the same job as c_show_axis, but takes
-   a full hash instead of getting information from the FigureMaker object,
-   it retrieves them from the axis_spec hash. Following keys are
-   understood:
-   - location: position, as in show_axis. Can be omitted, if you
-     provide the position yourself
-   - style: if set, copies style from the x or y axis, depending on the
-     first letter of this string-like object.
-
-   This function bypasses the axis_visible checks. Use with caution !
+/* This function prepares a PlotAxis object based on the information
+   given in the dict argument.
 */
-void c_show_axis_generic(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec, int *ierr)
+static int prepare_dict_PlotAxis(OBJ_PTR fmkr, FM *p, 
+				 OBJ_PTR axis_spec, PlotAxis * axis, 
+				 int *ierr)
 {
-   PlotAxis axis;
-   /* Our job will be to convert the axis_spec hash into
-      a PlotAxis object
-   */
-
    /* First, we get default from the location or from style.
       Too many things need to be checked if we don't get default values
       from a given point
@@ -903,13 +916,13 @@ void c_show_axis_generic(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec, int *ierr)
    if(Hash_Has_Key(axis_spec, "location")) {
       int location = Number_to_int(Hash_Get_Obj(axis_spec, "location"), ierr); 
       if (location == LEFT || location == RIGHT || location == AT_X_ORIGIN) {
-	 Get_yaxis_Specs(fmkr, p, &axis, ierr); 
+	 Get_yaxis_Specs(fmkr, p, axis, ierr); 
       } 
       else if (location == TOP || location == BOTTOM || 
 	       location == AT_Y_ORIGIN) {
-	 Get_xaxis_Specs(fmkr, p, &axis, ierr);
+	 Get_xaxis_Specs(fmkr, p, axis, ierr);
       } 
-      axis.location = location;
+      axis->location = location;
    }
    else {
       if(Hash_Has_Key(axis_spec, "from") && Hash_Has_Key(axis_spec, "to")) {
@@ -918,55 +931,55 @@ void c_show_axis_generic(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec, int *ierr)
 					     &dummy, ierr);
 	 double *to = Vector_Data_for_Read(Hash_Get_Obj(axis_spec, "to"),
 					   &dummy, ierr);
-	 axis.x0 = from[0];
-	 axis.x1 = to[0];
-	 axis.y0 = from[1];
-	 axis.y1 = to[1];
+	 axis->x0 = from[0];
+	 axis->x1 = to[0];
+	 axis->y0 = from[1];
+	 axis->y1 = to[1];
 
 	 /* We now determine various parameters attached to the axis:
 	    * its length
 	    * its min/max boundaries
 	    * whether it is reversed
 	  */
-	 if(axis.y0 != axis.y1) {
-	    Get_yaxis_Specs(fmkr, p, &axis, ierr);
-	    if(axis.x0 != axis.x1) {
+	 if(axis->y0 != axis->y1) {
+	    Get_yaxis_Specs(fmkr, p, axis, ierr);
+	    if(axis->x0 != axis->x1) {
 	       RAISE_ERROR("show_axis: sorry, axes must be horizontal or "
 			   "vertical", ierr);
 	    }
 	    else {
-	       if(axis.y0 > axis.y1) {
-		  axis.reversed = true;
-		  axis.axis_min = axis.y1;
-		  axis.axis_max = axis.y0;
-		  axis.length = axis.y0 - axis.y1;
+	       if(axis->y0 > axis->y1) {
+		  axis->reversed = true;
+		  axis->axis_min = axis->y1;
+		  axis->axis_max = axis->y0;
+		  axis->length = axis->y0 - axis->y1;
 	       }
 	       else {
-		  axis.reversed = false;
-		  axis.axis_min = axis.y0;
-		  axis.axis_max = axis.y1;
-		  axis.length = axis.y1 - axis.y0;
+		  axis->reversed = false;
+		  axis->axis_min = axis->y0;
+		  axis->axis_max = axis->y1;
+		  axis->length = axis->y1 - axis->y0;
 	       }
-	       axis.vertical = true;
-	       axis.location = AXIS_FREE_LOCATION;
+	       axis->vertical = true;
+	       axis->location = AXIS_FREE_LOCATION;
 	    }
 	 }
 	 else {
-	    Get_xaxis_Specs(fmkr, p, &axis, ierr);
-	    if(axis.x0 > axis.x1) {
-	       axis.reversed = true;
-	       axis.axis_min = axis.x1;
-	       axis.axis_max = axis.x0;
-	       axis.length = axis.x0 - axis.x1;
+	    Get_xaxis_Specs(fmkr, p, axis, ierr);
+	    if(axis->x0 > axis->x1) {
+	       axis->reversed = true;
+	       axis->axis_min = axis->x1;
+	       axis->axis_max = axis->x0;
+	       axis->length = axis->x0 - axis->x1;
 	    }
 	    else {
-	       axis.reversed = false;
-	       axis.axis_min = axis.x0;
-	       axis.axis_max = axis.x1;
-	       axis.length = axis.x1 - axis.x0;
+	       axis->reversed = false;
+	       axis->axis_min = axis->x0;
+	       axis->axis_max = axis->x1;
+	       axis->length = axis->x1 - axis->x0;
 	    }
-	    axis.vertical = false;
-	    axis.location = AXIS_FREE_LOCATION;
+	    axis->vertical = false;
+	    axis->location = AXIS_FREE_LOCATION;
 	 }
       }
       else {
@@ -976,40 +989,97 @@ void c_show_axis_generic(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec, int *ierr)
 
    /* Some generic overrides */
    if(Hash_Has_Key(axis_spec, "type"))
-      axis.type = Number_to_int(Hash_Get_Obj(axis_spec, "type"), ierr);
+      axis->type = Number_to_int(Hash_Get_Obj(axis_spec, "type"), ierr);
 
    if(Hash_Has_Key(axis_spec, "ticks_inside")) {
       OBJ_PTR val = Hash_Get_Obj(axis_spec, "ticks_inside");
       if(val == OBJ_NIL || val == OBJ_FALSE) 
-	 axis.ticks_inside = false;
+	 axis->ticks_inside = false;
       else
-	 axis.ticks_inside = true;
+	 axis->ticks_inside = true;
    }
 
    if(Hash_Has_Key(axis_spec, "ticks_outside")) {
       OBJ_PTR val = Hash_Get_Obj(axis_spec, "ticks_outside");
       if(val == OBJ_NIL || val == OBJ_FALSE) 
-	 axis.ticks_outside = false;
+	 axis->ticks_outside = false;
       else
-	 axis.ticks_outside = true;
+	 axis->ticks_outside = true;
    }
 
    if(Hash_Has_Key(axis_spec, "major_ticks"))
-      axis.locations_for_major_ticks = Hash_Get_Obj(axis_spec, "major_ticks");
+      axis->locations_for_major_ticks = Hash_Get_Obj(axis_spec, "major_ticks");
    if(Hash_Has_Key(axis_spec, "minor_ticks"))
-      axis.locations_for_minor_ticks = Hash_Get_Obj(axis_spec, "minor_ticks");
+      axis->locations_for_minor_ticks = Hash_Get_Obj(axis_spec, "minor_ticks");
    if(Hash_Has_Key(axis_spec, "labels"))
-      axis.tick_labels = Hash_Get_Obj(axis_spec, "labels");
+      axis->tick_labels = Hash_Get_Obj(axis_spec, "labels");
 
 
    /* Various tick label attributes */
    if(Hash_Has_Key(axis_spec, "shift"))
-      axis.numeric_label_shift = Hash_Get_Double(axis_spec, "shift");
+      axis->numeric_label_shift = Hash_Get_Double(axis_spec, "shift");
    if(Hash_Has_Key(axis_spec, "scale"))
-      axis.numeric_label_scale = Hash_Get_Double(axis_spec, "scale");
+      axis->numeric_label_scale = Hash_Get_Double(axis_spec, "scale");
    if(Hash_Has_Key(axis_spec, "angle"))
-      axis.numeric_label_angle = Hash_Get_Double(axis_spec, "angle");
+      axis->numeric_label_angle = Hash_Get_Double(axis_spec, "angle");
+   return 1;
+}
 
-   
-   c_show_side(fmkr, p, &axis, ierr);
+
+/* This function does nearly the same job as c_show_axis, but takes
+   a full hash instead of getting information from the FigureMaker object,
+   it retrieves them from the axis_spec hash. Following keys are
+   understood:
+   - location: position, as in show_axis. Can be omitted, if you
+     provide the position yourself
+
+   This function bypasses the axis_visible checks. Use with caution !
+*/
+void c_show_axis_generic(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec, int *ierr)
+{
+   PlotAxis axis;
+   if(prepare_dict_PlotAxis(fmkr, p, axis_spec, &axis, ierr)) {
+      c_show_side(fmkr, p, &axis, ierr);
+   }
+}
+
+
+/* 
+   This function takes an axis specification (either integer or
+   hash) and returns a hash containing the following keys:
+   * 'major' : position of all major ticks
+   * 'labels' : the names of all labels
+
+ */
+OBJ_PTR c_axis_get_information(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec,
+			       int *ierr)
+{
+   PlotAxis axis;
+   OBJ_PTR hash = Hash_New(), ar;
+   int i;
+   if(Is_Kind_of_Integer(axis_spec))
+      prepare_standard_PlotAxis(fmkr, p, Number_to_int(axis_spec, ierr),
+				&axis, ierr);
+   else 
+      prepare_dict_PlotAxis(fmkr, p, axis_spec, &axis, ierr);
+
+   /* First, major ticks positions */
+   prepare_axis_coordinates(fmkr, p, axis.location, &axis, ierr);
+   compute_major_ticks(fmkr, p, &axis, ierr);
+   Hash_Set_Obj(hash, "major", Vector_New(axis.nmajors, axis.majors));
+
+   /* Then, labels */
+   ar = Array_New(axis.nmajors);
+   axis.labels = Get_Labels(fmkr, p, &axis, ierr);
+   for (i=0; i < axis.nmajors; i++) {
+      if (axis.labels[i])
+	 Array_Store(ar, i, String_From_Cstring(axis.labels[i]), ierr);
+      else
+	 Array_Store(ar, i, OBJ_NIL, ierr);
+   }
+
+   Hash_Set_Obj(hash, "labels", ar);
+
+   free_allocated_memory(&axis);
+   return hash;
 }

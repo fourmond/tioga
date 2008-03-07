@@ -887,6 +887,7 @@ EOD
           'ticks_inside' => false,
         }
         t.show_axis(spec)
+        p t.axis_information(RIGHT)
         spec2 = {
           'from' => [12,3],
           'to' => [12,7],
@@ -896,6 +897,14 @@ EOD
           'labels' => ["$a$", "$b$"]
         }
         t.show_axis(spec2)
+        spec3 = {
+          'from' => [17,3],
+          'to' => [17,7],
+          'ticks_outside' => true,
+          'ticks_inside' => false,
+          'labels' => ["$a$", "$b$", 'c', 'd', 'e']
+        }
+        t.show_axis(spec3)
       end
       t.context do 
         t.set_bounds([-1, 19, 8, 2])

@@ -52,6 +52,12 @@ OBJ_PTR FM_no_right_edge(OBJ_PTR fmkr) { int ierr=0; c_no_right_edge(fmkr, Get_F
 OBJ_PTR FM_no_top_edge(OBJ_PTR fmkr) { int ierr=0; c_no_top_edge(fmkr, Get_FM(fmkr, &ierr), &ierr); RETURN_NIL; }
 OBJ_PTR FM_no_bottom_edge(OBJ_PTR fmkr) { int ierr=0; c_no_bottom_edge(fmkr, Get_FM(fmkr, &ierr), &ierr); RETURN_NIL;}
 
+OBJ_PTR FM_axis_information(OBJ_PTR fmkr, OBJ_PTR spec) 
+{ 
+   int ierr=0; 
+   return c_axis_get_information(fmkr, Get_FM(fmkr, &ierr), spec, &ierr);
+}
+
 // init.c
 OBJ_PTR FM_private_init_fm_data(OBJ_PTR fmkr) { int ierr=0; 
    c_private_init_fm_data(fmkr, Get_FM(fmkr, &ierr), &ierr); RETURN_NIL; }

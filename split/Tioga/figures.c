@@ -508,6 +508,7 @@ void Init_FigureMaker(void) {
    rb_define_method(cFM, "doing_subplot", FM_doing_subplot, 0);
    rb_define_method(cFM, "show_axis", FM_show_axis, 1);
    rb_define_method(cFM, "show_edge", FM_show_edge, 1);
+   rb_define_method(cFM, "axis_information", FM_axis_information, 1);
    rb_define_method(cFM, "no_title", FM_no_title, 0);
    rb_define_method(cFM, "no_xlabel", FM_no_xlabel, 0);
    rb_define_method(cFM, "no_ylabel", FM_no_ylabel, 0);
