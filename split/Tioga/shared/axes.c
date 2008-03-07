@@ -30,6 +30,9 @@
    * let the users choose between the current way to pick up ticks position
      and another, such as the one I'm using in SciYAG, which seems to give
      results that are more according to my expectations.
+
+   * BUG fix: apparently, two calls to the axes stuff do no return the
+     same thing, so I'll need to have a careful look at that
  */
 
 typedef struct {
@@ -187,8 +190,6 @@ static void Get_yaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
    Internal values for axis locations.
  */
 #define AXIS_FREE_LOCATION 1000
-#define AXIS_FREE_LOCATION_HORIZ 1002
-#define AXIS_FREE_LOCATION_VERT 1001
 
 static void draw_axis_line(OBJ_PTR fmkr, FM *p, int location, PlotAxis *s, int *ierr)
 {
@@ -676,14 +677,13 @@ static void draw_minor_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
 static void show_numeric_label(OBJ_PTR fmkr, FM *p, PlotAxis *s, 
    char *text, int location, double position, double shift, int *ierr)
 { 
-   if(location == AXIS_FREE_LOCATION_HORIZ || 
-      location == AXIS_FREE_LOCATION_VERT) {
+   if(location == AXIS_FREE_LOCATION) {
       /* We convert the tick position into frame position */
       double x,y, ft_ht = p->default_text_scale * 
 	 s->numeric_label_scale * p->default_font_size;
       double angle;
       /* Defaults to angle = +90, left side of the axis */
-      if(location == AXIS_FREE_LOCATION_VERT) {
+      if(s->vertical) {
 	 y = position;
 	 x = s->x0 + convert_output_to_figure_dx(p,(s->reversed ? 1.0 : -1.0) *
 						 ft_ht * ENLARGE * shift);
@@ -912,35 +912,6 @@ void c_show_axis_generic(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec, int *ierr)
       axis.location = location;
    }
    else {
-      if(Hash_Has_Key(axis_spec, "style")) {
-	 const char * val = String_Ptr(Hash_Get_Obj(axis_spec, "style"), ierr);
-	 switch(val[0]) {
-	 case 'x':
-	 case 'X':
-	    Get_xaxis_Specs(fmkr, p, &axis, ierr);
-	    break;
-	 case 'y':
-	 case 'Y':
-	    Get_yaxis_Specs(fmkr, p, &axis, ierr);
-	    break;
-	 default:
-	    RAISE_ERROR_s("show_axis: 'style' %s not understood", val, ierr);
-	    return;
-	 }
-      }
-      else {
-	 RAISE_ERROR("show_axis: you must specify either "
-		     "'location' or 'style'", ierr);
-      }
-      axis.location = AXIS_FREE_LOCATION;
-   }
-
-   if (*ierr != 0) return;
-
-   /* Now, we override values of PlotAxis with the ones found in the
-      dictionary. */
-   
-   if(axis.location == AXIS_FREE_LOCATION) {
       if(Hash_Has_Key(axis_spec, "from") && Hash_Has_Key(axis_spec, "to")) {
 	 long dummy; 
 	 double *from = Vector_Data_for_Read(Hash_Get_Obj(axis_spec, "from"), 
@@ -958,6 +929,7 @@ void c_show_axis_generic(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec, int *ierr)
 	    * whether it is reversed
 	  */
 	 if(axis.y0 != axis.y1) {
+	    Get_yaxis_Specs(fmkr, p, &axis, ierr);
 	    if(axis.x0 != axis.x1) {
 	       RAISE_ERROR("show_axis: sorry, axes must be horizontal or "
 			   "vertical", ierr);
@@ -975,10 +947,12 @@ void c_show_axis_generic(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec, int *ierr)
 		  axis.axis_max = axis.y1;
 		  axis.length = axis.y1 - axis.y0;
 	       }
-	       axis.location = AXIS_FREE_LOCATION_VERT;
+	       axis.vertical = true;
+	       axis.location = AXIS_FREE_LOCATION;
 	    }
 	 }
 	 else {
+	    Get_xaxis_Specs(fmkr, p, &axis, ierr);
 	    if(axis.x0 > axis.x1) {
 	       axis.reversed = true;
 	       axis.axis_min = axis.x1;
@@ -991,11 +965,12 @@ void c_show_axis_generic(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec, int *ierr)
 	       axis.axis_max = axis.x1;
 	       axis.length = axis.x1 - axis.x0;
 	    }
-	    axis.location = AXIS_FREE_LOCATION_HORIZ;
+	    axis.vertical = false;
+	    axis.location = AXIS_FREE_LOCATION;
 	 }
       }
       else {
-	 RAISE_ERROR("show_axis: either 'location' or 'to' and 'from'", ierr);
+	 RAISE_ERROR("show_axis: there must be  'location' or 'to' and 'from'", ierr);
       }
    }
 
@@ -1018,7 +993,23 @@ void c_show_axis_generic(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec, int *ierr)
       else
 	 axis.ticks_outside = true;
    }
-   
+
+   if(Hash_Has_Key(axis_spec, "major_ticks"))
+      axis.locations_for_major_ticks = Hash_Get_Obj(axis_spec, "major_ticks");
+   if(Hash_Has_Key(axis_spec, "minor_ticks"))
+      axis.locations_for_minor_ticks = Hash_Get_Obj(axis_spec, "minor_ticks");
+   if(Hash_Has_Key(axis_spec, "labels"))
+      axis.tick_labels = Hash_Get_Obj(axis_spec, "labels");
+
+
+   /* Various tick label attributes */
+   if(Hash_Has_Key(axis_spec, "shift"))
+      axis.numeric_label_shift = Hash_Get_Double(axis_spec, "shift");
+   if(Hash_Has_Key(axis_spec, "scale"))
+      axis.numeric_label_scale = Hash_Get_Double(axis_spec, "scale");
+   if(Hash_Has_Key(axis_spec, "angle"))
+      axis.numeric_label_angle = Hash_Get_Double(axis_spec, "angle");
+
    
    c_show_side(fmkr, p, &axis, ierr);
 }

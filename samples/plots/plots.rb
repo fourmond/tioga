@@ -881,20 +881,28 @@ EOD
       t.do_box_labels("Funny axes", "", "")
       t.show_plot([-1, 19, 8, 2]) do
         spec = {
-          'style' => "x",
-          'from' => [8,3],
-          'to' => [8,7],
+          'from' => [3,3],
+          'to' => [3,7],
           'ticks_outside' => true,
           'ticks_inside' => false,
         }
         t.show_axis(spec)
+        spec2 = {
+          'from' => [12,3],
+          'to' => [12,7],
+          'ticks_outside' => true,
+          'ticks_inside' => false,
+          'major_ticks' => [4,6],
+          'labels' => ["$a$", "$b$"]
+        }
+        t.show_axis(spec2)
       end
       t.context do 
         t.set_bounds([-1, 19, 8, 2])
         spec = {
-          'style' => "x",
           'from' => [4,1.2],
           'to' => [12,1.2],
+          'major_ticks' => [ 4.5, 8.8]
         }
         t.show_axis(spec)
       end
