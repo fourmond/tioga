@@ -20,6 +20,15 @@ class X_and_Y_Axes < Doc < FigureMaker
     def show_xaxis
     end
 
+    # Takes the same argument as #show_axis, and returns some information
+    # about the way the corresponding axis would be organized, in the form
+    # of a hash with the following keys:
+    # * 'major': the position of major ticks
+    # * 'labels': their corresponding numeric labels
+    # * 'vertical': whether the axis is vertical or horizontal
+    def axis_information(loc)
+    end
+
 # :call-seq:
 #   show_yaxis
 #

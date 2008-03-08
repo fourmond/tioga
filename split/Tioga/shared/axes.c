@@ -1080,6 +1080,8 @@ OBJ_PTR c_axis_get_information(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec,
 
    Hash_Set_Obj(hash, "labels", ar);
 
+   Hash_Set_Obj(hash, "vertical", axis.vertical ? OBJ_TRUE : OBJ_FALSE);
+
    free_allocated_memory(&axis);
    return hash;
 }
