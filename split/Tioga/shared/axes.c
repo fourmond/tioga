@@ -1082,6 +1082,10 @@ OBJ_PTR c_axis_get_information(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec,
 
    Hash_Set_Obj(hash, "vertical", axis.vertical ? OBJ_TRUE : OBJ_FALSE);
 
+   Hash_Set_Double(hash, "line_width", axis.line_width);
+   Hash_Set_Double(hash, "major_tick_width", axis.major_tick_width);
+   Hash_Set_Double(hash, "minor_tick_width", axis.major_tick_width);
+
    free_allocated_memory(&axis);
    return hash;
 }
