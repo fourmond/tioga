@@ -2,6 +2,7 @@
 /* axes.c */
 /*
    Copyright (C) 2005  Bill Paxton
+   Copyright (C) 2008  Vincent Fourmond
 
    This file is part of Tioga.
 
@@ -27,6 +28,7 @@
    * provide a way to reliably get the location from major/minor
      ticks for a given axis, so users can build lines/grids that build on
      top of that (or rather under it ;-)...)
+     -> this is partly done, as you can now get the major ticks position.
    * let the users choose between the current way to pick up ticks position
      and another, such as the one I'm using in SciYAG, which seems to give
      results that are more according to my expectations.
@@ -1022,6 +1024,17 @@ static int prepare_dict_PlotAxis(OBJ_PTR fmkr, FM *p,
       axis->numeric_label_scale = Hash_Get_Double(axis_spec, "scale");
    if(Hash_Has_Key(axis_spec, "angle"))
       axis->numeric_label_angle = Hash_Get_Double(axis_spec, "angle");
+   
+   /* Ticks attributes */
+   if(Hash_Has_Key(axis_spec, "major_tick_width"))
+      axis->major_tick_width = Hash_Get_Double(axis_spec, "major_tick_width");
+   if(Hash_Has_Key(axis_spec, "minor_tick_width"))
+      axis->minor_tick_width = Hash_Get_Double(axis_spec, "minor_tick_width");
+   if(Hash_Has_Key(axis_spec, "major_tick_length"))
+      axis->major_tick_length = Hash_Get_Double(axis_spec, "major_tick_length");
+   if(Hash_Has_Key(axis_spec, "minor_tick_length"))
+      axis->minor_tick_length = Hash_Get_Double(axis_spec, "minor_tick_length");
+
    return 1;
 }
 
@@ -1049,6 +1062,13 @@ void c_show_axis_generic(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec, int *ierr)
    hash) and returns a hash containing the following keys:
    * 'major' : position of all major ticks
    * 'labels' : the names of all labels
+   * 'vertical' : if the axis is vertical or horizontal
+   * 'line_width' : the line width
+   * 'major_tick_width', 'major_tick_length' : the major tick width and length
+   * 'minor_tick_width', 'minor_tick_length' : the minor tick width and length
+   * 'scale', 'shift' and 'angle': the scale, shift and angle of numeric
+     labels
+   * 'x0', 'y0', 'x1', 'y1': the position of the axis in figure coordinates
 
  */
 OBJ_PTR c_axis_get_information(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec,
@@ -1085,6 +1105,17 @@ OBJ_PTR c_axis_get_information(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec,
    Hash_Set_Double(hash, "line_width", axis.line_width);
    Hash_Set_Double(hash, "major_tick_width", axis.major_tick_width);
    Hash_Set_Double(hash, "minor_tick_width", axis.major_tick_width);
+   Hash_Set_Double(hash, "major_tick_length", axis.major_tick_length);
+   Hash_Set_Double(hash, "minor_tick_length", axis.major_tick_length);
+   Hash_Set_Double(hash, "shift", axis.numeric_label_shift);
+   Hash_Set_Double(hash, "scale", axis.numeric_label_scale);
+   Hash_Set_Double(hash, "angle", axis.numeric_label_angle);
+
+   /* Positions of the axis */
+   Hash_Set_Double(hash, "x0", axis.x0);
+   Hash_Set_Double(hash, "x1", axis.x1);
+   Hash_Set_Double(hash, "y0", axis.y0);
+   Hash_Set_Double(hash, "y1", axis.y1);
 
    free_allocated_memory(&axis);
    return hash;
