@@ -1,7 +1,29 @@
 # -*- mode: ruby; -*-
 
+# begin dirty hack: we need to copy the C files in the split/Tioga/shared/
+# directory to the split/Tioga/ so they are found by the usual
+# mkmf.rb/extconf.rb
+#
+# That is pretty unclean, I'd say...
+
+require 'fileutils'
+cleanup = []
+
+for file in Dir["split/Tioga/shared/*"]
+  cleanup << "split/Tioga/" + File.basename(file)
+  FileUtils::cp(file, "split/Tioga/")
+end
+
+at_exit do
+  FileUtils::rm(cleanup)
+end
+
+
+# end dirty hack
+
 spec = Gem::Specification.new do |s|
-  s.files += Dir["split/**/*.c"] + Dir["split/**/*.h"] + Dir["split/**/*.rb"]
+  s.files += Dir["split/*/*.c"] + Dir["split/*/*.h"] +
+    Dir["split/*/include/*.h"] + Dir["split/**/*.rb"]
   s.files += Dir["tests/*"]
   s.files += %w(Tioga_README lgpl.txt)
   s.test_files = Dir["tests/ts_*.rb"]
@@ -15,4 +37,5 @@ spec = Gem::Specification.new do |s|
   s.version = '1.7'
   s.summary = 'Tioga - a powerful scientific plotting library'
   s.homepage = 'http://tioga.rubyforge.org'
+  s.rubyforge_project = 'tioga'
 end
