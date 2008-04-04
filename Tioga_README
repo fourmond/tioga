@@ -1,6 +1,7 @@
-This is the README for the Tioga kernel, version 1.6, March 17, 2007.
+This is the README for the Tioga kernel, version 1.8, April 4, 2008.
 
-    Copyright (C) 2005, 2006, 2007  Bill Paxton
+    Copyright (C) 2005, 2006, 2007, 2008  Bill Paxton
+    Copyright (C) 2007, 2008 Vincent Fourmond, Taro Sato
     
     This file is part of Tioga.
     
@@ -14,36 +15,21 @@ This is the README for the Tioga kernel, version 1.6, March 17, 2007.
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Library General Public License for more details.
     
-    You should have received a copy of the GNU Library General Public LicenseD
+    You should have received a copy of the GNU Library General Public License
     along with Tioga; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 << What's new >>
 
-    Version 1.7 adds an option in legends for markers without any line;
-just call save_legend_info with 'line_type' => 'None' in addition to
-the marker information.  It is also now possible to give a 'legend' argument
-to show_marker.  The value of the arg can be either a legend dictionary
-or simply the legend text in which case defaults will be supplied for
-the rest.  There is an example of this in samples/plots.rb
-in the Legend_Outside figure.
+    Version 1.8 is essentially a cleanup/bug fix release. Tioga now compiles
+with hardly any warnings, thanks to the work by Taro Sato. show_axis can now
+take a hash instead of a simple location, and can draw axes basically
+anywhere. See the axes_fun function in samples/plots/plots.rb and
+show_axis documentation. Few bugs were fixed, in particular the
+position of ticks with ticks_inside/ticks_outside, and the
+installation via Rubygems which was broken for such a long time we are
+ashamed of it. 
 
-    It saw a very significant improvement in that you can now query
-the exact size of a text typeset by LaTeX, with the function text_size. Please
-have a look at its documentation, and at the Text_size and 
-Text_size_with_rotation samples in samples/figures/figures.rb.
-
-    The code base was quite moved around so as to facilitate work on a 
-Python version that would share as much code as possible with the Ruby one;
-this should not bring user-visible changes (apart, maybe, from compilation
-problems, but we hope not).
-
-    Some bug fixes, including potential stack overflows (unprotected
-snprintfs), and some new methods of Function. Dvector.fancy_read has been
-reimplemented in C and benchmarked: it should be around three times faster
-than before.
-
-    Code should now compile cleanly with Ruby 1.9.
 
 << Quick Installation of Tioga >>
 
@@ -54,9 +40,10 @@ the whole thing with a 'sudo'.  For Linux, you may have to become root.
 Once you've taken care of that, just run the QUICK_INSTALL script and
 keep your fingers crossed.
 
-    You now have the option to run HOME_INSTALL instead, which will install the files to 
-your home directory (no root privileges needed). You just need to set your RUBYLIB 
-environment variable as reminded at the end of the file.
+    You now have the option to run HOME_INSTALL instead, which will
+install the files to your home directory (no root privileges
+needed). You just need to set your RUBYLIB environment variable as
+reminded at the end of the file.
 
     Please check that there are 0 failures and 0 errors at the end of the test.
 Then, in your favorite PDF previewer, open the newly created 'tests/Icon_Test.pdf'
@@ -189,6 +176,35 @@ Bill Paxton
 << What's old >>
 
 Here are the old release messages:
+
+
+--------------------------
+
+    Version 1.7 adds an option in legends for markers without any line;
+just call save_legend_info with 'line_type' => 'None' in addition to
+the marker information.  It is also now possible to give a 'legend' argument
+to show_marker.  The value of the arg can be either a legend dictionary
+or simply the legend text in which case defaults will be supplied for
+the rest.  There is an example of this in samples/plots.rb
+in the Legend_Outside figure.
+
+    It saw a very significant improvement in that you can now query
+the exact size of a text typeset by LaTeX, with the function text_size. Please
+have a look at its documentation, and at the Text_size and 
+Text_size_with_rotation samples in samples/figures/figures.rb.
+
+    The code base was quite moved around so as to facilitate work on a 
+Python version that would share as much code as possible with the Ruby one;
+this should not bring user-visible changes (apart, maybe, from compilation
+problems, but we hope not).
+
+    Some bug fixes, including potential stack overflows (unprotected
+snprintfs), and some new methods of Function. Dvector.fancy_read has been
+reimplemented in C and benchmarked: it should be around three times faster
+than before.
+
+    Code should now compile cleanly with Ruby 1.9.
+
 
 
 

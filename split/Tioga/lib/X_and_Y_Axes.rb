@@ -24,8 +24,16 @@ class X_and_Y_Axes < Doc < FigureMaker
     # about the way the corresponding axis would be organized, in the form
     # of a hash with the following keys:
     # * 'major': the position of major ticks
-    # * 'labels': their corresponding numeric labels
+    # * 'labels': their corresponding numeric labels (as
+    #   given to LaTeX, so that includes things like
+    #   \tiogayaxisnumericlabel)
     # * 'vertical': whether the axis is vertical or horizontal
+    # * 'scale', 'shift', 'angle' : the shift, scale and angle of
+    #    the tick labels
+    # * 'line_width': the axis line width
+    # * 'x0', 'y0', 'x1', 'y1': the axis position in figure coordinates
+    # * 'major_tick_width', 'major_tick_length', 'minor_tick_length',
+    #   'minor_tick_width': ticks widths and lengths
     def axis_information(loc)
     end
 
@@ -193,13 +201,63 @@ class X_and_Y_Axes < Doc < FigureMaker
    end
 
 
-# Show one of the plot axes.  If _loc_ is +LEFT+, +RIGHT+, or +AT_X_ORIGIN+, and 
-# yaxis_visible is +true+, then the axis is shown using the current y axis settings.
-# If _loc_ is  +TOP+, +BOTTOM+,  or +AT_Y_ORIGIN+, and xaxis_visible is +true+, then
-# the axis is shown using the current x axis settings.
-#
-# Starting from Tioga 1.8, it is possible to give a hash to #show_axis that
-# specifies quite a fair bit of information. More to come later.
+   # Show one of the plot axes.  If _loc_ is +LEFT+, +RIGHT+,
+   # or +AT_X_ORIGIN+, and yaxis_visible is +true+, then the axis
+   # is shown using the current y axis settings. 
+   # If _loc_ is  +TOP+, +BOTTOM+,  or +AT_Y_ORIGIN+, and xaxis_visible
+   # is +true+, then the axis is shown using the current x axis settings.
+   #
+   # Sarting from Tioga 1.8, you can specify a dictionary instead of the
+   # position. This dictionary must either have a 'location' or a 'from' and
+   # 'to' entry to specify the position of the axis. See #axis_information
+   # for more dictionary entries understood.
+   #
+   # NOTE: using a dictionnary bypasses the checks #xaxis_visible and
+   # #yaxis_visible !
+   #
+   #     [from samples/plots/plots.rb]
+   #
+   #     # This plot is to demonstrate the new power of #show_axis.
+   #     def axes_fun
+   #       t.do_box_labels("Funny axes", "", "")
+   #       t.show_plot([-1, 19, 8, 2]) do
+   #         spec = {
+   #           'from' => [3,3],
+   #           'to' => [3,7],
+   #           'ticks_outside' => true,
+   #           'ticks_inside' => false,
+   #         }
+   #         t.show_axis(spec)
+   #         spec2 = {
+   #           'from' => [12,3],
+   #           'to' => [12,7],
+   #           'ticks_outside' => true,
+   #           'ticks_inside' => false,
+   #           'major_ticks' => [4,6],
+   #           'labels' => ["$a$", "$b$"]
+   #         }
+   #         t.show_axis(spec2)
+   #         spec3 = {
+   #           'from' => [17,3],
+   #           'to' => [17,7],
+   #           'ticks_outside' => true,
+   #           'ticks_inside' => false,
+   #           'labels' => ["$a$", "$b$", 'c', 'd', 'e']
+   #         }
+   #         t.show_axis(spec3)
+   #       end
+   #       t.context do 
+   #         t.set_bounds([-1, 19, 8, 2])
+   #         spec = {
+   #           'from' => [4,1.2],
+   #           'to' => [12,1.2],
+   #           'major_ticks' => [ 4.5, 8.8]
+   #         }
+   #         t.show_axis(spec)
+   #       end
+   #     end
+   #
+   # link:images/Axes_fun.png
    def show_axis(loc)
    end
 

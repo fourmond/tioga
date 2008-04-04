@@ -902,6 +902,7 @@ EOD
           'to' => [17,7],
           'ticks_outside' => true,
           'ticks_inside' => false,
+          'shift' => 1.3,
           'labels' => ["$a$", "$b$", 'c', 'd', 'e']
         }
         t.show_axis(spec3)
