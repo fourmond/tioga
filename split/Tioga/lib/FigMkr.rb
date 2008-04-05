@@ -36,7 +36,7 @@ class FigureMaker
     # SVN repository. This is where we'll look for version information.
     SVN_URL = '$HeadURL$'
 
-    TIOGA_VERSION = if SVN_URL =~ /releases\/tioga\/Tioga%20([^\/]+)/
+    TIOGA_VERSION = if SVN_URL =~ /tags\/tioga\/Tioga%20([^\/]+)/
                        $1
                      else
                        "SVN version"
