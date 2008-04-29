@@ -39,6 +39,8 @@ DocStructure -- The basic anatomy of a tioga document
 
 CommandLine -- How to run and debug your tioga programs
 
+OtherWaysToRunTioga -- Batch mode, Ctioga, Vtioga, etc.
+
 UsingRuby -- The bare essentials for using ruby for tioga
 
 SimpleFigure -- A first look at a nontrivial tioga figure definition

@@ -78,6 +78,36 @@ class FigureMaker
     end
     
 # :call-seq:
+#               FigureMaker.exec do |t| ... end
+#
+# Executes the block with FigureMaker.default as argument.
+    def FigureMaker.exec(&cmd)
+    end
+    
+# :call-seq:
+#               FigureMaker.make_pdf(name) do |t| ... end
+#
+# Executes the block to create a pdf with the given name.
+# The argument for the block is FigureMaker.default.
+    def FigureMaker.make_pdf(name,&cmd)
+    end
+    
+# :call-seq:
+#               FigureMaker.def_enter_page_function do |t| ... end
+#
+# Defines the block to be the enter_page_function for FigureMaker.default.
+    def FigureMaker.def_enter_page_function(&cmd)
+    end
+    
+# :call-seq:
+#               FigureMaker.page_style do |t| ... end
+#
+# Alias for FigureMaker.def_enter_page_function.
+# Defines the block to be the enter_page_function for FigureMaker.default.
+    def FigureMaker.page_style(&cmd)
+    end
+    
+# :call-seq:
 #               FigureMaker.version
 #
 # Returns a string defining the current tioga version.

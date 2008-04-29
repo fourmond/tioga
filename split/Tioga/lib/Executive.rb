@@ -58,14 +58,16 @@ class Executive < Doc < FigureMaker
     end
 
 # :call-seq:
+#   make_pdf(name) do |t| ... end
 #   make_pdf(name)
 #   make_pdf(number)
 #
-# Executes the corresponding code that was previously saved by def_figure.
+# First, if there is a command block given, def_figure is called to save it.
+# Then make_pdf executes the command corresponding to the given name or number.
 # Output is written to the currently specified save_dir directory.
 # See also require_pdf.
 #
-    def make_pdf(n)
+    def make_pdf(n,&cmd)
     end
 
 # :call-seq:
