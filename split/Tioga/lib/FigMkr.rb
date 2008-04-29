@@ -84,6 +84,10 @@ class FigureMaker
       FigureMaker.def_enter_page_function(&cmd)
     end
     
+    def FigureMaker.exec(&cmd) 
+      cmd.call(self.default)
+    end
+    
 
     attr_accessor :title
     attr_accessor :xlabel

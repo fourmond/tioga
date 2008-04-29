@@ -15,16 +15,21 @@ def page_style(t,w,h)
    t.default_enter_page_function
 end
 
-t = FigureMaker.default
- 
-t.make_pdf('blue') do
-   page_style(t,2,3)
-   t.fill_color = Blue
-   t.fill_frame
-end   
+FigureMaker.exec do |t| 
+   # t is FigureMaker.default
+   t.make_pdf('blue') do
+      page_style(t,2,3)
+      t.fill_color = Blue
+      t.fill_frame
+   end   
+   t.make_pdf('green') do
+      page_style(t,3,3)
+      t.fill_color = Green
+      t.fill_frame
+   end   
+end
 
-
-# here's an alternative way
+# here's an alternative way to make a pdf
 FigureMaker.make_pdf('red') do |t|
    page_style(t,3,2)
    t.fill_color = Red
