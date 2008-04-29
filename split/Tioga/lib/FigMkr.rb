@@ -73,9 +73,7 @@ class FigureMaker
     end
     
     def FigureMaker.make_pdf(name='immediate', &block)
-      # thanks to Dave MacMahon for this
-      self.default.def_figure(name, &block)
-      self.default.make_pdf(name)
+      self.default.make_pdf(name, &block)
     end
     
     def FigureMaker.def_enter_page_function(&cmd)
@@ -1961,7 +1959,8 @@ class FigureMaker
     
     # We wrap the call so that if the keys of @measures
     # did change during the call, we call it again.
-    def make_pdf(num) # returns pdf name if successful, false if failed.
+    def make_pdf(num,&cmd) # returns pdf name if successful, false if failed.
+        def_figure(num,&cmd) if Kernel.block_given?
         old_measure_keys = @measures.keys
         num = get_num_for_pdf(num)
         result = start_making_pdf(num)
@@ -1974,6 +1973,7 @@ class FigureMaker
         end
           
         if @measures.keys != old_measure_keys
+          # we dont need to pass &cmd since it has now been defined
           make_pdf(num)
         end
         return @figure_pdfs[num]
