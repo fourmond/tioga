@@ -66,14 +66,26 @@ class FigureMaker
       @@which_pdflatex = s
     end
     
-    
     def FigureMaker.make_name_lookup_hash(ary)
         dict = Hash.new
         ary.each { |name| dict[name] = true }
         return dict
     end
-
-
+    
+    def FigureMaker.make_pdf(name='immediate', &block)
+      # thanks to Dave MacMahon for this
+      self.default.def_figure(name, &block)
+      self.default.make_pdf(name)
+    end
+    
+    def FigureMaker.def_enter_page_function(&cmd)
+      self.default.def_enter_page_function(&cmd)
+    end
+    
+    def FigureMaker.page_style(&cmd) 
+      FigureMaker.def_enter_page_function(&cmd)
+    end
+    
 
     attr_accessor :title
     attr_accessor :xlabel
@@ -808,17 +820,17 @@ class FigureMaker
         
         unless entry_function == nil 
             begin
-                entry_function.call
+                entry_function.call(self)
             rescue Exception => er
                 report_error(er, nil)
             end
         end
         
-        result = cmd.call
+        result = cmd.call(self)
         
         unless exit_function == nil 
             begin
-                exit_function.call
+                exit_function.call(self)
             rescue Exception => er
                 report_error(er, nil)
             end
@@ -839,7 +851,7 @@ class FigureMaker
             end
         end
         
-        result = cmd.call
+        result = cmd.call(self)
         
         unless exit_function == nil 
             begin
@@ -857,14 +869,14 @@ class FigureMaker
     def show_plot(bounds=nil,&cmd)       
         trace_cmd_one_arg(@enter_show_plot_function, @exit_show_plot_function, bounds) {        
             set_bounds(bounds)
-            context { clip_to_frame; cmd.call }
+            context { clip_to_frame; cmd.call(self) }
             show_plot_box
         }      
     end
     
     def subfigure(margins=nil,&cmd)
         trace_cmd_one_arg(@enter_subfigure_function, @exit_subfigure_function, margins) {        
-            context { doing_subfigure; set_subframe(margins); cmd.call }
+            context { doing_subfigure; set_subframe(margins); cmd.call(self) }
         }      
     end
     
@@ -879,7 +891,7 @@ class FigureMaker
     def subplot(margins=nil,&cmd)
         trace_cmd_one_arg(@enter_subplot_function, @exit_subplot_function, margins) {        
             reset_legend_info
-            context { doing_subplot; set_subframe(margins); cmd.call }
+            context { doing_subplot; set_subframe(margins); cmd.call(self) }
         }      
     end
     
@@ -957,7 +969,7 @@ class FigureMaker
            save_fm_data = Dvector.new(@@fm_data_size).replace(@fm_data)
            pdf_gsave
            begin
-               cmd.call       
+               cmd.call(self)       
            ensure
                pdf_grestore
                self.title = save_title
@@ -1084,7 +1096,7 @@ class FigureMaker
         plot_scale = get_if_given_else_use_default_dict(dict, 'plot_scale', @legend_defaults)
         reset_legend_info
         rescale(plot_scale)
-        subplot([plot_left_margin, plot_right_margin, plot_top_margin, plot_bottom_margin]) { cmd.call }
+        subplot([plot_left_margin, plot_right_margin, plot_top_margin, plot_bottom_margin]) { cmd.call(self) }
         set_subframe([legend_left_margin, legend_right_margin, legend_top_margin, legend_bottom_margin])
         rescale(legend_scale) # note that legend_scale is an addition to the plot_scale, not a replacement
         @pr_margin = plot_right_margin
@@ -1784,7 +1796,6 @@ class FigureMaker
     end
     
     
-    
     def def_enter_page_function(&cmd)
         if cmd == nil
             raise "Sorry: must provide a command block for def_enter_page_function"
@@ -2310,7 +2321,7 @@ class FigureMaker
         exit_function = @exit_page_function
         unless entry_function == nil 
             begin
-                entry_result = entry_function.call
+                entry_result = entry_function.call(self)
             rescue Exception => er
                 report_error(er, nil)
             end
@@ -2318,7 +2329,7 @@ class FigureMaker
         result = do_cmd(cmd)       
         unless result == false or exit_function == nil 
             begin
-                exit_result = exit_function.call
+                exit_result = exit_function.call(self)
             rescue Exception => er
                 report_error(er, nil)
             end
@@ -2329,7 +2340,7 @@ class FigureMaker
 
     def do_cmd(cmd)  # the C implementation uses this to call Ruby commands
         begin
-            cmd.call
+            cmd.call(self)
             return true
         rescue Exception => er
             report_error(er, nil)
