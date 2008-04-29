@@ -39,6 +39,18 @@ module Dobjects
   end
 
   class Dvector
+  
+    # thanks to Dave MacMahon for from_na and to_na
+    # Create a Dvector from an NArray.
+    def Dvector.from_na(na)
+      _load([1, na.length, na.to_s].pack('CIa*'))
+    end
+
+    # Create an NArray with the same length and contents as +self+.
+    def to_na
+      ::NArray.to_na(_dump(nil)[5..-1], ::NArray::DFLOAT)
+    end
+    
       
     def to_dvector
       self
