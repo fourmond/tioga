@@ -22,7 +22,7 @@ PRIVATE void * rb_import_symbol_no_raise(VALUE module,
 		   
 #define DECLARE_SYMBOL(ret_type,name,args) \
   typedef ret_type (*rb_export_##name##_type) args;\
-  INTERN rb_export_##name##_type name
+  INTERN INTERN_EXTERN rb_export_##name##_type name
 
 #define IMPLEMENT_SYMBOL(name)\
   INTERN rb_export_##name##_type name = 0;

@@ -21,27 +21,35 @@
 #ifndef _NAMESPACE_H
 #define _NAMESPACE_H
 
-/* This header file provides two OS-specific macros for the definition of
-   extern symbols:
+/* This header file provides three OS-specific macros for the definition of
+   extern (or NOT extern) symbols:
 
    * PUBLIC, which has to be used to mark objects that will be used
-   outside the module
+     outside the module
 
-   * PRIVATE, for symbols which are "extern" but intern to the module
+   * INTERN, for symbols which are shared among compilation units within a
+     module, but are NOT exported to other modules.
+
+   * PRIVATE, for symbols which are visible only within the containing
+     compilation unit (i.e. C source file) and, of course, are not exported to
+     other modules.
 
    Please don't add "extern" after the PRIVATE or PUBLIC declaration
    as this would break compilation on Darwin.
 */
 
-#ifdef __APPLE__
+#if __GNUC__ >= 4 /* we have the visibility attribute */
+# define INTERN __attribute__ ((visibility ("hidden")))
+# define PUBLIC __attribute__ ((visibility ("default"))) 
+# define INTERN_EXTERN extern
+#elif defined __APPLE__
 # define INTERN __private_extern__
 # define PUBLIC 
-#elif __GNUC__ >= 4 /* we have the visibility attribute */
-# define INTERN __attribute__ ((visibility ("hidden"))) 
-# define PUBLIC __attribute__ ((visibility ("default"))) 
+# define INTERN_EXTERN
 #else /* not really good */
 # define INTERN
 # define PUBLIC 
+# define INTERN_EXTERN
 #endif /* __APPLE__  and __GNU_C_ >= 4*/
 
 /* In any case, PRIVATE is static */
