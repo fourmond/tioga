@@ -326,10 +326,11 @@ class TiogaUI
     $figures_font = 'system 12'
 =end
     
-    tiogainit_name = ENV['HOME'] + '/.tiogainit'
-    if File.exist?(tiogainit_name)
-      load(tiogainit_name)
+    tiogainit_names = %w[ .tiogarc .tiogainit ].map do |f|
+      File.join(ENV['HOME'], f)
     end
+    tiogainit_name = tiogainit_names.find {|f| test ?e, f}
+    load(tiogainit_name) unless tiogainit_name.nil?
     
     @pdf_name = nil
     @have_loaded = false    
