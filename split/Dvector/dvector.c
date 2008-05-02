@@ -5640,6 +5640,7 @@ void Init_Dvector() {
 
    /* nonstandard math functions */
    rb_define_method(cDvector, "neg", dvector_neg, 0);
+   rb_define_alias(cDvector, "-@", "neg");
    rb_define_method(cDvector, "exp10", dvector_exp10, 0);
    rb_define_method(cDvector, "inv", dvector_inv, 0);
    rb_define_method(cDvector, "trim", dvector_trim, -1);

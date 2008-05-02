@@ -1843,6 +1843,7 @@ PUBLIC void Init_Dtable() {
 
    /* nonstandard math functions */
    rb_define_method(cDtable, "neg", dtable_neg, 0);
+   rb_define_alias(cDtable, "-@", "neg");
    rb_define_method(cDtable, "exp10", dtable_exp10, 0);
    rb_define_method(cDtable, "inv", dtable_inv, 0);
    rb_define_method(cDtable, "trim", dtable_trim, -1);
