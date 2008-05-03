@@ -626,51 +626,53 @@ static void draw_major_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
    if (did_line) axis_stroke(fmkr,p, ierr);
 }
 
-static void draw_minor_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
+static double log_subintervals[8] = {
+   0.301030, 0.477121, 0.602060, 0.698970, 
+   0.778151, 0.845098, 0.903090, 0.954243 };
+
+
+/* A function that returns a double array *TO BE FREED* containing
+   the position of the minor ticks for the given axis.
+
+   The number of ticks is stored in the cnt (long) parameter.
+
+   Returns NULL in case of problems
+*/
+static double * get_minor_ticks_location(OBJ_PTR fmkr, FM *p,
+					 PlotAxis *s, long * cnt)
 {
+   double * target = NULL;
+   int ierr = 0;
+   *cnt = 0;
+ 
+   /* First, pick up the number of ticks to be used */
    if (s->number_of_minor_intervals <= 0) {
       if (s->log_vals) {
          double interval = s->majors[1] - s->majors[0];
          s->number_of_minor_intervals = (abs(interval) != 1.0 || s->nmajors > 10)? 1 : 9; 
       }  else {
-         s->number_of_minor_intervals = Pick_Number_of_Minor_Intervals(s->interval, ierr);
-         if (*ierr != 0) return;
+         s->number_of_minor_intervals = Pick_Number_of_Minor_Intervals(s->interval, &ierr);
+         if (ierr != 0) return NULL;
       }
    }
    int i, j, nsub = s->number_of_minor_intervals;
-   double inside=0.0, outside=0.0, length;
-   bool did_line = false;
-   double log_subintervals[8];
-   log_subintervals[0] = 0.301030;
-   log_subintervals[1] = 0.477121;
-   log_subintervals[2] = 0.602060;
-   log_subintervals[3] = 0.698970;
-   log_subintervals[4] = 0.778151;
-   log_subintervals[5] = 0.845098;
-   log_subintervals[6] = 0.903090;
-   log_subintervals[7] = 0.954243;
+
    if (s->log_vals && nsub > 9) nsub = 9;
-   length = s->minor_tick_length * ((s->vertical)? p->default_text_height_dx : p->default_text_height_dy);
-   if (s->ticks_inside) inside = length;
-   if (s->ticks_outside) outside = -length;
-   if (s->top_or_right) { inside = -inside; outside = -outside; }
-   if (s->line_width != s->minor_tick_width) {
-      c_line_width_set(fmkr, p, s->line_width = s->minor_tick_width, ierr);
-      if (*ierr != 0) return;
-   }
+
+   /* First case: user-supplied position of minor ticks */
    if (s->locations_for_minor_ticks != OBJ_NIL) {
-      long cnt;
-      double *locs = Vector_Data_for_Read(s->locations_for_minor_ticks, &cnt, ierr);
-      if (*ierr != 0) return;
-      for (i=0; i < cnt; i++) {
-         if (s->vertical)
-            figure_join(fmkr, p, s->x0+inside, locs[i], s->x0+outside, locs[i], ierr);
-         else
-            figure_join(fmkr, p, locs[i], s->y0+inside, locs[i], s->y0+outside, ierr);
-         did_line = true;
-         if (*ierr != 0) return;
-      }
+      double *locs = Vector_Data_for_Read(s->locations_for_minor_ticks, 
+					  cnt, &ierr);
+      if (ierr != 0) 
+	 return NULL;
+      target = ALLOC_N_double(*cnt);
+      long i;
+      for(i = 0; i < *cnt; i++)
+	 target[i] = locs[i];
+      return target;
    } else {
+      /* We allocate sligthly more space than should be necessary: */
+      target = ALLOC_N_double(nsub * (s->nmajors + 1));
       for (i=0; i <= s->nmajors; i++) {
          double loc = (i==0)? s->majors[0] - s->interval : s->majors[i-1];
          double next_loc = (i==s->nmajors)? loc + s->interval : s->majors[i];
@@ -680,18 +682,53 @@ static void draw_minor_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
             double subloc = loc + ((!s->log_vals) ? (j * subinterval) : log_subintervals[j-1]);
             if (subloc >= next_loc) break;
             if (subloc <= s->axis_min || subloc >= s->axis_max) continue;
-            if (s->vertical) {
-               figure_join(fmkr, p, s->x0+inside, subloc, s->x0+outside, subloc, ierr);
-            }
-            else {
-               figure_join(fmkr, p, subloc, s->y0+inside, subloc, s->y0+outside, ierr);
-            }
-            did_line = true;
-            if (*ierr != 0) return;
+	    
+	    /* We add one */
+	    target[*cnt] = subloc;
+	    (*cnt)++;
          }
       }
+      return target;
    }
-   if (did_line) axis_stroke(fmkr,p, ierr);
+}
+
+
+static void draw_minor_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
+{
+   long number;
+   double * locs = get_minor_ticks_location(fmkr, p, s, &number);
+   if(! locs) {
+      *ierr = 1;
+      return ;
+   }
+   long i;
+   double inside=0.0, outside=0.0, length;
+   bool did_line = false;
+
+   /* Initialization of the various lengths */
+   length = s->minor_tick_length * ((s->vertical)? p->default_text_height_dx : p->default_text_height_dy);
+   if (s->ticks_inside) inside = length;
+   if (s->ticks_outside) outside = -length;
+   if (s->top_or_right) { inside = -inside; outside = -outside; }
+   if (s->line_width != s->minor_tick_width) {
+      c_line_width_set(fmkr, p, s->line_width = s->minor_tick_width, ierr);
+      if (*ierr != 0) return;
+   }
+
+   /* Now, we stroke the ticks */
+   for(i = 0; i < number; i++) {
+      if (s->vertical)
+	 figure_join(fmkr, p, s->x0+inside, locs[i], 
+		     s->x0+outside, locs[i], ierr);
+      else
+	 figure_join(fmkr, p, locs[i], s->y0+inside, locs[i], 
+		     s->y0+outside, ierr);
+      did_line = true;
+   }
+   /* And we free the array returned by get_minor_ticks_location */
+   free(locs);
+   if (did_line) 
+      axis_stroke(fmkr,p, ierr);
 }
 
 static void show_numeric_label(OBJ_PTR fmkr, FM *p, PlotAxis *s, 
@@ -1087,6 +1124,15 @@ OBJ_PTR c_axis_get_information(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec,
    prepare_axis_coordinates(fmkr, p, axis.location, &axis, ierr);
    compute_major_ticks(fmkr, p, &axis, ierr);
    Hash_Set_Obj(hash, "major", Vector_New(axis.nmajors, axis.majors));
+
+   /* Then, minor ticks positions */
+   double * minor;
+   long count;
+   minor = get_minor_ticks_location(fmkr, p, &axis, &count);
+   if(minor) {
+      Hash_Set_Obj(hash, "minor", Vector_New(count, minor));
+      free(minor);
+   }
 
    /* Then, labels */
    ar = Array_New(axis.nmajors);
