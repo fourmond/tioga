@@ -487,7 +487,7 @@ void Init_FigureMaker(void) {
    rb_define_method(cFM, "private_radial_shading", FM_private_radial_shading, 13);
 /* markers */
    rb_define_method(cFM, "register_font", FM_register_font, 1);
-   rb_define_method(cFM, "private_show_marker", FM_private_show_marker, 15);
+   rb_define_method(cFM, "private_show_marker", FM_private_show_marker, 1);
    rb_define_method(cFM, "marker_string_info", FM_marker_string_info, 3);
 /* images */
    rb_define_method(cFM, "private_show_jpg", FM_private_show_jpg, 5);

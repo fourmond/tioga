@@ -1638,27 +1638,7 @@ class FigureMaker
         if (marker != nil && string != nil)
             raise "Sorry: Must give either 'marker' or 'string' for show_marker, but not both"
         end
-        if (marker == nil)
-            glyph = stroke_width = nil
-        else
-            if !(marker.kind_of?Array) && marker.size >= 2 && marker.size <= 3
-                raise "Sorry: 'marker' for show_marker must be array of [font_number, char_code] or [font_number, char_code, rendering_mode]"
-            end
-            font = marker[0]
-            glyph = marker[1]
-            if marker.size == 3
-                mode = STROKE if mode == nil
-                stroke_width = marker[2]
-            else
-                mode = FILL if mode == nil
-                stroke_width = nil
-            end
-        end
-        mode = FILL if mode == nil
-        font = Times_Roman if (font == nil && string != nil)
-        if (font != nil && !(font.kind_of? Integer))
-            raise "Sorry: 'font' for show_marker must be an integer font number (see FigureConstants list)"
-        end
+        
         stroke_width = get_if_given_else_default(dict, 'stroke_width', stroke_width)
         angle = get_if_given_else_use_default_dict(dict, 'angle', @marker_defaults)
         scale = get_if_given_else_use_default_dict(dict, 'scale', @marker_defaults)
@@ -1669,10 +1649,11 @@ class FigureMaker
         it_angle = get_if_given_else_use_default_dict(dict, 'italic_angle', @marker_defaults)
         ascent_angle = get_if_given_else_use_default_dict(dict, 'ascent_angle', @marker_defaults)
         glyph = 0 if glyph == nil
-        int_args = glyph*100000 + font*1000 + mode*100 + align*10 + (just+1) # min value for just is -1 
-            # Ruby limits us to 15 args, so pack some small integers together                
-        private_show_marker(int_args, stroke_width, string, x, y, xs, ys,
-            h_scale, v_scale, scale, it_angle, ascent_angle, angle, fill_color, stroke_color)                
+                     
+        args = [marker, font, mode, align, just, stroke_width, string, x, y, xs, ys,
+                h_scale, v_scale, scale, it_angle, ascent_angle, angle, fill_color, stroke_color]
+        private_show_marker(args)       
+                     
         legend_arg = dict['legend']
         if legend_arg != nil
             if legend_arg.kind_of?Hash

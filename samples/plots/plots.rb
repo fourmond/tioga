@@ -747,8 +747,8 @@ EOD
             t.append_interpolant_to_path(interp)
             t.stroke_color = Black
             t.stroke
-            t.show_marker('Xs' => xs, 'Ys' => ys, 'marker' => Bullet, 
-                'scale' => 0.6, 'color' => Red);
+            t.show_marker('Xs' => xs, 'Ys' => ys, 'marker' => [ Bullet, Star ], 
+                          'scale' => [ 0.6, 0.9 ], 'color' => [ Red, Blue, Teal ]);
         end
     end
     

@@ -458,84 +458,86 @@ c_rotated_string_at_points(OBJ_PTR fmkr, FM *p, double rotation,
 }
 
 
+static OBJ_PTR get1_obj(bool is_list, OBJ_PTR obj, int indx, int* ierr) {
+   if (is_list) {
+      int len;
+      len = Array_Len(obj, ierr); if (*ierr != 0) return 0.0;
+      obj = Array_Entry(obj, indx % len, ierr); if (*ierr != 0) return 0.0;
+   }
+   return obj;
+}
+
+
+static double get1_dbl(bool is_list, OBJ_PTR obj, int indx, int* ierr) {
+   OBJ_PTR num;
+   if (is_list) {
+      int len;
+      len = Array_Len(obj, ierr); if (*ierr != 0) return 0.0;
+      num = Array_Entry(obj, indx % len, ierr); if (*ierr != 0) return 0.0;
+   } else {
+      num = obj;
+   }
+   double val;
+   val = Number_to_double(num, ierr);
+   return val;
+}
+
+
+static int get1_int(bool is_list, OBJ_PTR obj, int indx, int* ierr) {
+   OBJ_PTR num;
+   if (is_list) {
+      int len;
+      len = Array_Len(obj, ierr); if (*ierr != 0) return 0.0;
+      num = Array_Entry(obj, indx % len, ierr); if (*ierr != 0) return 0.0;
+   } else {
+      num = obj;
+   }
+   int val;
+   val = Number_to_int(num, ierr);
+   return val;
+}
+
+
 void
-c_private_show_marker(OBJ_PTR fmkr, FM *p, int int_args,
-                      OBJ_PTR stroke_width, OBJ_PTR string,
-                      OBJ_PTR x, OBJ_PTR y, OBJ_PTR x_vec, OBJ_PTR y_vec,
-                      double h_scale, double v_scale, double scale,
-                      double it_angle, double ascent_angle, double angle,
-                      OBJ_PTR fill_color, OBJ_PTR stroke_color, int *ierr)
+c_private_show_marker(OBJ_PTR fmkr, FM *p, OBJ_PTR args, int *ierr)
 {
-   int c, alignment, justification, fnt_num, n, mode;
+   OBJ_PTR marker_obj, font_obj, mode_obj, align_obj, just_obj, stroke_width_obj, string, x, y, x_vec, y_vec,
+       h_scale_obj, v_scale_obj, scale_obj, it_angle_obj, ascent_angle_obj, angle_obj,
+       fill_color_obj, stroke_color_obj;
+   int c, alignment, justification, fnt_num, n, num_times, num_per_call, i, mode, len;
+   double h_scale, v_scale, scale, it_angle, ascent_angle, angle;
    unsigned char *text = NULL, buff[2];
    double *xs, *ys, xloc, yloc, prev_line_width = -1;
-   bool restore_fill_color = false, restore_stroke_color = false;
    double stroke_color_R = 0.0, stroke_color_G = 0.0, stroke_color_B = 0.0;
-   double prev_stroke_color_R = 0.0, prev_stroke_color_G = 0.0,
-      prev_stroke_color_B = 0.0;
    double fill_color_R = 0.0, fill_color_G = 0.0, fill_color_B = 0.0;
-   double prev_fill_color_R = 0.0, prev_fill_color_G = 0.0,
-      prev_fill_color_B = 0.0;
-   c = int_args / 100000; int_args -= c * 100000;
-   fnt_num = int_args / 1000; int_args -= fnt_num * 1000;
-   mode = int_args / 100; int_args -= mode * 100;
-   alignment = int_args / 10; int_args -= alignment * 10;
-   justification = int_args;
-   if (string == OBJ_NIL) {
-      if (c < 0 || c > 255) {
-         RAISE_ERROR_i("Sorry: invalid character code (%i) : "
-                       "must be between 0 and 255", c, ierr);
-         return;
-      }
-      text = buff; text[0] = c; text[1] = '\0';
-      if (stroke_width != OBJ_NIL) {
-         double width = Number_to_double(stroke_width, ierr);
-         if (*ierr != 0) return;
-         prev_line_width = p->line_width; // restore it later
-         fprintf(TF, "%0.6f w\n", width * ENLARGE);
-      }
-   }
-   else {
-      text = (unsigned char *)(String_Ptr(string, ierr));
-      if (*ierr != 0) return;
-   }
-   fprintf(TF, "%d Tr\n", mode);
-   if (stroke_color != OBJ_NIL &&
-       (mode == STROKE || mode == FILL_AND_STROKE
-        || mode == STROKE_AND_CLIP || mode == FILL_STROKE_AND_CLIP)) {
-      Unpack_RGB(stroke_color, &stroke_color_R, &stroke_color_G,
-                 &stroke_color_B, ierr);
-      if (*ierr != 0) return;
-      if (stroke_color_R != p->stroke_color_R
-          || stroke_color_G != p->stroke_color_G
-          || stroke_color_B != p->stroke_color_B) {
-         prev_stroke_color_R = p->stroke_color_R;
-         prev_stroke_color_G = p->stroke_color_G;
-         prev_stroke_color_B = p->stroke_color_B;
-         restore_stroke_color = true;
-         c_stroke_color_set_RGB(fmkr, p, stroke_color_R, stroke_color_G,
-                                stroke_color_B, ierr);
-         if (*ierr != 0) return;
-      }
-   }
-   if (fill_color != OBJ_NIL &&
-       (mode == FILL || mode == FILL_AND_STROKE
-        || mode == FILL_AND_CLIP || mode == FILL_STROKE_AND_CLIP)) {
-      Unpack_RGB(fill_color, &fill_color_R, &fill_color_G, &fill_color_B,
-                 ierr);
-      if (*ierr != 0) return;
-      if (fill_color_R != p->fill_color_R
-          || fill_color_G != p->fill_color_G
-          || fill_color_B != p->fill_color_B) {
-         prev_fill_color_R = p->fill_color_R;
-         prev_fill_color_G = p->fill_color_G;
-         prev_fill_color_B = p->fill_color_B;
-         restore_fill_color = true;
-         c_fill_color_set_RGB(fmkr, p, fill_color_R, fill_color_G,
-                              fill_color_B, ierr);
-         if (*ierr != 0) return;
-      }
-   }
+   double prev_stroke_color_R, prev_stroke_color_G, prev_stroke_color_B;
+   double prev_fill_color_R, prev_fill_color_G, prev_fill_color_B;
+   OBJ_PTR fill_color, stroke_color, marker;
+   bool do_lists, fill_color_is_list, stroke_color_is_list, stroke_width_is_list, h_scale_is_list;
+   bool it_angle_is_list, ascent_angle_is_list, angle_is_list, v_scale_is_list, scale_is_list;
+   bool align_is_list, just_is_list, marker_is_list, mode_is_list, font_is_list;
+
+   i = 0;
+   marker_obj = Array_Entry(args, i, ierr); i++;
+   font_obj = Array_Entry(args, i, ierr); i++;
+   mode_obj = Array_Entry(args, i, ierr); i++;
+   align_obj = Array_Entry(args, i, ierr); i++;
+   just_obj = Array_Entry(args, i, ierr); i++;
+   stroke_width_obj = Array_Entry(args, i, ierr); i++;
+   string = Array_Entry(args, i, ierr); i++;
+   x = Array_Entry(args, i, ierr); i++;
+   y = Array_Entry(args, i, ierr); i++;
+   x_vec = Array_Entry(args, i, ierr); i++;
+   y_vec = Array_Entry(args, i, ierr); i++;
+   h_scale_obj = Array_Entry(args, i, ierr); i++;
+   v_scale_obj = Array_Entry(args, i, ierr); i++;
+   scale_obj = Array_Entry(args, i, ierr); i++;
+   it_angle_obj = Array_Entry(args, i, ierr); i++;
+   ascent_angle_obj = Array_Entry(args, i, ierr); i++;
+   angle_obj = Array_Entry(args, i, ierr); i++;
+   fill_color_obj = Array_Entry(args, i, ierr); i++;
+   stroke_color_obj = Array_Entry(args, i, ierr); i++;
+
    if (x == OBJ_NIL) {
       long xlen, ylen;
       xs = Vector_Data_for_Read(x_vec, &xlen, ierr);
@@ -556,14 +558,165 @@ c_private_show_marker(OBJ_PTR fmkr, FM *p, int int_args,
       if (*ierr != 0) return;
       n = 1;
    }
-   c_rotated_string_at_points(fmkr, p, angle, fnt_num, text, scale, n, xs, ys,
-                              alignment, justification, h_scale, v_scale,
-                              it_angle, ascent_angle, ierr);
-   if (prev_line_width >= 0) c_line_width_set(fmkr, p, prev_line_width, ierr);
-   if (restore_fill_color)
-      c_fill_color_set_RGB(fmkr, p, prev_fill_color_R, prev_fill_color_G,
-                           prev_fill_color_B, ierr);
-   if (restore_stroke_color)
-      c_stroke_color_set_RGB(fmkr, p, prev_stroke_color_R, prev_stroke_color_G,
-                             prev_stroke_color_B, ierr);
+
+   prev_stroke_color_R = p->stroke_color_R;
+   prev_stroke_color_G = p->stroke_color_G;
+   prev_stroke_color_B = p->stroke_color_B;
+   prev_fill_color_R = p->fill_color_R;
+   prev_fill_color_G = p->fill_color_G;
+   prev_fill_color_B = p->fill_color_B;
+   prev_line_width = p->line_width;
+   
+   if (marker_obj == OBJ_NIL) {
+      marker_is_list = false;
+   } else {
+      marker = Array_Entry(marker_obj, 0, ierr); if (*ierr != 0) return;
+      marker_is_list = !Is_Kind_of_Number(marker);
+   } 
+
+   fill_color = Array_Entry(fill_color_obj, 0, ierr); if (*ierr != 0) return;
+   stroke_color = Array_Entry(stroke_color_obj, 0, ierr); if (*ierr != 0) return;   
+   fill_color_is_list = !Is_Kind_of_Number(fill_color);
+   stroke_color_is_list = !Is_Kind_of_Number(stroke_color);
+   
+   font_is_list = (font_obj != OBJ_NIL) && (!Is_Kind_of_Integer(font_obj));
+   align_is_list = !Is_Kind_of_Integer(align_obj);
+   just_is_list = !Is_Kind_of_Integer(just_obj);
+   mode_is_list = (mode_obj != OBJ_NIL) && (!Is_Kind_of_Number(mode_obj));
+   stroke_width_is_list = stroke_width_obj != OBJ_NIL && !Is_Kind_of_Number(stroke_width_obj);
+   h_scale_is_list = !Is_Kind_of_Number(h_scale_obj);
+   v_scale_is_list = !Is_Kind_of_Number(v_scale_obj);
+   scale_is_list = !Is_Kind_of_Number(scale_obj);
+   it_angle_is_list = !Is_Kind_of_Number(it_angle_obj);
+   ascent_angle_is_list = !Is_Kind_of_Number(ascent_angle_obj);
+   angle_is_list = !Is_Kind_of_Number(angle_obj);
+   
+   do_lists = fill_color_is_list || stroke_color_is_list || h_scale_is_list || v_scale_is_list || scale_is_list || 
+              align_is_list || just_is_list || it_angle_is_list || ascent_angle_is_list || angle_is_list;
+
+   if (do_lists) {
+      num_times = n; num_per_call = 1;
+   } else {
+      num_times = 1; num_per_call = n;
+   }
+
+   for (i=0; i<num_times; i++) {
+      alignment = get1_int(align_is_list, align_obj, i, ierr); if (*ierr != 0) return;
+      justification = 1+get1_int(just_is_list, just_obj, i, ierr); if (*ierr != 0) return;
+      h_scale = get1_dbl(h_scale_is_list, h_scale_obj, i, ierr); if (*ierr != 0) return;
+      v_scale = get1_dbl(v_scale_is_list, v_scale_obj, i, ierr); if (*ierr != 0) return;
+      scale = get1_dbl(scale_is_list, scale_obj, i, ierr); if (*ierr != 0) return;
+      it_angle = get1_dbl(it_angle_is_list, it_angle_obj, i, ierr); if (*ierr != 0) return;
+      ascent_angle = get1_dbl(ascent_angle_is_list, ascent_angle_obj, i, ierr); if (*ierr != 0) return;
+      angle = get1_dbl(angle_is_list, angle_obj, i, ierr); if (*ierr != 0) return;
+      fill_color = get1_obj(fill_color_is_list, fill_color_obj, i, ierr); if (*ierr != 0) return;
+      stroke_color = get1_obj(stroke_color_is_list, stroke_color_obj, i, ierr); if (*ierr != 0) return;
+      
+      if (mode_obj != OBJ_NIL) {
+         mode = get1_int(mode_is_list, mode_obj, i, ierr); if (*ierr != 0) return;
+      } else {
+         mode = FILL;
+      }
+      
+      if (font_obj != OBJ_NIL) {
+         fnt_num = get1_int(font_is_list, font_obj, i, ierr); if (*ierr != 0) return;
+      } else {
+         fnt_num = 1; // Times_Roman = 1
+      }
+
+      if (marker_obj == OBJ_NIL) {
+         text = (unsigned char *)(String_Ptr(string, ierr));
+         if (*ierr != 0) return;
+      } else {
+         marker = get1_obj(marker_is_list, marker_obj, i, ierr); if (*ierr != 0) return;
+         font_obj = Array_Entry(marker, 0, ierr); if (*ierr != 0) return;
+         fnt_num = Number_to_int(font_obj, ierr); if (*ierr != 0) return;
+         
+         OBJ_PTR glyph_obj = Array_Entry(marker, 1, ierr); if (*ierr != 0) return;
+         c = Number_to_int(glyph_obj, ierr); if (*ierr != 0) return;
+
+         if (mode_obj == OBJ_NIL) {
+            len = Array_Len(marker, ierr); if (*ierr != 0) return;
+            if (len == 3) {
+               mode = STROKE;
+               if (stroke_width_obj == OBJ_NIL) {
+                  OBJ_PTR s = Array_Entry(marker, 2, ierr); if (*ierr != 0) return;
+                  double width = Number_to_double(s,ierr); if (*ierr != 0) return;
+                  if (*ierr != 0) return;
+                  fprintf(TF, "%0.6f w\n", width * ENLARGE);
+               }
+            }
+         }
+         
+         font_obj = Array_Entry(marker, 0, ierr);
+         if (*ierr != 0) return;
+         fnt_num = Number_to_int(font_obj, ierr); if (*ierr != 0) return;
+         
+         if (c < 0 || c > 255) {
+            RAISE_ERROR_i("Sorry: invalid character code (%i) : "
+                          "must be between 0 and 255", c, ierr);
+            return;
+         }
+         text = buff; text[0] = c; text[1] = '\0';
+      }
+
+      if (stroke_width_obj != OBJ_NIL) {
+         double width = get1_dbl(stroke_width_is_list, stroke_width_obj, i, ierr); if (*ierr != 0) return;
+         if (*ierr != 0) return;
+         fprintf(TF, "%0.6f w\n", width * ENLARGE);
+      }
+      
+      if (mode_obj != OBJ_NIL) {
+         mode = get1_int(mode_is_list, mode_obj, i, ierr); if (*ierr != 0) return;
+      }
+      
+      fprintf(TF, "%d Tr\n", mode);
+      
+      if (stroke_color != OBJ_NIL &&
+          (mode == STROKE || mode == FILL_AND_STROKE
+           || mode == STROKE_AND_CLIP || mode == FILL_STROKE_AND_CLIP)) {
+         Unpack_RGB(stroke_color, &stroke_color_R, &stroke_color_G,
+                    &stroke_color_B, ierr);
+         if (*ierr != 0) return;
+         if (stroke_color_R != p->stroke_color_R
+             || stroke_color_G != p->stroke_color_G
+             || stroke_color_B != p->stroke_color_B) {
+            c_stroke_color_set_RGB(fmkr, p, stroke_color_R, stroke_color_G,
+                                   stroke_color_B, ierr);
+            if (*ierr != 0) return;
+         }
+      }
+      
+      if (fill_color != OBJ_NIL &&
+          (mode == FILL || mode == FILL_AND_STROKE
+           || mode == FILL_AND_CLIP || mode == FILL_STROKE_AND_CLIP)) {
+         Unpack_RGB(fill_color, &fill_color_R, &fill_color_G, &fill_color_B,
+                    ierr);
+         if (*ierr != 0) return;
+         if (fill_color_R != p->fill_color_R
+             || fill_color_G != p->fill_color_G
+             || fill_color_B != p->fill_color_B) {
+            c_fill_color_set_RGB(fmkr, p, fill_color_R, fill_color_G,
+                                 fill_color_B, ierr);
+            if (*ierr != 0) return;
+         }
+      }
+
+      c_rotated_string_at_points(fmkr, p, angle, fnt_num, text, scale, num_per_call, xs+i, ys+i,
+                        alignment, justification, h_scale, v_scale, it_angle, ascent_angle, ierr);
+                              
+      if (prev_line_width != p->line_width) c_line_width_set(fmkr, p, prev_line_width, ierr);
+      if (prev_fill_color_R != p->fill_color_R
+             || prev_fill_color_G != p->fill_color_G
+             || prev_fill_color_B != p->fill_color_B)
+         c_fill_color_set_RGB(fmkr, p, prev_fill_color_R, prev_fill_color_G,
+                              prev_fill_color_B, ierr);
+      if (prev_stroke_color_R != p->stroke_color_R
+             || prev_stroke_color_G != p->stroke_color_G
+             || prev_stroke_color_B != p->stroke_color_B)
+         c_stroke_color_set_RGB(fmkr, p, prev_stroke_color_R, prev_stroke_color_G,
+                                prev_stroke_color_B, ierr);
+      
+   }
+   
 }

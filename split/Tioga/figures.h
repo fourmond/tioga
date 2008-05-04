@@ -643,11 +643,7 @@ extern void Write_Font_Widths(void);
 
 extern OBJ_PTR c_register_font(OBJ_PTR fmkr, FM *p, char *font_name, int *ierr);
 extern OBJ_PTR c_marker_string_info(OBJ_PTR fmkr, FM *p, int fnt, unsigned char *text, double scale, int *ierr);
-extern void c_private_show_marker(
-   OBJ_PTR fmkr, FM *p, int int_args, OBJ_PTR stroke_width, OBJ_PTR string,
-   OBJ_PTR x, OBJ_PTR y, OBJ_PTR x_vec, OBJ_PTR y_vec,
-   double h_scale, double v_scale, double scale, double it_angle, double ascent_angle, double angle,
-   OBJ_PTR fill_color, OBJ_PTR stroke_color, int *ierr);
+extern void c_private_show_marker(OBJ_PTR fmkr, FM *p, OBJ_PTR args, int *ierr);
 
 /*======================================================================*/
 // texout.c

@@ -465,16 +465,8 @@ OBJ_PTR FM_register_font(OBJ_PTR fmkr, OBJ_PTR font_name) { int ierr=0;
 OBJ_PTR FM_marker_string_info(OBJ_PTR fmkr, OBJ_PTR font_number, OBJ_PTR string, OBJ_PTR scale) { int ierr=0;
    return c_marker_string_info(fmkr, Get_FM(fmkr, &ierr), Number_to_int(font_number, &ierr), 
       (unsigned char *)String_Ptr(string, &ierr), Number_to_double(scale, &ierr), &ierr); }
-OBJ_PTR FM_private_show_marker(
-   OBJ_PTR fmkr, OBJ_PTR integer_args, OBJ_PTR stroke_width, OBJ_PTR string,
-   OBJ_PTR x, OBJ_PTR y, OBJ_PTR x_vec, OBJ_PTR y_vec,
-   OBJ_PTR h_scale, OBJ_PTR v_scale, OBJ_PTR scale, OBJ_PTR it_angle, 
-   OBJ_PTR ascent_angle, OBJ_PTR angle,
-   OBJ_PTR fill_color, OBJ_PTR stroke_color) { int ierr=0;
-   c_private_show_marker(fmkr, Get_FM(fmkr, &ierr), Number_to_int(integer_args, &ierr), stroke_width,
-      string, x, y, x_vec, y_vec, Number_to_double(h_scale, &ierr), Number_to_double(v_scale, &ierr), 
-      Number_to_double(scale, &ierr), Number_to_double(it_angle, &ierr), Number_to_double(ascent_angle, &ierr), Number_to_double(angle, &ierr),
-      fill_color, stroke_color, &ierr); RETURN_NIL; }
+OBJ_PTR FM_private_show_marker(OBJ_PTR fmkr, OBJ_PTR args) { int ierr=0; 
+   c_private_show_marker(fmkr, Get_FM(fmkr, &ierr), args, &ierr); RETURN_NIL; }
 
 // texout.c
 OBJ_PTR FM_rescale_text(OBJ_PTR fmkr, OBJ_PTR scaling_factor) { int ierr=0;

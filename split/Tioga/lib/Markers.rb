@@ -65,6 +65,13 @@ Dictionary Entries
     'stroke_width'      => a_float               # to be used for stroked markers
     'mode'                                       # alias for 'rendering_mode'
     'legend'            => a_dict or a_string    # for adding marker to legend
+    
+You can provide a list of markers as the value of the 'marker' entry in the dictionary.  In this
+case, the show_marker routine will go through the list of markers using one per point.  If there
+are more points than markers, it will cycle through the list of markers repeatedly.  Similarly,
+you can provide a list of colors for 'color', 'fill_color', or 'stroke_color', and a list of
+numbers for 'font', 'angle', 'scale', 'horizontal_scale', 'vertical_scale', 'italic_angle', 'ascent_angle',
+or 'stroke_width'.  
 
 
 Examples
