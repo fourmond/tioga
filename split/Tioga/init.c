@@ -313,8 +313,8 @@ static bool Get_quiet_mode(OBJ_PTR fmkr, int *ierr) {
 
 static void Make_Save_Fname(OBJ_PTR fmkr, char *full_name, char *f_name,
    bool with_save_dir, bool with_pdf_extension, int *ierr) {
-   int i, j, k, len, mod_len, mod_num, did_mod_num = false;
-   char c, *fmt, model[STRLEN], *save=NULL;
+   int i, j, len;
+   char c, *save=NULL;
    if (with_save_dir) { save = Get_save_dir(fmkr,ierr); if (*ierr != 0) return; }
    if (with_save_dir && save != NULL && strlen(save) > 0) { 
       sprintf(full_name, "%s/", save); j = strlen(full_name); }
@@ -346,8 +346,7 @@ OBJ_PTR c_get_save_filename(OBJ_PTR fmkr, FM *p, OBJ_PTR name, int *ierr) {
    
    
 void c_private_make(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR cmd, int *ierr) {
-   char full_name[STRLEN], mod_num_name[STRLEN];
-   OBJ_PTR result;
+   char full_name[STRLEN];
    bool quiet = Get_quiet_mode(fmkr, ierr);
    if (*ierr != 0) return;
    if (!Get_initialized()) {
@@ -369,7 +368,6 @@ void c_private_make(OBJ_PTR fmkr, FM *p, OBJ_PTR name, OBJ_PTR cmd, int *ierr) {
    Call_Function(fmkr, make_page_ID, cmd, ierr);
    if (*ierr != 0) return;
    Write_grestore();
-   if (result == OBJ_FALSE) quiet = true;
    Close_pdf(fmkr, p, quiet, ierr);
    if (*ierr != 0) return;
    Close_tex(fmkr, quiet, ierr);

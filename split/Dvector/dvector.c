@@ -4533,7 +4533,7 @@ VALUE Read_Rows_of_Dvectors(char *filename, VALUE destinations, int first_row_of
    double v, *row_data;
    int buff_len = 1000;
    char *buff, *num_str, *pend, c, *cptr;
-   int num_rows = 0, i, row, col, buff_loc, c_loc, skip = first_row_of_file - 1;
+   int num_rows = 0, i, row, col, buff_loc, skip = first_row_of_file - 1;
    rows_obj = rb_Array(destinations);
    num_rows = RARRAY(rows_obj)->len;
    rows_ptr = RARRAY(rows_obj)->ptr;
@@ -4739,6 +4739,27 @@ VALUE dvector_read_row(int argc, VALUE *argv, VALUE klass) {
 }
 
 /* C API functions */
+
+bool isa_Dvector(VALUE dvector) {
+   return Is_Dvector(dvector); 
+   }
+
+long len_Dvector(VALUE dvector) {
+   Dvector *d = Get_Dvector(dvector);
+   return d->len;
+   }
+
+double access_Dvector(VALUE dvector, long offset) {
+   Dvector *d = Get_Dvector(dvector);
+   if (d->len == 0) return 0.0;
+   if (offset < 0) {
+      offset += d->len;
+   }
+   if (offset < 0 || d->len <= offset) {
+      return 0.0;
+   }
+   return d->ptr[offset];
+   } 
 
 double *Dvector_Data_for_Read(VALUE dvector, long *len_ptr) { /* returns pointer to the dvector's data (which may be shared) */
    Dvector *d = Get_Dvector(dvector);
@@ -5730,6 +5751,9 @@ void Init_Dvector() {
    /* now, the fun part: exporting binary symbols.
       see include/dvector.h for their meaning 
    */
+   RB_EXPORT_SYMBOL(cDvector, isa_Dvector);
+   RB_EXPORT_SYMBOL(cDvector, len_Dvector);
+   RB_EXPORT_SYMBOL(cDvector, access_Dvector);
    RB_EXPORT_SYMBOL(cDvector, Dvector_Data_for_Read);
    RB_EXPORT_SYMBOL(cDvector, Dvector_Data_Copy);
    RB_EXPORT_SYMBOL(cDvector, Dvector_Data_for_Write);

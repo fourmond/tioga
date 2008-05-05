@@ -737,6 +737,7 @@ EOD
         t.do_box_labels("Splines", "Position", "Average Count")
         xs = Dvector[ 1.0, 2.0, 5.0, 6.0, 7.0, 8.0, 10.0, 13.0, 17.0 ]
         ys = Dvector[ 3.0, 3.7, 3.9, 4.2, 5.7, 6.6,  7.1,  6.7,  4.5 ]
+        scale = Dvector[ 0.6, 0.9 ]
         t.show_plot([-1, 19, 8, 2]) do
             t.fill_color = FloralWhite
             t.fill_frame
@@ -748,7 +749,7 @@ EOD
             t.stroke_color = Black
             t.stroke
             t.show_marker('Xs' => xs, 'Ys' => ys, 'marker' => [ Bullet, Star ], 
-                          'scale' => [ 0.6, 0.9 ], 'color' => [ Red, Blue, Teal ]);
+                          'scale' => scale, 'color' => [ Red, Blue, Teal ]);
         end
     end
     

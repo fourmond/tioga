@@ -31,6 +31,13 @@
 
 /* functions for handling Dvectors: */
 
+DECLARE_SYMBOL(bool, isa_Dvector, (VALUE obj));
+ /* returns true if the obj is a Dvector */
+DECLARE_SYMBOL(long, len_Dvector, (VALUE dvector));
+ /* returns length of the dvector */
+DECLARE_SYMBOL(double, access_Dvector, (VALUE dvector, long idx));
+ /* returns the value of entry idx in dvector */
+
 DECLARE_SYMBOL(double *, Dvector_Data_for_Read, (VALUE dvector, long *len_ptr));
  /* returns pointer to the dvector's data (which may be shared) */
 DECLARE_SYMBOL(double *, Dvector_Data_Copy, (VALUE dvector, long *len_ptr)); 
@@ -45,6 +52,7 @@ DECLARE_SYMBOL(VALUE, Dvector_Create, (void));
 DECLARE_SYMBOL(void, Dvector_Store_Double, (VALUE ary, long idx, double val));
 /* pushes one element onto the vector */
 DECLARE_SYMBOL(void, Dvector_Push_Double, (VALUE ary, double val));
+
 
 /* functions for interpolation */
 DECLARE_SYMBOL(double, c_dvector_spline_interpolate,

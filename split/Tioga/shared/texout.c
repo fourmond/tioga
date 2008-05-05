@@ -515,7 +515,7 @@ void c_private_save_measure(OBJ_PTR fmkr, OBJ_PTR measure_name,
      of arrays (xy) of doubles 
   */
   OBJ_PTR points = Array_New(0);
-  OBJ_PTR current_point = NULL;
+  OBJ_PTR current_point = OBJ_NIL;
   int i;
   for(i = 0; i < 8; i++) {
     char buf[4];

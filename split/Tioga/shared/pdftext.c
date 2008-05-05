@@ -469,32 +469,20 @@ static OBJ_PTR get1_obj(bool is_list, OBJ_PTR obj, int indx, int* ierr) {
 
 
 static double get1_dbl(bool is_list, OBJ_PTR obj, int indx, int* ierr) {
-   OBJ_PTR num;
    if (is_list) {
-      int len;
-      len = Array_Len(obj, ierr); if (*ierr != 0) return 0.0;
-      num = Array_Entry(obj, indx % len, ierr); if (*ierr != 0) return 0.0;
-   } else {
-      num = obj;
+      int len = Array_Len(obj, ierr); if (*ierr != 0) return 0.0;      
+      return Array_Entry_double(obj, indx % len, ierr); if (*ierr != 0) return 0.0;
    }
-   double val;
-   val = Number_to_double(num, ierr);
-   return val;
+   return Number_to_double(obj, ierr);
 }
 
 
 static int get1_int(bool is_list, OBJ_PTR obj, int indx, int* ierr) {
-   OBJ_PTR num;
    if (is_list) {
-      int len;
-      len = Array_Len(obj, ierr); if (*ierr != 0) return 0.0;
-      num = Array_Entry(obj, indx % len, ierr); if (*ierr != 0) return 0.0;
-   } else {
-      num = obj;
+      int len = Array_Len(obj, ierr); if (*ierr != 0) return 0.0;      
+      return Array_Entry_int(obj, indx % len, ierr); if (*ierr != 0) return 0.0;
    }
-   int val;
-   val = Number_to_int(num, ierr);
-   return val;
+   return Number_to_int(obj, ierr);
 }
 
 

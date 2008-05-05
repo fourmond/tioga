@@ -73,13 +73,24 @@ char *CString_Ptr(OBJ_PTR obj, int *ierr) {
 
 OBJ_PTR Array_New(long len) { return rb_ary_new2(len); }
 
-long Array_Len(OBJ_PTR obj, int *ierr) { return (RARRAY(rb_Array(obj))->len); }
+long Array_Len(OBJ_PTR obj, int *ierr) { 
+   return isa_Dvector(obj)? len_Dvector(obj) : (RARRAY(rb_Array(obj))->len); }
 
 OBJ_PTR Array_Entry(OBJ_PTR obj, long indx, int *ierr) { return rb_ary_entry(obj,indx); }
 
 void Array_Store(OBJ_PTR obj, long indx, OBJ_PTR val, int *ierr) { rb_ary_store(obj,indx,val); }
 
 void Array_Push(OBJ_PTR obj, OBJ_PTR val, int *ierr) { rb_ary_push(obj,val); }
+
+double Array_Entry_double(OBJ_PTR obj, long indx, int *ierr) {
+   return isa_Dvector(obj)? access_Dvector(obj,indx) : Number_to_double(rb_ary_entry(obj,indx),ierr);
+}
+
+long Array_Entry_int(OBJ_PTR obj, long indx, int *ierr) {
+   return isa_Dvector(obj)? round(access_Dvector(obj,indx)) : Number_to_int(rb_ary_entry(obj,indx),ierr);
+}
+
+
 
 ID_PTR ID_Get(char *name) { return rb_intern(name); }
 

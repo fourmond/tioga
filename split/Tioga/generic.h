@@ -153,6 +153,19 @@ extern void Array_Store(OBJ_PTR obj, long indx, OBJ_PTR val, int *ierr);
 extern void Array_Push(OBJ_PTR obj, OBJ_PTR val, int *ierr);
     // pushes val onto the end of array obj.
     // raises error if obj not a kind of array
+    
+    
+extern double Array_Entry_double(OBJ_PTR obj, long indx, int *ierr);
+    // returns a C double
+    // tries to convert obj to array if necessary
+    // raises error if obj not a kind of array and cannot be converted to one
+    // or if entry is not a number and cannot be converted to one.
+    
+extern long Array_Entry_int(OBJ_PTR obj, long indx, int *ierr);
+    // returns a C long int
+    // tries to convert obj to array if necessary
+    // raises error if obj not a kind of array and cannot be converted to one
+    // or if entry is not a number and cannot be converted to one.
 
 
 extern ID_PTR ID_Get(char *name);

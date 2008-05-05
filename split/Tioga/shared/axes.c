@@ -799,7 +799,6 @@ static void free_allocated_memory(PlotAxis *s)
 }
 
 static void c_show_side(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr) {
-   int i;
    if (s->type == AXIS_HIDDEN) return;
    Start_Axis_Standard_State(fmkr, p, 
       s->stroke_color_R, s->stroke_color_G, s->stroke_color_B, 

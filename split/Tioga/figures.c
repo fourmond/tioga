@@ -644,6 +644,9 @@ void Init_FigureMaker(void) {
    RB_IMPORT_SYMBOL(cDvector, Dvector_Create);
    RB_IMPORT_SYMBOL(cDvector, Dvector_Data_Resize);
    RB_IMPORT_SYMBOL(cDvector, Dvector_Data_Replace);
+   RB_IMPORT_SYMBOL(cDvector, isa_Dvector);
+   RB_IMPORT_SYMBOL(cDvector, len_Dvector);
+   RB_IMPORT_SYMBOL(cDvector, access_Dvector);
    RB_IMPORT_SYMBOL(cDvector, Dvector_Data_for_Read);
    RB_IMPORT_SYMBOL(cDvector, Dvector_Data_for_Write);
    RB_IMPORT_SYMBOL(cDvector, Dvector_Store_Double);
@@ -665,6 +668,9 @@ void Init_FigureMaker(void) {
 IMPLEMENT_SYMBOL(Dvector_Create);
 IMPLEMENT_SYMBOL(Dvector_Data_Resize);
 IMPLEMENT_SYMBOL(Dvector_Data_Replace);
+IMPLEMENT_SYMBOL(isa_Dvector);
+IMPLEMENT_SYMBOL(len_Dvector);
+IMPLEMENT_SYMBOL(access_Dvector);
 IMPLEMENT_SYMBOL(Dvector_Data_for_Read);
 IMPLEMENT_SYMBOL(Dvector_Data_for_Write);
 IMPLEMENT_SYMBOL(Dvector_Store_Double);
