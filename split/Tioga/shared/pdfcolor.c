@@ -532,6 +532,8 @@ c_get_color_from_colormap(OBJ_PTR fmkr, FM *p, OBJ_PTR color_map, double x,
                   "(for R G B components)", ierr);
       RETURN_NIL;
    }
+   // Make sure x is non-negative
+   if (x < 0.0) x = -x;
    i = 3 * (ROUND(x * (cm_len-1)) % cm_len);
    r = buff[i]; g = buff[i+1]; b = buff[i+2];
    OBJ_PTR result = Array_New(3);
