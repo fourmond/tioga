@@ -510,16 +510,29 @@ c_get_color_from_colormap(OBJ_PTR fmkr, FM *p, OBJ_PTR color_map, double x,
                           int *ierr)
 {  // x is from 0 to 1.  this returns a vector for the RGB color from
    // the given colormap
-   unsigned char *buff = (unsigned char *)(String_Ptr(color_map,ierr));
-   unsigned char r, g, b, i;
-   int len = String_Len(color_map,ierr);
+   OBJ_PTR cm_len_obj;
+   OBJ_PTR lookup_obj;
+   unsigned char *buff;
+   unsigned char r, g, b;
+   int i, cm_len, lu_len;
+
+   cm_len_obj = Array_Entry(color_map, 0, ierr);
    if (*ierr != 0) RETURN_NIL;
-   if (len % 3 != 0) {
-      RAISE_ERROR("Sorry: color_map length must be a multiple of 3 "
+   cm_len = Number_to_int(cm_len_obj, ierr) + 1;
+   if (*ierr != 0) RETURN_NIL;
+   lookup_obj = Array_Entry(color_map, 1, ierr);
+   if (*ierr != 0) RETURN_NIL;
+   buff = (unsigned char *)(String_Ptr(lookup_obj,ierr));
+   if (*ierr != 0) RETURN_NIL;
+   lu_len = String_Len(lookup_obj,ierr);
+   if (*ierr != 0) RETURN_NIL;
+
+   if (3*cm_len != lu_len) {
+      RAISE_ERROR("Sorry: lookup length must be 3 times colormap length "
                   "(for R G B components)", ierr);
       RETURN_NIL;
    }
-   i = 3 * ROUND(x * ((len/3)-1));
+   i = 3 * (ROUND(x * (cm_len-1)) % cm_len);
    r = buff[i]; g = buff[i+1]; b = buff[i+2];
    OBJ_PTR result = Array_New(3);
    Array_Store(result, 0, Float_New(r/255.0), ierr);
