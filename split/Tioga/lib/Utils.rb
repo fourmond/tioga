@@ -43,6 +43,13 @@ module Tioga
       end
       return a
     end
+    module_function :tex_quote_text
+
+    class ::String
+      def quotex
+        Tioga::Utils.tex_quote_text(self)
+      end
+    end
 
     # Dimension conversion constants taken straight from the TeXbook
     DIMENSION_CONVERSION = {
