@@ -44,22 +44,6 @@ c_set_subframe(OBJ_PTR fmkr, FM *p,
                double bottom_margin, int *ierr)
 {
    double x, y, w, h;
-   if (left_margin < 0 || right_margin < 0 || top_margin < 0
-       || bottom_margin < 0) {
-      RAISE_ERROR("Sorry: margins for set_subframe must be non-negative",
-                  ierr);
-      return;
-   }
-   if (left_margin + right_margin >= 1.0) {
-      RAISE_ERROR_gg("Sorry: margins too large: left_margin (%g) "
-                     "right_margin (%g)", left_margin, right_margin, ierr);
-      return;
-   }
-   if (top_margin + bottom_margin >= 1.0) {
-      RAISE_ERROR_gg("Sorry: margins too large: top_margin (%g) "
-                     "bottom_margin (%g)", top_margin, bottom_margin, ierr);
-      return;
-   }
    x = p->frame_left += left_margin * p->frame_width;
    p->frame_right -= right_margin * p->frame_width;
    p->frame_top -= top_margin * p->frame_height;

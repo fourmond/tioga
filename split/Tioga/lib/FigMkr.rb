@@ -2337,6 +2337,10 @@ class FigureMaker
             private_show_rgb_image(ll[0], ll[1], lr[0], lr[1], ul[0], ul[1], interpolate, w, h, data, mask_xo_num)
             return self
         end
+        if color_space == 'HLS' || color_space == 'hls'
+            private_show_hls_image(ll[0], ll[1], lr[0], lr[1], ul[0], ul[1], interpolate, w, h, data, mask_xo_num)
+            return self
+        end
         if color_space == 'CMYK' || color_space == 'cmyk'
             private_show_cmyk_image(ll[0], ll[1], lr[0], lr[1], ul[0], ul[1], interpolate, w, h, data, mask_xo_num)
             return self

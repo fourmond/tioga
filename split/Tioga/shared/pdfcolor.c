@@ -362,7 +362,8 @@ clr_value(double n1, double n2, double hue)  // from plplot plctrl.c
 }
 
 
-static void
+// this is also used for converting images
+void
 convert_hls_to_rgb(double h, double l, double s, double *p_r, double *p_g,
                    double *p_b)  // from plplot plctrl.c
 {

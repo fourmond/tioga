@@ -156,6 +156,9 @@ extern OBJ_PTR FM_private_create_monochrome_image_data(OBJ_PTR fmkr, OBJ_PTR dat
 extern OBJ_PTR FM_private_show_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly,
    OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR OBJ_PTR_mask_min, OBJ_PTR OBJ_PTR_mask_max,
    OBJ_PTR hival, OBJ_PTR lookup, OBJ_PTR mask_xo_num);
+extern OBJ_PTR FM_private_show_hls_image(OBJ_PTR fmkr, 
+   OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly,
+   OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_xo_num);
 extern OBJ_PTR FM_private_show_rgb_image(OBJ_PTR fmkr, 
    OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly,
    OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_xo_num);

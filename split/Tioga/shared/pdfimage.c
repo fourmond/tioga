@@ -157,7 +157,10 @@ Write_JPG(JPG_Info *xo, int *ierr)
                          xo->mask_obj_num, ierr);
 }
 
-
+extern void
+convert_hls_to_rgb(double h, double l, double s, double *p_r, double *p_g,
+   double *p_b);
+   
 void
 Write_Sampled(Sampled_Info *xo, int *ierr)
 {
@@ -166,11 +169,16 @@ Write_Sampled(Sampled_Info *xo, int *ierr)
            (xo->interpolate)? "true":"false");
    fprintf(OF, "\t/Height %i\n", xo->height);
    fprintf(OF, "\t/Width %i\n", xo->width);
-   int i, len;
+   int i, j, n, len;
    unsigned long new_len;
+   unsigned char *image_data;
+   unsigned char *src;
+   unsigned char *dst;
    unsigned char *buffer;
+   double r,g,b,h,l,s;   
    switch (xo->image_type) {
       case RGB_IMAGE:
+      case HLS_IMAGE:
          fprintf(OF, "\t/ColorSpace /DeviceRGB\n");
          fprintf(OF, "\t/BitsPerComponent 8\n");
          break;
@@ -214,9 +222,24 @@ Write_Sampled(Sampled_Info *xo, int *ierr)
        && xo->value_mask_min <= 255 && xo->value_mask_max <= 255
        && xo->value_mask_min <= xo->value_mask_max)
       fprintf(OF, "\t/Mask [%i %i]\n", xo->value_mask_min, xo->value_mask_max);
+   
+   if (xo->image_type == HLS_IMAGE) {
+      image_data = ALLOC_N_unsigned_char(xo->length);
+      // convert HLS triples to RGB triples
+      n = xo->length/3; dst = image_data; src = xo->image_data;
+      for (j=0; j<n; j++) {
+         // 360/256 = 1.40625
+         h = (*src++)*1.40625; l = (*src++)/255.0; s = (*src++)/255.0;
+         convert_hls_to_rgb(h,l,s,&r,&g,&b);
+         *dst++ = round(r*255.0); *dst++ = round(g*255.0); *dst++ = round(b*255.0); 
+      }
+   } else {
+      image_data = xo->image_data;
+   }
+      
    new_len = (xo->length * 11)/10 + 100;
    buffer = ALLOC_N_unsigned_char(new_len);
-   if (do_flate_compress(buffer, &new_len, xo->image_data, xo->length)
+   if (do_flate_compress(buffer, &new_len, image_data, xo->length)
        != FLATE_OK) {
       free(buffer);
       RAISE_ERROR("Error compressing image data", ierr); 
@@ -229,6 +252,7 @@ Write_Sampled(Sampled_Info *xo, int *ierr)
       return;
    }
    free(buffer);
+   if (xo->image_type == HLS_IMAGE) free(image_data);
    fprintf(OF, "\nendstream\nendobj\n");
 }
 

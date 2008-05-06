@@ -96,6 +96,7 @@ extern void Free_Sampled(Sampled_Info *xo);
 #define SAMPLED_SUBTYPE 2
 
 #define RGB_IMAGE 0
+#define HLS_IMAGE 5
 #define CMYK_IMAGE 4
 #define GRAY_IMAGE 1
 #define MONO_IMAGE 2

@@ -492,7 +492,8 @@ void Init_FigureMaker(void) {
 /* images */
    rb_define_method(cFM, "private_show_jpg", FM_private_show_jpg, 5);
    rb_define_method(cFM, "private_show_rgb_image", FM_private_show_rgb_image, 11);
-   rb_define_method(cFM, "private_show_cmyk_image", FM_private_show_rgb_image, 11);
+   rb_define_method(cFM, "private_show_hls_image", FM_private_show_hls_image, 11);
+   rb_define_method(cFM, "private_show_cmyk_image", FM_private_show_cmyk_image, 11);
    rb_define_method(cFM, "private_show_grayscale_image", FM_private_show_grayscale_image, 11);
    rb_define_method(cFM, "private_show_monochrome_image", FM_private_show_monochrome_image, 12);
    rb_define_method(cFM, "private_show_image", FM_private_show_image, 15);

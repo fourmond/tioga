@@ -70,6 +70,7 @@ class MyPlots
         t.def_figure("Steps") { steps }
         t.def_figure("Splines") { splines }
         t.def_figure("Sampled_Data") { sampled_data }
+        t.def_figure("Sampled_with_grid") { sampled_with_grid }
         t.def_figure("Contours") { samples_with_contours }
 
         t.def_figure("Greens_clipped") { greens_clipped }
@@ -764,6 +765,29 @@ EOD
                 'w' => @eos_data_xlen, 'h' => @eos_data_ylen)
         end
     end
+        
+    def sampled_image_with_grid(title, colormap = nil)
+        t.do_box_labels(title, 'Log Density', 'Log Temperature')
+        data = get_press_image
+        xs = @eos_logRHOs
+        ys = @eos_logTs
+        colormap = t.mellow_colormap if colormap == nil
+        t.show_plot([@eos_xmin, @eos_xmax, @eos_ymax, @eos_ymin]) do
+            t.fill_color = Wheat
+            t.fill_frame
+            t.context do
+                clip_press_image
+                t.show_image(
+                    'll' => [xs.min, ys.min], 
+                    'lr' => [xs.max, ys.min], 
+                    'ul' => [xs.min, ys.max], 
+                    'color_space' => colormap, 
+                    'data' => data, 'value_mask' => 255,
+                    'w' => @eos_data_xlen, 'h' => @eos_data_ylen)
+            end
+            t.show_grid('stroke_color' => Teal, 'rescale_lines' => 0.5, 'major_grid' => true)
+        end
+    end
     
     def color_bar(ylabel, levels = nil)
         xmin = 0; xmax = 1; xmid = 0.5
@@ -794,6 +818,15 @@ EOD
         t.rescale(0.8)
         title = 'Log Opacity'
         t.subplot('right_margin' => @image_right_margin) { sampled_image(title) }
+        t.subplot('left_margin' => 0.95, 
+            'top_margin' => 0.05, 
+            'bottom_margin' => 0.05) { color_bar(title) }
+    end
+    
+    def sampled_with_grid
+        t.rescale(0.8)
+        title = 'Log Opacity'
+        t.subplot('right_margin' => @image_right_margin) { sampled_image_with_grid(title) }
         t.subplot('left_margin' => 0.95, 
             'top_margin' => 0.05, 
             'bottom_margin' => 0.05) { color_bar(title) }

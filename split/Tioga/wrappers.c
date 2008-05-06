@@ -258,6 +258,17 @@ OBJ_PTR FM_private_show_jpg(OBJ_PTR fmkr, OBJ_PTR filename,
    OBJ_PTR width, OBJ_PTR height, OBJ_PTR image_destination, OBJ_PTR mask_obj_num) { int ierr=0;
    c_private_show_jpg(fmkr, Get_FM(fmkr, &ierr), String_Ptr(filename, &ierr), 
       Number_to_int(width, &ierr), Number_to_int(height, &ierr), image_destination, Number_to_int(mask_obj_num, &ierr), &ierr); RETURN_NIL; }
+      
+OBJ_PTR FM_private_show_hls_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry,
+    OBJ_PTR ulx, OBJ_PTR uly, OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_obj_num)
+{ int ierr=0;
+   return c_private_show_image(fmkr, Get_FM(fmkr, &ierr), HLS_IMAGE, Number_to_double(llx, &ierr), Number_to_double(lly, &ierr), 
+      Number_to_double(lrx, &ierr), Number_to_double(lry, &ierr), 
+      Number_to_double(ulx, &ierr), Number_to_double(uly, &ierr), (interpolate != OBJ_FALSE), OBJ_FALSE, 
+      Number_to_int(w, &ierr), Number_to_int(h, &ierr), (unsigned char *)String_Ptr(data, &ierr), String_Len(data, &ierr), 
+      OBJ_NIL, OBJ_NIL, OBJ_NIL, OBJ_NIL, Number_to_int(mask_obj_num, &ierr), &ierr);
+}
+      
 OBJ_PTR FM_private_show_rgb_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry,
     OBJ_PTR ulx, OBJ_PTR uly, OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_obj_num)
 { int ierr=0;

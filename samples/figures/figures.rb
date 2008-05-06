@@ -49,6 +49,8 @@ class MyFigures
         t.def_figure("Squares") { both_squares }
         t.def_figure("Sample_Jpegs") { sample_jpegs }
         t.def_figure("Monochrome_Image") { mono_image }
+        t.def_figure("RGB_Image") { rgb_image }
+        t.def_figure("HLS_Image") { hls_image }
         t.def_figure("Axial_Shading") { axial_shading }
         t.def_figure("Radial_Shading") { radial_shading }
         t.def_figure("Dingbats") { dingbats }
@@ -955,6 +957,14 @@ class MyFigures
         t.show_image(
             'll' => [0.1, 0.1], 'lr' => [0.9, 0.1], 'ul' => [0.1, 0.9], 
             'color_space' => 'RGB', 'w' => 2, 'h' => 2, 'data' => samples)
+    end
+    
+    def hls_image
+        background
+        samples = "\277" "\000" "\000" "\000" "\277" "\000" "\000" "\000" "\277" "\237" "\237" "\237"
+        t.show_image(
+            'll' => [0.1, 0.1], 'lr' => [0.9, 0.1], 'ul' => [0.1, 0.9], 
+            'color_space' => 'HLS', 'w' => 2, 'h' => 2, 'data' => samples)
     end
 
     def mono_image_table(light, dark)
