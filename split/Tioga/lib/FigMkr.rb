@@ -1080,6 +1080,88 @@ class FigureMaker
         end
     end
     
+    @@keys_for_show_grid = %w[
+      stroke_color line_type rescale_lines line_width stroke_opacity stroke_transparency
+    ]
+
+    # Draws the gridlines associated with the X and Y axis.
+    #
+    # The following list shows the keys that cen be used in +dict+.  In the
+    # list, 'A' stands for either 'x' or 'y', and 'M' stands for 'major' or
+    # 'minor'.  Keys can also be specified without the "A_M_" prefix to specify
+    # "grid-global" defaults.  The +grid+ key, if true, enables both major and
+    # minor gridlines for both x and y axes.
+    #
+    # * A_M_grid
+    # * A_M_line_type
+    # * A_M_line_width
+    # * A_M_stroke_opacity
+    # * A_M_stroke_transparency
+    # * A_M_stroke_color
+    def show_grid(dict={})
+      dict = {
+        'line_type' => Line_Type_Dot,
+        'rescale_lines' => 0.25,
+        'stroke_color' => Gray,
+        'major_grid' => true,
+        'minor_grid' => false,
+        'x_minor_rescale_lines' => 0.5,
+        'y_minor_rescale_lines' => 0.5,
+      }.merge(dict)
+
+      # "grid-global" context
+      context do
+        @@keys_for_show_grid.each do |k|
+          next unless val = dict[k]
+          k += '=' if respond_to? "#{k}="
+          next unless respond_to? k
+          send(k, val)
+        end
+
+        if dict['x_major_grid'] || dict['x_minor_grid'] ||
+           dict[  'major_grid'] || dict[  'minor_grid'] || dict['grid']
+          top = axis_information(TOP)
+          bottom = axis_information(BOTTOM)
+          y0 = bottom['y0']
+          y1 = top['y1']
+          # Do minor and major grid lines in same context so minor lines will
+          # inherit properties from major lines.
+          context do
+            %w[ major minor ].each do |m|
+              next unless dict["x_#{m}_grid"] || dict["#{m}_grid"] || dict["grid"]
+              @@keys_for_show_grid.each do |k|
+                next unless val = dict["x_#{m}_#{k}"]
+                k += '=' if respond_to? "#{k}="
+                send(k, val)
+              end
+              bottom[m].each {|x| stroke_line(x, y0, x, y1)}
+            end
+          end
+        end
+
+        if dict['y_major_grid'] || dict['y_minor_grid'] ||
+           dict[  'major_grid'] || dict[  'minor_grid'] || dict['grid']
+          left = axis_information(LEFT)
+          right = axis_information(RIGHT)
+          x0 = left['x0']
+          x1 = right['x1']
+          # Do minor and major grid lines in same context so minor lines will
+          # inherit properties from major lines.
+          context do
+            %w[ major minor ].each do |m|
+              next unless dict["y_#{m}_grid"] || dict["#{m}_grid"] || dict["grid"]
+              @@keys_for_show_grid.each do |k|
+                next unless val = dict["y_#{m}_#{k}"]
+                k += '=' if respond_to? "#{k}="
+                send(k, val)
+              end
+              left[m].each {|y| stroke_line(x0, y, x1, y)}
+            end
+          end
+        end
+      end
+    end
+
     @@keys_for_show_plot_with_legend = FigureMaker.make_name_lookup_hash([
         'legend_top_margin', 'legend_bottom_margin', 'legend_left_margin', 'legend_right_margin',
         'plot_top_margin', 'plot_bottom_margin', 'plot_left_margin', 'plot_right_margin',
