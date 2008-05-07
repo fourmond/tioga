@@ -454,6 +454,8 @@ extern void c_xaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR valc_hls_to_rg
 extern OBJ_PTR c_xaxis_stroke_color_get(OBJ_PTR fmkr, FM *pc_hls_to_rgb, int *ierr); // value is array of [r, g, b] intensities from 0 to 1
 extern void c_yaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR valc_hls_to_rgb, int *ierr);
 extern OBJ_PTR c_yaxis_stroke_color_get(OBJ_PTR fmkr, FM *pc_hls_to_rgb, int *ierr); // value is array of [r, g, b] intensities from 0 to 1
+extern void c_string_hls_to_rgb_bang(OBJ_PTR fmkr, FM *p, unsigned char* hls_str, long len, int *ierr);
+extern void c_string_rgb_to_hls_bang(OBJ_PTR fmkr, FM *p, unsigned char* rgb_str, long len, int *ierr);
 
 /*======================================================================*/
 // pdfcoords.c

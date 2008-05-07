@@ -961,7 +961,7 @@ class MyFigures
     
     def hls_image
         background
-        samples = "\277" "\000" "\000" "\000" "\277" "\000" "\000" "\000" "\277" "\237" "\237" "\237"
+        samples = t.string_rgb_to_hls("\277" "\000" "\000" "\000" "\277" "\000" "\000" "\000" "\277" "\237" "\237" "\237")
         t.show_image(
             'll' => [0.1, 0.1], 'lr' => [0.9, 0.1], 'ul' => [0.1, 0.9], 
             'color_space' => 'HLS', 'w' => 2, 'h' => 2, 'data' => samples)

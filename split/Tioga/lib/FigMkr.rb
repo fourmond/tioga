@@ -657,7 +657,6 @@ class FigureMaker
         xright = x + ltw*line_ht_x
         y = 1.0 - self.legend_text_ystart*line_ht_y
         update_bbox(xright, y)
-        dy = -self.legend_text_dy*line_ht_y
         line_x0 = self.legend_line_x0*line_ht_x
         line_x1 = self.legend_line_x1*line_ht_x
         line_dy = self.legend_line_dy*line_ht_y
@@ -1534,6 +1533,17 @@ class FigureMaker
             x_hat[0], y_hat[0], x_hat[1], y_hat[1],
             extend_start, extend_end)
     end
+    
+    
+    def string_hls_to_rgb(str)
+      string_hls_to_rgb!(String.new(str))
+    end
+    
+    
+    def string_rgb_to_hls(str)
+      string_rgb_to_hls!(String.new(str))
+    end
+    
     
     @@keys_for_show_image = FigureMaker.make_name_lookup_hash([
         'll', 'lr', 'ul', 'w', 'width', 'height', 'h',

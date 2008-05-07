@@ -801,3 +801,43 @@ c_yaxis_stroke_color_get(OBJ_PTR fmkr, FM *p, int *ierr)
    Array_Store(result, 2, Float_New(b), ierr);
    return result;
 }
+
+
+
+void
+str_hls_to_rgb_bang(unsigned char* str, long len)
+{
+   double r,g,b,h,l,s;  
+   long n, j; 
+   // convert HLS triples to RGB triples
+   n = len/3;
+   for (j=0; j<n; j++) {
+      // 360/256 = 1.40625
+      h = str[0]*1.40625; l = str[1]/255.0; s = str[2]/255.0;
+      convert_hls_to_rgb(h,l,s,&r,&g,&b);
+      *str++ = round(r*255.0); *str++ = round(g*255.0); *str++ = round(b*255.0); 
+   }
+}
+
+
+void
+c_string_hls_to_rgb_bang(OBJ_PTR fmkr, FM *p, unsigned char* str, long len, int *ierr)
+{ str_hls_to_rgb_bang(str,len); }
+
+void
+c_string_rgb_to_hls_bang(OBJ_PTR fmkr, FM *p, unsigned char* str, long len, int *ierr)
+{
+   double r,g,b,h,l,s;  
+   long n, j; 
+   // convert RGB triples to HLS triples
+   n = len/3;
+   for (j=0; j<n; j++) {
+      // 360/256 = 1.40625
+      r = str[0]/255.0; g = str[1]/255.0; b = str[2]/255.0;
+      convert_rgb_to_hls(r, g, b, &h, &l, &s);
+      *str++ = round(h/1.40625); *str++ = round(l*255.0); *str++ = round(s*255.0); 
+   }
+}
+
+
+

@@ -143,6 +143,14 @@ OBJ_PTR FM_yaxis_stroke_color_set(OBJ_PTR fmkr, OBJ_PTR val) { int ierr=0;
    c_yaxis_stroke_color_set(fmkr, Get_FM(fmkr, &ierr), val, &ierr); RETURN_NIL; }
 OBJ_PTR FM_yaxis_stroke_color_get(OBJ_PTR fmkr) { int ierr=0;
    return c_yaxis_stroke_color_get(fmkr, Get_FM(fmkr, &ierr), &ierr); }
+OBJ_PTR FM_string_hls_to_rgb_bang(OBJ_PTR fmkr, OBJ_PTR str) { int ierr=0;
+   c_string_hls_to_rgb_bang(fmkr, Get_FM(fmkr, &ierr),  
+      (unsigned char *)String_Ptr(str, &ierr), String_Len(str, &ierr), &ierr);
+   return str; }
+OBJ_PTR FM_string_rgb_to_hls_bang(OBJ_PTR fmkr, OBJ_PTR str) { int ierr=0;
+   c_string_rgb_to_hls_bang(fmkr, Get_FM(fmkr, &ierr), 
+      (unsigned char *)String_Ptr(str, &ierr), String_Len(str, &ierr), &ierr);
+   return str; }
 
 // pdfcoords.c
 OBJ_PTR FM_private_set_subframe(OBJ_PTR fmkr, OBJ_PTR left_margin, OBJ_PTR right_margin, 

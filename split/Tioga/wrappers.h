@@ -92,6 +92,8 @@ extern OBJ_PTR FM_xaxis_stroke_color_get(OBJ_PTR fmkr);
 extern OBJ_PTR FM_xaxis_stroke_color_set(OBJ_PTR fmkr, OBJ_PTR val);
 extern OBJ_PTR FM_yaxis_stroke_color_get(OBJ_PTR fmkr);
 extern OBJ_PTR FM_yaxis_stroke_color_set(OBJ_PTR fmkr, OBJ_PTR val);
+extern OBJ_PTR FM_string_hls_to_rgb_bang(OBJ_PTR fmkr, OBJ_PTR str);
+extern OBJ_PTR FM_string_rgb_to_hls_bang(OBJ_PTR fmkr, OBJ_PTR str);
 
 /*======================================================================*/
 // pdfcoords.c

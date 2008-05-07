@@ -158,8 +158,7 @@ Write_JPG(JPG_Info *xo, int *ierr)
 }
 
 extern void
-convert_hls_to_rgb(double h, double l, double s, double *p_r, double *p_g,
-   double *p_b);
+str_hls_to_rgb_bang(unsigned char* str, long len);
    
 void
 Write_Sampled(Sampled_Info *xo, int *ierr)
@@ -169,13 +168,10 @@ Write_Sampled(Sampled_Info *xo, int *ierr)
            (xo->interpolate)? "true":"false");
    fprintf(OF, "\t/Height %i\n", xo->height);
    fprintf(OF, "\t/Width %i\n", xo->width);
-   int i, j, n, len;
+   int i, len;
    unsigned long new_len;
    unsigned char *image_data;
-   unsigned char *src;
-   unsigned char *dst;
    unsigned char *buffer;
-   double r,g,b,h,l,s;   
    switch (xo->image_type) {
       case RGB_IMAGE:
       case HLS_IMAGE:
@@ -225,14 +221,8 @@ Write_Sampled(Sampled_Info *xo, int *ierr)
    
    if (xo->image_type == HLS_IMAGE) {
       image_data = ALLOC_N_unsigned_char(xo->length);
-      // convert HLS triples to RGB triples
-      n = xo->length/3; dst = image_data; src = xo->image_data;
-      for (j=0; j<n; j++) {
-         // 360/256 = 1.40625
-         h = (*src++)*1.40625; l = (*src++)/255.0; s = (*src++)/255.0;
-         convert_hls_to_rgb(h,l,s,&r,&g,&b);
-         *dst++ = round(r*255.0); *dst++ = round(g*255.0); *dst++ = round(b*255.0); 
-      }
+      memcpy(image_data, xo->image_data, xo->length);
+      str_hls_to_rgb_bang(image_data, xo->length);
    } else {
       image_data = xo->image_data;
    }

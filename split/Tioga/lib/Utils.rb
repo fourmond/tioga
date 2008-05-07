@@ -48,7 +48,7 @@ module Tioga
     class ::String
       def quotex
         Tioga::Utils.tex_quote_text(self)
-      end
+      end      
     end
 
     # Dimension conversion constants taken straight from the TeXbook
