@@ -90,14 +90,45 @@ Dictionary Entries
    end
 
 # Returns a vector of [ red, green, blue ] intensities corresponding to the
-# <i>hls_vec</i> color given as [ hue, lightness, saturation].  See also rgb_to_hls.
+# <i>hls_vec</i> color given as [ hue, lightness, saturation ].  See also rgb_to_hls.
     def hls_to_rgb(hls_vec)
     end
     
 # Returns a vector of [ hue, lightness, saturation ] corresponding to the
-# <i>rgb_vec</i> color given as [ red, green, blue] intensities.  See also hls_to_rgb.
+# <i>rgb_vec</i> color given as [ red, green, blue ] intensities.  See also hls_to_rgb.
     def rgb_to_hls(rgb_vec)
     end
+
+
+# Returns a new string of [ red, green, blue ] byte triples corresponding to the
+# colors given in <i>str</i> as triples of [ hue, lightness, saturation ].
+# For representation as a byte, intensities in range 0.0 to 1.0 are multiplied by 255 and rounded;
+# hue angles in the range 0.0 to 360.0 are divided by 360, multiplied by 255, and rounded.
+# See also string_hls_to_rgb!.
+    def string_hls_to_rgb(str)
+    end
+
+# Modifies in-place the string of [ red, green, blue ] byte triples to give the corresponding
+# colors as triples of [ hue, lightness, saturation ].  
+# See also string_hls_to_rgb.
+    def string_hls_to_rgb!(str)
+    end
+    
+# Returns a new string of [ hue, lightness, saturation ] byte triples corresponding to the
+# colors given in <i>str</i> as triples of [ red, green, blue ].  
+# For representation as a byte, intensities in range 0.0 to 1.0 are multiplied by 255 and rounded;
+# hue angles in the range 0.0 to 360.0 are divided by 360, multiplied by 255, and rounded.
+# See also string_rgb_to_hls!.
+    def string_rgb_to_hls(str)
+    end
+    
+# Modifies in-place the string of [ hue, lightness, saturation ] byte triples to give the corresponding
+# colors as triples of [ red, green, blue ].  
+# See also string_rgb_to_hls.
+    def string_rgb_to_hls!(str)
+    end
+
+
 
 
 

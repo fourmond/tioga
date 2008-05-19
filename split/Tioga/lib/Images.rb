@@ -44,11 +44,19 @@ grayscale images is stored using one byte per sample.  The routine create_monoch
 a handy way to create such data from a table of values.
 
 Grayscale images can also be used as a "soft mask" for other images.  In this case, the grayscale samples
-are interpreted as relative opacities (a stencil mask, on the other hand, is "hard" in that each sample is either totally opaque or totally transparent).  To use such soft masking, create a dictionary for the grayscale
+are interpreted as relative opacities (a stencil mask, on the other hand, is "hard" in that each 
+sample is either totally opaque or totally transparent).  To use such soft masking, create a dictionary for the grayscale
 image and provide it as the 'opacity_mask' entry for the image be be masked.
 
 The 'color_space' entry is 'RGB' or 'rgb' for an image using the red-green-blue representation.  Samples
-are stored as three bytes, corresponding to red, green, and blue intensities.
+are stored as three bytes, corresponding to red, green, and blue intensities 
+(e.g., red intensity in range 0.0 to 1.0 is stored as round(red*255)).
+
+If the 'color_space' entry is 'HLS' or 'hls', then samples
+are stored as three bytes, corresponding to hue, lightness, and saturation 
+(the hue angle in the range 0.0 to 360.0 is stored as round(hue*256/360)).
+[Note: internally, the hls data is copied and converted to rgb -- see string_hls_to_rgb.]
+
 In 4-color printing, as in ink-jet printers, images are painted using cyan, magenta, yellow, and black inks.
 The corresponding 'color_space' is 'CMYK' or 'cmyk'.  For this case, samples are stored as four bytes,
 corresponding to cyan, magenta, yellow, and black intensitites.

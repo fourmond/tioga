@@ -18,6 +18,13 @@ class Figures_and_Plots < Doc < FigureMaker
     end
 
 # :call-seq:
+#   show_plot_without_clipping(bounds) do ... end
+#
+# This is identical to show_plot except it doesn't do #clip_to_frame before calling the plot command.
+    def show_plot_without_clipping(bounds=nil,&cmd)
+    end
+
+# :call-seq:
 #   context do ... end
 #
 # The context routine saves 'state', executes the given block, and then restores state.

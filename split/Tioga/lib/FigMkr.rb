@@ -875,6 +875,16 @@ class FigureMaker
         }      
     end
     
+    
+    def show_plot_without_clipping(bounds=nil,&cmd)       
+        trace_cmd_one_arg(@enter_show_plot_function, @exit_show_plot_function, bounds) {        
+            set_bounds(bounds)
+            context { cmd.call(self) }
+            show_plot_box
+        }      
+    end
+    
+    
     def subfigure(margins=nil,&cmd)
         trace_cmd_one_arg(@enter_subfigure_function, @exit_subfigure_function, margins) {        
             context { doing_subfigure; set_subframe(margins); cmd.call(self) }
