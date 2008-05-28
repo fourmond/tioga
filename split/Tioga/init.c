@@ -579,7 +579,7 @@ void c_private_init_fm_data(OBJ_PTR fmkr, FM *p, int *ierr) {
    /* Legend */
    p->legend_line_x0 = 0.5;
    p->legend_line_x1 = 2.0;
-   p->legend_line_dy = 0.4;
+   p->legend_line_dy = 0.25;
    p->legend_text_width = -1;
    p->legend_text_xstart = 2.8;
    p->legend_text_ystart = 2.0;

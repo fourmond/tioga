@@ -165,7 +165,7 @@ module MyPlotStyles
   # Legends
     t.legend_alignment = ALIGNED_AT_BASELINE
     t.legend_justification = LEFT_JUSTIFIED
-    t.legend_line_dy = 0.4
+    t.legend_line_dy = 0.28
     t.legend_line_width = -1
     t.legend_line_x0 = 0.5
     t.legend_line_x1 = 2.0
