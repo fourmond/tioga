@@ -444,8 +444,8 @@ class TiogaUI
         return
       end
       make_portfolio(true, parse_figs($tioga_args[argnum]))
-    else # unrecognized command
-      show_help(filename,cmd)
+    #else # unrecognized command
+    #  show_help(filename,cmd)
     end
   rescue
   end
