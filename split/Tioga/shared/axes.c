@@ -507,10 +507,14 @@ static int Pick_Number_of_Minor_Intervals(double length, int *ierr)
 {
    double t1, fuzz, newlen;
    int np, num_subintervals, inewlen;
-   t1 = (double) log10(length);
-   np = (int) floor(t1);
-   t1 -= np;
-   newlen = pow(10.0, t1);
+   if (length < 10.0 && length > 1.0) {
+      newlen = length;
+   } else {
+      t1 = (double) log10(length);
+      np = (int) floor(t1);
+      t1 -= np;
+      newlen = pow(10.0, t1);
+   }
    inewlen = (int) floor(newlen + 0.5);
    fuzz = newlen - inewlen;
    fuzz = abs(fuzz);
