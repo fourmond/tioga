@@ -906,7 +906,6 @@ static VALUE function_derivative(VALUE self)
   const double *y = Dvector_Data_for_Read(get_y_vector(self),NULL);
   VALUE derivative = Dvector_Create();
   long i = 0;
-  double val = 0;
   /* First value */
   Dvector_Push_Double(derivative, (y[i+1] - y[i]) /(x[i+1] - x[i]));
   i++;
