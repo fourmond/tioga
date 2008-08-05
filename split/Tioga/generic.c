@@ -20,6 +20,7 @@
 */
 
 #include <ctype.h>
+
 #include "dvector.h"
 #include "dtable.h"
 #include "ruby.h"
@@ -28,6 +29,7 @@
 #include "figures.h"
 #include "pdfs.h"
 #include "flate.h"
+
 
 
 static OBJ_PTR rb_Integer_class, rb_Numeric_class;

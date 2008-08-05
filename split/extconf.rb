@@ -2,7 +2,7 @@
 
 require './mkmf2.rb'
 
-$CFLAGS += " -O2 -g -Wall -Werror-implicit-function-declaration"
+$CFLAGS += " -O2 -g -Wall"
 
 # Now, if you want to install the include file, you need to
 # set the EXTCONF_RB_INCLUDE
@@ -24,9 +24,10 @@ setup_dir("Dtable", "Dobjects",
 #  b.add_sources("symbols.c")
 end
 
-setup_dir("Flate", "", "Flate", include) do |l,b,i|
-#  b.add_sources("symbols.c")
-end
+
+# setup_dir("Flate", "", "Flate", include) do |l,b,i|
+# #  b.add_sources("symbols.c")
+# end
 
 
 setup_dir("Function", "Dobjects", 
@@ -61,21 +62,30 @@ custom_rule("Tioga/lib/TexPreamble.rb",
              "Tioga/tioga.sty.in", "Tioga/mk_tioga_sty.rb"]
             )
 
-# we check the presence of zlib library
-unless have_header("zlib.h") and have_library("z", "compress", "zlib.h")
-  puts <<"EON"
-Error: you should have zlib (including development files) installed to
-build and run Tioga. You can get it there:
 
-  http://www.zlib.net/
+# Conditional use of embedded zlib
+if false and have_header("zlib.h") and have_library("z", "compress", "zlib.h")
+  declare_binary_library('Flate', "Flate/*.c")
+else
+  puts "zlib was not found or could not be linked against, using private copy"
+  declare_binary_library('Flate', "Flate/**/*.c")
+end  
 
-If that doesn't solve your problem, please report it on the Tioga tracker:
+# # we check the presence of zlib library
+# unless have_header("zlib.h") and have_library("z", "compress", "zlib.h")
+#   puts <<"EON"
+# Error: you should have zlib (including development files) installed to
+# build and run Tioga. You can get it there:
+
+#   http://www.zlib.net/
+
+# If that doesn't solve your problem, please report it on the Tioga tracker:
  
-  http://rubyforge.org/tracker/?group_id=701
+#   http://rubyforge.org/tracker/?group_id=701
 
-EON
-  exit 1 
-end
+# EON
+#   exit 1 
+# end
 
 unless have_header("ieee754.h")
   puts "You lack the ieee754.h header file, which might mean lower " +
