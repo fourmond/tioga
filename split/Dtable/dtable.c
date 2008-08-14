@@ -1915,8 +1915,7 @@ PUBLIC void Init_Dtable() {
    RB_EXPORT_SYMBOL(cDtable, Dtable_Ptr);
 
    /* now we import the symbols from Dvector */
-
-   VALUE cDvector = rb_define_class_under(mDobjects, "Dvector", rb_cObject);
+   VALUE cDvector = rb_const_get(mDobjects, rb_intern("Dvector"));
    RB_IMPORT_SYMBOL(cDvector, Dvector_Create);
    RB_IMPORT_SYMBOL(cDvector, Dvector_Data_Resize);
    RB_IMPORT_SYMBOL(cDvector, Dvector_Data_Replace);
