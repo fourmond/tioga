@@ -305,18 +305,21 @@ EOD
     def two_yaxes_with_legends
       read_data
       t.do_box_labels('Same X, Different Y\'s', 'Position', nil)
+      t.legend_text_dy = 1.2
       t.show_plot_with_legend('legend_left_margin' => 0.65,
                               'plot_scale' => 1,
                               'legend_scale' => 1.3,
                               'plot_right_margin' => 0) { 
-        t.subplot {
+        # NOTE: use subfigure rather than subplot to get combined legend info
+        # subplot would be correct if each had its own legend
+        t.subfigure {
           t.yaxis_loc = t.ylabel_side = LEFT;
           t.right_edge_type = AXIS_HIDDEN; 
           t.show_plot(plot_boundaries(@positions,@blues,@margin,-1,1)) {
             t.show_polyline(@positions,@blues,Blue,'Blues')
           }
         }
-        t.subplot {
+        t.subfigure {
           t.yaxis_loc = t.ylabel_side = RIGHT;
           t.left_edge_type = AXIS_HIDDEN; 
           t.show_plot(plot_boundaries(@positions,@reds,@margin,-1,1)) {
