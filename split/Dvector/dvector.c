@@ -1974,6 +1974,53 @@ VALUE dvector_delete_at_m(VALUE ary, VALUE pos) {
 PRIVATE
 /*
  *  call-seq:
+ *     dvector.prune(lst)  -> dvector
+ *  
+ *  Creates a new dvector without the entries given by the indexes in _lst_.
+ *     
+ *     a = Dvector.new(5) {|i| i*3 }    -> [0, 3, 6, 9, 12]
+ *     a.prune([0, 2])                  -> [3, 9, 12]
+ *     a                                -> [0, 3, 6, 9, 12]
+ */ 
+VALUE dvector_prune(VALUE ary, VALUE lst) {
+   ary = dvector_dup(ary);
+   dvector_prune_bang(ary, lst);
+   return ary;
+}
+
+PRIVATE
+/*
+ *  call-seq:
+ *     dvector.prune!(lst)  -> dvector
+ *  
+ *  Modifies the dvector by removing the entries given by the indexes in _lst_.
+ *     
+ *     a = Dvector.new(5) {|i| i*3 }    -> [0, 3, 6, 9, 12]
+ *     a.prune!([0, 2])                 -> [3, 9, 12]
+ *     a                                -> [3, 9, 12]
+ */ 
+VALUE dvector_prune_bang(VALUE ary, VALUE lst) {
+   Dvector *d;
+   d = dvector_modify(ary);
+   int i, lst_len, ary_len, pos, j;
+   VALUE *lst_ptr;
+   lst = rb_Array(lst);
+   lst_ptr = RARRAY(lst)->ptr;
+   lst_len = RARRAY(lst)->len;
+   for (i = lst_len-1; i >= 0; i--) {
+      ary_len = d->len;
+      pos = NUM2INT(lst_ptr[i]);  // remove this one from ary
+      for (j = pos+1; j < ary_len; j++, pos++) {
+         d->ptr[pos] = d->ptr[j];
+      }
+      d->len = pos;
+   }
+   return ary;
+}
+
+PRIVATE
+/*
+ *  call-seq:
  *     dvector.slice!(int)         -> number or nil
  *     dvector.slice!(start, length) -> sub_vector or nil
  *     dvector.slice!(range)         -> sub_vector or nil 
@@ -1999,7 +2046,8 @@ PRIVATE
 VALUE dvector_slice_bang(int argc, VALUE *argv, VALUE ary) {
    VALUE arg1, arg2;
    long pos, len;
-   Dvector *d = Get_Dvector(ary);
+   Dvector *d;
+   d = dvector_modify(ary);
    if (rb_scan_args(argc, argv, "11", &arg1, &arg2) == 2) {
       pos = NUM2LONG(arg1);
       len = NUM2LONG(arg2);
@@ -5543,6 +5591,8 @@ void Init_Dvector() {
    rb_define_method(cDvector, "sort!", dvector_sort_bang, 0);
    rb_define_method(cDvector, "collect", dvector_collect, 0);
    rb_define_method(cDvector, "collect!", dvector_collect_bang, 0);
+   rb_define_method(cDvector, "prune", dvector_prune, 1);
+   rb_define_method(cDvector, "prune!", dvector_prune_bang, 1);
    rb_define_alias(cDvector,  "map", "collect");
    rb_define_alias(cDvector,  "map!", "collect!");
    rb_define_method(cDvector, "dup", dvector_dup, 0);

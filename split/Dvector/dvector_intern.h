@@ -110,6 +110,8 @@ PRIVATE VALUE dvector_values_at(int argc, VALUE *argv, VALUE ary);
 PRIVATE VALUE dvector_select(VALUE ary);
 PRIVATE VALUE dvector_delete(VALUE ary, VALUE item);
 PRIVATE VALUE dvector_delete_at(VALUE ary, long pos);
+PRIVATE VALUE dvector_prune(VALUE ary, VALUE pos);
+PRIVATE VALUE dvector_prune_bang(VALUE ary, VALUE pos);
 PRIVATE VALUE dvector_slice_bang(int argc, VALUE *argv, VALUE ary);
 PRIVATE VALUE dvector_reject_bang(VALUE ary);
 PRIVATE VALUE dvector_reject(VALUE ary);

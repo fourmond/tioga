@@ -599,6 +599,30 @@ class TestDvector < Test::Unit::TestCase
         assert_equal(nil, @dv.delete_at(20))
     end
     
+    def test_prune
+        @dv = Dvector.new(5) {|i| i*3 }
+        assert_equal(6, @dv[2])
+        assert_equal(5, @dv.length)
+        x = @dv.prune([0,2])
+        assert_equal(3, x.length)
+        assert_equal(5, @dv.length)
+        assert_equal(3, x[0])
+        assert_equal(9, x[1])
+    end
+    
+    def test_prune_bang
+        @dv = Dvector.new(5) {|i| i*3 }
+        assert_equal(6, @dv[2])
+        assert_equal(5, @dv.length)
+        x = @dv.prune!([0,2])
+        assert_equal(3, x.length)
+        assert_equal(3, @dv.length)
+        assert_equal(3, x[0])
+        assert_equal(9, x[1])
+        assert_equal(@dv[0], x[0])
+        assert_equal(@dv[1], x[1])
+    end
+    
     def test_slice!
         a = Dvector.new(5) {|i| i*3 }
         assert_equal(3, a.slice!(1)) 
