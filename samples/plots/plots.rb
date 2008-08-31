@@ -49,6 +49,7 @@ class MyPlots
         t.def_figure("Reds_and_Blues") { reds_blues }
         t.def_figure("Legend_Inside") { legend_inside }
         t.def_figure("Legend_Outside") { legend_outside }
+        t.def_figure("Legend_Inside_with_Background") { legend_inside_with_background }
         t.def_figure("Inset") { inset }
         t.def_figure("French_Decimal_Separator") { french_decimal_separator }
         t.def_figure("Column_Triplets") { column_triplets }
@@ -83,9 +84,11 @@ class MyPlots
         t.model_number = -1
         
         t.def_enter_page_function { enter_page }
-            
+
+        # Uncomment the followiing line if you want tioga to leave
+        # its temporary files behind.
         t.autocleanup = false
-        
+            
     end
     
     def enter_page
@@ -384,6 +387,29 @@ EOD
             'legend_scale' => 1.3,
             'plot_right_margin' => 0) { reds_blues }
     end
+
+
+    def legend_inside_with_background
+        read_data
+        show_model_number
+        t.show_plot_with_legend(
+            'legend_left_margin' => 0.5,
+            'legend_top_margin' => 0.3,
+            'plot_scale' => 1,
+            'legend_scale' => 1.3,
+            'plot_right_margin' => 0) { 
+        # First, the plot:
+        reds_blues 
+        
+        # Then, a background rectangle for the legend
+        t.context do 
+          t.fill_color = White
+          t.fill_opacity = 0.7
+          t.fill_rect(3.2,-0.2, 2.3, 0.5)
+        end
+      }
+    end
+
     
     def legend_outside
         read_data
