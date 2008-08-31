@@ -43,6 +43,7 @@ class MyPlots
         t.def_figure("Log_Reds") { log_reds }
         t.def_figure("Side_by_Side") { side_by_side }
         t.def_figure("Two_Ys") { two_yaxes }
+        t.def_figure("Three_Ys") { three_yaxes }
         t.def_figure("Legends") { legends }
         t.def_figure("Two_Ys_with_Legends") { two_yaxes_with_legends }
         t.def_figure("Reds_and_Blues") { reds_blues }
@@ -83,6 +84,8 @@ class MyPlots
         
         t.def_enter_page_function { enter_page }
             
+        t.autocleanup = false
+        
     end
     
     def enter_page
@@ -291,13 +294,55 @@ EOD
     
     def two_yaxes
         read_data
-        t.do_box_labels('Same X, Different Y\'s', 'Position', nil)
+        t.do_box_labels('Same X, 2 Different Y\'s', 'Position', nil)
         t.subplot {
             t.yaxis_loc = t.ylabel_side = LEFT;
             t.right_edge_type = AXIS_HIDDEN; reds }
         t.subplot {
             t.yaxis_loc = t.ylabel_side = RIGHT;
             t.left_edge_type = AXIS_HIDDEN; greens }
+        show_model_number
+    end
+    
+    def three_yaxes
+        read_data
+        t.rescale(0.75)
+        t.ylabel_shift = 1.4
+        t.set_subframe('right_margin' => 0.3, 'top_margin' => 0.1, 'bottom_margin' => 0.1)
+        t.do_box_labels('Same X, 3 Different Y\'s', 'Position', nil)
+        t.subplot {
+            t.yaxis_loc = t.ylabel_side = LEFT;
+            t.right_edge_type = AXIS_HIDDEN
+            reds 
+        }
+        t.subplot {
+            t.yaxis_loc = t.ylabel_side = RIGHT;
+            t.left_edge_type = AXIS_HIDDEN
+            greens
+        }
+
+        t.context do 
+            xs = @positions
+            ys = @blues
+            bounds = plot_boundaries(xs,ys.mul(2),@margin,-1,1)
+            left_boundary = bounds[0]
+            right_boundary = bounds[1]
+            top_boundary = bounds[2]
+            bottom_boundary = bounds[3]
+            dx = right_boundary - left_boundary
+            t.set_bounds(bounds)
+            t.show_polyline(xs,ys,Blue)
+            spec = {
+                'ticks_outside' => false,
+                'ticks_inside' => true,
+                'from' => [right_boundary + 0.3*dx, top_boundary],
+                'to' => [right_boundary + 0.3*dx, bottom_boundary],
+            }
+            t.show_axis(spec)
+            t.yaxis_loc = t.ylabel_side = RIGHT
+            t.ylabel_shift = 5
+            t.show_ylabel('\textcolor[rgb]{0,0,1}{Blues}')
+        end
         show_model_number
     end
 
