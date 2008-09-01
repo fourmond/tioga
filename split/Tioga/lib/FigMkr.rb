@@ -243,6 +243,7 @@ class FigureMaker
             'plot_left_margin' => 0.0,
             'plot_right_margin' => 0.18,
             'plot_scale' => 1,
+            'legend_background_function' => false,
             'legend_scale' => 1 }
         
         @marker_defaults = { 
@@ -625,6 +626,7 @@ class FigureMaker
       'marker_scale' => nil,
     }
 
+
     def save_legend_info(arg)
         if arg.kind_of?String
             dict = { 'text' => arg }
@@ -639,8 +641,9 @@ class FigureMaker
         end
         @legend_info << dict
     end
+    
 
-    def show_legend
+    def show_legend(legend_background_function)
         char_dx = self.default_text_height_dx
         char_dy = self.default_text_height_dy
         line_ht_x = char_dx * self.legend_scale
@@ -661,6 +664,14 @@ class FigureMaker
         line_x1 = self.legend_line_x1*line_ht_x
         line_dy = self.legend_line_dy*line_ht_y
         self.label_left_margin = self.label_right_margin = self.label_top_margin = self.label_bottom_margin = -1e99
+        unless legend_background_function == nil || legend_background_function == false
+           ybot = y
+           @legend_info.each do |dict|
+                dy = dict['dy']; dy = 1 if dy == nil
+                ybot -= line_ht_y * dy
+           end
+           legend_background_function.call([ 0, xright, (1 + y + line_ht_y)/2, ybot ])
+        end
         @legend_info.each do |dict|
             text = dict['text']
             if text != nil
@@ -1174,7 +1185,7 @@ class FigureMaker
     @@keys_for_show_plot_with_legend = FigureMaker.make_name_lookup_hash([
         'legend_top_margin', 'legend_bottom_margin', 'legend_left_margin', 'legend_right_margin',
         'plot_top_margin', 'plot_bottom_margin', 'plot_left_margin', 'plot_right_margin',
-        'plot_scale', 'legend_scale' ])
+        'plot_scale', 'legend_scale', 'legend_background_function' ])
     def show_plot_with_legend(dict=nil, &cmd)
         check_dict(dict, @@keys_for_show_plot_with_legend, 'show_plot_with_legend') if dict != nil
         legend_top_margin = get_if_given_else_use_default_dict(dict, 'legend_top_margin', @legend_defaults)
@@ -1187,13 +1198,14 @@ class FigureMaker
         plot_left_margin = get_if_given_else_use_default_dict(dict, 'plot_left_margin', @legend_defaults)
         plot_right_margin = get_if_given_else_use_default_dict(dict, 'plot_right_margin', @legend_defaults)
         plot_scale = get_if_given_else_use_default_dict(dict, 'plot_scale', @legend_defaults)
+        legend_background_function = get_if_given_else_default(dict, 'legend_background_function', nil)
         reset_legend_info
         rescale(plot_scale)
         subplot([plot_left_margin, plot_right_margin, plot_top_margin, plot_bottom_margin]) { cmd.call(self) }
         set_subframe([legend_left_margin, legend_right_margin, legend_top_margin, legend_bottom_margin])
         rescale(legend_scale) # note that legend_scale is an addition to the plot_scale, not a replacement
         @pr_margin = plot_right_margin
-        show_legend
+        show_legend(legend_background_function)
     end
     
     def append_points_with_gaps_to_path(xs, ys, gaps, close_subpaths = false)

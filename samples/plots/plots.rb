@@ -382,9 +382,11 @@ EOD
         read_data
         show_model_number
         t.show_plot_with_legend(
-            'legend_left_margin' => 0.65,
+            'legend_top_margin' => 0.60,
+            'legend_left_margin' => 0.05,
             'plot_scale' => 1,
             'legend_scale' => 1.3,
+            'legend_background_function' => lambda { |bnds| do_legend_background(bnds) },
             'plot_right_margin' => 0) { reds_blues }
     end
 
@@ -409,6 +411,21 @@ EOD
         end
       }
     end
+
+    
+      
+    def do_legend_background(bnds)
+        t.fill_color = Teal
+        t.fill_opacity = 0.4
+        left = bnds[0]
+        right = 0.35 #bnds[1]
+        top = 0.85 # bnds[2]
+        bot = 0.25 #bnds[3]
+        t.fill_rounded_rect(left, bot, right-left, top-bot, 0.03, 0.03)
+        t.stroke_color = Black
+        t.stroke_width = 0.7
+        t.stroke_rounded_rect(left, bot, right-left, top-bot, 0.03, 0.03)
+    end 
 
     
     def legend_outside
