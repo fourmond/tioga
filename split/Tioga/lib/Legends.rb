@@ -25,10 +25,14 @@ class Legends < Doc < FigureMaker
     end
 
 # :call-seq:
-#               show_legend                         
+#               show_legend(legend_background_function=nil)                        
 #                   
-# Shows the legend in the current frame.
-    def show_legend
+# Shows the legend in the current frame.  If given a function arguement,
+# it calls the function with bounds [left, right, top, bottom] for the
+# rectangle where the legend will be shown.  You can use this opportunity
+# to provide a background for the legend info and a frame around it too
+# if you'd like.
+    def show_legend(legend_background_function=nil)
     end
 
 =begin rdoc

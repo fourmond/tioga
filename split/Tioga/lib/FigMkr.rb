@@ -643,7 +643,7 @@ class FigureMaker
     end
     
 
-    def show_legend(legend_background_function)
+    def show_legend(legend_background_function=nil)
         char_dx = self.default_text_height_dx
         char_dy = self.default_text_height_dy
         line_ht_x = char_dx * self.legend_scale
