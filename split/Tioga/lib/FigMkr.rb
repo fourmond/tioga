@@ -668,19 +668,33 @@ class FigureMaker
             end
         end
         xright = x + ltw*line_ht_x
+
         y = 1.0 - self.legend_text_ystart*line_ht_y
         update_bbox(xright, y)
         line_x0 = self.legend_line_x0*line_ht_x
         line_x1 = self.legend_line_x1*line_ht_x
         line_dy = self.legend_line_dy*line_ht_y
+
+        # If we are measuring legends, we come up with a more
+        # accurate version of xright:
+        if @measure_legends
+          xright = x + convert_output_to_figure_dx(legend_text_width)
+          xright += line_x0     # To leave a symetric space around
+          # the legend !
+        end
+
         self.label_left_margin = self.label_right_margin = self.label_top_margin = self.label_bottom_margin = -1e99
         unless legend_background_function == nil || legend_background_function == false
            ybot = y
-           @legend_info.each do |dict|
+          # we need to remove the first element ;-)...
+           @legend_info[1..-1].each do |dict|
                 dy = dict['dy']; dy = 1 if dy == nil
                 ybot -= line_ht_y * dy
            end
-           legend_background_function.call([ 0, xright, (1 + y + line_ht_y)/2, ybot ])
+           # We add half a line below to look good
+           ybot -= line_ht_y * 0.5
+           ytop = y + @legend_info.first['dy'] * line_ht_y * 0.5
+           legend_background_function.call([ 0, xright, ytop, ybot ])
         end
         legend_index = 0
         @legend_info.each do |dict|
@@ -724,75 +738,19 @@ class FigureMaker
         end
     end
 
-    # Returns the bounding box of the the legend in
-    # output coordinates
-    def legend_bounding_box_output
+    # Returns the exact length of the text width in output
+    # coordinates
+    def legend_text_width
       index = 0
-      xtl = nil 
-      ytl = nil
-      ybr = nil
-      xbr = nil
+      width = 0.0
       while h = get_text_size("legend-#{index}") and h.key?('width')
-        if ! xtl                # First time
-          xtl = h['xtl']
-          ytl = h['ytl']
-          ybr = h['ybr']
-          xbr = h['xbr']
-        else
-          if h['xbr'] > xbr
-            xbr = h['xbr']
-          end
-          if h['ybr'] < ybr
-            ybr = h['ybr']
-          end
+        if width < h['width'] 
+          width = h['width'] 
         end
         index += 1
       end
-
-      if xtl
-        # We remove legend_text_xstart - legend_line_x0
-        dx = (legend_text_xstart - legend_line_x0) * default_text_height_dx
-
-        return [10 * xtl - convert_figure_to_output_dx(dx), 10 * ytl, 
-                10 * xbr, 10 * ybr]
-      else
-        # First time with no measurements...
-        return [0, 1, 0, 1]
-      end
+      return 10 * width
     end
-
-    def legend_bounding_box_page
-      bbox = legend_bounding_box_output
-      return [
-              convert_output_to_page_x(bbox[0]),
-              convert_output_to_page_y(bbox[1]),
-              convert_output_to_page_x(bbox[2]),
-              convert_output_to_page_y(bbox[3])
-             ]
-    end
-
-    def legend_bounding_box_frame
-      bbox = legend_bounding_box_page
-      return [
-              convert_page_to_frame_x(bbox[0]),
-              convert_page_to_frame_y(bbox[1]),
-              convert_page_to_frame_x(bbox[2]),
-              convert_page_to_frame_y(bbox[3])
-             ]
-    end
-
-
-    # Returns the bounding box of the the legend in figure coordinates
-    def legend_bounding_box_figure
-      bbox = legend_bounding_box_frame
-      return [
-              convert_frame_to_figure_x(bbox[0]),
-              convert_frame_to_figure_y(bbox[1]),
-              convert_frame_to_figure_x(bbox[2]),
-              convert_frame_to_figure_y(bbox[3])
-             ]
-    end
-
 
     def legend_height
         height = 0.0

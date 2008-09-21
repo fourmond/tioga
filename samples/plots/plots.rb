@@ -422,20 +422,10 @@ EOD
             'legend_top_margin' => 0.3,
             'plot_scale' => 1,
             'legend_scale' => 1.3,
+            'legend_background_function' => lambda { 
+                                  |bnds| do_real_legend_background(bnds) },
             'plot_right_margin' => 0) { 
-        # First, the plot:
         reds_blues 
-        legend_bbox = t.legend_bounding_box_figure
-        p legend_bbox
-        
-        # Then, a background rectangle for the legend
-        t.context do 
-          t.fill_color = Red
-          t.fill_opacity = 0.7
-          t.fill_rect(legend_bbox[0], legend_bbox[1],
-                      legend_bbox[2] - legend_bbox[0], 
-                      legend_bbox[3] - legend_bbox[1])
-        end
       }
     end
 
@@ -448,6 +438,19 @@ EOD
         right = 0.35 #bnds[1]
         top = 0.85 # bnds[2]
         bot = 0.25 #bnds[3]
+        t.fill_rounded_rect(left, bot, right-left, top-bot, 0.03, 0.03)
+        t.stroke_color = Black
+        t.stroke_width = 0.7
+        t.stroke_rounded_rect(left, bot, right-left, top-bot, 0.03, 0.03)
+    end 
+
+    def do_real_legend_background(bnds)
+        t.fill_color = Teal
+        t.fill_opacity = 0.4
+        left = bnds[0]
+        right = bnds[1]
+        top =  bnds[2]
+        bot = bnds[3]
         t.fill_rounded_rect(left, bot, right-left, top-bot, 0.03, 0.03)
         t.stroke_color = Black
         t.stroke_width = 0.7
