@@ -64,7 +64,7 @@ custom_rule("Tioga/lib/TexPreamble.rb",
 
 
 # Conditional use of embedded zlib
-if false and have_header("zlib.h") and have_library("z", "compress", "zlib.h")
+if have_header("zlib.h") and have_library("z", "compress", "zlib.h")
   declare_binary_library('Flate', "Flate/*.c")
 else
   puts "zlib was not found or could not be linked against, using private copy"
