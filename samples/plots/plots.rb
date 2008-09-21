@@ -50,6 +50,7 @@ class MyPlots
         t.def_figure("Legend_Inside") { legend_inside }
         t.def_figure("Legend_Outside") { legend_outside }
         t.def_figure("Legend_Inside_with_Background") { legend_inside_with_background }
+        t.def_figure("Legend_Inside_with_Background_using_legend_bounding_box") { legend_inside_with_background_using_legend_bbox }
         t.def_figure("Inset") { inset }
         t.def_figure("French_Decimal_Separator") { french_decimal_separator }
         t.def_figure("Column_Triplets") { column_triplets }
@@ -408,6 +409,32 @@ EOD
           t.fill_color = White
           t.fill_opacity = 0.7
           t.fill_rect(3.2,-0.2, 2.3, 0.5)
+        end
+      }
+    end
+
+    def legend_inside_with_background_using_legend_bbox
+        read_data
+        show_model_number
+        t.measure_legends = true
+        t.show_plot_with_legend(
+            'legend_left_margin' => 0.5,
+            'legend_top_margin' => 0.3,
+            'plot_scale' => 1,
+            'legend_scale' => 1.3,
+            'plot_right_margin' => 0) { 
+        # First, the plot:
+        reds_blues 
+        legend_bbox = t.legend_bounding_box_figure
+        p legend_bbox
+        
+        # Then, a background rectangle for the legend
+        t.context do 
+          t.fill_color = Red
+          t.fill_opacity = 0.7
+          t.fill_rect(legend_bbox[0], legend_bbox[1],
+                      legend_bbox[2] - legend_bbox[0], 
+                      legend_bbox[3] - legend_bbox[1])
         end
       }
     end

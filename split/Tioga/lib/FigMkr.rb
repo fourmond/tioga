@@ -142,7 +142,7 @@ class FigureMaker
     
     attr_accessor :num_error_lines
 
-    # Whether or not to create +save_dir+ if it doesn't exist
+    # Whether or not to create _save_dir_ if it doesn't exist
     attr_accessor :create_save_dir
 
     # Whether or not do do automatic cleanup of the files
@@ -153,6 +153,13 @@ class FigureMaker
 
     # An accessor for @measures_info:
     attr_accessor :measures_info
+
+
+
+    # If we want to use #legend_bounding_box. It is off by default
+    # as it causes a systematic second run of pdflatex.
+    attr_accessor :measure_legends
+
 
     # old preview attributes -- to be removed later
     
@@ -294,6 +301,9 @@ class FigureMaker
 
         # We *must* initialize the measures_info hash.
         @measures_info = {}
+
+        # We don't measure legends by default.
+        @measure_legends = false
     end
     
 
@@ -672,13 +682,20 @@ class FigureMaker
            end
            legend_background_function.call([ 0, xright, (1 + y + line_ht_y)/2, ybot ])
         end
+        legend_index = 0
         @legend_info.each do |dict|
             text = dict['text']
             if text != nil
-                show_text('text' => text,
-                    'x' => x, 'y' => y, 'scale' => self.legend_scale,
-                    'justification' => self.legend_justification,
-                    'alignment' => self.legend_alignment)
+                # We prepare a dictionnary:
+                dct = { 'text' => text,
+                         'x' => x, 'y' => y, 'scale' => self.legend_scale,
+                         'justification' => self.legend_justification,
+                         'alignment' => self.legend_alignment }
+                if @measure_legends
+                  dct['measure'] = "legend-#{legend_index}"
+                  legend_index += 1
+                end
+                show_text(dct)
             end
             line_width = dict['line_width']
             line_type = dict['line_type']
@@ -706,6 +723,76 @@ class FigureMaker
             y -= line_ht_y * dy
         end
     end
+
+    # Returns the bounding box of the the legend in
+    # output coordinates
+    def legend_bounding_box_output
+      index = 0
+      xtl = nil 
+      ytl = nil
+      ybr = nil
+      xbr = nil
+      while h = get_text_size("legend-#{index}") and h.key?('width')
+        if ! xtl                # First time
+          xtl = h['xtl']
+          ytl = h['ytl']
+          ybr = h['ybr']
+          xbr = h['xbr']
+        else
+          if h['xbr'] > xbr
+            xbr = h['xbr']
+          end
+          if h['ybr'] < ybr
+            ybr = h['ybr']
+          end
+        end
+        index += 1
+      end
+
+      if xtl
+        # We remove legend_text_xstart - legend_line_x0
+        dx = (legend_text_xstart - legend_line_x0) * default_text_height_dx
+
+        return [10 * xtl - convert_figure_to_output_dx(dx), 10 * ytl, 
+                10 * xbr, 10 * ybr]
+      else
+        # First time with no measurements...
+        return [0, 1, 0, 1]
+      end
+    end
+
+    def legend_bounding_box_page
+      bbox = legend_bounding_box_output
+      return [
+              convert_output_to_page_x(bbox[0]),
+              convert_output_to_page_y(bbox[1]),
+              convert_output_to_page_x(bbox[2]),
+              convert_output_to_page_y(bbox[3])
+             ]
+    end
+
+    def legend_bounding_box_frame
+      bbox = legend_bounding_box_page
+      return [
+              convert_page_to_frame_x(bbox[0]),
+              convert_page_to_frame_y(bbox[1]),
+              convert_page_to_frame_x(bbox[2]),
+              convert_page_to_frame_y(bbox[3])
+             ]
+    end
+
+
+    # Returns the bounding box of the the legend in figure coordinates
+    def legend_bounding_box_figure
+      bbox = legend_bounding_box_frame
+      return [
+              convert_frame_to_figure_x(bbox[0]),
+              convert_frame_to_figure_y(bbox[1]),
+              convert_frame_to_figure_x(bbox[2]),
+              convert_frame_to_figure_y(bbox[3])
+             ]
+    end
+
 
     def legend_height
         height = 0.0
@@ -1199,13 +1286,17 @@ class FigureMaker
         plot_right_margin = get_if_given_else_use_default_dict(dict, 'plot_right_margin', @legend_defaults)
         plot_scale = get_if_given_else_use_default_dict(dict, 'plot_scale', @legend_defaults)
         legend_background_function = get_if_given_else_default(dict, 'legend_background_function', nil)
+        @legend_subframe = [legend_left_margin, legend_right_margin, 
+                            legend_top_margin, legend_bottom_margin]
         reset_legend_info
         rescale(plot_scale)
         subplot([plot_left_margin, plot_right_margin, plot_top_margin, plot_bottom_margin]) { cmd.call(self) }
-        set_subframe([legend_left_margin, legend_right_margin, legend_top_margin, legend_bottom_margin])
+        # We temporary store the legend information in @legend_subframes
+        set_subframe(@legend_subframe)
         rescale(legend_scale) # note that legend_scale is an addition to the plot_scale, not a replacement
         @pr_margin = plot_right_margin
         show_legend(legend_background_function)
+        @legend_subframe = nil
     end
     
     def append_points_with_gaps_to_path(xs, ys, gaps, close_subpaths = false)
