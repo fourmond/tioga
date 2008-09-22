@@ -898,6 +898,8 @@ static VALUE function_primitive(VALUE self)
 /*
   Computes the derivative of the Function and returns it as a new Function.
   The newly created function shares the X vector with the previous one.
+
+  WARNING: this is a very naive 3-points algorithm.
 */
 static VALUE function_derivative(VALUE self)
 {

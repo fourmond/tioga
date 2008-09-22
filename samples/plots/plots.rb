@@ -50,7 +50,7 @@ class MyPlots
         t.def_figure("Legend_Inside") { legend_inside }
         t.def_figure("Legend_Outside") { legend_outside }
         t.def_figure("Legend_Inside_with_Background") { legend_inside_with_background }
-        t.def_figure("Legend_Inside_with_Background_using_legend_bounding_box") { legend_inside_with_background_using_legend_bbox }
+        t.def_figure("Legend_Inside_with_Background_using_legend_background") { legend_inside_with_background_using_legend_background }
         t.def_figure("Inset") { inset }
         t.def_figure("French_Decimal_Separator") { french_decimal_separator }
         t.def_figure("Column_Triplets") { column_triplets }
@@ -413,7 +413,7 @@ EOD
       }
     end
 
-    def legend_inside_with_background_using_legend_bbox
+    def legend_inside_with_background_using_legend_background
         read_data
         show_model_number
         t.measure_legends = true

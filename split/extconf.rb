@@ -71,6 +71,8 @@ else
   declare_binary_library('Flate', "Flate/**/*.c")
 end  
 
+add_include_path("Flate/include")
+
 # # we check the presence of zlib library
 # unless have_header("zlib.h") and have_library("z", "compress", "zlib.h")
 #   puts <<"EON"
