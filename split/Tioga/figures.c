@@ -230,6 +230,10 @@ FM *Get_FM(OBJ_PTR fmkr, int *ierr) {
    RO_BOOL_ATTR(left_edge_visible)
    INT_ATTR(right_edge_type)
    RO_BOOL_ATTR(right_edge_visible)
+
+/* Major ticks picking algorithm */
+   BOOL_ATTR(vincent_or_bill)
+
     
 /* Legend */
    DBL_ATTR(legend_text_width)
@@ -620,6 +624,10 @@ void Init_FigureMaker(void) {
    attr_reader(left_edge_visible)
    attr_accessors(right_edge_type)
    attr_reader(right_edge_visible)
+
+
+/* Major ticks algorithm */
+   attr_accessors(vincent_or_bill)
     
 /* Legend */
    attr_accessors(legend_text_width)

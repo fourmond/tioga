@@ -281,7 +281,10 @@ typedef struct {
     bool left_edge_visible;
     int right_edge_type;
     bool right_edge_visible;
-    
+
+    /* General axis stuff*/
+    bool vincent_or_bill;
+
     /* Legend */
     // units are text heights for x and y for locations and sizes
     double legend_line_x0; // x location of start of line

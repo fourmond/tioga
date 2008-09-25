@@ -78,6 +78,13 @@ class MyPlots
 
         t.def_figure("Greens_clipped") { greens_clipped }
 
+        t.def_figure("Blues_far_off") { blues_far_off }
+        t.def_figure("Blues_far_off_vincent") { 
+          t.vincent_or_bill = true
+          blues_far_off 
+        }
+
+
 
         # Starting to play with axes specifications
         t.def_figure("Axes_fun") { axes_fun }
@@ -171,6 +178,30 @@ EOD
         xs = @positions
         ys = @blues
         t.show_plot(plot_boundaries(xs,ys,@margin,-1,1)) { 
+            t.show_grid(opts)
+            t.show_polyline(xs,ys,Blue) }
+    end
+
+    def blues_far_off(opts={})
+        opts = {
+          'major_grid' => false,
+          'minor_grid' => false,
+        }.merge(opts)
+        read_data
+        t.title_color = Crimson
+        t.do_box_labels('(shifted) Blues Plot ' + if t.vincent_or_bill
+                                                    '(Vincent)'
+                                                  else
+                                                    '(Bill)'
+                                                  end,
+                        'Position', '\textcolor[rgb]{0,0,1}{Blues}')
+        show_model_number
+        xs = @positions
+        ys = @blues
+        xs *= 0.1
+        xs += 100
+        ys *= 6
+        t.show_plot(plot_boundaries(xs,ys,@margin,-6,6)) { 
             t.show_grid(opts)
             t.show_polyline(xs,ys,Blue) }
     end

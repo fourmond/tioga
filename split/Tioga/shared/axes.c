@@ -81,6 +81,9 @@ typedef struct {
    int num_minors; // number of minor intervals
    double interval; // tick interval
    int location;
+   bool vincent_or_bill; 	/* True if we use Vincent's algorithm
+				   for picking major ticks
+				*/
 } PlotAxis;
 
 static void figure_moveto(OBJ_PTR fmkr, FM *p, double x, double y, int *ierr) // figure coords
@@ -147,6 +150,8 @@ static void Get_xaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
    s->numeric_label_justification = p->xaxis_numeric_label_justification;
    s->numeric_label_frequency = p->xaxis_numeric_label_frequency;
    s->numeric_label_phase = p->xaxis_numeric_label_phase;
+
+   s->vincent_or_bill = p->vincent_or_bill;
 }
 
 static void Get_yaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
@@ -184,6 +189,8 @@ static void Get_yaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
    s->numeric_label_justification = p->yaxis_numeric_label_justification;
    s->numeric_label_frequency = p->yaxis_numeric_label_frequency;
    s->numeric_label_phase = p->yaxis_numeric_label_phase;
+
+   s->vincent_or_bill = p->vincent_or_bill;
 }
 
 /*======================================================================*/
@@ -474,35 +481,6 @@ static char **Get_Labels(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
    return labels;
 }
          
-static double *Pick_Locations_for_Major_Ticks(double interval, 
-   double axis_min, double axis_max, int *num_locations, int *ierr)
-{
-   double next_tick, prev_tick, starting_tick;
-   double *majors;
-   int nmajors, i;
-   while (true) {
-       nmajors = 0;
-       starting_tick = interval * floor(axis_min / interval);
-       if (starting_tick == axis_min) starting_tick -= interval;
-       prev_tick = starting_tick;
-       while (true) {
-          next_tick = prev_tick + interval;
-          if (next_tick > axis_max) break;
-          nmajors++;
-          prev_tick = next_tick;
-       }
-       if (nmajors > 1) break;
-       interval *= 0.5;
-   }
-   majors = ALLOC_N_double(nmajors);
-   prev_tick = starting_tick;
-   for (i=0; i < nmajors; i++) {
-      majors[i] = prev_tick += interval;
-   }
-   *num_locations = nmajors;
-   return majors;
-}
-
 static int Pick_Number_of_Minor_Intervals(double length, int *ierr)
 {
    double t1, fuzz, newlen;
@@ -533,6 +511,39 @@ static int Pick_Number_of_Minor_Intervals(double length, int *ierr)
       else if (newlen > 1.5) num_subintervals = 5;
    }
    return num_subintervals;
+}
+
+/* Refactoring of the axis location picking code */
+
+/* First, Bill's point of view */
+
+static double *Pick_Locations_for_Major_Ticks(double interval, 
+   double axis_min, double axis_max, int *num_locations, int *ierr)
+{
+   double next_tick, prev_tick, starting_tick;
+   double *majors;
+   int nmajors, i;
+   while (true) {
+       nmajors = 0;
+       starting_tick = interval * floor(axis_min / interval);
+       if (starting_tick == axis_min) starting_tick -= interval;
+       prev_tick = starting_tick;
+       while (true) {
+          next_tick = prev_tick + interval;
+          if (next_tick > axis_max) break;
+          nmajors++;
+          prev_tick = next_tick;
+       }
+       if (nmajors > 1) break;
+       interval *= 0.5;
+   }
+   majors = ALLOC_N_double(nmajors);
+   prev_tick = starting_tick;
+   for (i=0; i < nmajors; i++) {
+      majors[i] = prev_tick += interval;
+   }
+   *num_locations = nmajors;
+   return majors;
 }
 
 static void Pick_Major_Tick_Interval(OBJ_PTR fmkr, FM *p, 
@@ -573,6 +584,76 @@ static void Pick_Major_Tick_Interval(OBJ_PTR fmkr, FM *p,
    }
 }
 
+static double * pick_major_ticks_positions_Bill(OBJ_PTR fmkr, FM *p, 
+						double axis_min, 
+						double axis_max, 
+						int *num_locations, 
+						double tick_min, 
+						double tick_gap, 
+						double length, 
+						bool log_vals, 
+						double *tick,
+						int *ierr)
+{
+   /* This code is using Bill's initial implementation */
+   Pick_Major_Tick_Interval(fmkr, p, tick_min, tick_gap, 
+			    length, log_vals, tick, ierr);
+   /*    printf("Tick gap: %f, length: %f, tick_min: %f, tick interval: %f\n", */
+   /* 	  tick_gap, length, tick_min, *tick); */
+   if (*ierr != 0) 
+      return NULL;
+   return Pick_Locations_for_Major_Ticks(*tick, axis_min, axis_max, 
+					 num_locations, ierr);
+}
+
+/* Then, Vincent's point of view ;-) ... */
+
+static double natural_distances[] = { 1.0, 2.0, 2.5, 5.0, 10.0 };
+const int nb_natural_distances = sizeof(natural_distances)/sizeof(double);
+
+static double * pick_major_ticks_positions_Vincent(OBJ_PTR fmkr, FM *p, 
+				   double axis_min, 
+				   double axis_max, 
+				   int *num_locations, 
+				   double tick_min, 
+				   double tick_gap, 
+				   double length, 
+				   bool log_vals, 
+				   double *tick,
+				   int *ierr)
+{
+   /* I like Bill's way of handling log scale */
+   if(log_vals)
+      return pick_major_ticks_positions_Bill(fmkr,p, 
+					     axis_min, axis_max, 
+					     num_locations, tick_min, 
+					     tick_gap, length, log_vals, 
+					     tick, ierr);
+   /* The factor by which you need to divide to get
+      the tick_min within [1,10[ */
+   double factor = pow(10, floor(log10(tick_min)));
+   double norm_tick_min = tick_min/factor;
+   int i;
+   
+   /* We get the one just above tick_min */
+   for(i = 0; i < nb_natural_distances; i++)
+      if(natural_distances[i] >= norm_tick_min)
+	 break;
+
+   *tick = natural_distances[i] * factor;
+   double first_tick = ceil(axis_min /(*tick)) * (*tick);
+   double last_tick = floor(axis_max /(*tick)) * (*tick);
+   
+   *num_locations = (int)((last_tick - first_tick)/(*tick) + 1);
+
+   double *majors = ALLOC_N_double(*num_locations);
+   for (i = 0; i < *num_locations; i++)
+      majors[i] = first_tick + (*tick) * i;
+   
+   return majors;
+}
+
+
 /* This functions fills the majors attribute of the PlotAxis object
    with the position of major ticks
 */
@@ -592,10 +673,22 @@ static void compute_major_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
       double height = ((s->vertical)? p->default_text_height_dy : p->default_text_height_dx);
       double tick_min = s->min_between_major_ticks * height;
       double tick_gap = 10.0 * height;
-      Pick_Major_Tick_Interval(fmkr, p, tick_min, tick_gap, s->length, s->log_vals, &s->interval, ierr);
-      if (*ierr != 0) return;
-      s->majors = Pick_Locations_for_Major_Ticks(s->interval, s->axis_min, s->axis_max, &s->nmajors, ierr);
-      if (*ierr != 0) return;
+
+      s->majors = (s->vincent_or_bill ? 
+		   pick_major_ticks_positions_Vincent(fmkr, p, 
+						      s->axis_min, 
+						      s->axis_max, &s->nmajors,
+						      tick_min, tick_gap, 
+						      s->length, s->log_vals, 
+						      &s->interval, ierr) :
+		   pick_major_ticks_positions_Bill(fmkr, p, s->axis_min, 
+						   s->axis_max, &s->nmajors,
+						   tick_min, tick_gap, 
+						   s->length, s->log_vals, 
+						   &s->interval, ierr));
+
+      if(*ierr || ! s->majors)
+	 return;
       s->free_majors = true;
    }
 }
