@@ -304,6 +304,9 @@ class FigureMaker
 
         # We don't measure legends by default.
         @measure_legends = false
+
+        # By default, we use Bill's algorithm for major ticks positions
+        self.vincent_or_bill = false
     end
     
 

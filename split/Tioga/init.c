@@ -574,9 +574,6 @@ void c_private_init_fm_data(OBJ_PTR fmkr, FM *p, int *ierr) {
    p->right_edge_type = EDGE_WITH_TICKS;
    p->right_edge_visible = true;
 
-   /* By default, we use Bill's algorithm for major ticks picking: */
-   p->vincent_or_bill = false;
-   
    /* Legend */
    p->legend_line_x0 = 0.5;
    p->legend_line_x1 = 2.0;
