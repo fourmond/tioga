@@ -608,7 +608,7 @@ static double * pick_major_ticks_positions_Bill(OBJ_PTR fmkr, FM *p,
 
 /* Then, Vincent's point of view ;-) ... */
 
-static double natural_distances[] = { 1.0, 2.0, 2.5, 5.0, 10.0 };
+static double natural_distances[] = { 1.0, 2.0, /*2.5,*/ 5.0, 10.0 };
 const int nb_natural_distances = sizeof(natural_distances)/sizeof(double);
 
 static double * pick_major_ticks_positions_Vincent(OBJ_PTR fmkr, FM *p, 
