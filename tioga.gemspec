@@ -35,7 +35,7 @@ spec = Gem::Specification.new do |s|
   s.bindir = 'split/scripts'
   s.executables << 'tioga'
   s.name = 'tioga'
-  s.version = '1.8'
+  s.version = '1.9'
   s.summary = 'Tioga - a powerful scientific plotting library'
   s.homepage = 'http://tioga.rubyforge.org'
   s.rubyforge_project = 'tioga'

@@ -21,14 +21,41 @@ This is the README for the Tioga kernel, version 1.8, April 4, 2008.
 
 << What's new >>
 
-    Version 1.8 is essentially a cleanup/bug fix release. Tioga now compiles
-with hardly any warnings, thanks to the work by Taro Sato. show_axis can now
-take a hash instead of a simple location, and can draw axes basically
-anywhere. See the axes_fun function in samples/plots/plots.rb and
-show_axis documentation. Few bugs were fixed, in particular the
-position of ticks with ticks_inside/ticks_outside, and the
-installation via Rubygems which was broken for such a long time we are
-ashamed of it. 
+  Version 1.9: 
+
+  zlib's source has been included again to fix compilation problems on
+MacOS. The embedded copy will only be used if tioga does not manage to
+link to the system one.
+
+  It is now possible to use directly a HLS image using 'color_space' =
+'HLS' as argument to show_image.
+
+  A new ticks placement algorithm was written. You can benefit from it
+by saying t.vincent_or_bill = true.
+
+  You can now use the optional argument to show_legend to draw a
+background (or anything else) to a legend. The information given to
+the callback will only be accurate if t.measure_legends = true. See
+samples/plots.rb
+(Legend_Inside_with_Background_using_legend_background) for more
+information. Accordingly, you can use legend_text_width to know the
+legend's text maximal width. 
+
+  A new utility function was written, show_grid, that draws a grid
+according to major and optionally minor ticks of the current axes.
+
+  show_marker can now take arrays for 'marker' and 'color', and cycles
+through them while plotting.
+
+  Some top-level convenience functions have been added:
+FigureMaker.exec, FigureMaker.make_pdf,
+FigureMaker.def_enter_page_function, FigureMaker.page_style that work
+on the default FigureMaker.
+
+  show_plot_without_clipping, obviously a non-clipping version of
+show_plot.
+
+  And all corresponding demonstrations in the samples/ directory !
 
 
 << Quick Installation of Tioga >>
@@ -177,6 +204,17 @@ Bill Paxton
 
 Here are the old release messages:
 
+--------------------------
+
+    Version 1.8 is essentially a cleanup/bug fix release. Tioga now compiles
+with hardly any warnings, thanks to the work by Taro Sato. show_axis can now
+take a hash instead of a simple location, and can draw axes basically
+anywhere. See the axes_fun function in samples/plots/plots.rb and
+show_axis documentation. Few bugs were fixed, in particular the
+position of ticks with ticks_inside/ticks_outside, and the
+installation via Rubygems which was broken for such a long time we are
+ashamed of it. 
+
 
 --------------------------
 
@@ -204,9 +242,6 @@ reimplemented in C and benchmarked: it should be around three times faster
 than before.
 
     Code should now compile cleanly with Ruby 1.9.
-
-
-
 
 --------------------------
 
