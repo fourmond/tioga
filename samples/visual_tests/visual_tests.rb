@@ -22,49 +22,15 @@ class MyPlots
         t.save_dir = 'visual_tests_out'
         t.def_eval_function { |str| eval(str) }
         
-#         @image_right_margin = 0.07
-#         @margin = 0.1
-#         @header = Dvector.new
-#         @positions = Dvector.new
-#         @blues = Dvector.new
-#         @reds = Dvector.new
-#         @greens = Dvector.new
-#         @data_array = [@positions, @blues, @reds, @greens]
-#         @have_data = false
-#         @big_blues = Dvector.new
-#         @big_blues_scale = 11.0
-        
         t.def_figure("Arrows") { arrows }
         t.def_figure("Markers") { marker_position }
         t.def_figure("Lines") { lines_position }
         t.def_figure("Cap") { lines_cap }
         t.def_figure("show_marker_bbox") {show_marker_bbox}
         t.def_figure("marker_centered") {marker_centered}
-#         t.def_figure("Greens") { greens }
-#         t.def_figure("Log_Reds") { log_reds }
-#         t.def_figure("Side_by_Side") { side_by_side }
-#         t.def_figure("Two_Ys") { two_yaxes }
-#         t.def_figure("Legends") { legends }
-#         t.def_figure("Reds_and_Blues") { reds_blues }
-#         t.def_figure("Legend_Inside") { legend_inside }
-#         t.def_figure("Legend_Outside") { legend_outside }
-#         t.def_figure("Column_Triplets") { column_triplets }
-#         t.def_figure("Row_Triplets") { row_triplets }
-#         t.def_figure("Rows") { rows }
-#         t.def_figure("Columns") { columns }
-#         t.def_figure("Array") { array }
-#         t.def_figure("Trio") { trio }
-#         t.def_figure("Collage") { collage }
-#         t.def_figure("Labels") { labels }
-#         t.def_figure("Error_Bars") { error_bars }
-#         t.def_figure("Error_Bars2") { error_bars2 }
-#         t.def_figure("Arrows") { arrows }
-#         t.def_figure("Special_Y") { special_y }
-#         t.def_figure("Sampled_Splines") { sampled_splines }
-#         t.def_figure("Steps") { steps }
-#         t.def_figure("Splines") { splines }
-#         t.def_figure("Sampled_Data") { sampled_data }
-#         t.def_figure("Contours") { samples_with_contours }
+
+        t.def_figure("Buggy ticks") { buggy_ticks }
+
 
         t.model_number = -1
         
@@ -78,29 +44,15 @@ class MyPlots
     end
     
     def read_data
-        if t.in_subplot || (@have_data && !t.need_to_reload_data)
-            return
-        end
-        Dvector.read_row(@data_filename, 1, @header)
-        model = @header[0].round
-        if (model != t.model_number) || t.need_to_reload_data
-            Dvector.read(@data_filename, @data_array, 2)
-            t.model_number = model
-            @big_blues = @blues.mul(@big_blues_scale)
-        end
-        @have_data = true
-        t.need_to_reload_data = false
+      @positions = Dvector.new(30) { |i| i}
+      @blues = @positions*@positions
+      @blues.sin!
+      @blues = @blues*@blues
+      
+      @have_data = true
+      t.need_to_reload_data = false
     end
 
-    def show_model_number(pos = 1, shift = 4)
-        if !(t.in_subplot) && t.model_number > 0
-            t.show_text('text' => t.model_number.to_s,
-                'side' => TOP, 'pos' => pos,
-                'shift' => shift, 'scale' => 0.8,
-                'justification' => RIGHT_JUSTIFIED)
-        end
-    end
-    
     def plot_boundaries(xs,ys,margin,ymin=nil,ymax=nil)
         xmin = xs.min
         xmax = xs.max
@@ -115,13 +67,16 @@ class MyPlots
         return [ left_boundary, right_boundary, top_boundary, bottom_boundary ]
     end
     
-    def blues
-        read_data
-        t.do_box_labels('Blues Plot', 'Position', '\textcolor[rgb]{0,0,1}{Blues}')
-        show_model_number
-        xs = @positions
-        ys = @blues
-        t.show_plot(plot_boundaries(xs,ys,@margin,-1,1)) { t.show_polyline(xs,ys,Blue) }
+    def buggy_ticks
+      read_data
+      t.do_box_labels('Check the ticks are correct', 
+                      'Position', 'Values')
+      t.vincent_or_bill = true 
+      xs = @positions
+      ys = @blues * (6.82507277e-07- 3.66090205e-07) + 3.66090205e-07 
+      t.show_plot(plot_boundaries(xs,ys,0)) { 
+        t.show_polyline(xs,ys,Blue) 
+      }
     end
     
     def reds

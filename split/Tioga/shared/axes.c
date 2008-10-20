@@ -20,8 +20,12 @@
    along with Tioga; if not, write to the Free Software
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
+#include <math.h>
+
 #include "figures.h"
 #include "pdfs.h"
+
+
 
 /* 
    Here is my (Vincent) big TODO-list for the axes stuff:
@@ -635,16 +639,21 @@ static double * pick_major_ticks_positions_Vincent(OBJ_PTR fmkr, FM *p,
    double norm_tick_min = tick_min/factor;
    int i;
    
+   /*    printf("axis_min: %g\taxis_max: %g\n", axis_min, axis_max); */
    /* We get the one just above tick_min */
    for(i = 0; i < nb_natural_distances; i++)
       if(natural_distances[i] >= norm_tick_min)
 	 break;
 
+
    *tick = natural_distances[i] * factor;
+/*    printf("norm_tick_min: %g\ttick: %g\ttick_min:%g\n",  */
+/* 	  norm_tick_min, *tick, tick_min); */
    double first_tick = ceil(axis_min /(*tick)) * (*tick);
    double last_tick = floor(axis_max /(*tick)) * (*tick);
    
-   *num_locations = (int)((last_tick - first_tick)/(*tick) + 1);
+   *num_locations = (int)round((last_tick - first_tick)/(*tick));
+   *num_locations += 1;
 
    double *majors = ALLOC_N_double(*num_locations);
    for (i = 0; i < *num_locations; i++)
