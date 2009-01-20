@@ -52,9 +52,7 @@ module Dobjects
     # 
     # No care is taken to intercept exceptions.
     def compute_unsafe(*args)
-      begin
-        return @block.call(*args)
-      rescue
+      return @block.call(*args)
     end
 
   end
