@@ -33,9 +33,30 @@ module Dobjects
     #
     #  e = MathEvaluator.new("x*y", "x,y")
     #  e.compute(1,2)         -> 2
+    #
+    # If an exception arises, NaN is returned. Note that compilation
+    # problems will be caught before ;-)...
     def compute(*args)
-      return @block.call(*args)
+      begin
+        return compute_unsafe(*args)
+      rescue
+        return 0.0/0.0
+      end
     end
+
+    # This function does the actual evaluation with the blocks
+    # given.
+    #
+    #  e = MathEvaluator.new("x*y", "x,y")
+    #  e.compute(1,2)         -> 2
+    # 
+    # No care is taken to intercept exceptions.
+    def compute_unsafe(*args)
+      begin
+        return @block.call(*args)
+      rescue
+    end
+
   end
 
   class Dvector
