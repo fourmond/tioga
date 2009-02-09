@@ -55,7 +55,8 @@ class MyPlots
         t.def_figure("French_Decimal_Separator") { french_decimal_separator }
         t.def_figure("Column_Triplets") { column_triplets }
         t.def_figure("Row_Triplets") { row_triplets }
-        t.def_figure("Rows") { rows }
+        t.def_figure("Two_Rows") { two_rows }
+        t.def_figure("Three_Rows") { rows }
         t.def_figure("Columns") { columns }
         t.def_figure("Array") { array }
         t.def_figure("Trio") { trio }
@@ -308,7 +309,7 @@ EOD
         boundaries = setup_lines(@positions, [@blues, @reds], -1, 1)
         xs = @positions
         t.show_plot(boundaries) do
-            t.show_polyline(xs,@blues,Blue,'Blues')
+            t.show_polyline(xs,@blues,Blue,'really Blues')
             t.show_polyline(xs,@reds,Red,'Reds')
         end
         show_model_number
@@ -574,6 +575,23 @@ EOD
             reds
         end
         t.subplot(t.row_margins('num_rows' => num_plots, 'row' => 3)) do 
+            t.top_edge_type = AXIS_HIDDEN
+            greens
+        end
+    end
+    
+    def two_rows
+        read_data
+        t.landscape
+        show_model_number
+        t.do_box_labels('Blues, Reds, Greens', 'Position', nil)
+        t.rescale(0.8)
+        num_plots = 2
+        t.subplot(t.row_margins('num_rows' => num_plots, 'row' => 1)) do
+            t.xaxis_type = AXIS_WITH_TICKS_ONLY
+            blues
+        end
+        t.subplot(t.row_margins('num_rows' => num_plots, 'row' => 2)) do 
             t.top_edge_type = AXIS_HIDDEN
             greens
         end

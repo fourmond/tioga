@@ -700,44 +700,46 @@ class FigureMaker
            legend_background_function.call([ 0, xright, ytop, ybot ])
         end
         legend_index = 0
-        @legend_info.each do |dict|
-            text = dict['text']
-            if text != nil
-                # We prepare a dictionnary:
-                dct = { 'text' => text,
-                         'x' => x, 'y' => y, 'scale' => self.legend_scale,
-                         'justification' => self.legend_justification,
-                         'alignment' => self.legend_alignment }
-                if @measure_legends
-                  dct['measure'] = "legend-#{legend_index}"
-                  legend_index += 1
+        if @legend_info != nil
+            @legend_info.each do |dict|
+                text = dict['text']
+                if text != nil
+                    # We prepare a dictionnary:
+                    dct = { 'text' => text,
+                             'x' => x, 'y' => y, 'scale' => self.legend_scale,
+                             'justification' => self.legend_justification,
+                             'alignment' => self.legend_alignment }
+                    if @measure_legends
+                      dct['measure'] = "legend-#{legend_index}"
+                      legend_index += 1
+                    end
+                    show_text(dct)
                 end
-                show_text(dct)
+                line_width = dict['line_width']
+                line_type = dict['line_type']
+                unless (line_width < 0) || ((line_type.kind_of?String) && (line_type.casecmp('none') == 0))
+                    self.line_color = dict['line_color']
+                    self.line_width = dict['line_width']
+                    self.line_cap = dict['line_cap']
+                    self.line_type = line_type
+                    stroke_line(line_x0, y+line_dy, line_x1, y+line_dy)
+                end
+                # place any marker right in the middle of the line
+                if dict['marker_dict'] != nil
+                    marker_dict = dict['marker_dict']
+                    marker_dict['x'] = 0.5*(line_x0 + line_x1)
+                    marker_dict['y'] = y+line_dy
+                    show_marker(marker_dict)
+                elsif dict['marker']
+                    show_marker( 'x' => 0.5*(line_x0 + line_x1),
+                            'y' => (y+line_dy),
+                            'marker' => dict['marker'],
+                            'color' => dict['marker_color'],
+                            'scale' => dict['marker_scale'])
+                end
+                dy = dict['dy']; dy = 1 if dy == nil
+                y -= line_ht_y * dy
             end
-            line_width = dict['line_width']
-            line_type = dict['line_type']
-            unless (line_width < 0) || ((line_type.kind_of?String) && (line_type.casecmp('none') == 0))
-                self.line_color = dict['line_color']
-                self.line_width = dict['line_width']
-                self.line_cap = dict['line_cap']
-                self.line_type = line_type
-                stroke_line(line_x0, y+line_dy, line_x1, y+line_dy)
-            end
-            # place any marker right in the middle of the line
-            if dict['marker_dict'] != nil
-                marker_dict = dict['marker_dict']
-                marker_dict['x'] = 0.5*(line_x0 + line_x1)
-                marker_dict['y'] = y+line_dy
-                show_marker(marker_dict)
-            elsif dict['marker']
-                show_marker( 'x' => 0.5*(line_x0 + line_x1),
-                        'y' => (y+line_dy),
-                        'marker' => dict['marker'],
-                        'color' => dict['marker_color'],
-                        'scale' => dict['marker_scale'])
-            end
-            dy = dict['dy']; dy = 1 if dy == nil
-            y -= line_ht_y * dy
         end
     end
 
