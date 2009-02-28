@@ -718,11 +718,24 @@ class FigureMaker
                 line_width = dict['line_width']
                 line_type = dict['line_type']
                 unless (line_width < 0) || ((line_type.kind_of?String) && (line_type.casecmp('none') == 0))
+                
+                    save_line_color = self.line_color
+                    save_line_width = self.line_width
+                    save_line_cap = self.line_cap
+                    save_line_type = self.line_type
+                    
                     self.line_color = dict['line_color']
                     self.line_width = dict['line_width']
                     self.line_cap = dict['line_cap']
                     self.line_type = line_type
+                    
                     stroke_line(line_x0, y+line_dy, line_x1, y+line_dy)
+                
+                    self.line_color = save_line_color
+                    self.line_width = save_line_width
+                    self.line_cap = save_line_cap
+                    self.line_type = save_line_type
+                    
                 end
                 # place any marker right in the middle of the line
                 if dict['marker_dict'] != nil
@@ -1027,7 +1040,6 @@ class FigureMaker
 
     def context(&cmd)
         trace_cmd_no_arg(@enter_context_function, @exit_context_function) {       
-             
            save_title = self.title
            save_xlabel = self.xlabel
            save_ylabel = self.ylabel
@@ -1055,8 +1067,7 @@ class FigureMaker
                self.yaxis_locations_for_minor_ticks = save_yaxis_locations_for_minor_ticks
                self.yaxis_tick_labels = save_yaxis_tick_labels
                @fm_data.replace(save_fm_data)            
-           end
-            
+           end            
         }      
     end
 
