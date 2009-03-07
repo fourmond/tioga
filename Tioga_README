@@ -1,7 +1,7 @@
-This is the README for the Tioga kernel, version 1.8, April 4, 2008.
+This is the README for the Tioga kernel, version 1.10, March 7, 2009.
 
-    Copyright (C) 2005, 2006, 2007, 2008  Bill Paxton
-    Copyright (C) 2007, 2008 Vincent Fourmond, Taro Sato
+    Copyright (C) 2005, 2006, 2007, 2008, 2009  Bill Paxton
+    Copyright (C) 2007, 2008, 2009 Vincent Fourmond, Taro Sato
     
     This file is part of Tioga.
     
@@ -21,41 +21,12 @@ This is the README for the Tioga kernel, version 1.8, April 4, 2008.
 
 << What's new >>
 
-  Version 1.9: 
+    Version 1.10 is a minor bug-fix release, the most important one
+being that save_legend_info now draws markers with the proper line style.
 
-  zlib's source has been included again to fix compilation problems on
-MacOS. The embedded copy will only be used if tioga does not manage to
-link to the system one.
-
-  It is now possible to use directly a HLS image using 'color_space' =
-'HLS' as argument to show_image.
-
-  A new ticks placement algorithm was written. You can benefit from it
-by saying t.vincent_or_bill = true.
-
-  You can now use the optional argument to show_legend to draw a
-background (or anything else) to a legend. The information given to
-the callback will only be accurate if t.measure_legends = true. See
-samples/plots.rb
-(Legend_Inside_with_Background_using_legend_background) for more
-information. Accordingly, you can use legend_text_width to know the
-legend's text maximal width. 
-
-  A new utility function was written, show_grid, that draws a grid
-according to major and optionally minor ticks of the current axes.
-
-  show_marker can now take arrays for 'marker' and 'color', and cycles
-through them while plotting.
-
-  Some top-level convenience functions have been added:
-FigureMaker.exec, FigureMaker.make_pdf,
-FigureMaker.def_enter_page_function, FigureMaker.page_style that work
-on the default FigureMaker.
-
-  show_plot_without_clipping, obviously a non-clipping version of
-show_plot.
-
-  And all corresponding demonstrations in the samples/ directory !
+    In addition, a patch was provided by Benjamin ter Kuile
+<bterkuile@gmail.com> to ease (and quicken) the interpolation of
+non-uniform 3D-data unto a uniform grid. Thanks !
 
 
 << Quick Installation of Tioga >>
@@ -203,6 +174,44 @@ Bill Paxton
 << What's old >>
 
 Here are the old release messages:
+
+--------------------------
+
+  Version 1.9: 
+
+  zlib's source has been included again to fix compilation problems on
+MacOS. The embedded copy will only be used if tioga does not manage to
+link to the system one.
+
+  It is now possible to use directly a HLS image using 'color_space' =
+'HLS' as argument to show_image.
+
+  A new ticks placement algorithm was written. You can benefit from it
+by saying t.vincent_or_bill = true.
+
+  You can now use the optional argument to show_legend to draw a
+background (or anything else) to a legend. The information given to
+the callback will only be accurate if t.measure_legends = true. See
+samples/plots.rb
+(Legend_Inside_with_Background_using_legend_background) for more
+information. Accordingly, you can use legend_text_width to know the
+legend's text maximal width. 
+
+  A new utility function was written, show_grid, that draws a grid
+according to major and optionally minor ticks of the current axes.
+
+  show_marker can now take arrays for 'marker' and 'color', and cycles
+through them while plotting.
+
+  Some top-level convenience functions have been added:
+FigureMaker.exec, FigureMaker.make_pdf,
+FigureMaker.def_enter_page_function, FigureMaker.page_style that work
+on the default FigureMaker.
+
+  show_plot_without_clipping, obviously a non-clipping version of
+show_plot.
+
+  And all corresponding demonstrations in the samples/ directory !
 
 --------------------------
 

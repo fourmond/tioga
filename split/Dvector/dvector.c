@@ -5319,7 +5319,8 @@ static VALUE dvector_convolve(VALUE self, VALUE kernel, VALUE middle)
   :call-seq:
   Dvector.fast_fancy_read(stream, options) => Array_of_Dvectors
   
-  Reads data from an IO stream and separate it into columns of data
+  Reads data from an IO stream (or anything that supports a gets method)
+  and separate it into columns of data
   according to the _options_, a hash holding the following elements
   (compulsory, but you can use FANCY_READ_DEFAULTS):
   * 'sep': a regular expression that separate the entries
@@ -5333,8 +5334,6 @@ static VALUE dvector_convolve(VALUE self, VALUE kernel, VALUE middle)
 
   As a side note, the read time is highly non-linear, which suggests that
   the read is memory-allocation/copying-limited, at least for big files.
-  Well, the read time is non-linear for 
-
 
   An internal memory allocation with aggressive policy should solve that,
   that is, not using directly Dvectors (and it would be way faster to store
