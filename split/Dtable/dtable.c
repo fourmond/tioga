@@ -1745,6 +1745,70 @@ VALUE dtable_load(VALUE klass, VALUE str)
   return ret;
 }
 
+PRIVATE
+/*
+ *  call-seq:
+ *     dtable.interpolate(Xs, Ys, nx, ny, x_start, x_end, y_start, y_end)  -> a_dtable
+ *  
+ *  Returns a copy of _dtable_ with the values interpolated given the proper X and Y axis to create a uniform spaced result in the X- and Y 
+ *  direction consisting of nx- and ny values for each direction.
+ */ VALUE dtable_interpolate(VALUE ary, VALUE x_vec, VALUE y_vec, VALUE nx_val, VALUE ny_val, VALUE xstart_val, VALUE xend_val, VALUE ystart_val, VALUE yend_val)
+{
+   Dtable *d = Get_Dtable(ary);
+	int nx = NUM2DBL(rb_Integer(nx_val));
+	int ny = NUM2DBL(rb_Integer(ny_val));
+   int i, j, num_cols = d->num_cols, num_rows = d->num_rows, last_row = num_rows - 1;
+	
+   long xsrc_len, ysrc_len;
+   double *xsrc = Dvector_Data_for_Read(x_vec, &xsrc_len);
+   double *ysrc = Dvector_Data_for_Read(y_vec, &ysrc_len);
+	if(xsrc_len != num_cols) rb_raise(rb_eArgError, "Number of x values (%d) do not match the number of columns (%d)", xsrc_len, num_cols);
+	if(ysrc_len != num_rows) rb_raise(rb_eArgError, "Number of y values (%d) do not match the number of rows (%d)", ysrc_len, num_rows);
+   VALUE new = dtable_init(dtable_alloc(cDtable), nx, ny);
+   Dtable *d2 = Get_Dtable(new);
+   double **src, **dest;
+	xstart_val = rb_Float(xstart_val);
+	double xstart = NUM2DBL(rb_Float(xstart_val));
+	if(xstart < xsrc[0]) rb_raise(rb_eArgError, "The start x value %d is smaller than the bound (%d)", xstart, xsrc[0]);
+	double xend = NUM2DBL(rb_Float(xend_val));
+	if(xend > xsrc[xsrc_len-1]) rb_raise(rb_eArgError, "The end x value %d is bigger than the bound (%d)", xend, xsrc[xsrc_len-1]);
+	double ystart = NUM2DBL(rb_Float(ystart_val));
+	if(ystart < ysrc[0]) rb_raise(rb_eArgError, "The start y value %d is smaller than the bound (%d)", ystart, ysrc[0]);
+	double yend = NUM2DBL(rb_Float(yend_val));
+	if(yend > ysrc[ysrc_len-1]) rb_raise(rb_eArgError, "The end y value %d is bigger than the bound (%d)", yend, ysrc[ysrc_len-1]);
+	double dx = (xend-xstart)/(nx-1);
+	double dy = (yend-ystart)/(ny-1);
+	double xcurrent = xstart;
+	double ycurrent = ystart;
+	double intvalue;
+	int isrc = 1;
+	int jsrc = 1;
+   src = d->ptr; dest = d2->ptr;
+   for (i = 1; i < ny+1; i++) {
+		while(ysrc[isrc] < ycurrent && isrc < ysrc_len){
+			isrc++;
+		}
+      for (j = 1; j < nx+1; j++) {
+			while(xsrc[jsrc] < xcurrent && jsrc < xsrc_len){
+				jsrc++;
+			}
+			intvalue = (
+				( src[isrc-1][jsrc-1]*(ysrc[isrc]-ycurrent)*(xsrc[jsrc]-xcurrent)) +
+				( src[isrc][jsrc - 1] * (ycurrent - ysrc[isrc - 1]) * (xsrc[jsrc] - xcurrent) ) +
+				( src[isrc - 1][jsrc] * (ysrc[isrc] - ycurrent) * (xcurrent - xsrc[jsrc - 1]) ) +
+				( src[isrc][jsrc] * (ycurrent - ysrc[isrc - 1]) * (xcurrent - xsrc[jsrc - 1]) )
+			);
+			intvalue = intvalue / ( (ysrc[isrc] - ysrc[isrc - 1]) * (xsrc[jsrc] - xsrc[jsrc - 1]) );
+         dest[i-1][j-1] = intvalue;
+			xcurrent += dx;
+      }
+		xcurrent = xstart;
+		jsrc = 1;
+		ycurrent += dy;
+   }
+   return new;
+}
+
 /* 
  * Document-class: Dobjects::Dtable
  *
@@ -1900,6 +1964,8 @@ PUBLIC void Init_Dtable() {
    rb_define_method(cDtable, "safe_sqrt!", dtable_safe_sqrt_bang, 0);
    rb_define_method(cDtable, "safe_asin!", dtable_safe_asin_bang, 0);
    rb_define_method(cDtable, "safe_acos!", dtable_safe_acos_bang, 0);
+
+   rb_define_method(cDtable, "interpolate", dtable_interpolate, 8);
 
    /* Marshal : */
    rb_define_method(cDtable, "_dump", dtable_dump, 1);
