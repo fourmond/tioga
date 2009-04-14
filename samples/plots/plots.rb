@@ -40,6 +40,7 @@ class MyPlots
         t.def_figure("Greens") { greens }
         t.def_figure("Blues_axes_1") { blues_axes_1 }
         t.def_figure("Blues_axes_2") { blues_axes_2 }
+        t.def_figure("Blues_without_padding") { blues_without_padding }
         t.def_figure("Log_Reds") { log_reds }
         t.def_figure("Side_by_Side") { side_by_side }
         t.def_figure("Two_Ys") { two_yaxes }
@@ -50,8 +51,7 @@ class MyPlots
         t.def_figure("Legend_Inside") { legend_inside }
         t.def_figure("Legend_Outside") { legend_outside }
         t.def_figure("Legend_Inside_with_Background") { legend_inside_with_background }
-        t.def_figure("Legend_Inside_with_Background_using_legend_background") 
-            { legend_inside_with_background_using_legend_background }
+        t.def_figure("Legend_Inside_with_Background_using_legend_background") { legend_inside_with_background_using_legend_background }
         t.def_figure("Inset") { inset }
         t.def_figure("French_Decimal_Separator") { french_decimal_separator }
         t.def_figure("Column_Triplets") { column_triplets }
@@ -182,6 +182,13 @@ EOD
         t.show_plot(plot_boundaries(xs,ys,@margin,-1,1)) { 
             t.show_grid(opts)
             t.show_polyline(xs,ys,Blue) }
+    end
+    
+    def blues_without_padding
+      p t.default_frame_right
+      t.default_frame_right = 1.0
+      p t.default_frame_right
+      blues
     end
 
     def blues_far_off(opts={})
@@ -1082,6 +1089,7 @@ EOD
           'to' => [3,7],
           'ticks_outside' => true,
           'ticks_inside' => false,
+          'log' => true
         }
         t.show_axis(spec)
         p t.axis_information(RIGHT)

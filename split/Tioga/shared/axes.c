@@ -1177,6 +1177,16 @@ static int prepare_dict_PlotAxis(OBJ_PTR fmkr, FM *p,
    if(Hash_Has_Key(axis_spec, "minor_tick_length"))
       axis->minor_tick_length = Hash_Get_Double(axis_spec, "minor_tick_length");
 
+   /* Log scale: */
+   if(Hash_Has_Key(axis_spec, "log")) {
+      OBJ_PTR val = Hash_Get_Obj(axis_spec, "log");
+      if(val == OBJ_NIL || val == OBJ_FALSE)
+	 axis->log_vals = 0;
+      else
+	 axis->log_vals = 1;
+   }
+   
+
    return 1;
 }
 
@@ -1267,6 +1277,9 @@ OBJ_PTR c_axis_get_information(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec,
    Hash_Set_Double(hash, "x1", axis.x1);
    Hash_Set_Double(hash, "y0", axis.y0);
    Hash_Set_Double(hash, "y1", axis.y1);
+
+   /* Log values */
+   Hash_Set_Obj(hash, "log", axis.log_vals ? OBJ_TRUE : OBJ_FALSE);
 
    free_allocated_memory(&axis);
    return hash;
