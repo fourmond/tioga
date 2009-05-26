@@ -1769,13 +1769,13 @@ PRIVATE
    double **src, **dest;
 	xstart_val = rb_Float(xstart_val);
 	double xstart = NUM2DBL(rb_Float(xstart_val));
-	if(xstart < xsrc[0]) rb_raise(rb_eArgError, "The start x value %d is smaller than the bound (%d)", xstart, xsrc[0]);
+	if(xstart < xsrc[0]) rb_raise(rb_eArgError, "The start x value %g is smaller than the bound (%g)", xstart, xsrc[0]);
 	double xend = NUM2DBL(rb_Float(xend_val));
-	if(xend > xsrc[xsrc_len-1]) rb_raise(rb_eArgError, "The end x value %d is bigger than the bound (%d)", xend, xsrc[xsrc_len-1]);
+	if(xend > xsrc[xsrc_len-1]) rb_raise(rb_eArgError, "The end x value %g is bigger than the bound (%g)", xend, xsrc[xsrc_len-1]);
 	double ystart = NUM2DBL(rb_Float(ystart_val));
-	if(ystart < ysrc[0]) rb_raise(rb_eArgError, "The start y value %d is smaller than the bound (%d)", ystart, ysrc[0]);
+	if(ystart < ysrc[0]) rb_raise(rb_eArgError, "The start y value %g is smaller than the bound (%g)", ystart, ysrc[0]);
 	double yend = NUM2DBL(rb_Float(yend_val));
-	if(yend > ysrc[ysrc_len-1]) rb_raise(rb_eArgError, "The end y value %d is bigger than the bound (%d)", yend, ysrc[ysrc_len-1]);
+	if(yend > ysrc[ysrc_len-1]) rb_raise(rb_eArgError, "The end y value %g is bigger than the bound (%g)", yend, ysrc[ysrc_len-1]);
 	double dx = (xend-xstart)/(nx-1);
 	double dy = (yend-ystart)/(ny-1);
 	double xcurrent = xstart;
@@ -1785,11 +1785,11 @@ PRIVATE
 	int jsrc = 1;
    src = d->ptr; dest = d2->ptr;
    for (i = 1; i < ny+1; i++) {
-		while(ysrc[isrc] < ycurrent && isrc < ysrc_len){
+		while(ysrc[isrc] < ycurrent && ycurrent < ysrc[ysrc_len-1]){
 			isrc++;
 		}
       for (j = 1; j < nx+1; j++) {
-			while(xsrc[jsrc] < xcurrent && jsrc < xsrc_len){
+			while(xsrc[jsrc] < xcurrent && xcurrent < xsrc[xsrc_len-1]){
 				jsrc++;
 			}
 			intvalue = (
