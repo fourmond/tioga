@@ -1745,6 +1745,8 @@ VALUE dtable_load(VALUE klass, VALUE str)
   return ret;
 }
 
+/* The following function has been written by Benjamin ter Kuile <bterkuile@gmail.com> */
+
 PRIVATE
 /*
  *  call-seq:

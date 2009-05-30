@@ -1212,7 +1212,8 @@ void c_show_axis_generic(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec, int *ierr)
 /* 
    This function takes an axis specification (either integer or
    hash) and returns a hash containing the following keys:
-   * 'major' : position of all major ticks
+   * 'major_ticks' : position of all major ticks
+   * 'minor_ticks' : position of all major ticks
    * 'labels' : the names of all labels
    * 'vertical' : if the axis is vertical or horizontal
    * 'line_width' : the line width
@@ -1238,14 +1239,14 @@ OBJ_PTR c_axis_get_information(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec,
    /* First, major ticks positions */
    prepare_axis_coordinates(fmkr, p, axis.location, &axis, ierr);
    compute_major_ticks(fmkr, p, &axis, ierr);
-   Hash_Set_Obj(hash, "major", Vector_New(axis.nmajors, axis.majors));
+   Hash_Set_Obj(hash, "major_ticks", Vector_New(axis.nmajors, axis.majors));
 
    /* Then, minor ticks positions */
    double * minor;
    long count;
    minor = get_minor_ticks_location(fmkr, p, &axis, &count);
    if(minor) {
-      Hash_Set_Obj(hash, "minor", Vector_New(count, minor));
+      Hash_Set_Obj(hash, "minor_ticks", Vector_New(count, minor));
       free(minor);
    }
 
