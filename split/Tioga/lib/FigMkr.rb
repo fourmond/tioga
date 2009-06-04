@@ -1806,7 +1806,8 @@ class FigureMaker
             fill_color = get_if_given_else_use_default_dict(dict, 'fill_color', @marker_defaults)
             stroke_color = get_if_given_else_use_default_dict(dict, 'stroke_color', @marker_defaults)
         else
-            fill_color = stroke_color = color
+          stroke_color = dict['stroke_color'] || color
+          fill_color = dict['fill_color'] || color
         end
         font = dict['font']
         mode = alt_names(dict, 'mode', 'rendering_mode')
