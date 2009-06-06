@@ -72,8 +72,9 @@ class MyPlots
         t.def_figure("Arrows") { arrows }
         t.def_figure("Special_Y") { special_y }
         t.def_figure("Sampled_Splines") { sampled_splines }
+        t.def_figure("Sampled_pm_cubics") { sampled_pm_cubics }
         t.def_figure("Steps") { steps }
-        t.def_figure("Splines") { splines }
+        t.def_figure("Bezier") { bezier }
         t.def_figure("Sampled_Data") { sampled_data }
         t.def_figure("Sampled_with_grid") { sampled_with_grid }
         t.def_figure("Contours") { samples_with_contours }
@@ -880,6 +881,33 @@ EOD
                 'marker' => Bullet, 'scale' => 0.6, 'color' => Red);
         end
     end
+
+    
+    def sampled_pm_cubics
+        t.do_box_labels("Sampled pm cubics", "Position", "Average Count")
+        xs = Dvector[ 1.0, 2.0, 5.0, 6.0, 7.0, 8.0, 10.0, 13.0, 17.0 ]
+        ys = Dvector[ 3.0, 3.7, 3.9, 4.2, 5.7, 6.6,  7.1,  6.7,  4.5 ]
+        data_pts = xs.size
+        csdata_interpolant = Dvector.create_pm_cubic_interpolant(xs, ys)
+        smooth_pts = 4*(data_pts-1) + 1
+        dx = (xs[data_pts-1] - xs[0])/(smooth_pts-1)
+        pm_xs = Dvector.new(smooth_pts) { |i| i*dx + xs[0] }
+        pm_ys = pm_xs.dup
+        pm_ys.length.times {|i| pm_ys[i] = 
+                Dvector.pm_cubic_interpolate(pm_xs[i], csdata_interpolant) }
+        t.show_plot([-1, 19, 8, 2]) do
+            t.fill_color = FloralWhite
+            t.fill_frame
+            t.stroke_color = Blue
+            t.append_points_to_path(pm_xs, pm_ys)
+            t.stroke
+            t.show_marker('Xs' => pm_xs, 'Ys' => pm_ys,
+                'marker' => Bullet, 'scale' => 0.4, 'color' => Green);
+            t.show_marker('Xs' => xs, 'Ys' => ys,
+                'marker' => Bullet, 'scale' => 0.6, 'color' => Red);
+        end
+    end
+    
     
     def steps
         t.do_box_labels("Steps", "Position", "Average Count")
@@ -904,8 +932,8 @@ EOD
         end
     end
     
-    def splines # append bezier curves
-        t.do_box_labels("Splines", "Position", "Average Count")
+    def bezier # append bezier curves
+        t.do_box_labels("bezier curves", "Position", "Average Count")
         xs = Dvector[ 1.0, 2.0, 5.0, 6.0, 7.0, 8.0, 10.0, 13.0, 17.0 ]
         ys = Dvector[ 3.0, 3.7, 3.9, 4.2, 5.7, 6.6,  7.1,  6.7,  4.5 ]
         scale = Dvector[ 0.6, 0.9 ]
@@ -923,6 +951,7 @@ EOD
                           'scale' => scale, 'color' => [ Red, Blue, Teal ]);
         end
     end
+    
     
     def sampled_image(title, colormap = nil)
         t.do_box_labels(title, 'Log Density', 'Log Temperature')

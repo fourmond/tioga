@@ -49,6 +49,9 @@
 #ifndef MIN
 #define MIN(a,b)    (((a) < (b)) ? (a) : (b))
 #endif
+#ifndef SIGN
+#define SIGN(a)    (((a) > 0) ? 1 : -1)
+#endif
 
 
 
@@ -1068,7 +1071,8 @@ PRIVATE
  *  call-seq:
  *     dvector.min_gt(val)  -> float or nil
  *  
- *  Returns the minimum entry in _dvector_ which is greater than _val_, or <code>nil</code> if no such entry if found.
+ *  Returns the minimum entry in _dvector_ which is greater than _val_,
+ *  or <code>nil</code> if no such entry if found.
  */ VALUE dvector_min_gt(VALUE ary, VALUE val) {
    Dvector *d = Get_Dvector(ary);
    val = rb_Float(val);
@@ -1092,7 +1096,8 @@ PRIVATE
  *  call-seq:
  *     dvector.max_lt(val)  -> float or nil
  *  
- *  Returns the maximum entry in _dvector_ which is less than _val_, or <code>nil</code> if no such entry if found.
+ *  Returns the maximum entry in _dvector_ which is less than _val_,
+ *  or <code>nil</code> if no such entry if found.
  */ VALUE dvector_max_lt(VALUE ary, VALUE val) {
    Dvector *d = Get_Dvector(ary);
    val = rb_Float(val);
@@ -1390,7 +1395,8 @@ PRIVATE
    Dvector *d2 = Get_Dvector(ary2);
    long len = d->len;
    if (len != d2->len) {
-      rb_raise(rb_eArgError, "vectors with different lengths (%d vs %d) for reverse_each2_with_index", len, d2->len);
+      rb_raise(rb_eArgError, "vectors with different lengths (%d vs %d) for reverse_each2_with_index", 
+         len, d2->len);
    }
    while (len--) {
       rb_yield_values(3, rb_float_new(d->ptr[len]), rb_float_new(d2->ptr[len]), LONG2NUM(len));
@@ -1687,8 +1693,10 @@ PRIVATE
  *  call-seq:
  *     dvector.dup  -> a_dvector
  *  
- *  Returns a copy of _dvector_.  For performance sensitive situations involving a series of vector operations,
- *  first make a copy using dup and then do "bang" operations to modify the result without further copying.
+ *  Returns a copy of _dvector_.
+ *  For performance sensitive situations involving a series of vector operations,
+ *  first make a copy using dup and then do "bang" operations to modify the result
+ *  without further copying.
  */ VALUE dvector_dup(VALUE ary) {
    Dvector *d = Get_Dvector(ary);
    return dvector_new4_dbl(d->len, d->ptr);
@@ -1700,7 +1708,8 @@ PRIVATE
  *     dvector.collect {|x| block }  -> a_dvector
  *     dvector.map     {|x| block }  -> a_dvector
  *  
- *  Invokes <i>block</i> once for each element of _dvector_.  Returns a new vector holding the values returned by _block_.
+ *  Invokes <i>block</i> once for each element of _dvector_.
+ *  Returns a new vector holding the values returned by _block_.
  *  Note that for numeric operations on long vectors, it is more efficient to
  *  apply the operator directly to the vector rather than using map or collect.
  *     
@@ -4896,7 +4905,8 @@ PRIVATE
  *  Replaces contents of _dvector_ by control points for Bezier curve.
  *  The cubic, y(x), is defined from x0 to x0+delta_x.
  *  At location x = x0 + dx, with dx between 0 and delta_x, define y = a*dx^3 + b*dx^2 + c*dx + y0.
- *  This routine replaces the contents of _dest_ by [x1, y1, x2, y2, x3, y3], the Bezier control points to match this cubic.
+ *  This routine replaces the contents of _dest_ by [x1, y1, x2, y2, x3, y3],
+ *  the Bezier control points to match this cubic.
  *     
  */ 
 VALUE dvector_make_bezier_control_points_for_cubic_in_x(VALUE dest, VALUE x0, VALUE y0, VALUE delta_x, VALUE a, VALUE b, VALUE c)
@@ -4910,6 +4920,162 @@ VALUE dvector_make_bezier_control_points_for_cubic_in_x(VALUE dest, VALUE x0, VA
    return c_make_bezier_control_points_for_cubic_in_x(dest,
       NUM2DBL(x0), NUM2DBL(y0), NUM2DBL(delta_x), NUM2DBL(a), NUM2DBL(b), NUM2DBL(c));
 }
+
+
+
+
+
+void c_dvector_create_pm_cubic_interpolant(int nx, double *x, double *f,
+    double *As, double *Bs, double *Cs)
+{
+   double *h = (double *)ALLOC_N(double, nx);
+   double *s = (double *)ALLOC_N(double, nx);
+   double *p = (double *)ALLOC_N(double, nx);
+   double as00, asm1, ap00, sm1, s00;
+   int n = nx-1, i;
+   
+   
+   for (i=0; i < n; i++) {
+      h[i] = x[i+1] - x[i];
+      s[i] = (f[i+1] - f[i])/h[i];
+   }
+   
+   /* slope at i of parabola through i-1, i, and i+1 */
+   for (i=1; i < n; i++) {
+      p[i] = (s[i-1]*h[i] + s[i]*h[i-1])/(h[i]+h[i-1]);
+   }
+   
+   /* "safe" slope at i to ensure monotonic -- see Steffen paper for explanation. */
+   for (i=1; i < n; i++) {
+      asm1 = fabs(s[i-1]);
+      as00 = fabs(s[i]);
+      ap00 = fabs(p[i]);
+      sm1 = (s[i-1] > 0)? 1.0 : -1.0;
+      s00 = (s[i] > 0)? 1.0 : -1.0;
+      Cs[i] = (sm1+s00)*MIN(asm1, MIN(as00, 0.5*ap00));
+   }
+      
+   /* slope at 1st point of parabola through 1st 3 points */
+   p[0] = s[0]*(1 + h[0] / (h[0] + h[1])) - s[1] * h[0] / (h[0] + h[1]);
+   
+   /* safe slope at 1st point */
+   if (p[0]*s[0] <= 0) {
+      Cs[0] = 0;
+   } else if (fabs(p[0]) > 2.0*fabs(s[0])) {
+      Cs[0] = 2.0*s[0];
+   } else {
+      Cs[0] = p[0];
+   }
+   
+   /* slope at last point of parabola through last 3 points */   
+   p[n] = s[n-1]*(1 + h[n-1] / (h[n-1] + h[n-2])) - s[n-2]*h[n-1] / (h[n-1] + h[n-2]);
+
+   /* safe slope at last point */    
+   if (p[n]*s[n-1] <= 0) {
+      Cs[n] = 0;
+   } else if (fabs(p[n]) > 2.0*fabs(s[n-1])) {
+      Cs[n] = 2.0*s[n-1];
+   } else {
+      Cs[n] = p[n];
+   }
+         
+   for (i=0; i < n; i++) {
+      Bs[i] = (3.0*s[i] - 2.0*Cs[i] - Cs[i+1]) / h[i];
+   }
+   Bs[n] = 0;
+         
+   for (i=1; i < n; i++) {
+      As[i] = (Cs[i] + Cs[i+1] - 2.0*s[i]) / (h[i]*h[i]);
+   }
+   As[n] = 0;
+      
+   free(p); free(s); free(h);
+}
+
+PRIVATE
+/*
+ *  call-seq:
+ *     Dvector.create_pm_cubic_interpolant(xs, ys) ->  interpolant
+ *
+ *  Uses Dvectors _xs_ and _ys_ to create a cubic pm_cubic interpolant.  The _xs_ must be given in ascending order.
+ *  The interpolant is an array of Dvectors: [Xs, Ys, As, Bs, Cs].
+ *  For x between Xs[j] and Xs[j+1], let dx = x - Xs[j], and find interpolated y for x by
+ *  y = As[j]*dx^3 + Bs[j]*dx^2 + Cs[j]*dx + Ys[j].
+ *  pm_cubic algorithms derived from Steffen, M., "A simple method for monotonic interpolation in one dimension", 
+ *        Astron. Astrophys., (239) 1990, 443-450.
+ *  
+ */ 
+VALUE dvector_create_pm_cubic_interpolant(int argc, VALUE *argv, VALUE klass) {
+   if (argc != 2)
+      rb_raise(rb_eArgError, "wrong # of arguments(%d) for create_pm_cubic_interpolant", argc);
+   klass = Qnil;
+   VALUE Xs = argv[0], Ys = argv[1];
+   long xdlen, ydlen;
+   double start = 0.0, end = 0.0;
+   double *X_data = Dvector_Data_for_Read(Xs, &xdlen);
+   double *Y_data = Dvector_Data_for_Read(Ys, &ydlen);
+   if (X_data == NULL || Y_data == NULL || xdlen != ydlen)
+      rb_raise(rb_eArgError, "Data for create_pm_cubic_interpolant must be equal length Dvectors");
+   int nx = xdlen;
+   VALUE As = Dvector_Create(), Bs = Dvector_Create(), Cs = Dvector_Create();
+   double *As_data = Dvector_Data_Resize(As, nx);
+   double *Bs_data = Dvector_Data_Resize(Bs, nx);
+   double *Cs_data = Dvector_Data_Resize(Cs, nx);
+   c_dvector_create_pm_cubic_interpolant(nx, X_data, Y_data, As_data, Bs_data, Cs_data);
+   VALUE result = rb_ary_new2(5);
+   rb_ary_store(result, 0, Xs);
+   rb_ary_store(result, 1, Ys);
+   rb_ary_store(result, 2, As);
+   rb_ary_store(result, 3, Bs);
+   rb_ary_store(result, 4, Cs);
+   return result;
+}
+
+double c_dvector_pm_cubic_interpolate(double x, int nx, 
+    double *Xs, double *Ys, double *As, double *Bs, double *Cs)
+{
+   int j;
+   for (j = 0; j < nx && x >= Xs[j]; j++);
+   if (j == nx) return Ys[j-1];
+   if (j == 0) return Ys[0];
+   j--;
+   double dx = x - Xs[j];
+   return Ys[j] + dx*(Cs[j] + dx*(Bs[j] + dx*As[j]));
+}
+
+PRIVATE
+/*
+ *  call-seq:
+ *     Dvector.pm_cubic_interpolate(x, interpolant)  ->  y
+ *
+ *  Returns the _y_ corresponding to _x_ by pm_cubic interpolation using the _interpolant_
+ *  which was previously created by calling _create_pm_cubic_interpolant_.
+ *  
+ */ 
+VALUE dvector_pm_cubic_interpolate(int argc, VALUE *argv, VALUE klass) {
+   if (argc != 2)
+      rb_raise(rb_eArgError, "wrong # of arguments(%d) for pm_cubic_interpolate", argc);
+   klass = Qnil;
+   VALUE x = argv[0];
+   VALUE interpolant = argv[1];
+   x = rb_Float(x);
+   interpolant = rb_Array(interpolant);
+   if (RARRAY(interpolant)->len != 5)
+      rb_raise(rb_eArgError, "interpolant must be array of length 5 from create_pm_cubic_interpolant");
+   Dvector *Xs = Get_Dvector(rb_ary_entry(interpolant,0));
+   Dvector *Ys = Get_Dvector(rb_ary_entry(interpolant,1));
+   Dvector *As = Get_Dvector(rb_ary_entry(interpolant,2));
+   Dvector *Bs = Get_Dvector(rb_ary_entry(interpolant,3));
+   Dvector *Cs = Get_Dvector(rb_ary_entry(interpolant,4));
+   if (Xs->len <= 0 || Xs->len != Ys->len || Xs->len != Bs->len || Xs->len != Cs->len || Xs->len != As->len)
+      rb_raise(rb_eArgError, "interpolant must be from create_pm_cubic_interpolant");
+   double y = c_dvector_pm_cubic_interpolate(NUM2DBL(x), Xs->len, Xs->ptr, Ys->ptr, As->ptr, Bs->ptr, Cs->ptr);
+   return rb_float_new(y);
+}
+
+
+
+
 
 void c_dvector_create_spline_interpolant(int n_pts_data, double *Xs, double *Ys,
     bool start_clamped, double start_slope, bool end_clamped, double end_slope,
@@ -5533,6 +5699,10 @@ void Init_Dvector() {
    rb_define_singleton_method(cDvector, "read_row", dvector_read_row, -1);
    rb_define_singleton_method(cDvector, "create_spline_interpolant", dvector_create_spline_interpolant, -1);
    rb_define_singleton_method(cDvector, "spline_interpolate", dvector_spline_interpolate, -1);
+
+   rb_define_singleton_method(cDvector, "create_pm_cubic_interpolant", dvector_create_pm_cubic_interpolant, -1);
+   rb_define_singleton_method(cDvector, "pm_cubic_interpolate", dvector_pm_cubic_interpolate, -1);
+
    rb_define_singleton_method(cDvector, "linear_interpolate", dvector_linear_interpolate, -1);
    rb_define_singleton_method(cDvector, "min_of_many", dvector_min_of_many, 1);
    rb_define_singleton_method(cDvector, "max_of_many", dvector_max_of_many, 1);

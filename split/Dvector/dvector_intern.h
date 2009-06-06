@@ -135,6 +135,18 @@ PRIVATE double c_dvector_spline_interpolate(double x, int n_pts_data,
     double *Xs, double *Ys, double *Bs, double *Cs, double *Ds);
 PRIVATE VALUE dvector_spline_interpolate(int argc, VALUE *argv, VALUE klass);
 
+
+
+PRIVATE void c_dvector_create_pm_cubic_interpolant(int n_pts_data, double *Xs, double *Ys,
+    double *Bs, double *Cs, double *Ds);
+PRIVATE VALUE dvector_create_pm_cubic_interpolant(int argc, VALUE *argv, VALUE klass);
+    
+PRIVATE double c_dvector_pm_cubic_interpolate(double x, int n_pts_data, 
+    double *Xs, double *Ys, double *Bs, double *Cs, double *Ds);
+PRIVATE VALUE dvector_pm_cubic_interpolate(int argc, VALUE *argv, VALUE klass);
+
+
+
 PRIVATE double c_dvector_linear_interpolate(int num_pts, double *xs, double *ys, double x);
 PRIVATE VALUE dvector_linear_interpolate(int argc, VALUE *argv, VALUE klass);
 

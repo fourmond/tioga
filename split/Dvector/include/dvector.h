@@ -55,15 +55,23 @@ DECLARE_SYMBOL(void, Dvector_Push_Double, (VALUE ary, double val));
 
 
 /* functions for interpolation */
-DECLARE_SYMBOL(double, c_dvector_spline_interpolate,
-	       (double x, int n_pts_data, double *Xs, double *Ys, 
-		double *Bs, double *Cs, double *Ds));
-DECLARE_SYMBOL(double, c_dvector_linear_interpolate,
-	       (int num_pts, double *xs, double *ys, double x));
 DECLARE_SYMBOL(void, c_dvector_create_spline_interpolant,
 	       (int n_pts_data, double *Xs, double *Ys,
 		bool start_clamped, double start_slope, 
 		bool end_clamped, double end_slope,
 		double *As, double *Bs, double *Cs));
+DECLARE_SYMBOL(double, c_dvector_spline_interpolate,
+	       (double x, int n_pts_data, double *Xs, double *Ys, 
+		double *Bs, double *Cs, double *Ds));
+
+DECLARE_SYMBOL(void, c_dvector_create_pm_cubic_interpolant,
+	       (int n_pts_data, double *Xs, double *Ys,
+		double *As, double *Bs, double *Cs));
+DECLARE_SYMBOL(double, c_dvector_pm_cubic_interpolate,
+	       (double x, int n_pts_data, double *Xs, double *Ys, 
+		double *Bs, double *Cs, double *Ds));
+
+DECLARE_SYMBOL(double, c_dvector_linear_interpolate,
+	       (int num_pts, double *xs, double *ys, double x));
 #endif   /* __Dvector_H__ */
 
