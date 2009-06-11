@@ -757,6 +757,7 @@ c_xaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
 }
 
 
+
 OBJ_PTR
 c_xaxis_stroke_color_get(OBJ_PTR fmkr, FM *p, int *ierr) 
 {  
@@ -795,6 +796,66 @@ c_yaxis_stroke_color_get(OBJ_PTR fmkr, FM *p, int *ierr)
    r = p->yaxis_stroke_color_R;
    g = p->yaxis_stroke_color_G;
    b = p->yaxis_stroke_color_B;
+   OBJ_PTR result = Array_New(3);
+   Array_Store(result, 0, Float_New(r), ierr);
+   Array_Store(result, 1, Float_New(g), ierr);
+   Array_Store(result, 2, Float_New(b), ierr);
+   return result;
+}
+
+/* Accessors for tick label colors */
+
+void
+c_xaxis_labels_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
+{
+   double r, g, b;
+   Unpack_RGB(val, &r, &g, &b, ierr);
+   if (*ierr != 0) return;
+   p->xaxis_labels_color_R = r;
+   p->xaxis_labels_color_G = g;
+   p->xaxis_labels_color_B = b;
+}
+
+
+
+OBJ_PTR
+c_xaxis_labels_color_get(OBJ_PTR fmkr, FM *p, int *ierr) 
+{  
+   // value is array of [r, g, b] intensities from 0 to 1
+   // r g b RG
+   double r, g, b;
+   r = p->xaxis_labels_color_R;
+   g = p->xaxis_labels_color_G;
+   b = p->xaxis_labels_color_B;
+   OBJ_PTR result = Array_New(3);
+   Array_Store(result, 0, Float_New(r), ierr);
+   Array_Store(result, 1, Float_New(g), ierr);
+   Array_Store(result, 2, Float_New(b), ierr);
+   return result;
+}
+
+
+void
+c_yaxis_labels_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR val, int *ierr)
+{
+   double r, g, b;
+   Unpack_RGB(val, &r, &g, &b, ierr);
+   if (*ierr != 0) return;
+   p->yaxis_labels_color_R = r;
+   p->yaxis_labels_color_G = g;
+   p->yaxis_labels_color_B = b;
+}
+
+
+OBJ_PTR
+c_yaxis_labels_color_get(OBJ_PTR fmkr, FM *p, int *ierr) 
+{  
+   // value is array of [r, g, b] intensities from 0 to 1
+   // r g b RG
+   double r, g, b;
+   r = p->yaxis_labels_color_R;
+   g = p->yaxis_labels_color_G;
+   b = p->yaxis_labels_color_B;
    OBJ_PTR result = Array_New(3);
    Array_Store(result, 0, Float_New(r), ierr);
    Array_Store(result, 1, Float_New(g), ierr);

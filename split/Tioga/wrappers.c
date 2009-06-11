@@ -135,6 +135,7 @@ OBJ_PTR FM_ylabel_color_set(OBJ_PTR fmkr, OBJ_PTR val) { int ierr=0;
    c_ylabel_color_set(fmkr, Get_FM(fmkr, &ierr), val, &ierr); RETURN_NIL; }
 OBJ_PTR FM_ylabel_color_get(OBJ_PTR fmkr) { int ierr=0;
    return c_ylabel_color_get(fmkr, Get_FM(fmkr, &ierr), &ierr); }
+
 OBJ_PTR FM_xaxis_stroke_color_set(OBJ_PTR fmkr, OBJ_PTR val) { int ierr=0;
    c_xaxis_stroke_color_set(fmkr, Get_FM(fmkr, &ierr), val, &ierr); RETURN_NIL; }
 OBJ_PTR FM_xaxis_stroke_color_get(OBJ_PTR fmkr) { int ierr=0;
@@ -143,6 +144,16 @@ OBJ_PTR FM_yaxis_stroke_color_set(OBJ_PTR fmkr, OBJ_PTR val) { int ierr=0;
    c_yaxis_stroke_color_set(fmkr, Get_FM(fmkr, &ierr), val, &ierr); RETURN_NIL; }
 OBJ_PTR FM_yaxis_stroke_color_get(OBJ_PTR fmkr) { int ierr=0;
    return c_yaxis_stroke_color_get(fmkr, Get_FM(fmkr, &ierr), &ierr); }
+
+OBJ_PTR FM_xaxis_labels_color_set(OBJ_PTR fmkr, OBJ_PTR val) { int ierr=0;
+   c_xaxis_labels_color_set(fmkr, Get_FM(fmkr, &ierr), val, &ierr); RETURN_NIL; }
+OBJ_PTR FM_xaxis_labels_color_get(OBJ_PTR fmkr) { int ierr=0;
+   return c_xaxis_labels_color_get(fmkr, Get_FM(fmkr, &ierr), &ierr); }
+OBJ_PTR FM_yaxis_labels_color_set(OBJ_PTR fmkr, OBJ_PTR val) { int ierr=0;
+   c_yaxis_labels_color_set(fmkr, Get_FM(fmkr, &ierr), val, &ierr); RETURN_NIL; }
+OBJ_PTR FM_yaxis_labels_color_get(OBJ_PTR fmkr) { int ierr=0;
+   return c_yaxis_labels_color_get(fmkr, Get_FM(fmkr, &ierr), &ierr); }
+
 OBJ_PTR FM_string_hls_to_rgb_bang(OBJ_PTR fmkr, OBJ_PTR str) { int ierr=0;
    c_string_hls_to_rgb_bang(fmkr, Get_FM(fmkr, &ierr),  
       (unsigned char *)String_Ptr(str, &ierr), String_Len(str, &ierr), &ierr);

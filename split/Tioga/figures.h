@@ -215,6 +215,11 @@ typedef struct {
     double xaxis_stroke_color_R; // for axis line and tick marks
     double xaxis_stroke_color_G;
     double xaxis_stroke_color_B;
+
+    /* For tick labels */
+    double xaxis_labels_color_R;
+    double xaxis_labels_color_G;
+    double xaxis_labels_color_B;
     // tick marks
     double xaxis_major_tick_width; // same units as line_width
     double xaxis_minor_tick_width; // same units as line_width
@@ -253,6 +258,11 @@ typedef struct {
     double yaxis_stroke_color_R; // for axis line and tick marks
     double yaxis_stroke_color_G;
     double yaxis_stroke_color_B;
+
+    /* For tick labels */
+    double yaxis_labels_color_R;
+    double yaxis_labels_color_G;
+    double yaxis_labels_color_B;
     // tick marks
     double yaxis_major_tick_width; // same units as line_width
     double yaxis_minor_tick_width; // same units as line_width
@@ -457,6 +467,14 @@ extern void c_xaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR valc_hls_to_rg
 extern OBJ_PTR c_xaxis_stroke_color_get(OBJ_PTR fmkr, FM *pc_hls_to_rgb, int *ierr); // value is array of [r, g, b] intensities from 0 to 1
 extern void c_yaxis_stroke_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR valc_hls_to_rgb, int *ierr);
 extern OBJ_PTR c_yaxis_stroke_color_get(OBJ_PTR fmkr, FM *pc_hls_to_rgb, int *ierr); // value is array of [r, g, b] intensities from 0 to 1
+
+/* Same but for label colors: */
+extern void c_xaxis_labels_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR valc_hls_to_rgb, int *ierr);
+extern OBJ_PTR c_xaxis_labels_color_get(OBJ_PTR fmkr, FM *pc_hls_to_rgb, int *ierr); // value is array of [r, g, b] intensities from 0 to 1
+extern void c_yaxis_labels_color_set(OBJ_PTR fmkr, FM *p, OBJ_PTR valc_hls_to_rgb, int *ierr);
+extern OBJ_PTR c_yaxis_labels_color_get(OBJ_PTR fmkr, FM *pc_hls_to_rgb, int *ierr); // value is array of [r, g, b] intensities from 0 to 1
+
+
 extern void c_string_hls_to_rgb_bang(OBJ_PTR fmkr, FM *p, unsigned char* hls_str, long len, int *ierr);
 extern void c_string_rgb_to_hls_bang(OBJ_PTR fmkr, FM *p, unsigned char* rgb_str, long len, int *ierr);
 

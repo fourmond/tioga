@@ -29,14 +29,6 @@
 
 /* 
    Here is my (Vincent) big TODO-list for the axes stuff:
-   * provide a way to reliably get the location from major/minor
-     ticks for a given axis, so users can build lines/grids that build on
-     top of that (or rather under it ;-)...)
-     -> this is partly done, as you can now get the major ticks position.
-   * let the users choose between the current way to pick up ticks position
-     and another, such as the one I'm using in SciYAG, which seems to give
-     results that are more according to my expectations.
-
    * BUG fix: apparently, two calls to the axes stuff do no return the
      same thing, so I'll need to have a careful look at that
  */
@@ -1178,6 +1170,8 @@ static int prepare_dict_PlotAxis(OBJ_PTR fmkr, FM *p,
       axis->minor_tick_length = Hash_Get_Double(axis_spec, "minor_tick_length");
 
    /* Stroke color */
+   /* TODO: maybe add a 'color' attribute that does both stroke and
+      ticks ? */
    if(Hash_Has_Key(axis_spec, "stroke_color")) {
       OBJ_PTR color = Hash_Get_Obj(axis_spec, "stroke_color");
       int err;
@@ -1231,8 +1225,8 @@ void c_show_axis_generic(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec, int *ierr)
    * 'scale', 'shift' and 'angle': the scale, shift and angle of numeric
      labels
    * 'x0', 'y0', 'x1', 'y1': the position of the axis in figure coordinates
-
- */
+   * 'stroke_color': the color to use for drawing lines.
+*/
 OBJ_PTR c_axis_get_information(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec,
 			       int *ierr)
 {

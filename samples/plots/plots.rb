@@ -1112,6 +1112,7 @@ EOD
     # This plot is to demonstrate the new power of #show_axis.
     def axes_fun
       t.do_box_labels("Funny axes", "", "")
+      t.xaxis_labels_color = [0.3,0.5,0.3]
       t.show_plot([-1, 19, 8, 2]) do
         spec = {
           'from' => [3,3],
