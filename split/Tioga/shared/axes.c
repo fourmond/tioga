@@ -37,9 +37,17 @@ typedef struct {
    int type;
    int other_axis_type;
    double line_width;
+
+   /* Stroke color... */
    double stroke_color_R;
    double stroke_color_G;
    double stroke_color_B;
+
+   /* Tick labels color */
+   double labels_color_R;
+   double labels_color_G;
+   double labels_color_B;
+
    double major_tick_width; // same units as line_width
    double minor_tick_width; // same units as line_width
    double major_tick_length; // in units of numeric label char heights
@@ -123,6 +131,11 @@ static void Get_xaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
    s->stroke_color_R = p->xaxis_stroke_color_R; // for axis line and tick marks
    s->stroke_color_G = p->xaxis_stroke_color_G;
    s->stroke_color_B = p->xaxis_stroke_color_B;
+
+   s->labels_color_R = p->xaxis_labels_color_R; // for axis line and tick marks
+   s->labels_color_G = p->xaxis_labels_color_G;
+   s->labels_color_B = p->xaxis_labels_color_B;
+
    s->major_tick_width = p->xaxis_major_tick_width; // same units as line_width
    s->minor_tick_width = p->xaxis_minor_tick_width; // same units as line_width
    s->major_tick_length = p->xaxis_major_tick_length; // in units of numeric label char heights
@@ -159,9 +172,15 @@ static void Get_yaxis_Specs(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
    s->type = p->yaxis_type;
    s->other_axis_type = p->xaxis_type;
    s->line_width = p->yaxis_line_width; // for axis line
+
    s->stroke_color_R = p->yaxis_stroke_color_R; // for axis line and tick marks
    s->stroke_color_G = p->yaxis_stroke_color_G;
    s->stroke_color_B = p->yaxis_stroke_color_B;
+
+   s->labels_color_R = p->yaxis_labels_color_R; // for axis line and tick marks
+   s->labels_color_G = p->yaxis_labels_color_G;
+   s->labels_color_B = p->yaxis_labels_color_B;
+
    s->major_tick_width = p->yaxis_major_tick_width; // same units as line_width
    s->minor_tick_width = p->yaxis_minor_tick_width; // same units as line_width
    s->major_tick_length = p->yaxis_major_tick_length; // in units of numeric label char heights
@@ -832,6 +851,13 @@ static void draw_minor_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
 static void show_numeric_label(OBJ_PTR fmkr, FM *p, PlotAxis *s, 
    char *text, int location, double position, double shift, int *ierr)
 { 
+   /* We need a buffer to implement the color */
+   long len = strlen(text) + 100; /* Should be enough overhead ! */
+   char * buffer = ALLOC_N_char(len);
+   snprintf(buffer, len, "\\textcolor[rgb]{%0.2f,%0.2f,%0.2f}{%s}",
+	    s->labels_color_R, s->labels_color_G, s->labels_color_B,
+	    text);
+	    
    if(location == AXIS_FREE_LOCATION) {
       /* We convert the tick position into frame position */
       double x,y, ft_ht = p->default_text_scale * 
@@ -853,7 +879,7 @@ static void show_numeric_label(OBJ_PTR fmkr, FM *p, PlotAxis *s,
 						 ft_ht * ENLARGE * shift);
       }
 
-      c_show_rotated_label(fmkr, p, text, x, y, 
+      c_show_rotated_label(fmkr, p, buffer, x, y, 
 			   s->numeric_label_scale, 
 			   s->numeric_label_angle + angle, 
 			   s->numeric_label_justification, 
@@ -863,9 +889,10 @@ static void show_numeric_label(OBJ_PTR fmkr, FM *p, PlotAxis *s,
    else {
       // position is in figure coords and must be converted to frame coords
       double pos = ((!s->reversed)? (position - s->axis_min) : (s->axis_max - position)) / s->length;
-      c_show_rotated_text(fmkr, p, text, location, shift, pos, 
+      c_show_rotated_text(fmkr, p, buffer, location, shift, pos, 
 			  s->numeric_label_scale, s->numeric_label_angle, s->numeric_label_justification, s->numeric_label_alignment, OBJ_NIL, ierr);
    }
+   free(buffer);
 }
 
 static void draw_numeric_labels(OBJ_PTR fmkr, FM *p, int location, PlotAxis *s, int *ierr)

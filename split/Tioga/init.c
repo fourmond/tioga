@@ -508,9 +508,14 @@ void c_private_init_fm_data(OBJ_PTR fmkr, FM *p, int *ierr) {
    p->xaxis_loc = BOTTOM;
    // line
    p->xaxis_line_width = 1.0; // for axis line
+
    p->xaxis_stroke_color_R = 0.0; // for axis line and tick marks
    p->xaxis_stroke_color_G = 0.0;
    p->xaxis_stroke_color_B = 0.0;
+
+   p->xaxis_labels_color_R = 0.0; // for axis line and tick marks
+   p->xaxis_labels_color_G = 0.0;
+   p->xaxis_labels_color_B = 0.0;
    // tick marks
    p->xaxis_major_tick_width = 0.9; // same units as line_width
    p->xaxis_minor_tick_width = 0.7; // same units as line_width
@@ -547,6 +552,10 @@ void c_private_init_fm_data(OBJ_PTR fmkr, FM *p, int *ierr) {
    p->yaxis_stroke_color_R = 0.0; // for axis line and tick marks
    p->yaxis_stroke_color_G = 0.0;
    p->yaxis_stroke_color_B = 0.0;
+
+   p->yaxis_labels_color_R = 0.0; // for axis line and tick marks
+   p->yaxis_labels_color_G = 0.0;
+   p->yaxis_labels_color_B = 0.0;
    // tick marks
    p->yaxis_major_tick_width = 0.9; // same units as line_width
    p->yaxis_minor_tick_width = 0.7; // same units as line_width
