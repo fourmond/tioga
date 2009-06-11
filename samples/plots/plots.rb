@@ -1128,7 +1128,8 @@ EOD
           'ticks_outside' => true,
           'ticks_inside' => false,
           'major_ticks' => [4,6],
-          'labels' => ["$a$", "$b$"]
+          'labels' => ["$a$", "$b$"],
+          'stroke_color' => [0.2,0.4,0.7]
         }
         t.show_axis(spec2)
         spec3 = {

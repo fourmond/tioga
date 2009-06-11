@@ -1177,6 +1177,15 @@ static int prepare_dict_PlotAxis(OBJ_PTR fmkr, FM *p,
    if(Hash_Has_Key(axis_spec, "minor_tick_length"))
       axis->minor_tick_length = Hash_Get_Double(axis_spec, "minor_tick_length");
 
+   /* Stroke color */
+   if(Hash_Has_Key(axis_spec, "stroke_color")) {
+      OBJ_PTR color = Hash_Get_Obj(axis_spec, "stroke_color");
+      int err;
+      axis->stroke_color_R = Array_Entry_double(color, 0, &err);
+      axis->stroke_color_G = Array_Entry_double(color, 1, &err);
+      axis->stroke_color_B = Array_Entry_double(color, 2, &err);
+   }
+
    /* Log scale: */
    if(Hash_Has_Key(axis_spec, "log")) {
       OBJ_PTR val = Hash_Get_Obj(axis_spec, "log");
@@ -1244,6 +1253,7 @@ OBJ_PTR c_axis_get_information(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec,
    /* Then, minor ticks positions */
    double * minor;
    long count;
+   OBJ_PTR stroke_color;
    minor = get_minor_ticks_location(fmkr, p, &axis, &count);
    if(minor) {
       Hash_Set_Obj(hash, "minor_ticks", Vector_New(count, minor));
@@ -1281,6 +1291,14 @@ OBJ_PTR c_axis_get_information(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec,
 
    /* Log values */
    Hash_Set_Obj(hash, "log", axis.log_vals ? OBJ_TRUE : OBJ_FALSE);
+
+   /* Stroke color */
+   stroke_color = Array_New(3);
+   Array_Store(stroke_color, 0, Float_New(axis.stroke_color_R),ierr);
+   Array_Store(stroke_color, 1, Float_New(axis.stroke_color_G),ierr);
+   Array_Store(stroke_color, 2, Float_New(axis.stroke_color_B),ierr);
+   Hash_Set_Obj(hash, "stroke_color", stroke_color);
+
 
    free_allocated_memory(&axis);
    return hash;
