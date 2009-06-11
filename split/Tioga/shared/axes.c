@@ -1197,14 +1197,27 @@ static int prepare_dict_PlotAxis(OBJ_PTR fmkr, FM *p,
       axis->minor_tick_length = Hash_Get_Double(axis_spec, "minor_tick_length");
 
    /* Stroke color */
-   /* TODO: maybe add a 'color' attribute that does both stroke and
-      ticks ? */
-   if(Hash_Has_Key(axis_spec, "stroke_color")) {
-      OBJ_PTR color = Hash_Get_Obj(axis_spec, "stroke_color");
+   if(Hash_Has_Key(axis_spec, "stroke_color") || 
+      Hash_Has_Key(axis_spec, "color")) {
+      OBJ_PTR color = (Hash_Has_Key(axis_spec, "stroke_color") ? 
+		       Hash_Get_Obj(axis_spec, "stroke_color") :
+		       Hash_Get_Obj(axis_spec, "color") );
       int err;
       axis->stroke_color_R = Array_Entry_double(color, 0, &err);
       axis->stroke_color_G = Array_Entry_double(color, 1, &err);
       axis->stroke_color_B = Array_Entry_double(color, 2, &err);
+   }
+
+   /* Labels color */
+   if(Hash_Has_Key(axis_spec, "labels_color") || 
+      Hash_Has_Key(axis_spec, "color")) {
+      OBJ_PTR color = (Hash_Has_Key(axis_spec, "labels_color") ? 
+		       Hash_Get_Obj(axis_spec, "labels_color") :
+		       Hash_Get_Obj(axis_spec, "color") );
+      int err;
+      axis->labels_color_R = Array_Entry_double(color, 0, &err);
+      axis->labels_color_G = Array_Entry_double(color, 1, &err);
+      axis->labels_color_B = Array_Entry_double(color, 2, &err);
    }
 
    /* Log scale: */
@@ -1253,6 +1266,7 @@ void c_show_axis_generic(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec, int *ierr)
      labels
    * 'x0', 'y0', 'x1', 'y1': the position of the axis in figure coordinates
    * 'stroke_color': the color to use for drawing lines.
+   * 'labels_color': the color to use for drawing tick labels.
 */
 OBJ_PTR c_axis_get_information(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec,
 			       int *ierr)
@@ -1274,7 +1288,7 @@ OBJ_PTR c_axis_get_information(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec,
    /* Then, minor ticks positions */
    double * minor;
    long count;
-   OBJ_PTR stroke_color;
+   OBJ_PTR color;
    minor = get_minor_ticks_location(fmkr, p, &axis, &count);
    if(minor) {
       Hash_Set_Obj(hash, "minor_ticks", Vector_New(count, minor));
@@ -1314,11 +1328,19 @@ OBJ_PTR c_axis_get_information(OBJ_PTR fmkr, FM *p, OBJ_PTR axis_spec,
    Hash_Set_Obj(hash, "log", axis.log_vals ? OBJ_TRUE : OBJ_FALSE);
 
    /* Stroke color */
-   stroke_color = Array_New(3);
-   Array_Store(stroke_color, 0, Float_New(axis.stroke_color_R),ierr);
-   Array_Store(stroke_color, 1, Float_New(axis.stroke_color_G),ierr);
-   Array_Store(stroke_color, 2, Float_New(axis.stroke_color_B),ierr);
-   Hash_Set_Obj(hash, "stroke_color", stroke_color);
+   color = Array_New(3);
+   Array_Store(color, 0, Float_New(axis.stroke_color_R),ierr);
+   Array_Store(color, 1, Float_New(axis.stroke_color_G),ierr);
+   Array_Store(color, 2, Float_New(axis.stroke_color_B),ierr);
+   Hash_Set_Obj(hash, "stroke_color", color);
+
+   /* Tick labels color */
+   color = Array_New(3);
+   Array_Store(color, 0, Float_New(axis.labels_color_R),ierr);
+   Array_Store(color, 1, Float_New(axis.labels_color_G),ierr);
+   Array_Store(color, 2, Float_New(axis.labels_color_B),ierr);
+   Hash_Set_Obj(hash, "labels_color", color);
+
 
 
    free_allocated_memory(&axis);
