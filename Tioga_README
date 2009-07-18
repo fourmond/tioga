@@ -21,39 +21,44 @@ This is the README for the Tioga kernel, version 1.10, March 7, 2009.
 
 << What's new >>
 
-    Version 1.10 is a minor bug-fix release, the most important one
-being that save_legend_info now draws markers with the proper line style.
+    Version 1.11 brings in a few new features. First, it is now
+possible to set the color of axis tick labels - if you love pink axes,
+you can them fully in Pink, now ;-) ! Check out the
+x/yaxis_labels_color= accessors. The show_axis/axis_info functions
+have been updated accordingly, and are now complete.
 
-    In addition, a patch was provided by Benjamin ter Kuile
-<bterkuile@gmail.com> to ease (and quicken) the interpolation of
-non-uniform 3D-data unto a uniform grid. Thanks !
+    Second, a new interpolation function for monotonic interpolations
+has been added to Dvector (check out the Sampled_pm_cubics sample in
+samples/plots/plots.rb).
 
 
 << Quick Installation of Tioga >>
 
-    Are you feeling lucky?  If so, try QUICK_INSTALL.  This simply does
-the steps for you that are described below.  The install needs to copy some
-files to the ruby directory.  On the Mac, this probably means you need to do
-the whole thing with a 'sudo'.  For Linux, you may have to become root.
-Once you've taken care of that, just run the QUICK_INSTALL script and
-keep your fingers crossed.
+    Are you feeling lucky?  If so, try QUICK_INSTALL.  This simply
+does the steps for you that are described below.  The install needs to
+copy some files to the ruby directory.  On the Mac, this probably
+means you need to do the whole thing with a 'sudo'.  For Linux, you
+may have to become root.  Once you've taken care of that, just run the
+QUICK_INSTALL script and keep your fingers crossed.
 
     You now have the option to run HOME_INSTALL instead, which will
 install the files to your home directory (no root privileges
 needed). You just need to set your RUBYLIB environment variable as
 reminded at the end of the file.
 
-    Please check that there are 0 failures and 0 errors at the end of the test.
-Then, in your favorite PDF previewer, open the newly created 'tests/Icon_Test.pdf'
-and compare it to the prebuilt 'samples/Icon.pdf'.  They should be very similar!
-If it all seems to be working, go directly to the << Documentation >> section below.
+    Please check that there are 0 failures and 0 errors at the end of
+the test.  Then, in your favorite PDF previewer, open the newly
+created 'tests/Icon_Test.pdf' and compare it to the prebuilt
+'samples/Icon.pdf'.  They should be very similar!  If it all seems to
+be working, go directly to the << Documentation >> section below.
 
 
 << Step-by-Step Installation >>
 
-    To get Tioga running, you need to have a working Ruby, a C compiler,
-make, and pdflaxtex.  Assuming you've got all that (more later if you don't),
-connect to the Tioga directory that you just unpacked and do the following:
+    To get Tioga running, you need to have a working Ruby, a C
+compiler, make, and pdflaxtex.  Assuming you've got all that (more
+later if you don't), connect to the Tioga directory that you just
+unpacked and do the following:
 
   [ this has been changed, be careful ! ]
 
@@ -63,29 +68,35 @@ connect to the Tioga directory that you just unpacked and do the following:
     make install
 
 This creates the Makefile, runs it, and finally does the actual
-installation.  The "make install" needs to copy some files to the ruby directory.
-On the Mac, this probably means you need to do the whole thing inside a 'sudo'.
-For Linux, you may have to become root.
+installation.  The "make install" needs to copy some files to the ruby
+directory.  On the Mac, this probably means you need to do the whole
+thing inside a 'sudo'.  For Linux, you may have to become root.
 
-Note that on Linux, the make will compile all the source files.  On the Mac,
-the tar file includes precompiled versions of everything, so the make won't
-have anything to do.  That's okay.  Do the whole sequence anyway just to be safe.
+Note that on Linux, the make will compile all the source files.  On
+the Mac, the tar file includes precompiled versions of everything, so
+the make won't have anything to do.  That's okay.  Do the whole
+sequence anyway just to be safe.
 
     You now have another option to install: if you replace the line
+
     ruby extconf.rb
+
 with 
+
     ruby extconf.rb --home
-it will install the files to your home directory, namely ~/lib/ruby. You don't need root 
-privileges to do that, but make sure that you set RUBYLIB=~/lib/ruby somewhere, so that ruby 
-can find it.
+
+it will install the files to your home directory, namely
+~/lib/ruby. You don't need root privileges to do that, but make sure
+that you set RUBYLIB=~/lib/ruby somewhere, so that ruby can find it.
 
 
 
 
 << Checking The Installation >>
 
-    To make sure at least something works of out the newly installed stuff,
-change directory to your new Tioga folder.  Then enter this to the shell:
+    To make sure at least something works of out the newly installed
+stuff, change directory to your new Tioga folder.  Then enter this to
+the shell:
 
     cd tests
     ruby ts_Tioga.rb
@@ -109,12 +120,14 @@ This should produce something like the following if the install worked:
 
 	55 tests, 647 assertions, 0 failures, 0 errors
 
-[the numbers here are not up-to-date, tests are added everytime a feature is added, so it 
-is likely the numbers you see are greater - it means we're actually working ;-) !]
+[the numbers here are not up-to-date, tests are added everytime a
+feature is added, so it is likely the numbers you see are greater - it
+means we're actually working ;-) !]
 
-These tests ensure that Tioga is accessible and that some of the basic stuff is working.
-Don't skip the visual check of the newly created file 'tests/Icon_Test.pdf'.
-If that's ok, there's a good chance your installation is up and running.
+These tests ensure that Tioga is accessible and that some of the basic
+stuff is working.  Don't skip the visual check of the newly created
+file 'tests/Icon_Test.pdf'.  If that's ok, there's a good chance your
+installation is up and running.
 
 The next step is to do the tutorial found in the documentation.
 
@@ -150,12 +163,12 @@ an email if you'd like a tar file of the images.
 
 << Open Source >>
 
-    You are welcome to take the Tioga source and do what you want with it
-(within the bounds of the GNU license of course).  But don't even think about
-asking for support from me for debugging your new stuff!  I have enough trouble
-with my own bugs to keep me busy endlessly!  But if it looks like a bug in Tioga,
-please do let me know so I can try to fix it.  Or even better, let me know
-the fix along with the bug!
+    You are welcome to take the Tioga source and do what you want with
+it (within the bounds of the GNU license of course).  But don't even
+think about asking for support from me for debugging your new stuff!
+I have enough trouble with my own bugs to keep me busy endlessly!  But
+if it looks like a bug in Tioga, please do let me know so I can try to
+fix it.  Or even better, let me know the fix along with the bug!
 
 
 ----------------------------------
@@ -174,6 +187,16 @@ Bill Paxton
 << What's old >>
 
 Here are the old release messages:
+
+--------------------------
+
+    Version 1.10 is a minor bug-fix release, the most important one
+being that save_legend_info now draws markers with the proper line
+style.
+
+    In addition, a patch was provided by Benjamin ter Kuile
+<bterkuile@gmail.com> to ease (and quicken) the interpolation of
+non-uniform 3D-data unto a uniform grid. Thanks !
 
 --------------------------
 
@@ -215,69 +238,73 @@ show_plot.
 
 --------------------------
 
-    Version 1.8 is essentially a cleanup/bug fix release. Tioga now compiles
-with hardly any warnings, thanks to the work by Taro Sato. show_axis can now
-take a hash instead of a simple location, and can draw axes basically
-anywhere. See the axes_fun function in samples/plots/plots.rb and
-show_axis documentation. Few bugs were fixed, in particular the
-position of ticks with ticks_inside/ticks_outside, and the
-installation via Rubygems which was broken for such a long time we are
-ashamed of it. 
+    Version 1.8 is essentially a cleanup/bug fix release. Tioga now
+compiles with hardly any warnings, thanks to the work by Taro
+Sato. show_axis can now take a hash instead of a simple location, and
+can draw axes basically anywhere. See the axes_fun function in
+samples/plots/plots.rb and show_axis documentation. Few bugs were
+fixed, in particular the position of ticks with
+ticks_inside/ticks_outside, and the installation via Rubygems which
+was broken for such a long time we are ashamed of it.
 
 
 --------------------------
 
-    Version 1.7 adds an option in legends for markers without any line;
-just call save_legend_info with 'line_type' => 'None' in addition to
-the marker information.  It is also now possible to give a 'legend' argument
-to show_marker.  The value of the arg can be either a legend dictionary
-or simply the legend text in which case defaults will be supplied for
-the rest.  There is an example of this in samples/plots.rb
-in the Legend_Outside figure.
+    Version 1.7 adds an option in legends for markers without any
+line; just call save_legend_info with 'line_type' => 'None' in
+addition to the marker information.  It is also now possible to give a
+'legend' argument to show_marker.  The value of the arg can be either
+a legend dictionary or simply the legend text in which case defaults
+will be supplied for the rest.  There is an example of this in
+samples/plots.rb in the Legend_Outside figure.
 
     It saw a very significant improvement in that you can now query
-the exact size of a text typeset by LaTeX, with the function text_size. Please
-have a look at its documentation, and at the Text_size and 
-Text_size_with_rotation samples in samples/figures/figures.rb.
+the exact size of a text typeset by LaTeX, with the function
+text_size. Please have a look at its documentation, and at the
+Text_size and Text_size_with_rotation samples in
+samples/figures/figures.rb.
 
-    The code base was quite moved around so as to facilitate work on a 
-Python version that would share as much code as possible with the Ruby one;
-this should not bring user-visible changes (apart, maybe, from compilation
-problems, but we hope not).
+    The code base was quite moved around so as to facilitate work on a
+Python version that would share as much code as possible with the Ruby
+one; this should not bring user-visible changes (apart, maybe, from
+compilation problems, but we hope not).
 
     Some bug fixes, including potential stack overflows (unprotected
-snprintfs), and some new methods of Function. Dvector.fancy_read has been
-reimplemented in C and benchmarked: it should be around three times faster
-than before.
+snprintfs), and some new methods of Function. Dvector.fancy_read has
+been reimplemented in C and benchmarked: it should be around three
+times faster than before.
 
     Code should now compile cleanly with Ruby 1.9.
 
 --------------------------
 
-   Version 1.6 adds numeric label "frequency" and "phase" attributes for
-both axes.  Previously Tioga assumed that every major tick mark got a numeric
-label.  Now the i'th major tick on the axis gets a label only if
-mod(i+j,k)==0 where j is the phase and k is the frequency.  The default
-frequency is naturally 1 so that every major tick gets a label.
-The full names for these attributes are xaxis_numeric_label_frequency,
-xaxis_numeric_label_phase, and similar for yaxis.
+    Version 1.6 adds numeric label "frequency" and "phase" attributes
+for both axes.  Previously Tioga assumed that every major tick mark
+got a numeric label.  Now the i'th major tick on the axis gets a label
+only if mod(i+j,k)==0 where j is the phase and k is the frequency.
+The default frequency is naturally 1 so that every major tick gets a
+label.  The full names for these attributes are
+xaxis_numeric_label_frequency, xaxis_numeric_label_phase, and similar
+for yaxis.
 
 --------------------------
 
-	Version 1.5 is mainly Vincent's work, so my part of this release message
-will be short.  Remember how I killed off the Mac GUI last time?  Turns out there
-was one user who couldn't live without it -- me!  So it's back, but I'm still not
-making any promises about keeping it alive if Apple does something stupid in
-coming releases.  If you're interested in playing with it in spite of that warning,
-it's available from my website (http://theory.kitp.ucsb.edu/~paxton/Tioga-1.5.dmg).
+    Version 1.5 is mainly Vincent's work, so my part of this release
+message will be short.  Remember how I killed off the Mac GUI last
+time?  Turns out there was one user who couldn't live without it --
+me!  So it's back, but I'm still not making any promises about keeping
+it alive if Apple does something stupid in coming releases.  If you're
+interested in playing with it in spite of that warning, it's available
+from my website (http://theory.kitp.ucsb.edu/~paxton/Tioga-1.5.dmg).
 
 	Cheers, Bill
 
-	[Vincent] Version 1.5 has seen a not-so-s√mall change inthe structure of the 
-tutorial, which now has local links to images. So the images are now included in the
-tarball (though the -without-images don't have them, for those who have sparse 
-disk space or bandwidth). To get a local copy of the tutorial, just run rdoc 
-and then link doc/images to images using the following commands:
+    [Vincent] Version 1.5 has seen a not-so-small change inthe
+structure of the tutorial, which now has local links to images. So the
+images are now included in the tarball (though the -without-images
+don't have them, for those who have sparse disk space or
+bandwidth). To get a local copy of the tutorial, just run rdoc and
+then link doc/images to images using the following commands:
 
 cd doc; ln -s ../images .
 
@@ -288,38 +315,46 @@ doesn't run pdflatex (used by ctioga)
   * a Function#derivative method has been added, that does what you think it 
 does.
 
-The C code has been heavily tweaked to prevent segfaults on some 
-architectures/distributions, and some samples were added, notably one for 
-insets (I'll let you find it !).
+The C code has been heavily tweaked to prevent segfaults on some
+architectures/distributions, and some samples were added, notably one
+for insets (I'll let you find it !).
 
 	Cheers, Vincent
 
 --------------------------
 
-	Version 1.4 is a major overhaul with particular emphasis on the tioga user interface.
-Please take a moment to go through the new section of the tutorial titled, CommandLine.
-It gives a detailed discussion of the new tioga command line interface that replaces
-irb_tioga and the old mac gui.  There is a also new small drag-and-drop application for the Mac
-called "Tioga Droplet" that takes any file dropped on it and sends it to the new tioga
-command line interface to have a portfolio created and displayed.  There
-is also a browser-based viewer called Vtioga that JJ Fleck has developed that uses
-command line tioga to create pdfs, converts them to png's, and displays them in a
-browser page using Ruby on Rails.  And Vincent Fourmond has of course been continuing his
-development of Ctioga.  So there are now several nice options available for tioga user
-interfaces.  [BTW: The old mac gui for tioga is now an orphan; I've decided I can't commit to
-giving it the amount of attention it seems to need to stay healthy!  The current upheaval
-in the user interface area is a result of my decision that things needed to get simpler.
-If you've become hopelessly addicted to the old mac gui, I'll happily let you adopt it.
-Just let me know, and it's yours to maintain and develop as long as your sanity lasts.]
+    Version 1.4 is a major overhaul with particular emphasis on the
+tioga user interface.  Please take a moment to go through the new
+section of the tutorial titled, CommandLine.  It gives a detailed
+discussion of the new tioga command line interface that replaces
+irb_tioga and the old mac gui.  There is a also new small
+drag-and-drop application for the Mac called "Tioga Droplet" that
+takes any file dropped on it and sends it to the new tioga command
+line interface to have a portfolio created and displayed.  There is
+also a browser-based viewer called Vtioga that JJ Fleck has developed
+that uses command line tioga to create pdfs, converts them to png's,
+and displays them in a browser page using Ruby on Rails.  And Vincent
+Fourmond has of course been continuing his development of Ctioga.  So
+there are now several nice options available for tioga user
+interfaces.  [BTW: The old mac gui for tioga is now an orphan; I've
+decided I can't commit to giving it the amount of attention it seems
+to need to stay healthy!  The current upheaval in the user interface
+area is a result of my decision that things needed to get simpler.  If
+you've become hopelessly addicted to the old mac gui, I'll happily let
+you adopt it.  Just let me know, and it's yours to maintain and
+develop as long as your sanity lasts.]
 
-	If you take a look in tioga/samples/plots, you will find a new item: plot_styles.rb.
-Do you like to use a sans-serif font for your plots?  Then 'require plot_styles.rb' in your plot file,
-'include MyPlotStyles' in your plot class (the module defined in plot_styles.rb), and call the 'sans_serif_style' method at the beginning of your plot definition 
-(or from your enter_page function, or from your
-plot class initialization method).  Curious about what tioga attributes there are for
-dealing with the appearance of plots?  Scan through the set_default_plot_style method
-in plot_styles.rb.  Want a style that's not in plot_styles.rb?  Great!  Write it yourself,
-and share it with the rest of us by sending a message to tioga-users! 
+    If you take a look in tioga/samples/plots, you will find a new
+item: plot_styles.rb.  Do you like to use a sans-serif font for your
+plots?  Then 'require plot_styles.rb' in your plot file, 'include
+MyPlotStyles' in your plot class (the module defined in
+plot_styles.rb), and call the 'sans_serif_style' method at the
+beginning of your plot definition (or from your enter_page function,
+or from your plot class initialization method).  Curious about what
+tioga attributes there are for dealing with the appearance of plots?
+Scan through the set_default_plot_style method in plot_styles.rb.
+Want a style that's not in plot_styles.rb?  Great!  Write it yourself,
+and share it with the rest of us by sending a message to tioga-users!
 
 Additionnally, some more classical functionalities have been added: 
   * show_arrow now allows to specify a 'line_style' and justification for

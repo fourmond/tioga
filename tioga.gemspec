@@ -35,8 +35,10 @@ spec = Gem::Specification.new do |s|
   s.bindir = 'split/scripts'
   s.executables << 'tioga'
   s.name = 'tioga'
-  s.version = '1.10'
+  s.version = '1.11'
   s.summary = 'Tioga - a powerful scientific plotting library'
   s.homepage = 'http://tioga.rubyforge.org'
+  s.authors = ['Bill Paxton', 'Vincent Fourmond', 'Taro Sato', 'Jean-Julien Fleck']
   s.rubyforge_project = 'tioga'
+  s.license = "LGPL 2.1"
 end
