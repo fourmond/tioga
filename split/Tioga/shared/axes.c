@@ -644,22 +644,41 @@ static double * pick_major_ticks_positions_Vincent(OBJ_PTR fmkr, FM *p,
 					     num_locations, tick_min, 
 					     tick_gap, length, log_vals, 
 					     tick, ierr);
+   if(tick_min < 0)
+      tick_min = - tick_min;
+
    /* The factor by which you need to divide to get
       the tick_min within [1,10[ */
    double factor = pow(10, floor(log10(tick_min)));
    double norm_tick_min = tick_min/factor;
    int i;
+   int done = 0;
+
+   /* In principle, the loop below show run at most twice, but a
+      safeguard is not too expensive ;-)... */
+   int nb_tries = 0;
    
    /*    printf("axis_min: %g\taxis_max: %g\n", axis_min, axis_max); */
    /* We get the one just above tick_min */
-   for(i = 0; i < nb_natural_distances; i++)
-      if(natural_distances[i] >= norm_tick_min)
-	 break;
+   do {
+      nb_tries ++;
+      for(i = 0; i < nb_natural_distances; i++)
+	 if(natural_distances[i] >= norm_tick_min)
+	    break;
+      /* Now, there is a corner case when there is not enough */
 
+      *tick = natural_distances[i] * factor;
+      
+      /* If the there is room for at most one tick here, there is a
+	 problem, so take the size down. */
+      if( (axis_max - axis_min) < 2.0 * *tick) {
+	 factor = pow(10, floor(log10(tick_min/2)));
+	 norm_tick_min = tick_min/(2*factor);
+      }
+      else
+	 done = 1;
+   } while(! done && nb_tries < 3);
 
-   *tick = natural_distances[i] * factor;
-/*    printf("norm_tick_min: %g\ttick: %g\ttick_min:%g\n",  */
-/* 	  norm_tick_min, *tick, tick_min); */
    double first_tick = ceil(axis_min /(*tick)) * (*tick);
    double last_tick = floor(axis_max /(*tick)) * (*tick);
    
