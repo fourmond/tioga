@@ -187,7 +187,7 @@ static void dvector_store(VALUE ary, long idx, VALUE val) {
 static VALUE dvector_to_dvector(VALUE obj) {
    if ( is_a_dvector(obj) ) return obj;
    obj = rb_Array(obj);
-   return dvector_s_create(RARRAY(obj)->len, RARRAY(obj)->ptr, cDvector);
+   return dvector_s_create(RARRAY_LEN(obj), RARRAY_PTR(obj), cDvector);
 }
 
 static Dvector *Get_Dvector(VALUE obj) {
@@ -910,7 +910,7 @@ static void dvector_splice(VALUE ary, long beg, long len, VALUE rpl) {
       rlen = 0;
    } else if (rb_obj_is_kind_of(rpl,rb_cArray)) {
       rpl = rb_Array(rpl);
-      rlen = RARRAY(rpl)->len;
+      rlen = RARRAY_LEN(rpl);
    } else {
       rpl = dvector_to_dvector(rpl);
       r = Get_Dvector(rpl);
@@ -925,7 +925,7 @@ static void dvector_splice(VALUE ary, long beg, long len, VALUE rpl) {
       dvector_mem_clear(d->ptr + d->len, beg - d->len);
       if (rlen > 0) {
          if (r != NULL) MEMCPY(d->ptr + beg, r->ptr, double, rlen);
-         else ary_to_dvector(RARRAY(rpl)->ptr, rlen, d->ptr);
+         else ary_to_dvector(RARRAY_PTR(rpl), rlen, d->ptr);
       }
       d->len = len;
    } else {
@@ -944,7 +944,7 @@ static void dvector_splice(VALUE ary, long beg, long len, VALUE rpl) {
       }
       if (rlen > 0) {
          if (r != NULL) MEMMOVE(d->ptr + beg, r->ptr, double, rlen);
-         else ary_to_dvector(RARRAY(rpl)->ptr, rlen, d->ptr + beg);
+         else ary_to_dvector(RARRAY_PTR(rpl), rlen, d->ptr + beg);
       }
    }
 }
@@ -1190,7 +1190,7 @@ PRIVATE
    Dvector *d2 = Get_Dvector(ary2);
    long i;
    if (d->len != d2->len) {
-      rb_raise(rb_eArgError, "vectors with different lengths (%d vs %d) for each2", d->len, d2->len);
+      rb_raise(rb_eArgError, "vectors with different lengths (%ld vs %ld) for each2", d->len, d2->len);
    }
    for (i=0; i < d->len; i++) {
       rb_yield_values(2, rb_float_new(d->ptr[i]), rb_float_new(d2->ptr[i]));
@@ -1258,7 +1258,7 @@ PRIVATE
    Dvector *d2 = Get_Dvector(ary2);
    long i;
    if (d->len != d2->len) {
-      rb_raise(rb_eArgError, "vectors with different lengths (%d vs %d) for each2_with_index", d->len, d2->len);
+      rb_raise(rb_eArgError, "vectors with different lengths (%ld vs %ld) for each2_with_index", d->len, d2->len);
    }
    for (i=0; i < d->len; i++) {
       rb_yield_values(3, rb_float_new(d->ptr[i]), rb_float_new(d2->ptr[i]), LONG2NUM(i));
@@ -1312,7 +1312,7 @@ PRIVATE
    Dvector *d2 = Get_Dvector(ary2);
    long len = d->len;
    if (len != d2->len) {
-      rb_raise(rb_eArgError, "vectors with different lengths (%d vs %d) for reverse_each2", len, d2->len);
+      rb_raise(rb_eArgError, "vectors with different lengths (%ld vs %ld) for reverse_each2", len, d2->len);
    }
    while (len--) {
       rb_yield_values(2, rb_float_new(d->ptr[len]), rb_float_new(d2->ptr[len]));
@@ -1395,7 +1395,7 @@ PRIVATE
    Dvector *d2 = Get_Dvector(ary2);
    long len = d->len;
    if (len != d2->len) {
-      rb_raise(rb_eArgError, "vectors with different lengths (%d vs %d) for reverse_each2_with_index", 
+      rb_raise(rb_eArgError, "vectors with different lengths (%ld vs %ld) for reverse_each2_with_index", 
          len, d2->len);
    }
    while (len--) {
@@ -1522,7 +1522,7 @@ PRIVATE
         gam[j] = c[j-1] / bet;
         bet = b[j] - a[j]*gam[j];
         if (bet == 0.0) {
-            rb_raise(rb_eArgError, "zero divisor in tridag (j=%i)", j);
+            rb_raise(rb_eArgError, "zero divisor in tridag (j=%ld)", j);
         }
         u[j] = (r[j] - a[j]*u[j-1]) / bet;
     }
@@ -1632,7 +1632,7 @@ static VALUE dvector_sort_internal(VALUE ary) {
    else {
       ary2 = dvector_to_a(ary);
       ary2 = rb_ary_sort_bang(ary2);
-      ary_to_dvector(RARRAY(ary2)->ptr, d->len, d->ptr);
+      ary_to_dvector(RARRAY_PTR(ary2), d->len, d->ptr);
    }
    return ary;
 }
@@ -1727,7 +1727,7 @@ PRIVATE
          return dvector_new4_dbl(d->len, d->ptr);
       }
       ary = rb_Array(ary);
-      return dvector_new4(d->len, RARRAY(ary)->ptr);
+      return dvector_new4(d->len, RARRAY_PTR(ary));
    }
    collect = dvector_new2(0,d->len);
    for (i = 0; i < d->len; i++) {
@@ -1755,7 +1755,7 @@ PRIVATE
    Dvector *d = Get_Dvector(ary);
    Dvector *d2 = Get_Dvector(ary2);
    if (d->len != d2->len) {
-      rb_raise(rb_eArgError, "vectors with different lengths (%d vs %d) for collect2", d->len, d2->len);
+      rb_raise(rb_eArgError, "vectors with different lengths (%ld vs %ld) for collect2", d->len, d2->len);
    }
    if (!rb_block_given_p()) {
       return dvector_collect(ary);
@@ -1813,7 +1813,7 @@ VALUE dvector_collect2_bang(VALUE ary, VALUE ary2) {
    Dvector *d = dvector_modify(ary);
    Dvector *d2 = Get_Dvector(ary2);
    if (d->len != d2->len) {
-      rb_raise(rb_eArgError, "vectors with different lengths (%d vs %d) for collect2!", d->len, d2->len);
+      rb_raise(rb_eArgError, "vectors with different lengths (%ld vs %ld) for collect2!", d->len, d2->len);
    }
    for (i = 0; i < d->len; i++) {
       dvector_store(ary, i, rb_yield_values(2, rb_float_new(d->ptr[i]), rb_float_new(d2->ptr[i])));
@@ -2014,8 +2014,8 @@ VALUE dvector_prune_bang(VALUE ary, VALUE lst) {
    int i, lst_len, ary_len, pos, j;
    VALUE *lst_ptr;
    lst = rb_Array(lst);
-   lst_ptr = RARRAY(lst)->ptr;
-   lst_len = RARRAY(lst)->len;
+   lst_ptr = RARRAY_PTR(lst);
+   lst_len = RARRAY_LEN(lst);
    for (i = lst_len-1; i >= 0; i--) {
       ary_len = d->len;
       pos = NUM2INT(lst_ptr[i]);  // remove this one from ary
@@ -3011,7 +3011,7 @@ VALUE dvector_dot(VALUE ary1, VALUE ary2) {
    double *p1 = d1->ptr, *p2 = d2->ptr, sum = 0.0;
    long len = d1->len, i;
    if (len != d2->len) {
-      rb_raise(rb_eArgError, "vectors with different lengths (%d vs %d) for dot", d1->len, d2->len);
+      rb_raise(rb_eArgError, "vectors with different lengths (%ld vs %ld) for dot", d1->len, d2->len);
    }
    for (i=0; i<len; i++) sum += p1[i] * p2[i];
    return rb_float_new(sum);
@@ -4079,7 +4079,7 @@ VALUE dvector_apply_math_op2_bang(VALUE ary1, VALUE ary2, double (*op)(double, d
    double *p1 = d1->ptr, *p2 = d2->ptr;
    long len = d1->len, i;
    if (len != d2->len) {
-      rb_raise(rb_eArgError, "vectors with different lengths (%d vs %d) math operation", d1->len, d2->len);
+      rb_raise(rb_eArgError, "vectors with different lengths (%ld vs %ld) math operation", d1->len, d2->len);
    }
    for (i=0; i<len; i++) p1[i] = (*op)(p1[i], p2[i]);
    return ary1;
@@ -4446,8 +4446,8 @@ VALUE Read_Dvectors(char *filename, VALUE destinations, int first_row_of_file, i
    if ((last_row_of_file != -1 && last_row_of_file < first_row_of_file) || filename == NULL) return false;
    if (destinations != Qnil) {
       cols_obj = rb_Array(destinations);
-      num_cols = RARRAY(cols_obj)->len;
-      cols_ptr = RARRAY(cols_obj)->ptr;
+      num_cols = RARRAY_LEN(cols_obj);
+      cols_ptr = RARRAY_PTR(cols_obj);
       for (i = 0; i < num_cols; i++) { /* first pass to check validity */
          col_obj = cols_ptr[i];
          if (col_obj == Qnil) continue;
@@ -4494,8 +4494,8 @@ VALUE Read_Dvectors(char *filename, VALUE destinations, int first_row_of_file, i
       }
       if (row == 0) {
          cols_obj = rb_Array(destinations);
-         num_cols = RARRAY(cols_obj)->len;
-         cols_ptr = RARRAY(cols_obj)->ptr;
+         num_cols = RARRAY_LEN(cols_obj);
+         cols_ptr = RARRAY_PTR(cols_obj);
       }
       buff_loc = 0;
       for (col = 0; col < num_cols; col++) {
@@ -4592,8 +4592,8 @@ VALUE Read_Rows_of_Dvectors(char *filename, VALUE destinations, int first_row_of
    char *buff, *num_str, *pend, c, *cptr;
    int num_rows = 0, i, row, col, buff_loc, skip = first_row_of_file - 1;
    rows_obj = rb_Array(destinations);
-   num_rows = RARRAY(rows_obj)->len;
-   rows_ptr = RARRAY(rows_obj)->ptr;
+   num_rows = RARRAY_LEN(rows_obj);
+   rows_ptr = RARRAY_PTR(rows_obj);
    for (i = 0; i < num_rows; i++) { /* first pass to check validity */
       row_obj = rows_ptr[i];
       if (row_obj == Qnil) continue;
@@ -4854,7 +4854,7 @@ double *Dvector_Data_Replace(VALUE dvector, long len, double *data) { /* copies 
    return dvector_replace_dbls(dvector, len, data); }
 PRIVATE    
 VALUE Dvector_Create(void) { return dvector_new(); }
-
+/*
 PRIVATE int Find_First_Both_Greater(VALUE Xs, VALUE Ys, double x, double y) {
       int i;
       long xlen, ylen;
@@ -4882,7 +4882,7 @@ PRIVATE int Find_First_Both_Smaller(VALUE Xs, VALUE Ys, double x, double y) {
          }
       return -1;
       }
-
+*/
 PRIVATE    
 VALUE c_make_bezier_control_points_for_cubic_in_x(VALUE dest, double x0, double y0, double delta_x, double a, double b, double c)
 {
@@ -5011,7 +5011,6 @@ VALUE dvector_create_pm_cubic_interpolant(int argc, VALUE *argv, VALUE klass) {
    klass = Qnil;
    VALUE Xs = argv[0], Ys = argv[1];
    long xdlen, ydlen;
-   double start = 0.0, end = 0.0;
    double *X_data = Dvector_Data_for_Read(Xs, &xdlen);
    double *Y_data = Dvector_Data_for_Read(Ys, &ydlen);
    if (X_data == NULL || Y_data == NULL || xdlen != ydlen)
@@ -5060,7 +5059,7 @@ VALUE dvector_pm_cubic_interpolate(int argc, VALUE *argv, VALUE klass) {
    VALUE interpolant = argv[1];
    x = rb_Float(x);
    interpolant = rb_Array(interpolant);
-   if (RARRAY(interpolant)->len != 5)
+   if (RARRAY_LEN(interpolant) != 5)
       rb_raise(rb_eArgError, "interpolant must be array of length 5 from create_pm_cubic_interpolant");
    Dvector *Xs = Get_Dvector(rb_ary_entry(interpolant,0));
    Dvector *Ys = Get_Dvector(rb_ary_entry(interpolant,1));
@@ -5189,7 +5188,7 @@ VALUE dvector_spline_interpolate(int argc, VALUE *argv, VALUE klass) {
    VALUE interpolant = argv[1];
    x = rb_Float(x);
    interpolant = rb_Array(interpolant);
-   if (RARRAY(interpolant)->len != 5)
+   if (RARRAY_LEN(interpolant) != 5)
       rb_raise(rb_eArgError, "Spline interpolant must be array of length 5 from create_spline_interpolant");
    Dvector *Xs = Get_Dvector(rb_ary_entry(interpolant,0));
    Dvector *Ys = Get_Dvector(rb_ary_entry(interpolant,1));
@@ -5232,7 +5231,7 @@ VALUE dvector_linear_interpolate(int argc, VALUE *argv, VALUE klass) {
    Dvector *X_data = Get_Dvector(Xs);
    Dvector *Y_data = Get_Dvector(Ys);
    if (X_data->len <= 0 || X_data->len != Y_data->len)
-      rb_raise(rb_eArgError, "Xs and Ys for linear_interpolate must be equal length Dvectors: xlen %i ylen %i.", 
+      rb_raise(rb_eArgError, "Xs and Ys for linear_interpolate must be equal length Dvectors: xlen %ld ylen %ld.", 
          X_data->len, Y_data->len);
    x = rb_Float(x);
    double y = c_dvector_linear_interpolate(X_data->len, X_data->ptr, Y_data->ptr, NUM2DBL(x));
@@ -5255,8 +5254,8 @@ VALUE dvector_min_of_many(VALUE klass, VALUE ary) {
    double m=0.0, tmp;
    bool found_one = false;
    ary = rb_Array(ary);
-   ary_ptr = RARRAY(ary)->ptr;
-   ary_len = RARRAY(ary)->len;
+   ary_ptr = RARRAY_PTR(ary);
+   ary_len = RARRAY_LEN(ary);
    if (ary_len == 0) return Qnil;
    for (i = 0; i < ary_len; i++) {
       if (ary_ptr[i] == Qnil) continue;
@@ -5289,8 +5288,8 @@ VALUE dvector_max_of_many(VALUE klass, VALUE ary) {
    double m=0.0, tmp;
    bool found_one = false;
    ary = rb_Array(ary);
-   ary_ptr = RARRAY(ary)->ptr;
-   ary_len = RARRAY(ary)->len;
+   ary_ptr = RARRAY_PTR(ary);
+   ary_len = RARRAY_LEN(ary);
    if (ary_len == 0) return Qnil;
    for (i = 0; i < ary_len; i++) {
       if (ary_ptr[i] == Qnil) continue;
@@ -5512,8 +5511,8 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
 				       rb_str_new2("default")));
   int remove_space = RTEST(rb_hash_aref(options, 
 					rb_str_new2("remove_space")));
-  int index_col = RTEST(rb_hash_aref(options, 
-				     rb_str_new2("index_col")));
+//  int index_col = RTEST(rb_hash_aref(options, 
+//				     rb_str_new2("index_col")));
   long skip_first = FIX2LONG(rb_hash_aref(options, 
 					  rb_str_new2("skip_first")));
   VALUE sep = rb_hash_aref(options, rb_str_new2("sep"));

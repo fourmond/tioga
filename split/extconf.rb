@@ -2,7 +2,7 @@
 
 require './mkmf2.rb'
 
-$CFLAGS += " -O2 -g -Wall"
+$CFLAGS += " -O2 -g -Wall -fPIC"
 
 # Now, if you want to install the include file, you need to
 # set the EXTCONF_RB_INCLUDE

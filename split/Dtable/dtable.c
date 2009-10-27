@@ -406,7 +406,7 @@ PRIVATE
    row_num = rb_Integer(row_num);
    int row = NUM2INT(row_num);
    if (row < 0 || row >= d->num_rows)
-      rb_raise(rb_eArgError, "Asking for row i = %i from array with only %i rows", row, d->num_rows);
+      rb_raise(rb_eArgError, "Asking for row i = %i from array with only %li rows", row, d->num_rows);
    VALUE dvec = Dvector_Create();
    Dvector_Data_Replace(dvec, d->num_cols, d->ptr[row]);
    return dvec;
@@ -426,9 +426,9 @@ PRIVATE
    row_num = rb_Integer(row_num);
    int row = NUM2INT(row_num);
    if (row < 0 || row >= d->num_rows)
-      rb_raise(rb_eArgError, "Asking for row i = %i from array with only %i rows", row, d->num_rows);
+      rb_raise(rb_eArgError, "Asking for row i = %i from array with only %li rows", row, d->num_rows);
    if (len != d->num_cols)
-      rb_raise(rb_eArgError, "Length of vector (%i) does not match number of columns (%i)", len, d->num_cols);
+      rb_raise(rb_eArgError, "Length of vector (%li) does not match number of columns (%li)", len, d->num_cols);
    for (j=0; j < len; j++)
       d->ptr[row][j] = data[j];
    return dvec;
@@ -448,9 +448,9 @@ PRIVATE
    col_num = rb_Integer(col_num);
    int col = NUM2INT(col_num);
    if (col < 0 || col >= d->num_cols)
-      rb_raise(rb_eArgError, "Asking for column i = %i from array with only %i columns", col, d->num_cols);
+      rb_raise(rb_eArgError, "Asking for column i = %i from array with only %li columns", col, d->num_cols);
    if (len != d->num_rows)
-      rb_raise(rb_eArgError, "Length of vector (%i) does not match number of rows (%i)", len, d->num_rows);
+      rb_raise(rb_eArgError, "Length of vector (%li) does not match number of rows (%li)", len, d->num_rows);
    for (i=0; i < len; i++)
       d->ptr[i][col] = data[i];
    return dvec;
@@ -467,7 +467,7 @@ PRIVATE
    column_num = rb_Integer(column_num);
    int i, column = NUM2INT(column_num), len;
    if (column < 0 || column >= d->num_cols)
-      rb_raise(rb_eArgError, "Asking for column i = %i from array with only %i columns", column, d->num_cols);
+      rb_raise(rb_eArgError, "Asking for column i = %i from array with only %li columns", column, d->num_cols);
    VALUE dvec = Dvector_Create();
    len = d->num_rows;
    Dvector_Data_Resize(dvec, len);
@@ -1576,7 +1576,7 @@ PRIVATE
             printf("len %i\n", len);
             strncpy(err_str,buff,len);
             rb_raise(rb_eArgError,
-               "failed to read requested amount of data in %s (asked for %i xs and %i ys; found only %i and %i). last attempt to read got %g from string starting with: %s",
+               "failed to read requested amount of data in %s (asked for %li xs and %li ys; found only %i and %i). last attempt to read got %g from string starting with: %s",
                filename, num_cols, num_rows, i+1, j, data[j], err_str);
          }
       }
@@ -1759,13 +1759,13 @@ PRIVATE
    Dtable *d = Get_Dtable(ary);
 	int nx = NUM2DBL(rb_Integer(nx_val));
 	int ny = NUM2DBL(rb_Integer(ny_val));
-   int i, j, num_cols = d->num_cols, num_rows = d->num_rows, last_row = num_rows - 1;
+	int i, j, num_cols = d->num_cols, num_rows = d->num_rows/*, last_row = num_rows - 1*/;
 	
    long xsrc_len, ysrc_len;
    double *xsrc = Dvector_Data_for_Read(x_vec, &xsrc_len);
    double *ysrc = Dvector_Data_for_Read(y_vec, &ysrc_len);
-	if(xsrc_len != num_cols) rb_raise(rb_eArgError, "Number of x values (%d) do not match the number of columns (%d)", xsrc_len, num_cols);
-	if(ysrc_len != num_rows) rb_raise(rb_eArgError, "Number of y values (%d) do not match the number of rows (%d)", ysrc_len, num_rows);
+	if(xsrc_len != num_cols) rb_raise(rb_eArgError, "Number of x values (%ld) do not match the number of columns (%d)", xsrc_len, num_cols);
+	if(ysrc_len != num_rows) rb_raise(rb_eArgError, "Number of y values (%ld) do not match the number of rows (%d)", ysrc_len, num_rows);
    VALUE new = dtable_init(dtable_alloc(cDtable), nx, ny);
    Dtable *d2 = Get_Dtable(new);
    double **src, **dest;

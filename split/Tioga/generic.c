@@ -76,7 +76,7 @@ char *CString_Ptr(OBJ_PTR obj, int *ierr) {
 OBJ_PTR Array_New(long len) { return rb_ary_new2(len); }
 
 long Array_Len(OBJ_PTR obj, int *ierr) { 
-   return isa_Dvector(obj)? len_Dvector(obj) : (RARRAY(rb_Array(obj))->len); }
+   return isa_Dvector(obj)? len_Dvector(obj) : (RARRAY_LEN(rb_Array(obj))); }
 
 OBJ_PTR Array_Entry(OBJ_PTR obj, long indx, int *ierr) { return rb_ary_entry(obj,indx); }
 
