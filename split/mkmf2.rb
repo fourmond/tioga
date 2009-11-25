@@ -554,7 +554,7 @@ module Mkmf2
                  else
                    f.dup
                  end
-      filename.gsub!(delete, '')
+      filename = filename.gsub(delete, '')
       
       if target_dir.nil? or target_dir.empty?
         install_hash[f] = filename
