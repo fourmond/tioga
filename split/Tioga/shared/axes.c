@@ -1204,6 +1204,12 @@ static int prepare_dict_PlotAxis(OBJ_PTR fmkr, FM *p,
       axis->numeric_label_scale = Hash_Get_Double(axis_spec, "scale");
    if(Hash_Has_Key(axis_spec, "angle"))
       axis->numeric_label_angle = Hash_Get_Double(axis_spec, "angle");
+   if(Hash_Has_Key(axis_spec, "justification"))
+      axis->numeric_label_justification = 
+	 Hash_Get_Double(axis_spec, "justification");
+   if(Hash_Has_Key(axis_spec, "alignment"))
+      axis->numeric_label_alignment = 
+	 Hash_Get_Double(axis_spec, "alignment");
    
    /* Ticks attributes */
    if(Hash_Has_Key(axis_spec, "major_tick_width"))
