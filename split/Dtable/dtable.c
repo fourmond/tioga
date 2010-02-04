@@ -1811,6 +1811,23 @@ PRIVATE
    return new;
 }
 
+/*
+ * Return the sum of all the values in the Dtable
+ */
+PRIVATE VALUE dtable_sum(VALUE tabl){
+  int i,j;
+  double sum=0.0;
+  double **src;
+  Dtable *d = Get_Dtable(tabl);
+  src = d->ptr; 
+  for(i=0; i < d->num_cols; i++){
+    for(j=0; j < d->num_rows; j++){
+      sum = sum + src[j][i];
+    }
+  }
+  return rb_float_new(sum);
+}
+
 /* 
  * Document-class: Dobjects::Dtable
  *
@@ -1819,8 +1836,6 @@ PRIVATE
  * Essentially any of the operations you might do with a Ruby Array of numbers can also be done with a Dtable.
  * Dtables follow the same design philosophy as Dvector and uses Dvectors for several operations.
  */
-
-
 PUBLIC void Init_Dtable() {
    /* modified by Vincent Fourmond, for splitting out the libraries */
   
@@ -1968,6 +1983,7 @@ PUBLIC void Init_Dtable() {
    rb_define_method(cDtable, "safe_acos!", dtable_safe_acos_bang, 0);
 
    rb_define_method(cDtable, "interpolate", dtable_interpolate, 8);
+   rb_define_method(cDtable, "sum", dtable_sum, 0);
 
    /* Marshal : */
    rb_define_method(cDtable, "_dump", dtable_dump, 1);
