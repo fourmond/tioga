@@ -437,6 +437,23 @@ PRIVATE
 PRIVATE
 /*
  *  call-seq:
+ *    dtable.each_row{|row| }
+ *
+ *  Iterates over all rows and executes the given block
+ */ VALUE dtable_each_row(VALUE ary){
+   Dtable *d = Get_Dtable(ary);
+   VALUE dvec = Dvector_Create();
+   int i;
+   for(i=0; i < d->num_rows; i++){
+     Dvector_Data_Replace(dvec, d->num_cols, d->ptr[i]);
+     rb_yield(dvec);
+   }
+   return ary;
+}
+
+PRIVATE
+/*
+ *  call-seq:
  *     dtable.set_column(int,a_dvec) -> a_dvec
  *  
  *  Stores the contents of _a_dec_ in the specified column of the array.
@@ -474,6 +491,25 @@ PRIVATE
    for (i=0; i < len; i++)
       Dvector_Store_Double(dvec, i, d->ptr[i][column]);
    return dvec;
+}
+
+PRIVATE
+/*
+ *  call-seq:
+ *    dtable.each_column{|col| }
+ *
+ *  Iterates over all columns and executes the given block
+ */ VALUE dtable_each_column(VALUE ary){
+   Dtable *d = Get_Dtable(ary);
+   VALUE dvec = Dvector_Create();
+   int i,j;
+   for(j=0; j < d->num_cols; j++){
+     for(i=0; i < d->num_rows; i++){
+       Dvector_Store_Double(dvec, i, d->ptr[i][j]);
+     }
+     rb_yield(dvec);
+   }
+   return ary;
 }
 
 static void set_dtable_vals(VALUE ary, double v) {
@@ -1811,10 +1847,21 @@ PRIVATE
    return new;
 }
 
+PRIVATE 
 /*
- * Return the sum of all the values in the Dtable
- */
-PRIVATE VALUE dtable_sum(VALUE tabl){
+ *  call-seq:
+ *     dtable.sum   ->  number
+ *  
+ *  Returns the sum of the entries in _dtable_. Returns 0.0 if
+ *  _dtable_ is empty.
+ *     
+ *     a = Dtable.new(2,4)
+ *     a.set_column(0, Dvector[1,2,3,4])
+ *     a.set_column(1, Dvector[0, 1, 0, 1])
+ *     a.sum        -> 12.0
+ *     Dtable.new(2,2).sum   -> 0.0
+ */ 
+VALUE dtable_sum(VALUE tabl){
   int i,j;
   double sum=0.0;
   double **src;
@@ -1984,6 +2031,8 @@ PUBLIC void Init_Dtable() {
 
    rb_define_method(cDtable, "interpolate", dtable_interpolate, 8);
    rb_define_method(cDtable, "sum", dtable_sum, 0);
+   rb_define_method(cDtable, "each_row", dtable_each_row, 0);
+   rb_define_method(cDtable, "each_column", dtable_each_column, 0);
 
    /* Marshal : */
    rb_define_method(cDtable, "_dump", dtable_dump, 1);
