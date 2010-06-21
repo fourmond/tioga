@@ -5495,6 +5495,8 @@ static VALUE dvector_convolve(VALUE self, VALUE kernel, VALUE middle)
     number of the line read
   * 'remove_space': whether to remove spaces at the beginning of a line. *This 
     option is currently not implemented !*
+  * 'comment_out': this should be an array into which the comments
+     will be dumped one by one.
   * 'default':  what to put when nothing was found but a number must be used
 
   As a side note, the read time is highly non-linear, which suggests that
@@ -5517,6 +5519,7 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
 					  rb_str_new2("skip_first")));
   VALUE sep = rb_hash_aref(options, rb_str_new2("sep"));
   VALUE comments = rb_hash_aref(options, rb_str_new2("comments"));
+  VALUE comment_out = rb_hash_aref(options, rb_str_new2("comment_out"));
 
   /* Then, some various variables: */
   VALUE line;
@@ -5540,7 +5543,7 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
   /* The return value */
   VALUE ary;
 
-  /* We use a real gets so we can also rely on StringIO, for instance */
+  /* We use a real gets so we can also use StringIO, for instance */
   while(RTEST(line = rb_funcall(stream, gets_id, 0))) {
     VALUE pre, post, match;
     const char * line_ptr;
@@ -5563,8 +5566,11 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
       line = rb_str_new2(line_ptr);
 
     /* ... or a comment line */
-    if(RTEST(comments) && RTEST(rb_reg_match(comments, line))) 
+    if(RTEST(comments) && RTEST(rb_reg_match(comments, line))) {
+      if(RTEST(comment_out))
+	rb_ary_push(comment_out, line);
       continue;
+    }
 
     /* Then, we remove the newline: */
     post = line;

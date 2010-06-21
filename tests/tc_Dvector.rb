@@ -778,13 +778,16 @@ EOT
 
     def test_fast_fancy_read 
       stream = StringIO.new(FANCY_READ_TEXT)
+      ary = []
       cols = Dvector.fast_fancy_read(stream, {
                                        'sep' => /\s+/,
                                        'comments' => /^\s*\#/,
+                                       'comment_out' => ary,
                                        'skip_first' => 0,
                                        'index_col' => false,
                                        'remove_space' => true,
                                        'default'=> 0.0})
+      assert_equal(ary, ["# some comments\n", "# and a blank line above\n"])
       cols2 = [Dvector[1.2, 1.3, 1.2], Dvector[2.4, 2.4, 0.0],
                Dvector[0.0, 3.5, 0.0]]
       3.times do |i|
