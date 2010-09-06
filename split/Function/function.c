@@ -925,6 +925,140 @@ static VALUE function_derivative(VALUE self)
 }
 
 /*
+  Computes a 4th order accurate derivative of the Function.
+
+  This function *requires* that there are at the very least 5 data
+  points !
+*/
+static VALUE function_diff_5p(VALUE self)
+{
+  long size = function_sanity_check(self);
+  const double *x = Dvector_Data_for_Read(get_x_vector(self),NULL);
+  const double *y = Dvector_Data_for_Read(get_y_vector(self),NULL);
+  VALUE derivative = Dvector_Create();
+  long i = 0;
+  double delta_1, delta_2, delta_3, delta_4;
+  double alpha_1, alpha_2, alpha_3, alpha_4;
+  double v0,v1,v2,v3,v4;
+  /* TODO: what happens when there are less than 5 points ? */
+
+  for(i = 0; i < size; i++) {
+    /* First initialize values, though this is very suboptimal */
+    v0 = y[i];
+    if(i == 0) {
+      delta_1 = x[1] - x[0]; v1 = y[1];
+      delta_2 = x[2] - x[0]; v2 = y[2];
+      delta_3 = x[3] - x[0]; v3 = y[3];
+      delta_4 = x[4] - x[0]; v4 = y[4];
+    } else if(i == 1) {
+      delta_1 = x[0] - x[1]; v1 = y[0];
+      delta_2 = x[2] - x[1]; v2 = y[2];
+      delta_3 = x[3] - x[1]; v3 = y[3];
+      delta_4 = x[4] - x[1]; v4 = y[4];
+    } else if(i == size - 2) {
+      delta_1 = x[size-1] - x[size-2]; v1 = y[size-1];
+      delta_2 = x[size-3] - x[size-2]; v2 = y[size-3];
+      delta_3 = x[size-4] - x[size-2]; v3 = y[size-4];
+      delta_4 = x[size-5] - x[size-2]; v4 = y[size-5];
+    } else if(i == size - 1) {
+      delta_1 = x[size-2] - x[size-1]; v1 = y[size-2];
+      delta_2 = x[size-3] - x[size-1]; v2 = y[size-3];
+      delta_3 = x[size-4] - x[size-1]; v3 = y[size-4];
+      delta_4 = x[size-5] - x[size-1]; v4 = y[size-5];
+    } else {
+      delta_1 = x[i-2] - x[i]; v1 = y[i-2];
+      delta_2 = x[i-1] - x[i]; v2 = y[i-1];
+      delta_3 = x[i+2] - x[i]; v3 = y[i+2];
+      delta_4 = x[i+1] - x[i]; v4 = y[i+1];
+    }
+    alpha_1 = delta_2*delta_3*delta_4/
+      (delta_1 * (delta_2 - delta_1) * (delta_3 - delta_1) 
+       * (delta_4 - delta_1));
+    alpha_2 = delta_1*delta_3*delta_4/
+      (delta_2 * (delta_1 - delta_2) * (delta_3 - delta_2) 
+       * (delta_4 - delta_2));
+    alpha_3 = delta_1*delta_2*delta_4/
+      (delta_3 * (delta_1 - delta_3) * (delta_2 - delta_3) 
+       * (delta_4 - delta_3));
+    alpha_4 = delta_1*delta_2*delta_3/
+      (delta_4 * (delta_1 - delta_4) * (delta_2 - delta_4) 
+       * (delta_3 - delta_4));
+    Dvector_Push_Double(derivative,
+			-(alpha_1 + alpha_2 + alpha_3 + alpha_4) * v0 +
+			alpha_1 * v1 + alpha_2 * v2 + 
+			alpha_3 * v3 + alpha_4 * v4);
+  }
+  return Function_Create(get_x_vector(self), derivative);
+}
+
+/*
+  Computes a 4th order accurate second derivative of the Function.
+
+  This function *requires* that there are at the very least 5 data
+  points!  
+*/
+static VALUE function_diff2_5p(VALUE self)
+{
+  long size = function_sanity_check(self);
+  const double *x = Dvector_Data_for_Read(get_x_vector(self),NULL);
+  const double *y = Dvector_Data_for_Read(get_y_vector(self),NULL);
+  VALUE derivative = Dvector_Create();
+  long i = 0;
+  double delta_1, delta_2, delta_3, delta_4;
+  double alpha_1, alpha_2, alpha_3, alpha_4;
+  double v0,v1,v2,v3,v4;
+
+  for(i = 0; i < size; i++) {
+    /* First initialize values, though this is very suboptimal */
+    v0 = y[i];
+    if(i == 0) {
+      delta_1 = x[1] - x[0]; v1 = y[1];
+      delta_2 = x[2] - x[0]; v2 = y[2];
+      delta_3 = x[3] - x[0]; v3 = y[3];
+      delta_4 = x[4] - x[0]; v4 = y[4];
+    } else if(i == 1) {
+      delta_1 = x[0] - x[1]; v1 = y[0];
+      delta_2 = x[2] - x[1]; v2 = y[2];
+      delta_3 = x[3] - x[1]; v3 = y[3];
+      delta_4 = x[4] - x[1]; v4 = y[4];
+    } else if(i == size - 2) {
+      delta_1 = x[size-1] - x[size-2]; v1 = y[size-1];
+      delta_2 = x[size-3] - x[size-2]; v2 = y[size-3];
+      delta_3 = x[size-4] - x[size-2]; v3 = y[size-4];
+      delta_4 = x[size-5] - x[size-2]; v4 = y[size-5];
+    } else if(i == size - 1) {
+      delta_1 = x[size-2] - x[size-1]; v1 = y[size-2];
+      delta_2 = x[size-3] - x[size-1]; v2 = y[size-3];
+      delta_3 = x[size-4] - x[size-1]; v3 = y[size-4];
+      delta_4 = x[size-5] - x[size-1]; v4 = y[size-5];
+    } else {
+      delta_1 = x[i-2] - x[i]; v1 = y[i-2];
+      delta_2 = x[i-1] - x[i]; v2 = y[i-1];
+      delta_3 = x[i+2] - x[i]; v3 = y[i+2];
+      delta_4 = x[i+1] - x[i]; v4 = y[i+1];
+    }
+    alpha_1 = -2 * (delta_2*delta_3 + delta_2*delta_4 + delta_3*delta_4)/
+      (delta_1 * (delta_2 - delta_1) * (delta_3 - delta_1) 
+       * (delta_4 - delta_1));
+    alpha_2 = -2 * (delta_1*delta_3 + delta_1*delta_4 + delta_3*delta_4)/
+      (delta_2 * (delta_1 - delta_2) * (delta_3 - delta_2) 
+       * (delta_4 - delta_2));
+    alpha_3 = -2 * (delta_2*delta_1 + delta_2*delta_4 + delta_1*delta_4)/
+      (delta_3 * (delta_1 - delta_3) * (delta_2 - delta_3) 
+       * (delta_4 - delta_3));
+    alpha_4 = -2 * (delta_2*delta_3 + delta_2*delta_1 + delta_3*delta_1)/
+      (delta_4 * (delta_1 - delta_4) * (delta_2 - delta_4) 
+       * (delta_3 - delta_4));
+    Dvector_Push_Double(derivative,
+			-(alpha_1 + alpha_2 + alpha_3 + alpha_4) * v0 +
+			alpha_1 * v1 + alpha_2 * v2 + 
+			alpha_3 * v3 + alpha_4 * v4);
+  }
+  return Function_Create(get_x_vector(self), derivative);
+}
+
+
+/*
   Returns the number of points inside the function.
 */
 static VALUE function_size(VALUE self)
@@ -1101,6 +1235,10 @@ void Init_Function()
   rb_define_method(cFunction, "primitive", function_primitive, 0);
   /* derivative */
   rb_define_method(cFunction, "derivative", function_derivative, 0);
+
+  /* 5-points derivatives */
+  rb_define_method(cFunction, "diff_5p", function_diff_5p, 0);
+  rb_define_method(cFunction, "diff2_5p", function_diff2_5p, 0);
 
   /* distance to a point */
   rb_define_method(cFunction, "distance", function_distance, -1);
