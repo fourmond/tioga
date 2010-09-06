@@ -139,5 +139,39 @@ class TestFunction < Test::Unit::TestCase
     # It really should be fine.
   end
 
+  # Testing derivatives
+  def test_derivatives
+    x = Dvector.new
+    y = Dvector.new
+    d1 = Dvector.new
+    d2 = Dvector.new
+    30.times do |i|
+      x << i
+      y << i*i*i
+      d1 << 3 * i * i
+      d2 << 6 * i
+    end
+
+
+    f = Function.new(x,y)
+
+    # First derivative
+    f1 = f.diff_5p
+    d1.sub!(f1.y)
+    d1.each do |x|
+      assert_in_delta(x,0,1e-10)
+    end
+
+    # Second derivative
+    f1 = f.diff2_5p
+    d2.sub!(f1.y)
+    d2.each do |x|
+      assert_in_delta(x,0,1e-10)
+    end
+    
+  end
+    
+    
+
   # There is unfortunately no simple way to test the interpolations...
 end
