@@ -5529,7 +5529,11 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
   long line_number = 0;
 
   /* 
-     Now come the fun part - rudimentary vectors management 
+     Now come the fun part - rudimentary vectors management
+
+     TODO: if the stream provides functionality to get its total size,
+     it could be interesting to estimate the total number of lines
+     based on some small heuristics
    */
   int nb_vectors = 0;		/* The number of vectors currently created */
   int current_size = 10;	/* The number of slots available */
@@ -5634,6 +5638,98 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
   free(vectors);
   return ary;
 }
+
+/*
+  Returns a list of local extrema of the vector, organized thus:
+  
+   [ [:min, idmin1], [:max, idmax1], ...]
+  
+  The values are pushed in the order in which they are found. It works
+  thus: it scans the vector and looks around the current point in a
+  given window. If the current point is the maximum or the minimum, it
+  is considered as a local maximum/minimum. Control over which extrema
+  are included is given to the used through threshold mechanisms.
+
+  The _options_ hash controls how the peaks are detected:
+  * _window_: the number of elements on which we look on
+    both sides (default 5, ie the local maximum is over 11 points)
+  * _threshold_: the minimum amplitude the extrema must have to
+    be considered (default 0)
+
+    *Note:* beware of NANs ! They *will* screw up peak detection, as
+  they are neither bigger nor smaller than anything...  
+*/
+static VALUE dvector_extrema(int argc, VALUE *argv, VALUE self)
+{
+  long window = 5;
+  double threshold = 0;
+  
+  if(argc == 1) {
+    VALUE t;
+    t = rb_hash_aref(argv[0], rb_str_new2("window"));
+    if(RTEST(t)) {
+      window = FIX2LONG(t);
+    }
+    t = rb_hash_aref(argv[0], rb_str_new2("threshold"));
+    if(RTEST(t)) {
+      threshold = rb_num2dbl(t);
+    }
+  } else if(argc > 1)
+    rb_raise(rb_eArgError, "Dvector.extrema only takes 0 or 1 argument");
+
+  /* Handling of the vector */
+  long len, i,j;
+  double * data = Dvector_Data_for_Read(self, &len);
+  VALUE s_min = ID2SYM(rb_intern("min"));
+  VALUE s_max = ID2SYM(rb_intern("max"));
+
+  
+
+  VALUE ret = rb_ary_new();
+		       
+  for(i = 0; i < len; i++) {
+
+    /* This is stupid and will need decent optimization when I have
+       time */
+    long first = i > window ? i - window : 0;
+    double cur_min = data[first];
+    long cur_min_idx = first;
+    double cur_max = data[first];
+    long cur_max_idx = first;
+    
+    for(j = first; (j < i+window) && (j < len); j++) {
+      if(data[j] <= cur_min) {
+	cur_min = data[j];
+	cur_min_idx = j;
+      }
+      if(data[j] >= cur_max) {
+	cur_max = data[j];
+	cur_max_idx = j;
+      }
+    }
+
+    if(cur_min_idx == i) {
+      /* This is a potential minimum */
+      if(fabs(cur_min) >= threshold) {
+	VALUE min = rb_ary_new();
+	rb_ary_push(min, s_min);
+	rb_ary_push(min, LONG2FIX(i));
+	rb_ary_push(ret, min);
+      }
+    }
+    else if(cur_max_idx == i) {
+      /* A potential maximum */
+      if(fabs(cur_max) >= threshold) { 
+	VALUE max = rb_ary_new();
+	rb_ary_push(max, s_max);
+	rb_ary_push(max, LONG2FIX(i));
+	rb_ary_push(ret, max);
+      }
+    }
+  }
+  return ret;
+}
+
 
 
 /* 
@@ -5961,6 +6057,10 @@ void Init_Dvector() {
    /* Fast fancy read: */
    rb_define_singleton_method(cDvector, "fast_fancy_read", 
 			      dvector_fast_fancy_read, 2);
+
+
+   /* Local extrema */
+   rb_define_method(cDvector, "extrema", dvector_extrema, -1);
 
 
    dvector_output_fs = Qnil;

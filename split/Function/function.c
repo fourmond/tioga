@@ -5,7 +5,7 @@
    An object embedding two Dvectors for the ease of manipulation as
    a function. 
    
-   Copyright (C) 2006  Vincent Fourmond
+   Copyright (C) 2006,2010  Vincent Fourmond
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Library Public License as published
@@ -1056,7 +1056,6 @@ static VALUE function_diff2_5p(VALUE self)
   }
   return Function_Create(get_x_vector(self), derivative);
 }
-
 
 /*
   Returns the number of points inside the function.

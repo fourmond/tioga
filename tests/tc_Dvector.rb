@@ -867,5 +867,32 @@ EOT
       assert_equal(b,d)
     end
 
+    # Test the search for local extrema
+    def test_extrema
+      a = Dvector.new
+      101.times do |i|
+        a << Math.sin(0.1 * 3.141592 * i)
+      end
+      
+      ext = a.extrema
+      vals = [[:min, 0], [:max, 5], [:min, 15], 
+              [:max, 25], [:min, 35], [:max, 45], 
+              [:min, 55], [:max, 65], [:min, 75], [:max, 85], 
+              [:min, 95], [:max, 100]]
+      assert_equal(vals, ext)
+
+      # Same, but with a larger window: we get rid of what is on both
+      # sides
+      ext = a.extrema('window' => 12)
+      vals.shift
+      vals.pop
+      assert_equal(vals, ext)
+
+      ext = a.extrema('threshold' => 0.1) # Also gets rid of artefacts
+                                          # on both sides
+
+
+    end
+
     
 end
