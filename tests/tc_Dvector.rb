@@ -874,25 +874,36 @@ EOT
         a << Math.sin(0.1 * 3.141592 * i)
       end
       
-      ext = a.extrema
       vals = [[:min, 0], [:max, 5], [:min, 15], 
               [:max, 25], [:min, 35], [:max, 45], 
               [:min, 55], [:max, 65], [:min, 75], [:max, 85], 
               [:min, 95], [:max, 100]]
+      vals2 = vals.dup
+      vals2.shift
+      vals2.pop
+
+      ext = a.extrema
       assert_equal(vals, ext)
 
       # Same, but with a larger window: we get rid of what is on both
       # sides
       ext = a.extrema('window' => 12)
-      vals.shift
-      vals.pop
-      assert_equal(vals, ext)
+      assert_equal(vals2, ext)
 
       ext = a.extrema('threshold' => 0.1) # Also gets rid of artefacts
                                           # on both sides
+      assert_equal(vals2, ext)
+
+      ext = a.extrema('dthreshold' => 0.1) # Keep both sides
+      assert_equal(vals, ext)
 
 
+      ext = a.extrema('dthreshold' => 0.1, 'threshold' => 0.1) # Drops sides
+      assert_equal(vals2, ext)
+
+      ext = a.extrema('dthreshold' => 0.1, 
+                      'threshold' => 0.1, 'or' => true) # Drops sides
+      assert_equal(vals, ext)
     end
-
     
 end

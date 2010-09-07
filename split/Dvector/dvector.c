@@ -5655,6 +5655,11 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
     both sides (default 5, ie the local maximum is over 11 points)
   * _threshold_: the minimum amplitude the extrema must have to
     be considered (default 0)
+  * _dthreshold_: how much over/under the average an extremum must be
+    (default 0) 
+  * _or_: whether the _threshold_ and _dthreshold_ tests are both
+    necessary or if only one is (default false: both tests are
+    necessary)
 
     *Note:* beware of NANs ! They *will* screw up peak detection, as
   they are neither bigger nor smaller than anything...  
@@ -5663,6 +5668,8 @@ static VALUE dvector_extrema(int argc, VALUE *argv, VALUE self)
 {
   long window = 5;
   double threshold = 0;
+  double dthreshold = 0;
+  int inclusive = 1;
   
   if(argc == 1) {
     VALUE t;
@@ -5674,6 +5681,13 @@ static VALUE dvector_extrema(int argc, VALUE *argv, VALUE self)
     if(RTEST(t)) {
       threshold = rb_num2dbl(t);
     }
+    t = rb_hash_aref(argv[0], rb_str_new2("dthreshold"));
+    if(RTEST(t)) {
+      dthreshold = rb_num2dbl(t);
+    }
+    
+    t = rb_hash_aref(argv[0], rb_str_new2("or"));
+    inclusive = ! RTEST(t);
   } else if(argc > 1)
     rb_raise(rb_eArgError, "Dvector.extrema only takes 0 or 1 argument");
 
@@ -5696,8 +5710,11 @@ static VALUE dvector_extrema(int argc, VALUE *argv, VALUE self)
     long cur_min_idx = first;
     double cur_max = data[first];
     long cur_max_idx = first;
+    double average = 0;
+    long nb = 0;
     
-    for(j = first; (j < i+window) && (j < len); j++) {
+    for(j = first; (j < i+window) && (j < len); j++,nb++) {
+      average += data[j];
       if(data[j] <= cur_min) {
 	cur_min = data[j];
 	cur_min_idx = j;
@@ -5707,10 +5724,17 @@ static VALUE dvector_extrema(int argc, VALUE *argv, VALUE self)
 	cur_max_idx = j;
       }
     }
+    average /= nb;
 
     if(cur_min_idx == i) {
       /* This is a potential minimum */
-      if(fabs(cur_min) >= threshold) {
+      if((inclusive && 
+	  (fabs(cur_min) >= threshold) && 
+	  (fabs(cur_min - average) >= dthreshold))
+	 || (!inclusive && 
+	     ((fabs(cur_min) >= threshold) ||
+	      (fabs(cur_min - average) >= dthreshold))
+	     )) {
 	VALUE min = rb_ary_new();
 	rb_ary_push(min, s_min);
 	rb_ary_push(min, LONG2FIX(i));
@@ -5719,7 +5743,13 @@ static VALUE dvector_extrema(int argc, VALUE *argv, VALUE self)
     }
     else if(cur_max_idx == i) {
       /* A potential maximum */
-      if(fabs(cur_max) >= threshold) { 
+      if((inclusive && 
+	  (fabs(cur_max) >= threshold) && 
+	  (fabs(cur_max - average) >= dthreshold))
+	 || (!inclusive && 
+	     ((fabs(cur_max) >= threshold) ||
+	      (fabs(cur_max - average) >= dthreshold))
+	     )) {
 	VALUE max = rb_ary_new();
 	rb_ary_push(max, s_max);
 	rb_ary_push(max, LONG2FIX(i));
