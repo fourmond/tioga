@@ -3,7 +3,7 @@ require 'mkmf'
 
 
 
-if false && have_header("zlib.h") and have_library("z", "compress", "zlib.h")
+if have_header("zlib.h") and have_library("z", "compress", "zlib.h")
   puts "Using the system zlib library"
 else
   require 'ftools'
