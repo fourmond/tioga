@@ -26,12 +26,16 @@
 #include <namespace.h>
 #include <ruby.h>
 
-#include "dvector.h"
-#include "../symbols.c"
 
 #include <math.h>
+
+/* Private include files */
+#include "dvector.h"
+#include "symbols.c"
+
 /* compiler-dependent definitions, such as is_okay_number */
 #include <defs.h>
+/* End of private files */
 
 /* the class we're defining */
 static VALUE cFunction;
