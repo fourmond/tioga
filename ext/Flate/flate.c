@@ -1,12 +1,16 @@
 /* flate.c -- main file for Ruby extension
  */
 
-#include "../symbols.h"
-#include "../symbols.c"
-#include "zlib.h"
+/* Internal files */
+#include "symbols.h"
+#include "symbols.c"
 #include "flate_intern.h"
 
 #include <defs.h>
+/* End of internal include files */
+
+#include "zlib.h"
+
 /*
    Copyright (C) 2005  Bill Paxton
 
