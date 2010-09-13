@@ -27,13 +27,15 @@
 #include <math.h>
 #include "intern.h"
 
-#include "../symbols.h"
-#include "../symbols.c"
+/* Internal include files, from the ext/includes directory */
+#include <symbols.h>
+#include <symbols.c>
 
 #include <defs.h>
 
 /* safe storing of doubles */
 #include <safe_double.h>
+/* End of internal files */
 
 
 #define is_a_dtable(d) ( TYPE(d) == T_DATA && RDATA(d)->dfree == (RUBY_DATA_FUNC)dtable_free )
