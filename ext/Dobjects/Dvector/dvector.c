@@ -5763,7 +5763,7 @@ static VALUE dvector_extrema(int argc, VALUE *argv, VALUE self)
 }
 
 /* This is the FFTW-based part of the game */
-#ifdef _HAVE_FFTW3_H
+#ifdef HAVE_FFTW3_H
 #include <fftw3.h>
 
 /* 
@@ -6255,7 +6255,7 @@ void Init_Dvector() {
    rb_define_method(cDvector, "extrema", dvector_extrema, -1);
 
    /* FFT functions */
-#ifdef _HAVE_FFTW3_H
+#ifdef HAVE_FFTW3_H
 
    rb_define_method(cDvector, "fft!", dvector_fft, 0);
    rb_define_method(cDvector, "rfft!", dvector_rfft, 0);
