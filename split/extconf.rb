@@ -89,6 +89,15 @@ add_include_path("Flate/include")
 #   exit 1 
 # end
 
+
+# Conditional use of embedded zlib
+if have_header("fftw3.h") and have_library("fftw3", "fftw_execute", "fftw3.h")
+  puts "fftw3 was found on this system: Fourier transforms will be available"
+else
+  puts "fftw3 was not found on this system: no Fourier transforms"
+end
+
+
 unless have_header("ieee754.h")
   puts "You lack the ieee754.h header file, which might mean lower " +
     "reliability when Marshalling Dvectors and Dtables"

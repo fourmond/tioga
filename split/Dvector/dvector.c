@@ -5760,6 +5760,87 @@ static VALUE dvector_extrema(int argc, VALUE *argv, VALUE self)
   return ret;
 }
 
+/* This is the FFTW-based part of the game */
+#ifdef _HAVE_FFTW3_H
+#include <fftw3.h>
+
+/* 
+   Performs an in-place Fourier transform of the vector. The results
+   is stored in the so-called "half-complex" format (see
+   http://www.fftw.org/fftw3_doc/The-Halfcomplex_002dformat-DFT.html
+   for more information).
+
+*/
+static VALUE dvector_fft(VALUE self)
+{
+  long len;
+  double * values = Dvector_Data_for_Write(self, &len);
+  fftw_plan plan = fftw_plan_r2r_1d(len, values, values,
+				    FFTW_R2HC, FFTW_ESTIMATE);
+  fftw_execute(plan);
+  fftw_destroy_plan(plan);
+  return self;
+}
+
+/* 
+   Performs a reverse in-place Fourier transform of the vector. The
+   original data must have been stored in the so called "half-complex"
+   format (see #fft!).
+*/
+
+static VALUE dvector_rfft(VALUE self)
+{
+  long len;
+  double * values = Dvector_Data_for_Write(self, &len);
+  fftw_plan plan = fftw_plan_r2r_1d(len, values, values,
+				    FFTW_HC2R, FFTW_ESTIMATE);
+  fftw_execute(plan);
+  fftw_destroy_plan(plan);
+  return self;
+}
+
+/* 
+   Now, small functions to manipulate the FFTed data:
+   * multiply them
+   * divide them
+   * get their module
+*/
+
+
+/* 
+   Returns the power spectra of the ffted data (ie the square of the
+   norm of the complex fourier coefficients.
+   
+   The returned value is a new Dvector of size about two times smaller
+   than the original (precisely size/2 + 1)
+*/
+static VALUE dvector_fft_spectrum(VALUE self)
+{
+  long len;
+  const double * values = Dvector_Data_for_Read(self, &len);
+  /* First compute the size of the target: */
+  long target_size = len/2+1;
+  long i;
+  VALUE retval = dvector_new2(target_size,target_size);
+  double * ret = Dvector_Data_for_Write(retval,NULL);
+
+  /* Pointer to real and imaginary parts */
+  const double * real;
+  const double * img;
+  ret[0] = values[0] * values[0];
+
+
+  /* The Nyquist frequency */
+  if(len % 2 == 0)
+    ret[target_size - 1] = values[target_size-1] * values[target_size-1];
+  for(i = 1, real = values + 1, img = values + len; i < (len+1)/2;
+      i++, real++, img--)
+    ret[i] = *real * *real + *img * *img;
+  return retval;
+}
+
+
+#endif
 
 
 /* 
@@ -6091,6 +6172,15 @@ void Init_Dvector() {
 
    /* Local extrema */
    rb_define_method(cDvector, "extrema", dvector_extrema, -1);
+
+   /* FFT functions */
+#ifdef _HAVE_FFTW3_H
+
+   rb_define_method(cDvector, "fft!", dvector_fft, 0);
+   rb_define_method(cDvector, "rfft!", dvector_rfft, 0);
+   rb_define_method(cDvector, "fft_spectrum", dvector_fft_spectrum, 0);
+
+#endif
 
 
    dvector_output_fs = Qnil;
