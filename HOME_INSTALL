@@ -1,8 +1,14 @@
-cd split && 
-ruby extconf.rb --home &&
-make &&
-make install &&
-export RUBYLIB=$HOME/lib/ruby &&
-cd ../tests &&
-ruby ts_Tioga.rb &&
-echo "Don't" 'forget to set the RUBYLIB=$HOME/lib/ruby !'
+#! /bin/sh 
+set -e
+if [ -z "$HOME_LIB" ]; then
+    HOME_LIB=$HOME/lib/ruby
+fi
+ruby setup.rb config --prefix=$HOME --siteruby=$HOME_LIB \
+    --siterubyver=$HOME_LIB \
+    --siterubyverarch=$HOME_LIB
+ruby setup.rb setup 
+ruby setup.rb install
+export RUBYLIB=$HOME_LIB
+cd tests 
+ruby ts_Tioga.rb 
+echo "Don't" 'forget to set RUBYLIB='"$HOME_LIB"' in your shell config file !'
