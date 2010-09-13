@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# when this script runs, your normal $PATH list is not used!
-# so the AppleScript needs to be in a standard location
-
-osascript '/usr/bin/Reload_Preview_Document.scpt' $*
