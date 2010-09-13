@@ -30,8 +30,10 @@
 #include "intern.h"
 #include "dvector_intern.h"
 
-#include "../symbols.h"
-#include "../symbols.c"
+
+/* Internal files that are defined in the ext/includes directory */
+#include <symbols.h>
+#include <symbols.c>
 
 /* compiler-dependent definitions, such as is_okay_number */
 #include <defs.h>
@@ -39,8 +41,8 @@
 /* safe storing of doubles */
 #include <safe_double.h>
 
-/* temp */
-/* #include <stdio.h> */
+/* End of internal files */
+
 #define is_a_dvector(d) ( TYPE(d) == T_DATA && RDATA(d)->dfree == (RUBY_DATA_FUNC)dvector_free )
 
 #ifndef MAX
