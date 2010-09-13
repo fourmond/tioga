@@ -5803,7 +5803,7 @@ static VALUE dvector_rfft(VALUE self)
    Now, small functions to manipulate the FFTed data:
    * multiply them
    * divide them
-   * get their module
+   * get (the square of) their module
 */
 
 
@@ -5813,6 +5813,8 @@ static VALUE dvector_rfft(VALUE self)
    
    The returned value is a new Dvector of size about two times smaller
    than the original (precisely size/2 + 1)
+
+   For some reasons, convolutions don't work for now.
 */
 static VALUE dvector_fft_spectrum(VALUE self)
 {
@@ -5833,10 +5835,87 @@ static VALUE dvector_fft_spectrum(VALUE self)
   /* The Nyquist frequency */
   if(len % 2 == 0)
     ret[target_size - 1] = values[target_size-1] * values[target_size-1];
-  for(i = 1, real = values + 1, img = values + len; i < (len+1)/2;
+  for(i = 1, real = values + 1, img = values + len-1; i < len/2;
       i++, real++, img--)
     ret[i] = *real * *real + *img * *img;
   return retval;
+}
+
+/*
+  Converts the FFTed data in the complex conjugate
+*/
+static VALUE dvector_fft_conj(VALUE self)
+{
+  long len;
+  double * v1 = Dvector_Data_for_Write(self, &len);
+  double * img;
+  long i;
+  for(i = 1, img = v1 + len-1; i < (len+1)/2;
+      i++, img--)
+    *img = -*img;
+  return self;
+}
+
+
+/* 
+   Multiplies the FFTed data held in the vector by another vector. The
+   behaviour depends on the size of the target vector:
+   
+   * if it is the same size, it is assumed to be FFTed data
+   * if it is the same size of a power spectrum, then it is assumed that it
+     is multiplication by real values
+   * anything else won't make this function happy.
+
+   As a side note, if you only want multiplication by a scalar, the
+   standard #mul! should be what you look for.
+ */
+static VALUE dvector_fft_mul(VALUE self, VALUE m)
+{
+  long len;
+  double * v1 = Dvector_Data_for_Write(self, &len);
+  long len2;
+  const double * v2 = Dvector_Data_for_Write(m, &len2);
+  if(len2 == len) {		/* Full complex multiplication */
+    const double * m_img;
+    const double * m_real;
+    double * v_img;
+    double * v_real;
+    long i;
+    /* First, special cases */
+    v1[0] *= v2[0];
+    if(len % 2 == 0)
+      v1[len/2] *= v2[len/2];
+    
+    for(i = 1, m_real = v2 + 1, m_img = v2 + len-1,
+	  v_real = v1 + 1, v_img = v1 + len-1; i < (len+1)/2;
+	i++, m_real++, v_real++, m_img--, v_img--) {
+      double r = *m_real * *v_real - *m_img * *v_img;
+      *v_img = *m_real * *v_img + *v_real * *m_img;
+      *v_real = r;
+    }
+    return self;
+  }
+  else if(len2 == len/2+1) {		/* Complex * real*/
+    const double * val;
+    double * v_img;
+    double * v_real;
+    long i;
+    /* First, special cases */
+    v1[0] *= v2[0];
+    if(len % 2 == 0)
+      v1[len/2] *= v2[len/2];
+    
+    for(i = 1, val = v2 + 1,
+	  v_real = v1 + 1, v_img = v1 + len-1; i < (len+1)/2;
+	i++, val++, v_real++, v_img--) {
+      *v_real *= *val;
+      *v_img *= *val;
+    }
+    return self;
+  }
+  else {
+    rb_raise(rb_eArgError, "incorrect Dvector size for fft_mul!");
+  }
 }
 
 
@@ -6179,6 +6258,8 @@ void Init_Dvector() {
    rb_define_method(cDvector, "fft!", dvector_fft, 0);
    rb_define_method(cDvector, "rfft!", dvector_rfft, 0);
    rb_define_method(cDvector, "fft_spectrum", dvector_fft_spectrum, 0);
+   rb_define_method(cDvector, "fft_mul!", dvector_fft_mul, 1);
+   rb_define_method(cDvector, "fft_conj!", dvector_fft_conj, 0);
 
 #endif
 
