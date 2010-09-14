@@ -176,14 +176,14 @@ class TestFunction < Test::Unit::TestCase
     a = Dvector[1,2,3,4]
     b = Dvector[5,6,7,8]
     f = Function.new(a,b)
-    f.revert!
+    f.reverse!
     assert_equal(f.x, Dvector[4,3,2,1])
     assert_equal(f.y, Dvector[8,7,6,5])
 
     a = Dvector[1,2,4]
     b = Dvector[5,6,8]
     f = Function.new(a,b)
-    f.revert!
+    f.reverse!
     assert_equal(f.x, Dvector[4,2,1])
     assert_equal(f.y, Dvector[8,6,5])
   end

@@ -1170,7 +1170,7 @@ static VALUE function_bound_values(VALUE self,
   
   excepted that it is faster (though not *much* faster).
 */
-static VALUE function_revert(VALUE self)
+static VALUE function_reverse(VALUE self)
 {
   long len = function_sanity_check(self);
   double *xs = Dvector_Data_for_Write(get_x_vector(self),NULL);
@@ -1220,7 +1220,7 @@ void Init_Function()
 
   rb_define_method(cFunction, "initialize", function_initialize, 2);
   rb_define_method(cFunction, "sorted?", function_is_sorted, 0);
-  rb_define_method(cFunction, "revert!", function_revert, 0);
+  rb_define_method(cFunction, "reverse!", function_reverse, 0);
   rb_define_alias(cFunction,  "is_sorted", "sorted?");
 
   rb_define_singleton_method(cFunction, "joint_sort", function_joint_sort, 2);
