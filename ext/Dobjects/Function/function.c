@@ -1163,6 +1163,30 @@ static VALUE function_bound_values(VALUE self,
   return Function_Create(x_out, y_out);
 }
 
+/* Reverts the function. Equivalent to doing 
+
+   x.revert!
+   y.revert!
+  
+  excepted that it is faster (though not *much* faster).
+*/
+static VALUE function_revert(VALUE self)
+{
+  long len = function_sanity_check(self);
+  double *xs = Dvector_Data_for_Write(get_x_vector(self),NULL);
+  double *ys = Dvector_Data_for_Write(get_y_vector(self),NULL);
+  
+  double *xe = xs+len-1;
+  double *ye = ys+len-1;
+  double tmp;
+  long i;
+  for(i = 0; i < len/2; i++, xs++, ys++, xe--, ye--) {
+    tmp = *xe; *xe = *xs; *xs = tmp;
+    tmp = *ye; *ye = *ys; *ys = tmp;
+  }
+  return self;
+}
+
 /*
   Document-class: Dobjects::Function
 
@@ -1196,6 +1220,7 @@ void Init_Function()
 
   rb_define_method(cFunction, "initialize", function_initialize, 2);
   rb_define_method(cFunction, "sorted?", function_is_sorted, 0);
+  rb_define_method(cFunction, "revert!", function_revert, 0);
   rb_define_alias(cFunction,  "is_sorted", "sorted?");
 
   rb_define_singleton_method(cFunction, "joint_sort", function_joint_sort, 2);

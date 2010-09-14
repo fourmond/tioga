@@ -170,8 +170,16 @@ class TestFunction < Test::Unit::TestCase
     end
     
   end
-    
-    
+
+  # Test revert!
+  def test_revert
+    a = Dvector[1,2,3,4]
+    b = Dvector[5,6,7,8]
+    f = Function.new(a,b)
+    f.revert!
+    assert_equal(f.x, Dvector[4,3,2,1])
+    assert_equal(f.y, Dvector[8,7,6,5])
+  end
 
   # There is unfortunately no simple way to test the interpolations...
 end
