@@ -1229,9 +1229,9 @@ static VALUE function_reglin(int argc, VALUE *argv, VALUE self)
   long len = function_sanity_check(self);
   const double *x = Dvector_Data_for_Read(get_x_vector(self),NULL);
   const double *y = Dvector_Data_for_Read(get_y_vector(self),NULL);
-  double a,b;
+  VALUE ret = rb_funcall(cDvector, idNew, 1, INT2NUM(2));
+  double * dat = Dvector_Data_for_Write(ret, NULL);
   long nb;
-  VALUE ret;
   if(argc == 2) {
     long f = NUM2LONG(argv[0]);
     long l = NUM2LONG(argv[1]);
@@ -1249,11 +1249,101 @@ static VALUE function_reglin(int argc, VALUE *argv, VALUE self)
   else {
     rb_raise(rb_eArgError, "reglin should have 0 or 2 parameters");
   }
-  reglin(x,y,nb,&a,&b);
-  ret = rb_ary_new();
-  rb_ary_push(ret, rb_float_new(a));
-  rb_ary_push(ret, rb_float_new(b));
+  reglin(x,y,nb,dat,dat+1);
   return ret;
+}
+
+
+/* Simply returns the sign */
+static int signof(double x)
+{
+  if(x > 0)
+    return 1;
+  else if(x < 0)
+    return -1;
+  else
+    return 0;
+}
+
+/* 
+   Returns a "smoothed" value, according to the algorithm implented
+   for "smooth" markers in Soas. See DOI:
+   10.1016/j.bioelechem.2009.02.010
+   
+   Basically, we start at a given range, and narrow the range until
+   the number of consecutive residuals of the same sign is lower than
+   a quarter of the interval.
+
+   It works
+
+*/
+double smooth_pick(const double *x, const double *y, 
+		   long nb, long idx, long range)
+{
+  long left, right,i,nb_same_sign;
+  double a,b;
+  int last_sign;
+  do {
+    left = idx - range/2;
+    if(left < 0) 
+      left = 0;
+    right = idx + range/2;
+    if(right > nb)
+      right = nb;
+    reglin(x+left, y+left, right-left,&a,&b);
+    if(range == 6)
+      break; 			/* We stop here */
+    last_sign = 0;
+    for(i = left; i < right; i++) {
+      double residual = y[i] - a * x[i] - b;
+      if(! last_sign)
+	last_sign = signof(residual);
+      else if(last_sign == signof(residual))
+	nb_same_sign ++;
+      else {
+	nb_same_sign = 1;
+	last_sign = signof(residual);
+      }
+    }
+    if(nb_same_sign * 4 <= right - left)
+      break;
+    range -= (nb_same_sign * 4 -range)/2 + 2;
+    if(range < 6)
+      range = 6;
+  } while(1);
+  /* Now, we have a and b for the last range measured. */
+  return a*x[idx] + b;
+}
+
+/* 
+   Attemps to pick a smooth value for a point, according to the
+   algorithm implented for "smooth" markers in Soas. See DOI:
+   10.1016/j.bioelechem.2009.02.010
+
+   *Warning*: be wary of this function as it will return a correct
+   value only for rather noisy data !
+ */
+static VALUE function_smooth_pick(int argc, VALUE *argv, VALUE self)
+{
+  long len = function_sanity_check(self);
+  const double *x = Dvector_Data_for_Read(get_x_vector(self),NULL);
+  const double *y = Dvector_Data_for_Read(get_y_vector(self),NULL);
+  long idx;
+  long range;
+  switch(argc) {
+  case 2:
+    range = NUM2LONG(argv[1]);
+    break;
+  case 1:
+    range = len > 500 ? 50 : len/10;
+    break;
+  default:
+    rb_raise(rb_eArgError, "smooth_a=t should have 1 or 2 parameters");
+  }
+  idx = NUM2LONG(argv[0]);
+  if(idx < 0)
+    idx = len + idx;
+  return rb_float_new(smooth_pick(x,y,len,idx,range));
 }
 
 /*
@@ -1308,6 +1398,7 @@ void Init_Function()
 
   /* access to data */
   rb_define_method(cFunction, "point", function_point, 1);
+  rb_define_method(cFunction, "[]", function_point, 1);
   rb_define_method(cFunction, "x", get_x_vector, 0);
   rb_define_method(cFunction, "y", get_y_vector, 0);
 
@@ -1317,6 +1408,7 @@ void Init_Function()
 
   /* Soas-like functions ;-) */
   rb_define_method(cFunction, "reglin", function_reglin, -1);
+  rb_define_method(cFunction, "smooth_pick", function_smooth_pick, -1);
 
 		   
 
