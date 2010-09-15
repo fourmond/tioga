@@ -188,5 +188,19 @@ class TestFunction < Test::Unit::TestCase
     assert_equal(f.y, Dvector[8,6,5])
   end
 
+  # Test the linear regression
+  def test_reglin
+    x = Dvector.new(20) do |i|
+      i
+    end
+    y = Dvector.new(20) do |i|
+      1.23 * i + 2.04
+    end
+    f = Function.new(x,y)
+    a,b = f.reglin
+    assert_equal(a, 1.23)
+    assert_equal(b, 2.04)
+  end
+
   # There is unfortunately no simple way to test the interpolations...
 end

@@ -903,7 +903,8 @@ static VALUE function_primitive(VALUE self)
   Computes the derivative of the Function and returns it as a new Function.
   The newly created function shares the X vector with the previous one.
 
-  WARNING: this is a very naive 3-points algorithm.
+  WARNING: this is a very naive 3-points algorithm; you should
+  consider using diff_5p
 */
 static VALUE function_derivative(VALUE self)
 {
@@ -1187,6 +1188,74 @@ static VALUE function_reverse(VALUE self)
   return self;
 }
 
+/* Computes the linear regression of the dataset. */
+static void reglin(const double *x, const double *y, long nb, 
+		   double *a, double *b)
+{
+  double sx = 0;
+  double sy = 0;
+  double sxx = 0;
+  double sxy = 0;
+  long i = 0;
+  double det;
+  for(i = 0; i < nb; i++, x++, y++) {
+    sx += *x;
+    sy += *y;
+    sxx += *x * *x;
+    sxy += *x * *y;
+  }
+  det = nb*sxx - sx*sx;
+  if(det == 0) {
+    *a = 0;			/* Whichever, we only have one point */
+    *b = sy/nb;
+  }
+  else {
+    *a = (nb *sxy - sx*sy)/det; 
+    *b = (sxx * sy - sx * sxy)/(det);
+  }
+}
+
+
+/* 
+   Performs a linear regression of the Function; returns the pair
+    [ a, b]
+   where f(x) = a*x + b
+
+   if the optional arguments _first_ and _last_ are provided, they
+   represent the indices of the first and last elements.
+ */
+static VALUE function_reglin(int argc, VALUE *argv, VALUE self)
+{
+  long len = function_sanity_check(self);
+  const double *x = Dvector_Data_for_Read(get_x_vector(self),NULL);
+  const double *y = Dvector_Data_for_Read(get_y_vector(self),NULL);
+  double a,b;
+  long nb;
+  VALUE ret;
+  if(argc == 2) {
+    long f = NUM2LONG(argv[0]);
+    long l = NUM2LONG(argv[1]);
+    if(f < 0)
+      f = len + f;
+    if(l < 0)
+      l = len + l;
+    x += f;
+    y += f;
+    nb = l - f;
+  }
+  else if(argc == 0) {
+    nb = len;
+  }
+  else {
+    rb_raise(rb_eArgError, "reglin should have 0 or 2 parameters");
+  }
+  reglin(x,y,nb,&a,&b);
+  ret = rb_ary_new();
+  rb_ary_push(ret, rb_float_new(a));
+  rb_ary_push(ret, rb_float_new(b));
+  return ret;
+}
+
 /*
   Document-class: Dobjects::Function
 
@@ -1245,6 +1314,10 @@ void Init_Function()
 
   rb_define_method(cFunction, "size", function_size, 0);
   rb_define_alias(cFunction,  "length", "size");
+
+  /* Soas-like functions ;-) */
+  rb_define_method(cFunction, "reglin", function_reglin, -1);
+
 		   
 
   /* iterator */
