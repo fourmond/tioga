@@ -33,7 +33,7 @@
 #include "dvector.h"
 #include "symbols.c"
 
-/* compiler-dependent definitions, such as is_okay_number */
+/* compiler-dependent defintions, such as is_okay_number */
 #include <defs.h>
 /* End of private files */
 
@@ -612,6 +612,8 @@ static VALUE function_interpolate(VALUE self, VALUE x_values)
     }
   return Qnil;
 }
+
+
 
 /*
   Strips all the points containing NaN values from the function, and
@@ -1346,6 +1348,215 @@ static VALUE function_smooth_pick(int argc, VALUE *argv, VALUE self)
   return rb_float_new(smooth_pick(x,y,len,idx,range));
 }
 
+/* 
+   Computes the convolution of the kernel with the dataset; the
+   overall result is scaled
+ */
+static double norm_convolve(const double *y, long len, long idx,
+			    const double * kernel, long klen, long kmid)
+{
+  double ret = 0;
+  long ki,yi;
+  double norm = 0;
+  yi = idx - kmid;
+  /* We ensure we don't go */
+  if(yi < 0) {
+    ki -= yi;
+    yi = 0;
+  }
+  for(; ki < klen && yi < len; yi++, ki++) {
+    norm += kernel[ki];
+    ret += kernel[ki] * y[yi];
+  }
+  return ret/norm;
+}
+
+/*
+  This function attempts to filter data using interpolation.
+
+  The algorithm is the following:
+  * one starts with 3 points: 2 on the sides and one at the middle
+  * then, we pick an interval between the points where the sum of the
+    square of the residuals is the greatest, and place a point there.
+  * then, we repeat until we reach a maximum number of points (_nbmax_)
+
+  Point positions are averaged over _nbavg_ using a gaussian-like
+  filter.
+
+  Interpolation is returned into the _xi_, _yi_ and _y2i_ vectors
+
+*/
+static void internal_interpolation_filter(const double *x, const double *y,
+					  long len, 
+					  double *xi, double *yi, 
+					  double *y2i,
+					  long nbmax,
+					  long nbavg, 
+					  double * target) 
+{
+  double left_slope;		/* Derivative on the left */
+  double right_slope;		/* Same on the right */
+  
+  /* The gaussian kernel for the average */
+  double kernel[nbavg];
+  
+  /* The indices of the point where the residuals are maximal */
+  long max_res_idx[nbmax-1];
+
+  /* The indices of the corner points*/
+  long indices[nbmax];
+
+  long i;
+  long cur_size = 3;
+  double tmp,tmp2;
+  /* Initialization of the kernel */
+  long mid = nbavg/2;		/* Middle of the kernel */
+  for(i = 0,tmp=0; i < nbavg; i++) {
+    tmp = (3.2 * (i - nbavg/2))/nbavg; /* Gives about 7% left on the
+					  side elements */
+    tmp = exp(-tmp*tmp);
+    kernel[i] = tmp;
+  }
+  
+  /* Left side */
+  xi[0] = x[0];
+  reglin(x,y, mid+1, &left_slope, &tmp2);
+  yi[0] = left_slope * x[0] + tmp2;
+  indices[0] = 0;
+
+  /* Middle */
+  xi[1] = x[len/2];
+  yi[1] = norm_convolve(y, len, len/2, kernel, nbavg, mid);
+  indices[1] = len/2;
+
+  /* Right */
+  xi[2] = x[len-1];
+  reglin(x+(len-(mid+2)),y + (len-(mid+2)), mid+1, &right_slope, &tmp2);
+  yi[2] = right_slope * x[len-1] + tmp2;
+  indices[2] = len - 1;
+
+  do {
+    long cur_seg;
+    long max_res_seg = 0;	/* The segment where the residuals are
+				   the greatest */
+    double max_res = 0;
+    /* Compute interpolation */
+    function_fill_second_derivatives(cur_size, xi, yi, y2i, 
+				     left_slope, right_slope);
+
+
+    /* We stop here if we have reached the max number and we're not
+       interested in Y values */
+    if(cur_size >= nbmax && !target)
+      break;
+
+    /* Now we compute the residuals  */
+    for(cur_seg = 0; cur_seg < cur_size - 1; cur_seg++) {
+      double residuals = 0;
+      double a,b,int_y,delta,h = xi[cur_seg+1] - xi[cur_seg];
+      double imr = 0;		/* Internal max residuals */
+      /* printf("seg: %ld/%ld indices %ld -- %ld\n", cur_seg, cur_size-1,  */
+      /* 	     indices[cur_seg], indices[cur_seg+1]); */
+      for(i = indices[cur_seg] + 1; i < indices[cur_seg+1]; i++) {
+	a = (xi[cur_seg+1] - x[i])/h;
+	b = (x[i] - xi[cur_seg])/h;
+	int_y = a * yi[cur_seg] + b * yi[cur_seg + 1] 
+	  + ((a*a*a - a) * y2i[cur_seg] +
+	     (b*b*b - b) * y2i[cur_seg + 1]) * 
+	  (h * h)/6.0;
+	if(target)		/* We set the value if applicable. */
+	  target[i] = int_y;
+	delta = int_y - y[i];
+	delta *= delta;
+	residuals += delta;
+	if(delta > imr) {
+	  imr = delta;
+	  max_res_idx[cur_seg] = i;
+	}
+      }
+      if(max_res < residuals) {
+	max_res = residuals;
+	max_res_seg = cur_seg;
+      }
+      /* printf(" -> residuals %g\n", cur_seg, cur_size-1,  */
+      /* 	     residuals); */
+    }
+    /* printf("-> max residuals at segment %d\n", max_res_seg); */
+
+    if(cur_size >= nbmax)
+      break;
+
+    
+    /* OK, so now we know in which segment the residuals are the
+       greatest, and which point of this segment is holds the max
+       residuals. So we just add a point there */
+
+    /* We shift the positions */
+    for(i = cur_size; i > max_res_seg + 1; i--) {
+      xi[i] = xi[i-1];
+      yi[i] = yi[i-1];
+      y2i[i] = y2i[i-1];
+      indices[i] = indices[i-1];
+    }
+    cur_size++;
+    xi[max_res_seg + 1] = x[max_res_idx[max_res_seg]];
+    yi[max_res_seg + 1] = norm_convolve(y, len, max_res_idx[max_res_seg], 
+					kernel, nbavg, mid);
+    indices[max_res_seg + 1] = max_res_idx[max_res_seg];
+  } while(1);
+
+  /* Now fill in the missing values of y, since we do not evaluate them */
+  if(target) {
+    for(i = 0; i < nbmax; i++)
+      target[indices[i]] = yi[i];
+  }
+  
+  
+}
+
+/* 
+   Filters the Function through interpolation. _params_ holds a 
+   hash with the following values:
+  
+
+   It returns a hash.
+*/
+static VALUE function_interpolation_filter(VALUE self, VALUE params)
+{
+  long len = function_sanity_check(self);
+  const double *x = Dvector_Data_for_Read(get_x_vector(self),NULL);
+  const double *y = Dvector_Data_for_Read(get_y_vector(self),NULL);
+  VALUE xiret, yiret, y2iret, yintret,ret;
+  double * xi, *yi, *y2i, *yint;
+  long nbavg = 9;  
+  long nbmax = 20;
+  if(RTEST(rb_hash_aref(params, rb_str_new2("number"))))
+    nbmax = NUM2LONG(rb_hash_aref(params, rb_str_new2("number")));
+  if(RTEST(rb_hash_aref(params, rb_str_new2("average"))))
+    nbavg = NUM2LONG(rb_hash_aref(params, rb_str_new2("average")));
+
+  /* TODO: add checks that monotonic and growing. */
+  
+  xiret = rb_funcall(cDvector, idNew, 1, INT2NUM(nbmax)); 
+  xi = Dvector_Data_for_Write(xiret, NULL);
+  yiret = rb_funcall(cDvector, idNew, 1, INT2NUM(nbmax)); 
+  yi = Dvector_Data_for_Write(yiret, NULL);
+  y2iret = rb_funcall(cDvector, idNew, 1, INT2NUM(nbmax)); 
+  y2i = Dvector_Data_for_Write(y2iret, NULL);
+  yintret = rb_funcall(cDvector, idNew, 1, INT2NUM(len)); 
+  yint = Dvector_Data_for_Write(yintret, NULL);
+
+  internal_interpolation_filter(x, y, len, xi, yi, y2i,
+				nbmax, nbavg, yint);
+  ret = rb_hash_new();
+  rb_hash_aset(ret, rb_str_new2("xi"), xiret);
+  rb_hash_aset(ret, rb_str_new2("yi"), yiret);
+  rb_hash_aset(ret, rb_str_new2("y2i"), y2iret);
+  rb_hash_aset(ret, rb_str_new2("y"), yintret);
+  return ret;
+}
+
+
 /*
   Document-class: Dobjects::Function
 
@@ -1395,6 +1606,9 @@ void Init_Function()
 		   function_interpolate, 1);
   rb_define_method(cFunction, "make_interpolant", 
 		   function_make_interpolant, 0);
+  rb_define_method(cFunction, "interpolation_filter", 
+		   function_interpolation_filter, 1);
+
 
   /* access to data */
   rb_define_method(cFunction, "point", function_point, 1);
