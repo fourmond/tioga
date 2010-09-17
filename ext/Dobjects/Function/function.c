@@ -1385,6 +1385,12 @@ static double norm_convolve(const double *y, long len, long idx,
 
   Interpolation is returned into the _xi_, _yi_ and _y2i_ vectors
 
+  TODO: try to place the points more in the middle ? (provide a factor
+  governing this)
+  
+  TODO: use moments to decide of the precise position of the
+  points ?
+
 */
 static void internal_interpolation_filter(const double *x, const double *y,
 					  long len, 
