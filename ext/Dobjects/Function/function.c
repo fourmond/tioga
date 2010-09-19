@@ -1318,7 +1318,7 @@ double smooth_pick(const double *x, const double *y,
 }
 
 /* 
-   Attemps to pick a smooth value for a point, according to the
+   Attempts to pick a smooth value for a point, according to the
    algorithm implented for "smooth" markers in Soas. See DOI:
    10.1016/j.bioelechem.2009.02.010
 
@@ -1372,7 +1372,7 @@ static double norm_convolve(const double *y, long len, long idx,
 }
 
 /*
-  This function attempts to filter data using interpolation.
+  This functions tries to approximate the given data using a spline.
 
   The algorithm is the following:
   * one starts with 3 points: 2 on the sides and one at the middle
@@ -1392,7 +1392,7 @@ static double norm_convolve(const double *y, long len, long idx,
   points ?
 
 */
-static void internal_interpolation_filter(const double *x, const double *y,
+static void internal_spline_approximation(const double *x, const double *y,
 					  long len, 
 					  double *xi, double *yi, 
 					  double *y2i,
@@ -1527,7 +1527,7 @@ static void internal_interpolation_filter(const double *x, const double *y,
 
    It returns a hash.
 */
-static VALUE function_interpolation_filter(VALUE self, VALUE params)
+static VALUE function_spline_approximation(VALUE self, VALUE params)
 {
   long len = function_sanity_check(self);
   const double *x = Dvector_Data_for_Read(get_x_vector(self),NULL);
@@ -1552,7 +1552,7 @@ static VALUE function_interpolation_filter(VALUE self, VALUE params)
   yintret = rb_funcall(cDvector, idNew, 1, INT2NUM(len)); 
   yint = Dvector_Data_for_Write(yintret, NULL);
 
-  internal_interpolation_filter(x, y, len, xi, yi, y2i,
+  internal_spline_approximation(x, y, len, xi, yi, y2i,
 				nbmax, nbavg, yint);
   ret = rb_hash_new();
   rb_hash_aset(ret, rb_str_new2("xi"), xiret);
@@ -1612,8 +1612,8 @@ void Init_Function()
 		   function_interpolate, 1);
   rb_define_method(cFunction, "make_interpolant", 
 		   function_make_interpolant, 0);
-  rb_define_method(cFunction, "interpolation_filter", 
-		   function_interpolation_filter, 1);
+  rb_define_method(cFunction, "spline_approximation", 
+		   function_spline_approximation, 1);
 
 
   /* access to data */
