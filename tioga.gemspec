@@ -1,44 +1,29 @@
 # -*- mode: ruby; -*-
 
-# begin dirty hack: we need to copy the C files in the split/Tioga/shared/
-# directory to the split/Tioga/ so they are found by the usual
-# mkmf.rb/extconf.rb
-#
-# That is pretty unclean, I'd say...
-
-require 'fileutils'
-cleanup = []
-
-for file in Dir["split/Tioga/shared/*"]
-  cleanup << "split/Tioga/" + File.basename(file)
-  FileUtils::cp(file, "split/Tioga/")
-end
-
-at_exit do
-  FileUtils::rm(cleanup)
-end
-
-
-# end dirty hack
+# More informaton about the fields available can be found at:
+# http://docs.rubygems.org/read/chapter/20
 
 spec = Gem::Specification.new do |s|
-  s.files += Dir["split/*/*.c"] + Dir["split/*/*.h"] +
+  s.files += Dir["ext/**/*.[ch]"] + 
+    Dir["lib/**/*.rb"] +
     Dir["split/*/include/*.h"] + Dir["split/**/*.rb"] +
     Dir["split/*.h"] +  Dir["split/*.c"]
   s.files += Dir["tests/*"]
   s.files += %w(Tioga_README lgpl.txt)
-  s.test_files = Dir["tests/ts_*.rb"]
+  s.test_files = Dir["tests/tsc_*.rb"]
   s.extensions +=  
-    %w{Flate Tioga Dvector Dtable Function}.map do |d|
-    "split/#{d}/extconf.rb"
+    %w{Flate Tioga/FigureMaker Dobjects/Dvector Dobjects/Dtable Dobjects/Function}.map do |d|
+    "ext/#{d}/extconf.rb"
   end
-  s.bindir = 'split/scripts'
+  s.bindir = 'bin'
   s.executables << 'tioga'
   s.name = 'tioga'
-  s.version = '1.11'
+  s.version = '1.12'
   s.summary = 'Tioga - a powerful scientific plotting library'
   s.homepage = 'http://tioga.rubyforge.org'
   s.authors = ['Bill Paxton', 'Vincent Fourmond', 'Taro Sato', 'Jean-Julien Fleck']
   s.rubyforge_project = 'tioga'
+  s.email = ['tioga-users@rubyforge.org']
   s.license = "LGPL 2.1"
+  s.has_rdoc = true
 end
