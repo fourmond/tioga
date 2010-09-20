@@ -1,7 +1,10 @@
 #! /bin/sh 
 set -e
-ruby setup.rb config 
-ruby setup.rb setup 
-ruby setup.rb install
+if [ -z "$RUBY" ]; then
+    RUBY=ruby
+fi
+$RUBY setup.rb config 
+$RUBY setup.rb setup 
+$RUBY setup.rb install
 cd tests 
-ruby ts_Tioga.rb 
+$RUBY ts_Tioga.rb 
