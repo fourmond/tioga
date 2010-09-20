@@ -1166,10 +1166,10 @@ static VALUE function_bound_values(VALUE self,
   return Function_Create(x_out, y_out);
 }
 
-/* Reverts the function. Equivalent to doing 
+/* Reverses the function. Equivalent to doing 
 
-   x.revert!
-   y.revert!
+   x.reverse!
+   y.reverse!
   
   excepted that it is faster (though not *much* faster).
 */
@@ -1446,6 +1446,13 @@ static void internal_spline_approximation(const double *x, const double *y,
     long max_res_seg = 0;	/* The segment where the residuals are
 				   the greatest */
     double max_res = 0;
+
+    long max_deviation_seg = 0; /* The segment where the deviation
+				   (square of the average) is the
+				   greatest */
+    double max_deviation = 0;
+
+    long chosen_seg;	      /* The segment in which we'll add a point */
     /* Compute interpolation */
     function_fill_second_derivatives(cur_size, xi, yi, y2i, 
 				     left_slope, right_slope);
@@ -1461,6 +1468,7 @@ static void internal_spline_approximation(const double *x, const double *y,
       double residuals = 0;
       double a,b,int_y,delta,h = xi[cur_seg+1] - xi[cur_seg];
       double imr = 0;		/* Internal max residuals */
+      double deviation = 0;
       /* printf("seg: %ld/%ld indices %ld -- %ld\n", cur_seg, cur_size-1,  */
       /* 	     indices[cur_seg], indices[cur_seg+1]); */
       for(i = indices[cur_seg] + 1; i < indices[cur_seg+1]; i++) {
@@ -1473,6 +1481,7 @@ static void internal_spline_approximation(const double *x, const double *y,
 	if(target)		/* We set the value if applicable. */
 	  target[i] = int_y;
 	delta = int_y - y[i];
+	deviation += delta;
 	delta *= delta;
 	residuals += delta;
 	if(delta > imr) {
@@ -1483,6 +1492,11 @@ static void internal_spline_approximation(const double *x, const double *y,
       if(max_res < residuals) {
 	max_res = residuals;
 	max_res_seg = cur_seg;
+      }
+      deviation *= deviation;
+      if(deviation > max_deviation) {
+	max_deviation_seg = cur_seg;
+	max_deviation = deviation;
       }
       /* printf(" -> residuals %g\n", cur_seg, cur_size-1,  */
       /* 	     residuals); */
@@ -1496,19 +1510,20 @@ static void internal_spline_approximation(const double *x, const double *y,
     /* OK, so now we know in which segment the residuals are the
        greatest, and which point of this segment is holds the max
        residuals. So we just add a point there */
+    chosen_seg = max_deviation_seg;
 
     /* We shift the positions */
-    for(i = cur_size; i > max_res_seg + 1; i--) {
+    for(i = cur_size; i > chosen_seg + 1; i--) {
       xi[i] = xi[i-1];
       yi[i] = yi[i-1];
       y2i[i] = y2i[i-1];
       indices[i] = indices[i-1];
     }
     cur_size++;
-    xi[max_res_seg + 1] = x[max_res_idx[max_res_seg]];
-    yi[max_res_seg + 1] = norm_convolve(y, len, max_res_idx[max_res_seg], 
+    xi[chosen_seg + 1] = x[max_res_idx[chosen_seg]];
+    yi[chosen_seg + 1] = norm_convolve(y, len, max_res_idx[chosen_seg], 
 					kernel, nbavg, mid);
-    indices[max_res_seg + 1] = max_res_idx[max_res_seg];
+    indices[chosen_seg + 1] = max_res_idx[chosen_seg];
   } while(1);
 
   /* Now fill in the missing values of y, since we do not evaluate them */
