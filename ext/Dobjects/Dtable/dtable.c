@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <math.h>
-#include "intern.h"
 
 /* Internal include files, from the ext/includes directory */
 #include <symbols.h>

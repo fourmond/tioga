@@ -27,7 +27,6 @@
 #include <ctype.h>
 #include <math.h>
 #include "ruby.h"
-#include "intern.h"
 #include "dvector_intern.h"
 
 

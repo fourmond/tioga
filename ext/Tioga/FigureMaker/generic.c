@@ -24,7 +24,6 @@
 #include "dvector.h"
 #include "dtable.h"
 #include "ruby.h"
-#include "intern.h"
 #include "generic.h"
 #include "figures.h"
 #include "pdfs.h"

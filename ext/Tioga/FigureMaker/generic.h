@@ -27,7 +27,6 @@
 
 //if ruby
 #include "ruby.h"
-#include "intern.h"
 
 
 extern void Init_generic(void);
