@@ -6,15 +6,15 @@ require 'mkmf'
 if have_header("zlib.h") and have_library("z", "compress", "zlib.h")
   puts "Using the system zlib library"
 else
-  require 'ftools'
+  require 'fileutils'
   puts "Using the private copy of zlib: copying the files from zlib/"
   files = Dir["zlib/*.[ch]"]
   for f in files do
     target = File::basename(f)
     begin
-      File::symlink(f, target)
+      FileUtils::symlink(f, target)
     rescue NotImplemented => e  # For platforms when that isn't implemented
-      File::copy(f, target)
+      FileUtils::copy(f, target)
     end
     $distcleanfiles << target
   end
