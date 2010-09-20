@@ -318,8 +318,8 @@ class TestDvector < Test::Unit::TestCase
     
     def test_rindex
         a = Dvector[11, 22, 33, 44, 33, 11 ]
-        assert(5,a.rindex(11))
-        assert(4,a.rindex(33))
+        assert_equal(5,a.rindex(11))
+        assert_equal(4,a.rindex(33))
         assert_nil(a.rindex(32))
     end
     
@@ -389,8 +389,8 @@ class TestDvector < Test::Unit::TestCase
     
     def test_index
         a = Dvector[11, 22, 33, 44 ]
-        assert(0,a.index(11))
-        assert(2,a.index(33))
+        assert_equal(0,a.index(11))
+        assert_equal(2,a.index(33))
         assert_nil(a.index(32))
     end
     

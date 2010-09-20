@@ -8,11 +8,10 @@ class TestFlate < Test::Unit::TestCase
   def make_data(size = 10000) 
     srand # intitialize the random seed...
     data = ""
-    i = 0
-    while i < size
-      # not efficicent, but this will have to do ;-) !
-      data += [rand(256)].pack("C")
-      i += 1
+    # For some reason, there is a failure here in Ruby1.9.1, around the 768th
+    # iteration.
+    size.times do
+      data << [rand(256)].pack("C")
     end
     return data
   end
