@@ -1587,16 +1587,21 @@ static VALUE function_spline_approximation(VALUE self, VALUE params)
   - facilities for sorting the X while keeping the Y matching, with #sort and
     Function.joint_sort;
   - to check if X data is sorted: #sorted?, #is_sorted;
-  - interpolation, with #compute_spline, #compute_spline_data and #interpolate;
+  - interpolation, with #compute_spline, #compute_spline_data and #interpolate
   - some functions for data access : #x, #y, #point;
-  - some utiliy functions: #split_monotonic, #strip_nan;
+  - some utiliy functions: #split_monotonic, #strip_nan, #reverse!
   - data inspection: #min, #max;
-  - some computational functions: #integrate, #primitive, #derivative.
+  - some computational functions: #integrate, #primitive, #derivative,
+    and now 4th-order accurate first and second derivatives: #diff_5p
+    and #diff2_5p
   - utility for fuzzy operations, when the X values of two functions
     differ, but only slightly, of when points are missing: 
     #fuzzy_sub!
+  - linear regression #reglin
+  - a function to approximate data using a low-order spline:
+    #spline_approximation
 
-  And getting bigger everyday...
+  And getting bigger (almost) everyday...
  */ 
 void Init_Function() 
 {
