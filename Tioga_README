@@ -1,7 +1,8 @@
 This is the README for the Tioga kernel, version 1.10, March 7, 2009.
 
     Copyright (C) 2005, 2006, 2007, 2008, 2009  Bill Paxton
-    Copyright (C) 2007, 2008, 2009 Vincent Fourmond, Taro Sato
+    Copyright (C) 2007, 2008, 2009, 2010 Vincent Fourmond, Taro Sato, 
+    	      	  Benjamin ter Kuile
     
     This file is part of Tioga.
     
@@ -21,16 +22,30 @@ This is the README for the Tioga kernel, version 1.10, March 7, 2009.
 
 << What's new >>
 
-    Version 1.11 brings in a few new features. First, it is now
-possible to set the color of axis tick labels - if you love pink axes,
-you can them fully in Pink, now ;-) ! Check out the
-x/yaxis_labels_color= accessors. The show_axis/axis_info functions
-have been updated accordingly, and are now complete.
+    Tioga 1.12 has seen quite a lot of action. The first and major
+change is the switch from a custom rewrite of mkmf.rb for
+building/installing to the standard setup.rb tool, which finally has
+the gem version build exactly the same way as the pristine one.
 
-    Second, a new interpolation function for monotonic interpolations
-has been added to Dvector (check out the Sampled_pm_cubics sample in
-samples/plots/plots.rb).
+    Another side effect of this is that, for a big part thanks to
+Carlo E. Prelz <fluido@fluido.as>, we now have tioga that works just
+fine with Ruby 1.9.1 (though there is a weird bug while testing the
+Flate library, we welcome any input on that).
 
+    Apart from that, Tioga has seen many improvements on the numerical
+side. First, we welcome the participation of Benjamin ter Kuile, who
+has started improving some aspects of Dtable.
+
+    Second, now Dvector is gifted with FFT capacities if the
+development files of fftw3 are available at compile time (have a look
+at the documentation).
+
+    Third, Function has been endowed with a whole bunch of new
+functions for data processing, such as linear regression, spline
+approximation (that almost looks like a good filter !), 4th order
+accurate first and second derivatives.
+
+    Finally, a couple of annoying bugs were fixed.
 
 << Quick Installation of Tioga >>
 
@@ -56,41 +71,27 @@ be working, go directly to the << Documentation >> section below.
 << Step-by-Step Installation >>
 
     To get Tioga running, you need to have a working Ruby, a C
-compiler, make, and pdflaxtex.  Assuming you've got all that (more
+compiler, make, and pdflatex.  Assuming you've got all that (more
 later if you don't), connect to the Tioga directory that you just
 unpacked and do the following:
 
   [ this has been changed, be careful ! ]
 
-    cd split 
-    ruby extconf.rb
-    make
-    make install
+    ruby setup.rb config
+    ruby setup.rb seutp
+    ruby setup.rb install
 
-This creates the Makefile, runs it, and finally does the actual
-installation.  The "make install" needs to copy some files to the ruby
-directory.  On the Mac, this probably means you need to do the whole
-thing inside a 'sudo'.  For Linux, you may have to become root.
+    (that's exactly what the ./QUICK_INSTALL script is doing)
 
-Note that on Linux, the make will compile all the source files.  On
-the Mac, the tar file includes precompiled versions of everything, so
-the make won't have anything to do.  That's okay.  Do the whole
-sequence anyway just to be safe.
+    Tioga now uses the standard setup.rb installation tool, so you get
+a lot of customization possibilities for free. For more information on
+how to use setup.rb to suit your needs, try
 
-    You now have another option to install: if you replace the line
+    ruby setup.rb --help
 
-    ruby extconf.rb
+or, even better, take a look at its documentation:
 
-with 
-
-    ruby extconf.rb --home
-
-it will install the files to your home directory, namely
-~/lib/ruby. You don't need root privileges to do that, but make sure
-that you set RUBYLIB=~/lib/ruby somewhere, so that ruby can find it.
-
-
-
+http://i.loveruby.net/en/projects/setup/doc/usage.html
 
 << Checking The Installation >>
 
@@ -187,6 +188,19 @@ Bill Paxton
 << What's old >>
 
 Here are the old release messages:
+
+--------------------------
+
+    Version 1.11 brings in a few new features. First, it is now
+possible to set the color of axis tick labels - if you love pink axes,
+you can them fully in Pink, now ;-) ! Check out the
+x/yaxis_labels_color= accessors. The show_axis/axis_info functions
+have been updated accordingly, and are now complete.
+
+    Second, a new interpolation function for monotonic interpolations
+has been added to Dvector (check out the Sampled_pm_cubics sample in
+samples/plots/plots.rb).
+
 
 --------------------------
 
