@@ -384,10 +384,20 @@ void Init_FigureMaker(void) {
    rb_define_method(cFM, "private_set_subframe", FM_private_set_subframe, 4);
    rb_define_method(cFM, "doing_subfigure", FM_doing_subfigure, 0);
 /* colors */
+   
    rb_define_method(cFM, "hls_to_rgb", FM_hls_to_rgb, 1);
    rb_define_method(cFM, "rgb_to_hls", FM_rgb_to_hls, 1);
    rb_define_method(cFM, "string_hls_to_rgb!", FM_string_hls_to_rgb_bang, 1);
    rb_define_method(cFM, "string_rgb_to_hls!", FM_string_rgb_to_hls_bang, 1);
+   /* We define them as class methods too, as they do not depend on a
+      FigureMaker instance*/
+
+   rb_define_singleton_method(cFM, "hls_to_rgb", FM_hls_to_rgb, 1);
+   rb_define_singleton_method(cFM, "rgb_to_hls", FM_rgb_to_hls, 1);
+   rb_define_singleton_method(cFM, "string_hls_to_rgb!", FM_string_hls_to_rgb_bang, 1);
+   rb_define_singleton_method(cFM, "string_rgb_to_hls!", FM_string_rgb_to_hls_bang, 1);
+
+
 /* coordinate system conversions */
    rb_define_method(cFM, "convert_inches_to_output", FM_convert_inches_to_output, 1);
    rb_define_method(cFM, "convert_output_to_inches", FM_convert_output_to_inches, 1);

@@ -120,9 +120,9 @@ OBJ_PTR FM_get_color_from_colormap(OBJ_PTR fmkr, OBJ_PTR color_map, OBJ_PTR colo
 OBJ_PTR FM_convert_to_colormap(OBJ_PTR fmkr, OBJ_PTR Rs, OBJ_PTR Gs, OBJ_PTR Bs) { int ierr=0;
    return c_convert_to_colormap(fmkr, Get_FM(fmkr, &ierr), Rs, Gs, Bs, &ierr); }
 OBJ_PTR FM_hls_to_rgb(OBJ_PTR fmkr, OBJ_PTR hls_vec) { int ierr=0;
-   return c_hls_to_rgb(fmkr, Get_FM(fmkr, &ierr), hls_vec, &ierr); }
+   return c_hls_to_rgb(Qnil, NULL, hls_vec, &ierr); }
 OBJ_PTR FM_rgb_to_hls(OBJ_PTR fmkr, OBJ_PTR rgb_vec) { int ierr=0;
-   return c_rgb_to_hls(fmkr, Get_FM(fmkr, &ierr), rgb_vec, &ierr); }
+   return c_rgb_to_hls(Qnil, NULL, rgb_vec, &ierr); }
 OBJ_PTR FM_title_color_set(OBJ_PTR fmkr, OBJ_PTR val) { int ierr=0;
    c_title_color_set(fmkr, Get_FM(fmkr, &ierr), val, &ierr); RETURN_NIL; }
 OBJ_PTR FM_title_color_get(OBJ_PTR fmkr) { int ierr=0;
@@ -155,11 +155,11 @@ OBJ_PTR FM_yaxis_labels_color_get(OBJ_PTR fmkr) { int ierr=0;
    return c_yaxis_labels_color_get(fmkr, Get_FM(fmkr, &ierr), &ierr); }
 
 OBJ_PTR FM_string_hls_to_rgb_bang(OBJ_PTR fmkr, OBJ_PTR str) { int ierr=0;
-   c_string_hls_to_rgb_bang(fmkr, Get_FM(fmkr, &ierr),  
+   c_string_hls_to_rgb_bang(Qnil, NULL,  
       (unsigned char *)String_Ptr(str, &ierr), String_Len(str, &ierr), &ierr);
    return str; }
 OBJ_PTR FM_string_rgb_to_hls_bang(OBJ_PTR fmkr, OBJ_PTR str) { int ierr=0;
-   c_string_rgb_to_hls_bang(fmkr, Get_FM(fmkr, &ierr), 
+   c_string_rgb_to_hls_bang(Qnil, NULL,
       (unsigned char *)String_Ptr(str, &ierr), String_Len(str, &ierr), &ierr);
    return str; }
 
