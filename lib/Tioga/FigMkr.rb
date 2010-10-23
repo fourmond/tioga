@@ -21,12 +21,16 @@
 =end
 
 require 'Tioga/FigureConstants.rb'
-require 'Tioga/Utils.rb'
+require 'Tioga/Utils'
 
 module Tioga
 class FigureMaker
     
     include FigureConstants
+
+    # For the parsing of Hash arguments
+    include HashArguments       # For instance methods
+    extend HashArguments        # For class methods
     
     @@default_figure_maker = nil
     @@which_pdflatex = nil
@@ -1297,7 +1301,12 @@ class FigureMaker
     
     @@keys_for_make_contour = FigureMaker.make_name_lookup_hash([
         'dest_xs', 'dest_ys', 'z_level', 'z', 'level', 'xs', 'ys', 'gaps', 'zs', 'data', 'legit', 'method'])
+    
     def make_contour(dict)
+      return FigureMaker.make_contour(dict)
+    end
+
+    def self.make_contour(dict)
         check_dict(dict, @@keys_for_make_contour, 'make_contour')
         z_level = dict['z_level']
         if z_level == nil
@@ -1328,7 +1337,7 @@ class FigureMaker
         
         method = dict['method']
         use_conrec = (method == 'conrec' or method == 'CONREC')? 1 : 0
-        pts_array = private_make_contour(gaps, xs, ys, zs, z_level, legit, use_conrec)
+        pts_array = FigureMaker.private_make_contour(gaps, xs, ys, zs, z_level, legit, use_conrec)
             
         unless dest_xs == nil
             dest_xs.resize(pts_array[0].size)
@@ -2516,73 +2525,7 @@ class FigureMaker
         end
         return false
     end
-    
-    def check_dict(dict,names,str)
-        dict.each_key do |name|
-            if names[name] == nil
-                raise "Sorry: Invalid dictionary key for #{str} (#{name})."
-            end
-        end
-    end
-    
-    def set_if_given(name, dict)
-        val = dict[name]
-        return if val == nil
-        eval "self." + name + " = val"
-    end
-        
-    def alt_names(dict, name1, name2)
-        val = dict[name1]
-        val = dict[name2] if val == nil
-        return val
-    end
-        
-    def get_if_given_else_use_default_dict(dict, name, default_dict)
-        if dict != nil
-            val = dict[name]
-            return val if val != nil
-        end
-        val = default_dict[name]
-        if val == nil
-            raise "Sorry: failed to find value for '#{name}' in the defaults dictionary."
-        end
-        return val
-    end
-    
-    def get_if_given_else_default(dict, name, default)
-        return default if dict == nil
-        val = dict[name]
-        return val if val != nil
-        return default
-    end
-    
-    def complain_if_missing_numeric_arg(dict, name, alt_name, who_called)
-        val = dict[name]
-        val = dict[alt_name] if val == nil
-        if val == nil
-            raise "Sorry: Must supply '#{name}' in call to '#{who_called}'"
-        end
-        if !(val.kind_of?Numeric)
-            raise "Sorry: Must supply numeric value for '#{name}' in call to '#{who_called}'"
-        end
-        return val
-    end
-    
-    def check_pair(ary, name, who_called)
-        return false if ary == nil
-        if !(ary.kind_of?(Array) || ary.kind_of?(Dvector)) and ary.size == 2
-            raise "Sorry: '#{name}' must be array [x,y] for #{who_called}."
-        end
-        return true
-    end
-    
-    def get_dvec(dict, name, who_called)
-        val = dict[name]
-        if val == nil || !(val.kind_of? Dvector)
-            raise "Sorry: '#{name}' must be a Dvector for '#{who_called}'"
-        end
-        return val
-    end
+
 
     # We make sure that save_dir exists and is a directory, creating it
     # if necessary.

@@ -77,7 +77,7 @@ OBJ_PTR FM_private_make_portfolio(OBJ_PTR fmkr, OBJ_PTR name, OBJ_PTR fignums, O
 // makers.c
 OBJ_PTR FM_private_make_contour(OBJ_PTR fmkr, OBJ_PTR gaps,
   OBJ_PTR xs, OBJ_PTR ys, OBJ_PTR zs, OBJ_PTR z_level, OBJ_PTR legit, OBJ_PTR method) { int ierr=0; 
-     return c_private_make_contour(fmkr, Get_FM(fmkr, &ierr), gaps, xs, ys, zs, Number_to_double(z_level, &ierr),
+     return c_private_make_contour(Qnil, NULL, gaps, xs, ys, zs, Number_to_double(z_level, &ierr),
         legit, Number_to_int(method, &ierr), &ierr); }
 OBJ_PTR FM_private_make_steps(OBJ_PTR fmkr, OBJ_PTR Xvec_data, OBJ_PTR Yvec_data,
      OBJ_PTR xfirst, OBJ_PTR yfirst, OBJ_PTR xlast, OBJ_PTR ylast) { int ierr=0;

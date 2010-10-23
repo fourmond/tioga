@@ -82,4 +82,78 @@ module Tioga
 
 
   end
+
+
+  # This module is used internally by Tioga for handling the hash
+  # arguments that most of the functions take
+  module HashArguments
+
+    def check_dict(dict,names,str)
+        dict.each_key do |name|
+            if names[name] == nil
+                raise "Sorry: Invalid dictionary key for #{str} (#{name})."
+            end
+        end
+    end
+    
+    def set_if_given(name, dict)
+        val = dict[name]
+        return if val == nil
+        eval "self." + name + " = val"
+    end
+        
+    def alt_names(dict, name1, name2)
+        val = dict[name1]
+        val = dict[name2] if val == nil
+        return val
+    end
+        
+    def get_if_given_else_use_default_dict(dict, name, default_dict)
+        if dict != nil
+            val = dict[name]
+            return val if val != nil
+        end
+        val = default_dict[name]
+        if val == nil
+            raise "Sorry: failed to find value for '#{name}' in the defaults dictionary."
+        end
+        return val
+    end
+    
+    def get_if_given_else_default(dict, name, default)
+        return default if dict == nil
+        val = dict[name]
+        return val if val != nil
+        return default
+    end
+    
+    def complain_if_missing_numeric_arg(dict, name, alt_name, who_called)
+        val = dict[name]
+        val = dict[alt_name] if val == nil
+        if val == nil
+            raise "Sorry: Must supply '#{name}' in call to '#{who_called}'"
+        end
+        if !(val.kind_of?Numeric)
+            raise "Sorry: Must supply numeric value for '#{name}' in call to '#{who_called}'"
+        end
+        return val
+    end
+
+    def check_pair(ary, name, who_called)
+        return false if ary == nil
+        if !(ary.kind_of?(Array) || ary.kind_of?(Dobjects::Dvector)) and ary.size == 2
+            raise "Sorry: '#{name}' must be array [x,y] for #{who_called}."
+        end
+        return true
+    end
+    
+    def get_dvec(dict, name, who_called)
+        val = dict[name]
+        if val == nil || !(val.kind_of? Dobjects::Dvector)
+            raise "Sorry: '#{name}' must be a Dvector for '#{who_called}'"
+        end
+        return val
+    end
+
+  end
 end

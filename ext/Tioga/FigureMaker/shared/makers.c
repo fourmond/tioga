@@ -1259,7 +1259,7 @@ c_make_contour(FM *p,
  * the 2nd derivative is set to 0 and the slope is determined by the fit.
  * In this case, the corresponding slope argument is ignored.
  */
-OBJ_PTR c_private_make_contour(OBJ_PTR fmkr, FM *p,
+OBJ_PTR c_private_make_contour(OBJ_PTR fmkr, FM * p,
                                OBJ_PTR gaps,
                                // these vectors get the results
                                OBJ_PTR xs, OBJ_PTR ys,
@@ -1285,7 +1285,7 @@ OBJ_PTR c_private_make_contour(OBJ_PTR fmkr, FM *p,
   dest_xs_data = ALLOC_N_double(dest_sz);
   dest_ys_data = ALLOC_N_double(dest_sz);
   
-  c_make_contour(p, &dest_len, &dest_xs_data, &dest_ys_data, &dest_sz, 
+  c_make_contour(NULL, &dest_len, &dest_xs_data, &dest_ys_data, &dest_sz, 
                  gaps, xs, ys, zs, z_level, legit, method, ierr);
   if (*ierr != 0) RETURN_NIL;
   

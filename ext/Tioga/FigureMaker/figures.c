@@ -536,7 +536,9 @@ void Init_FigureMaker(void) {
    rb_define_method(cFM, "no_top_edge", FM_no_top_edge, 0);
    rb_define_method(cFM, "no_bottom_edge", FM_no_bottom_edge, 0);
 /* makers */
-   rb_define_method(cFM, "private_make_contour", FM_private_make_contour, 7);
+   rb_define_singleton_method(cFM, "private_make_contour", 
+			      FM_private_make_contour, 7);
+
    rb_define_method(cFM, "private_make_spline_interpolated_points", FM_private_make_spline_interpolated_points, 5);
    rb_define_method(cFM, "private_make_steps", FM_private_make_steps, 6);
    
