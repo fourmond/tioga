@@ -76,6 +76,22 @@ class TestFunction < Test::Unit::TestCase
     assert_equal(ary[2].x, x)
   end
 
+
+  def test_nan
+    nan = 0.0/0.0
+    x = Dvector[1,nan,2,nan,5,6]
+    y = Dvector[2,3,nan,3,4,5]
+    f = Function.new(x,y)
+    ary = f.split_on_nan(nil)
+    assert_equal(ary.size, 4)
+
+    ary = f.split_on_nan(:y)
+    assert_equal(ary.size, 2)
+
+    ary = f.split_on_nan(:x)
+    assert_equal(ary.size, 3)
+  end
+
   def test_integrate
     x = Dvector[1,2,4]
     y = Dvector[0,1,2]

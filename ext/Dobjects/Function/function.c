@@ -650,7 +650,6 @@ static VALUE function_strip_nan(VALUE self)
   Returns the array of the subfunctions. The returned values are
   necessarily new values.
 */
-
 static VALUE function_split_monotonic(VALUE self)
 {
   VALUE ret = rb_ary_new();
@@ -707,6 +706,60 @@ static VALUE function_split_monotonic(VALUE self)
       Dvector_Push_Double(cur_y, y[i]);
       last_x = x[i];
     }
+  f = Function_Create(cur_x, cur_y);
+  rb_ary_push(ret, f);
+  return ret;
+}
+
+
+/*
+  Splits the function on NaN values for x, y or xy, depending on
+  whether _sym_ is +:x+, +:y+ or +:xy+ (or, as a matter of fact,
+  anything else than +:x+ or +:y+).
+
+  This returns an array of new Function objects.
+
+  This function will return empty Function objects between consecutive
+  NaN values.
+*/
+static VALUE function_split_on_nan(VALUE self, VALUE sym)
+{
+  VALUE ret = rb_ary_new();
+  VALUE cur_x = Dvector_Create();
+  VALUE cur_y = Dvector_Create();
+  int on_x = 1;
+  int on_y = 1;
+  long size = function_sanity_check(self);
+  long cur_size = 0;
+  long i;
+  if(size < 2)
+    rb_raise(rb_eRuntimeError, "Function needs to have at least 2 points");
+
+  double *x = Dvector_Data_for_Read(get_x_vector(self),NULL);
+  double *y = Dvector_Data_for_Read(get_y_vector(self),NULL);
+
+  VALUE f;
+  
+  if(sym == ID2SYM(rb_intern("x")))
+    on_y = 0;
+  else if(sym == ID2SYM(rb_intern("y")))
+    on_x = 0;
+
+
+  for(i = 0; i < size; i++) {
+    if((on_x && isnan(x[i])) ||
+       (on_y && isnan(y[i]))) {
+      /* We split */
+      f = Function_Create(cur_x, cur_y);
+      rb_ary_push(ret, f);
+      cur_x = Dvector_Create();
+      cur_y = Dvector_Create();
+    }
+    else {
+      Dvector_Push_Double(cur_x, x[i]);
+      Dvector_Push_Double(cur_y, y[i]);
+    }
+  }
   f = Function_Create(cur_x, cur_y);
   rb_ary_push(ret, f);
   return ret;
@@ -1322,7 +1375,7 @@ double smooth_pick(const double *x, const double *y,
    algorithm implented for "smooth" markers in Soas. See DOI:
    10.1016/j.bioelechem.2009.02.010
 
-   *Warning*: be wary of this function as it will return a correct
+   Warning: be wary of this function as it will return a correct
    value only for rather noisy data !
  */
 static VALUE function_smooth_pick(int argc, VALUE *argv, VALUE self)
@@ -1538,7 +1591,7 @@ static void internal_spline_approximation(const double *x, const double *y,
 /* 
    Filters the Function through interpolation. _params_ holds a 
    hash with the following values:
-  
+   * ??
 
    It returns a hash.
 */
@@ -1659,8 +1712,9 @@ void Init_Function()
   /* stripping of NaNs */
   rb_define_method(cFunction, "strip_nan", function_strip_nan, 0);
 
-  /* split into monotonic subfunctions */
+  /* split into subfunctions with given properties */
   rb_define_method(cFunction, "split_monotonic", function_split_monotonic, 0);
+  rb_define_method(cFunction, "split_on_nan", function_split_on_nan, 1);
 
   /* integration between two integer boundaries */
   rb_define_method(cFunction, "integrate", function_integrate, -1);
