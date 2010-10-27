@@ -120,8 +120,8 @@ static VALUE dvector_alloc(VALUE klass) {
    Dvector *d;
    VALUE ary = Data_Make_Struct(klass, Dvector, dvector_mark, dvector_free, d);
    d->len = 0;
-   d->ptr = ALLOC_N(double, 1);
-   d->capa = 1;
+   d->ptr = NULL;
+   d->capa = 0;
    d->shared = Qnil;
    return ary;
 }
