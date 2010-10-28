@@ -5500,12 +5500,13 @@ static VALUE dvector_convolve(VALUE self, VALUE kernel, VALUE middle)
      will be dumped one by one.
   * 'default':  what to put when nothing was found but a number must be used
 
-  As a side note, the read time is highly non-linear, which suggests that
-  the read is memory-allocation/copying-limited, at least for big files.
+  In addition to these options that control the output, here are a few
+  others to tune memory allocation; these can strongly improve the
+  performance (or make it worse if you wish):
 
-  An internal memory allocation with aggressive policy should solve that,
-  that is, not using directly Dvectors (and it would be way faster to store
-  anyway).
+  * 'initial_size': the initial size of the memory buffers: if there
+    are not more lines than that, no additional memory allocation/copy
+    occurs.
 */
 static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
 {
@@ -5540,7 +5541,9 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
   int current_size = 10;	/* The number of slots available */
   double ** vectors = ALLOC_N(double *, current_size);
   long index = 0;		/* The current index in the vectors */
-  int allocated_size = 5004;	/* The size available in the vectors */
+  /* The size available in the vectors */
+  int allocated_size = 
+    FIX2LONG(rb_hash_aref(options, rb_str_new2("initial_size"))); 
 
 
   int i;

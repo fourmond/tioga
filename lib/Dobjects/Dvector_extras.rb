@@ -84,6 +84,7 @@ module Dobjects
       'index_col' => false,
       'headers' => nil, # not used for now.
       'default' => 0.0/0.0, # defaults to NaN
+      'initial_size' => 5001,
       'remove_space' => true ,# removes spaces at the beginning of the lines
     }
 
