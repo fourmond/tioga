@@ -26,7 +26,12 @@ Benchmark.bm do |x|
     Dobjects::Dvector.fancy_read(stream, nil, 'default'=> 0.0).size
   end
 
-
+  # Trying pre-allocation.
+  x.report("fancy_read(100 000), preallocation to 1 :") do 
+    stream = File.open(f.path)
+    Dobjects::Dvector.fancy_read(stream, nil, 'default'=> 0.0, 
+                                 'initial_size' => 1).size
+  end
   x.report("fancy_read(100 000), preallocation to 49999 :") do 
     stream = File.open(f.path)
     Dobjects::Dvector.fancy_read(stream, nil, 'default'=> 0.0, 
