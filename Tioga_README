@@ -22,30 +22,13 @@ This is the README for the Tioga kernel, version 1.10, March 7, 2009.
 
 << What's new >>
 
-    Tioga 1.12 has seen quite a lot of action. The first and major
-change is the switch from a custom rewrite of mkmf.rb for
-building/installing to the standard setup.rb tool, which finally has
-the gem version build exactly the same way as the pristine one.
+   Tioga 1.13 brings in a fix for a well-hidden memory leak that was
+unlikely to hit you unless you were allocating a huge number of
+vectors.
 
-    Another side effect of this is that, for a big part thanks to
-Carlo E. Prelz <fluido@fluido.as>, we now have tioga that works just
-fine with Ruby 1.9.1 (though there is a weird bug while testing the
-Flate library, we welcome any input on that).
-
-    Apart from that, Tioga has seen many improvements on the numerical
-side. First, we welcome the participation of Benjamin ter Kuile, who
-has started improving some aspects of Dtable.
-
-    Second, now Dvector is gifted with FFT capacities if the
-development files of fftw3 are available at compile time (have a look
-at the documentation).
-
-    Third, Function has been endowed with a whole bunch of new
-functions for data processing, such as linear regression, spline
-approximation (that almost looks like a good filter !), 4th order
-accurate first and second derivatives.
-
-    Finally, a couple of annoying bugs were fixed.
+   More interestingly, a few instance functions that did not depend on
+FigureMaker's internal state (color conversion functions and
+contouring algorithms) were made available as module functions too.
 
 << Quick Installation of Tioga >>
 
@@ -188,6 +171,32 @@ Bill Paxton
 << What's old >>
 
 Here are the old release messages:
+
+    Tioga 1.12 has seen quite a lot of action. The first and major
+change is the switch from a custom rewrite of mkmf.rb for
+building/installing to the standard setup.rb tool, which finally has
+the gem version build exactly the same way as the pristine one.
+
+    Another side effect of this is that, for a big part thanks to
+Carlo E. Prelz <fluido@fluido.as>, we now have tioga that works just
+fine with Ruby 1.9.1 (though there is a weird bug while testing the
+Flate library, we welcome any input on that).
+
+    Apart from that, Tioga has seen many improvements on the numerical
+side. First, we welcome the participation of Benjamin ter Kuile, who
+has started improving some aspects of Dtable.
+
+    Second, now Dvector is gifted with FFT capacities if the
+development files of fftw3 are available at compile time (have a look
+at the documentation).
+
+    Third, Function has been endowed with a whole bunch of new
+functions for data processing, such as linear regression, spline
+approximation (that almost looks like a good filter !), 4th order
+accurate first and second derivatives.
+
+    Finally, a couple of annoying bugs were fixed.
+
 
 --------------------------
 
