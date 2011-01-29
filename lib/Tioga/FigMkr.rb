@@ -311,6 +311,7 @@ class FigureMaker
 
         # By default, we use Bill's algorithm for major ticks positions
         self.vincent_or_bill = false
+        self.log_minor_ticks_limit = 10
     end
     
 

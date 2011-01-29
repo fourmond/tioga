@@ -292,8 +292,9 @@ typedef struct {
     int right_edge_type;
     bool right_edge_visible;
 
-    /* General axis stuff*/
-    bool vincent_or_bill;
+    /* General axis */
+    bool vincent_or_bill; /* whether to use Bill's or Vincent's algorithms for minor ticks */
+    int log_minor_ticks_limit; /* the number after which we disable the display of minor ticks on log scale */
 
     /* Legend */
     // units are text heights for x and y for locations and sizes

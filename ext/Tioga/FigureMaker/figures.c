@@ -233,6 +233,7 @@ FM *Get_FM(OBJ_PTR fmkr, int *ierr) {
 
 /* Major ticks picking algorithm */
    BOOL_ATTR(vincent_or_bill)
+   INT_ATTR(log_minor_ticks_limit)
 
     
 /* Legend */
@@ -642,6 +643,7 @@ void Init_FigureMaker(void) {
 
 /* Major ticks algorithm */
    attr_accessors(vincent_or_bill)
+   attr_accessors(log_minor_ticks_limit)
     
 /* Legend */
    attr_accessors(legend_text_width)

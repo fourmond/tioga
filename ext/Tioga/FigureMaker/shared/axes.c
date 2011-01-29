@@ -785,7 +785,7 @@ static double * get_minor_ticks_location(OBJ_PTR fmkr, FM *p,
    if (s->number_of_minor_intervals <= 0) {
       if (s->log_vals) {
          double interval = s->majors[1] - s->majors[0];
-         s->number_of_minor_intervals = (abs(interval) != 1.0 || s->nmajors > 10)? 1 : 9; 
+         s->number_of_minor_intervals = (abs(interval) != 1.0 || s->nmajors > p->log_minor_ticks_limit) ? 1 : 9; 
       }  else {
          s->number_of_minor_intervals = Pick_Number_of_Minor_Intervals(s->interval, &ierr);
          if (ierr != 0) return NULL;
