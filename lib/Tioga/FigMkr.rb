@@ -283,7 +283,7 @@ class FigureMaker
         @enter_context_function = nil
         @exit_context_function = nil
 
-        @enter_page_function = lambda { default_enter_page_function }
+        @enter_page_function = lambda  { |t| t.default_enter_page_function }
         @exit_page_function = nil
                 
         @tex_preview_paper_width = '297mm'
