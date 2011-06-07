@@ -2,7 +2,7 @@
 
 require 'Tioga/FigureMaker'
 
-require 'figure_styles.rb'
+require './figure_styles.rb'
 
 class MyFigures
 
@@ -86,17 +86,24 @@ class MyFigures
         grays = []
         arys = Array.new(12) { Array.new }
         ColorConstants.constants.each do |name|
-            rgb = eval(name)
+            rgb = ColorConstants::const_get(name)
             if (rgb[0] == rgb[1] and rgb[1] == rgb[2])
                 grays << name
             else
-                hls = t.rgb_to_hls(eval(name))
+                hls = t.rgb_to_hls(rgb)
                 i = hls[0].floor/30
                 arys[i] << name
             end
         end
-        grays.sort! { |a,b| as = t.rgb_to_hls(eval(a))[1]; bs = t.rgb_to_hls(eval(b))[1]; as <=> bs }
-        arys.each { |ary| ary.sort! { |a,b| as = t.rgb_to_hls(eval(a))[1]; bs = t.rgb_to_hls(eval(b))[1]; as <=> bs } }
+        grays.sort! { |a,b| 
+          as = t.rgb_to_hls(ColorConstants::const_get(a))[1]; 
+          bs = t.rgb_to_hls(ColorConstants::const_get(b))[1]; 
+          as <=> bs 
+        }
+        arys.each { |ary| ary.sort! { |a,b| 
+          as = t.rgb_to_hls(ColorConstants::const_get(a))[1]; 
+          bs = t.rgb_to_hls(ColorConstants::const_get(b))[1]; 
+          as <=> bs } }
         colors = grays
         arys.each { |ary| colors.concat(ary) }
         @color_list = colors
@@ -108,7 +115,7 @@ class MyFigures
         dy = 0.75
         t.fill_color = White
         t.fill_rect(x, y + yfrac * height, width, (1-yfrac) * height)
-        t.fill_color = eval(name)
+        t.fill_color = ColorConstants::const_get(name)
         t.fill_rect(x, y, width, yfrac * height)
         t.show_text('text' => name, 'x' => x + 0.5 * width, 'y' => y + dy * height,
             'justification' => CENTERED, 'scale' => 0.55)

@@ -1,7 +1,7 @@
 # plots.rb
 
 require 'Tioga/FigureMaker'
-require 'plot_styles.rb'
+require './plot_styles.rb'
 
 class MyPlots
 
