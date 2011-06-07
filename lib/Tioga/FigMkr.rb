@@ -1220,7 +1220,7 @@ class FigureMaker
                 k += '=' if respond_to? "#{k}="
                 send(k, val)
               end
-              bottom[m].each {|x| stroke_line(x, y0, x, y1)}
+              bottom["#{m}_ticks"].each {|x| stroke_line(x, y0, x, y1)}
             end
           end
         end
@@ -1241,7 +1241,7 @@ class FigureMaker
                 k += '=' if respond_to? "#{k}="
                 send(k, val)
               end
-              left[m].each {|y| stroke_line(x0, y, x1, y)}
+              left["#{m}_ticks"].each {|y| stroke_line(x0, y, x1, y)}
             end
           end
         end
