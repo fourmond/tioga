@@ -2472,26 +2472,8 @@ class FigureMaker
             puts msg
             puts ""
         end
-        puts "    " + "#{er.message}" + "  [version: " + FigureMaker.version + "]"
-        line_count = 0
-        show_count = 0
-        past_callers_routines = false
-        in_callers_routines = false
-        er.backtrace.each do |line|
-            if (line.include?('Tioga/FigMkr.rb')) || (line.include?('Tioga/tioga_ui.rb'))
-              if in_callers_routines
-                past_callers_routines = true 
-                in_callers_routines = false
-              end
-            else
-              in_callers_routines = true
-            end 
-            if (show_count < @num_error_lines) and in_callers_routines
-                puts "    " + line
-                show_count = show_count + 1
-            end
-            line_count = line_count + 1
-        end
+        puts "    #{er.message}  [version: #{ FigureMaker.version}]"
+        puts "\t#{er.backtrace.join("\n\t")}"
     end
     
 
