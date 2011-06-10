@@ -122,18 +122,18 @@ The next step is to do the tutorial found in the documentation.
     Once you have Tioga installed, the on-line tutorial will help you
 get started using it.
     
-http://theory.kitp.ucsb.edu/~paxton/tioga_doc/classes/Tioga/Tutorial.html
+http://tioga.rubyforge.org/doc/classes/Tioga/Tutorial.html
 
 
 << Documentation >>
 
     Visit this website to access the documentation:
     
-        http://theory.kitp.ucsb.edu/~paxton/tioga_doc/index.html
+        http://tioga.rubyforge.org/doc/
 
 If for some reason that link isn't working, go to my website,
 
-        http://theory.kitp.ucsb.edu/~paxton
+        http://www.kitp.ucsb.edu/~paxton
 
 and check there for a new link to the Tioga stuff.
 
@@ -157,7 +157,7 @@ fix it.  Or even better, let me know the fix along with the bug!
 
 ----------------------------------
 
-For more, visit my website:  http://theory.kitp.ucsb.edu/~paxton
+For more, visit my website:  http://www.kitp.ucsb.edu/~paxton
 
 Best wishes,
 Bill Paxton
@@ -318,7 +318,7 @@ time?  Turns out there was one user who couldn't live without it --
 me!  So it's back, but I'm still not making any promises about keeping
 it alive if Apple does something stupid in coming releases.  If you're
 interested in playing with it in spite of that warning, it's available
-from my website (http://theory.kitp.ucsb.edu/~paxton/Tioga-1.5.dmg).
+from my website (http://www.kitp.ucsb.edu/~paxton/Tioga-1.5.dmg).
 
 	Cheers, Bill
 

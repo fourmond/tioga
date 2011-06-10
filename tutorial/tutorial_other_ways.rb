@@ -15,16 +15,17 @@ available -- here's the current list.
 Batch mode -- you can write your tioga file in a way that can be directly run by ruby to create
 the pdfs.  Take a look at the file samples/immediate.rb for an example of how to do this.
 
-{Ctioga}[http://sciyag.rubyforge.org/ctioga/index.html] by Vincent Fourmond is a command-line plotting
-system along the lines of gnuplot that uses the tioga kernel.  Basically, Ctioga writes the tioga ruby
-files for you based on a powerful set of command line options.
+{ctioga2}[http://ctioga2.rubyforge.org] by Vincent Fourmond is a
+command-line plotting system along the lines of gnuplot that uses the
+tioga kernel.  Basically, +ctioga2+ writes the tioga ruby files for
+you based on a powerful set of command line options.
 
 {Vtioga}[http://astro.u-strasbg.fr/~jfleck/] by Jean-Julien Fleck is a browser-based viewer that uses
 tioga to create the pdfs, converts them to png's, and them displays them in a browser page 
 created using Ruby on Rails.  The browser page has thumbnails for all the figures in the file -- click 
 them to see a larger version.
 
-{Tioga Droplet}[http://theory.kitp.ucsb.edu/~paxton/tioga.html] by me (Bill Paxton) is a tiny Mac application
+{Tioga Droplet}[http://www.kitp.ucsb.edu/~paxton/tioga.html] by me (Bill Paxton) is a tiny Mac application
 whose only function is to do the equivalent of 'tioga filename -p' for any files dropped on it.
 
 There is also an irb version of the tioga command line interface that is part of the standard

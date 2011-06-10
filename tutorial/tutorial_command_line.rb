@@ -17,7 +17,7 @@ tutorial will be based on the description given here.
   This program is a command line interface for the open-source tioga kernel.
   The tioga kernel is for creating figures and plots using Ruby, PDF, and TeX.
   Following is a brief description of the tioga command line options.
-  For more information, visit http://theory.kitp.ucsb.edu/~paxton/tioga.html.
+  For more information, visit http://www.kitp.ucsb.edu/~paxton/tioga.html.
 
   Before any command line information is processed, tioga runs ~/.tiogainit if it exists.
       The primary use of this file is to set your default pdf viewer command (see below).

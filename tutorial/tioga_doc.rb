@@ -31,8 +31,8 @@ link:images/Icon.png
 
 Tioga is a program for creating figures and plots using Ruby, PDF, and TeX.
 
-It was originally designed, implemented, and documented by {Bill Paxton}[http://theory.kitp.ucsb.edu/~paxton/].
-{Vincent Fourmond}[http://vincent.fourmond.neuf.fr] has also been an active developer of Tioga for sometime now.
+It was originally designed, implemented, and documented by {Bill Paxton}[http://www.kitp.ucsb.edu/~paxton/].
+{Vincent Fourmond}[http://vince-debian.blogspot.com] has also been an active developer of Tioga for sometime now.
 
 The tioga kernel is a {Ruby}[http://www.rubycentral.com/misc/intro.html] 
 extension providing a set of classes and modules
@@ -46,8 +46,8 @@ into a PDF file and the text into a TeX file.  These get combined when you
 include the figure or plot in a TeX document by placing the graphics in a box first
 and then adding a layer with the text on top of the graphics.
 
-The {Tutorial}[http://theory.kitp.ucsb.edu/~paxton/tioga_doc/classes/Tioga/Tutorial.html] will get you started, 
-and the {FigureMaker}[http://theory.kitp.ucsb.edu/~paxton/tioga_doc/classes/Tioga.html] reference material will keep you going.  
+The {Tutorial}[http://tioga.rubyforge.org/doc/classes/Tioga/Tutorial.html] will get you started, 
+and the {FigureMaker}[http://tioga.rubyforge.org/doc/classes/Tioga.html] reference material will keep you going.  
 For your first visit, you should read on to see about licenses, credits, etc.
 
 = Open Source Licenses
@@ -56,7 +56,7 @@ Tioga is free software.  Source code for the kernel is available at the website 
 the {GNU Lesser General Library Public License}[http://www.gnu.org/licenses/licenses.html#LGPL].
 
 The tioga documentation is also freely available, both in this on-line form, and for
-downloading (from my website[http://theory.kitp.ucsb.edu/~paxton/]), copying, and redistribution, under the terms of the
+downloading (from my website[http://www.kitp.ucsb.edu/~paxton/]), copying, and redistribution, under the terms of the
 {GNU Free Documentation License}[http://www.gnu.org/licenses/fdl.html].
 
       Copyright (c)  2005, 2006  Bill Paxton.

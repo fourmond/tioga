@@ -201,7 +201,7 @@ class TiogaUI
     puts "\nThis program is a command line interface for the open-source tioga kernel."
     puts "The tioga kernel is for creating figures and plots using Ruby, PDF, and TeX."
     puts "Following is a brief description of the tioga command line options."
-    puts "For more information, visit http://theory.kitp.ucsb.edu/~paxton/tioga.html."
+    puts "For more information, visit http://www.kitp.ucsb.edu/~paxton/tioga.html."
     puts "\nBefore any command line information is processed, tioga runs ~/.tiogainit if it exists."
     puts "    The primary use of this file is to set your default pdf viewer command (see below)."
     puts "\nIf there are no command line arguments, or the argument is -h, this help info is output."
@@ -699,7 +699,7 @@ class TiogaUI
         'message' => "Tioga-Point-and-Click is a Ruby/Tk Application.\n" +
             "It uses the Tioga kernel to create PDFs and then calls your favorite viewer to show them.\n\n" +
             "Version 0.1  -- January, 2007\n\n" +
-            "Visit http://theory.kitp.ucsb.edu/~paxton/tioga.html")
+            "Visit http://www.kitp.ucsb.edu/~paxton/tioga.html")
   end
 
 

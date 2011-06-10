@@ -36,7 +36,7 @@ Don't forget the - at the end of the epstopdf command!
 We've now been through the "figures" folder and the "plots" folder in
 the samples.  The remaining ones are included as examples of "real"
 cases using tioga to make plots.  The plots and the data they
-represent come from my stellar evolution program, "EZ[http://theory.kitp.ucsb.edu/~paxton/#EZ]".
+represent come from my stellar evolution program, "EZ[http://www.kitp.ucsb.edu/~paxton/#EZ]".
 Here's the answer to what's a "zams":
 
 []     The "main sequence" is where stars spend most of their lives while they burn hydrogen in their cores.

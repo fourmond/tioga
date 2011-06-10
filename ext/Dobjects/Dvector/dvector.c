@@ -5967,7 +5967,7 @@ static VALUE dvector_fft_mul(VALUE self, VALUE m)
  * This copies <i>xhe</i> to <i>log_xhe0</i>, subtracts <i>xhe1</i> and <i>xhe2</i> from <i>log_xhe0</i> in place,
  * and then takes the +log+, also in place.  It's not pretty, but it is efficient -- use if needed.
  *
- * Please report problems with the Dvector extension here[http://theory.kitp.ucsb.edu/~paxton/].
+ * Please report problems with the Dvector extension to the <tt>tioga-users</tt> at <tt>rubyforge.org</tt> mailing list.
  * [Note: for N-dimensional arrays or arrays of complex numbers or integers as well as doubles,
  * along with a variety of matrix operations,
  * check out the NArray[http://www.ir.isas.ac.jp/~masa/ruby/index-e.html] extension.]
