@@ -1,7 +1,7 @@
-This is the README for the Tioga kernel, version 1.10, March 7, 2009.
+This is the README for the Tioga kernel, version 1.14, June 10, 2011.
 
     Copyright (C) 2005, 2006, 2007, 2008, 2009  Bill Paxton
-    Copyright (C) 2007, 2008, 2009, 2010 Vincent Fourmond, Taro Sato, 
+    Copyright (C) 2007, 2008, 2009, 2010, 2011 Vincent Fourmond, Taro Sato, 
     	      	  Benjamin ter Kuile
     
     This file is part of Tioga.
@@ -22,13 +22,13 @@ This is the README for the Tioga kernel, version 1.10, March 7, 2009.
 
 << What's new >>
 
-   Tioga 1.13 brings in a fix for a well-hidden memory leak that was
-unlikely to hit you unless you were allocating a huge number of
-vectors.
+    Tioga 1.14 fixes all known problems of Tioga with Ruby 1.9.1 and
+higher (to the point that it runs with ctioga2, and the samples run
+too !).
 
-   More interestingly, a few instance functions that did not depend on
-FigureMaker's internal state (color conversion functions and
-contouring algorithms) were made available as module functions too.
+    It also brings in the possibility to customize the number of major
+ticks after which log plots don't show minor ticks, via the
+log_minor_ticks_limit accessor.
 
 << Quick Installation of Tioga >>
 
@@ -171,6 +171,15 @@ Bill Paxton
 << What's old >>
 
 Here are the old release messages:
+
+   Tioga 1.13 brings in a fix for a well-hidden memory leak that was
+unlikely to hit you unless you were allocating a huge number of
+vectors.
+
+   More interestingly, a few instance functions that did not depend on
+FigureMaker's internal state (color conversion functions and
+contouring algorithms) were made available as module functions too.
+
 
     Tioga 1.12 has seen quite a lot of action. The first and major
 change is the switch from a custom rewrite of mkmf.rb for
