@@ -18,7 +18,7 @@ spec = Gem::Specification.new do |s|
   s.bindir = 'bin'
   s.executables << 'tioga'
   s.name = 'tioga'
-  s.version = '1.13'
+  s.version = '1.14'
   s.summary = 'Tioga - a powerful scientific plotting library'
   s.homepage = 'http://tioga.rubyforge.org'
   s.authors = [
@@ -29,5 +29,4 @@ spec = Gem::Specification.new do |s|
   s.rubyforge_project = 'tioga'
   s.email = ['tioga-users@rubyforge.org']
   s.license = "LGPL 2.1"
-  s.has_rdoc = true
 end
