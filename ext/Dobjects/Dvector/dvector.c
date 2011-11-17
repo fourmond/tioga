@@ -1202,6 +1202,40 @@ PRIVATE
 PRIVATE
 /*
  *  call-seq:
+ *     dvector.each3(other1, other2) {|x,y, z| block } 
+ *  
+ *  Calls <i>block</i> once for each element in _dvector_, passing that
+ *  element as a parameter along with the corresponding element from the _other1_ and _other2_ vectors.
+ *  The three vectors must be the same length.
+ *     
+ *     a = Dvector[ 1, 0, -1 ]
+ *     b = Dvector[ 3, 4, 5 ]
+ *     c = Dvector[ 6, 9, 2 ]
+ *     a.each3(b, c) {|x,y,z| print "(", x ",", y, ", ", z, ") " }
+ *     
+ *  produces:
+ *     
+ *     (1,3,6) (0,4,9) (-1,5,2) 
+ */ VALUE dvector_each3(VALUE ary, VALUE ary2, VALUE ary3) {
+   Dvector *d = Get_Dvector(ary);
+   Dvector *d2 = Get_Dvector(ary2);
+   Dvector *d3 = Get_Dvector(ary3);
+   long i;
+   if (d->len != d2->len) {
+      rb_raise(rb_eArgError, "vectors with different lengths (%ld vs %ld) for each3", d->len, d2->len);
+   }
+   if (d->len != d3->len) {
+      rb_raise(rb_eArgError, "vectors with different lengths (%ld vs %ld) for each3", d->len, d3->len);
+   }
+   for (i=0; i < d->len; i++) {
+      rb_yield_values(3, rb_float_new(d->ptr[i]), rb_float_new(d2->ptr[i]), rb_float_new(d3->ptr[i]));
+   }
+   return ary;
+}
+
+PRIVATE
+/*
+ *  call-seq:
  *     dvector.each_index {|index| block }  ->  dvector
  *  
  *  Same as <code>Dvector#each</code>, but passes the index of the element
@@ -1270,6 +1304,40 @@ PRIVATE
 PRIVATE
 /*
  *  call-seq:
+ *     dvector.each3_with_index(other1, other2) {|x,y,z,i| block } 
+ *  
+ *  Calls <i>block</i> once for each element in _dvector_, passing that
+ *  element as a parameter along with the corresponding element from the _other1_ and _other2_ vectors and the index.
+ *  The three vectors must be the same length.
+ *     
+ *     a = Dvector[ 1, 0, -1 ]
+ *     b = Dvector[ 3, 4, 5 ]
+ *     c = Dvector[ 6, 9, 2 ]
+ *     a.each3(b, c) {|x,y,z,i| print "(", x ",", y, ", ", z, ",", i, ") " }
+ *     
+ *  produces:
+ *     
+ *     (1,3,6,0) (0,4,9,1) (-1,5,2,2) 
+ */ VALUE dvector_each3_with_index(VALUE ary, VALUE ary2, VALUE ary3) {
+   Dvector *d = Get_Dvector(ary);
+   Dvector *d2 = Get_Dvector(ary2);
+   Dvector *d3 = Get_Dvector(ary3);
+   long i;
+   if (d->len != d2->len) {
+      rb_raise(rb_eArgError, "vectors with different lengths (%ld vs %ld) for each3", d->len, d2->len);
+   }
+   if (d->len != d3->len) {
+      rb_raise(rb_eArgError, "vectors with different lengths (%ld vs %ld) for each3", d->len, d3->len);
+   }
+   for (i=0; i < d->len; i++) {
+      rb_yield_values(4, rb_float_new(d->ptr[i]), rb_float_new(d2->ptr[i]), rb_float_new(d3->ptr[i]), LONG2NUM(i));
+   }
+   return ary;
+}
+
+PRIVATE
+/*
+ *  call-seq:
  *     dvector.reverse_each {|x| block } 
  *  
  *  Same as <code>Dvector#each</code>, but traverses _dvector_ in reverse
@@ -1317,6 +1385,42 @@ PRIVATE
    }
    while (len--) {
       rb_yield_values(2, rb_float_new(d->ptr[len]), rb_float_new(d2->ptr[len]));
+      if (d->len < len) {
+         len = d->len;
+      }
+   }
+   return ary;
+}
+
+PRIVATE
+/*
+ *  call-seq:
+ *     dvector.reverse_each3(other1, other2) {|x,y,z| block } 
+ *  
+ *  Same as <code>Dvector#each3</code>, but traverses vectors in reverse
+ *  order.  The vectors must have the same size.
+ *     
+ *     a = Dvector[ 1, 0, -1 ]
+ *     b = Dvector[ 3, 4, 5 ]
+ *     c = Dvector[ 6, 9, 2 ]
+ *     a.reverse_each3(b, c) {|x,y,z| print "(", x ",", y, ", ", z, ") " }
+ *     
+ *  produces:
+ *     
+ *      (-1,5,2) (0,4,9) (1,3,6)
+ */ VALUE dvector_reverse_each3(VALUE ary, VALUE ary2, VALUE ary3) {
+   Dvector *d = Get_Dvector(ary);
+   Dvector *d2 = Get_Dvector(ary2);
+   Dvector *d3 = Get_Dvector(ary3);
+   long len = d->len;
+   if (len != d2->len) {
+      rb_raise(rb_eArgError, "vectors with different lengths (%ld vs %ld) for reverse_each3", len, d2->len);
+   }
+   if (len != d3->len) {
+      rb_raise(rb_eArgError, "vectors with different lengths (%ld vs %ld) for reverse_each3", len, d3->len);
+   }
+   while (len--) {
+      rb_yield_values(3, rb_float_new(d->ptr[len]), rb_float_new(d2->ptr[len]), rb_float_new(d3->ptr[len]));
       if (d->len < len) {
          len = d->len;
       }
@@ -1401,6 +1505,45 @@ PRIVATE
    }
    while (len--) {
       rb_yield_values(3, rb_float_new(d->ptr[len]), rb_float_new(d2->ptr[len]), LONG2NUM(len));
+      if (d->len < len) {
+         len = d->len;
+      }
+   }
+   return ary;
+}
+
+PRIVATE
+/*
+ *  call-seq:
+ *     dvector.reverse_each3_with_index {|x,y,z,index| block }  ->  dvector
+ *  
+ *  Same as <code>Dvector#each3_with_index</code>, but traverses the vectors in reverse
+ *  order.
+ *     
+ *     a = Dvector[ 1, 0, -1 ]
+ *     b = Dvector[ 3, 4, 5 ]
+ *     c = Dvector[ 6, 9, 2 ]
+ *     a.reverse_each3_with_index(b,c) {|x,y,i| print "(", x ",", y, "," i, ") " }
+ *     a.each3(b, c) {|x,y,z,i| print "(", x ",", y, ", ", z, ",", i, ") " }
+ *     
+ *  produces:
+ *     
+ *      (-1,5,2,2) (0,4,9,1) (1,3,6,0)
+ */ VALUE dvector_reverse_each3_with_index(VALUE ary, VALUE ary2, VALUE ary3) {
+   Dvector *d = Get_Dvector(ary);
+   Dvector *d2 = Get_Dvector(ary2);
+   Dvector *d3 = Get_Dvector(ary3);
+   long len = d->len;
+   if (len != d2->len) {
+      rb_raise(rb_eArgError, "vectors with different lengths (%ld vs %ld) for reverse_each3_with_index", 
+         len, d3->len);
+   }
+   if (len != d3->len) {
+      rb_raise(rb_eArgError, "vectors with different lengths (%ld vs %ld) for reverse_each3_with_index", 
+         len, d3->len);
+   }
+   while (len--) {
+      rb_yield_values(4, rb_float_new(d->ptr[len]), rb_float_new(d2->ptr[len]), rb_float_new(d3->ptr[len]), LONG2NUM(len));
       if (d->len < len) {
          len = d->len;
       }
@@ -6080,6 +6223,10 @@ void Init_Dvector() {
    rb_define_method(cDvector, "each2_with_index", dvector_each2_with_index, 1);
    rb_define_method(cDvector, "reverse_each2", dvector_reverse_each2, 1);
    rb_define_method(cDvector, "reverse_each2_with_index", dvector_reverse_each2_with_index, 1);
+   rb_define_method(cDvector, "each3", dvector_each3, 2);
+   rb_define_method(cDvector, "each3_with_index", dvector_each3_with_index, 2);
+   rb_define_method(cDvector, "reverse_each3", dvector_reverse_each3, 2);
+   rb_define_method(cDvector, "reverse_each3_with_index", dvector_reverse_each3_with_index, 2);
    
    rb_define_method(cDvector, "collect2", dvector_collect2, 1);
    rb_define_method(cDvector, "collect2!", dvector_collect2_bang, 1);

@@ -153,6 +153,42 @@ class TestDvector < Test::Unit::TestCase
         assert_equal(ans, a.div(b))
     end
 
+    def test_each3
+      a = Dvector[ 1, 0, -1 ]
+      b = Dvector[ 3, 4, 5 ]
+      c = Dvector[ 6, 9, 2 ]
+      new = Dvector[]
+      a.each3(b,c){|x,y,z| new << x << y << z}
+      assert_equal Dvector[1,3,6,0,4,9,-1,5,2], new
+    end
+
+    def test_each3_with_index
+      a = Dvector[ 1, 0, -1 ]
+      b = Dvector[ 3, 4, 5 ]
+      c = Dvector[ 6, 9, 2 ]
+      new = Dvector[]
+      a.each3_with_index(b,c){|x,y,z, i| new << x << y << z << i}
+      assert_equal Dvector[1,3,6,0,0,4,9,1,-1,5,2,2], new
+    end
+
+    def test_reverse_each3
+      a = Dvector[ 1, 0, -1 ]
+      b = Dvector[ 3, 4, 5 ]
+      c = Dvector[ 6, 9, 2 ]
+      new = Dvector[]
+      a.reverse_each3(b,c){|x,y,z| new << x << y << z}
+      assert_equal Dvector[-1,5,2,0,4,9,1,3,6], new
+    end
+
+    def test_reverse_each3_with_index
+      a = Dvector[ 1, 0, -1 ]
+      b = Dvector[ 3, 4, 5 ]
+      c = Dvector[ 6, 9, 2 ]
+      new = Dvector[]
+      a.reverse_each3_with_index(b,c){|x,y,z,i| new << x << y << z << i}
+      assert_equal Dvector[-1,5,2,2,0,4,9,1,1,3,6,0], new
+    end
+
     def test_math
         a = Dvector[11, 22, 33]
         b = Dvector[6.3, -2.1, 3e-40]
