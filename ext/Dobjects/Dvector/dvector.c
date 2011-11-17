@@ -3168,7 +3168,7 @@ PRIVATE
  *  
  *  Returns square root of the dot product of the vector with itself.
  *     
- *     a = Dvector[ 3, 5 ]
+ *     a = Dvector[ 3, 4 ]
  *     a.vector_length -> 5.0
  */ 
 VALUE dvector_vector_length(VALUE ary) {
