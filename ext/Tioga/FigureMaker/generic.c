@@ -115,7 +115,7 @@ OBJ_PTR COLOR_PREAMBLE(OBJ_PTR fmkr, int *ierr) { return rb_const_get(CLASS_OF(f
 
 void GIVE_WARNING(const char *fmt, const char *str) { rb_warn(fmt,str); }
 
-void RAISE_ERROR(char *str, int *ierr) { *ierr = -1; rb_raise(rb_eArgError,str); }
+void RAISE_ERROR(char *str, int *ierr) { *ierr = -1; rb_raise(rb_eArgError,"%s", str); }
 
 #define err_buff_len 256
 void RAISE_ERROR_s(char *fmt, char *s, int *ierr) {
