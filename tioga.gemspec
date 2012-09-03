@@ -6,10 +6,10 @@
 spec = Gem::Specification.new do |s|
   s.files += Dir["ext/**/*.[ch]"] + 
     Dir["lib/**/*.rb"] +
-    Dir["split/*/include/*.h"] + Dir["split/**/*.rb"] +
-    Dir["split/*.h"] +  Dir["split/*.c"]
   s.files += Dir["tests/*"]
   s.files += %w(Tioga_README lgpl.txt)
+  # We explicitly add TexPreamble so that it doesn't get forgotten
+  s.files += ["lib/Tioga/TexPreamble.rb"]
   s.test_files = Dir["tests/tsc_*.rb"]
   s.extensions +=  
     %w{Flate Tioga/FigureMaker Dobjects/Dvector Dobjects/Dtable Dobjects/Function}.map do |d|
@@ -18,7 +18,7 @@ spec = Gem::Specification.new do |s|
   s.bindir = 'bin'
   s.executables << 'tioga'
   s.name = 'tioga'
-  s.version = '1.14'
+  s.version = '1.15'
   s.summary = 'Tioga - a powerful scientific plotting library'
   s.homepage = 'http://tioga.rubyforge.org'
   s.authors = [
