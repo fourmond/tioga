@@ -140,6 +140,18 @@ class TestFMkr < Test::Unit::TestCase
       assert_equal(b['biniou'], 0)
     end
 
+    def test_hls_to_rgb
+      t = Tioga::FigureMaker.default
+      rgb_old = [0.1, 0.1, 1.0]
+      rgb_new = t.hls_to_rgb(t.rgb_to_hls(rgb_old))
+      3.times do |i|
+        # Exact conversion is not expected, but that shouldn't be so
+        # bad.
+        assert((rgb_old[i] - rgb_new[i]).abs < 1e-5)
+      end
+    end
+
+
 end
 
 
