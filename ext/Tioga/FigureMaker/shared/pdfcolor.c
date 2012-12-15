@@ -402,7 +402,7 @@ convert_rgb_to_hls(double r, double g, double b, double *p_h, double *p_l,
    }
    *p_h = h;
    *p_l = l;
-   *p_s = s;
+   *p_s = MIN( 1., MAX( s, 0. ));
 }
 
 
