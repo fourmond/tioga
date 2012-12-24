@@ -107,9 +107,14 @@ static void figure_join(OBJ_PTR fmkr, FM *p,
    figure_lineto(fmkr, p, x1, y1, ierr);
 }
 
-static void axis_stroke(OBJ_PTR fmkr, FM *p, int *ierr)
+static void axis_stroke(OBJ_PTR fmkr, FM *p, int *ierr, int cap)
 {
+   int old_cap = p->line_cap;
+   if(old_cap != cap)           /* Save cap */
+      c_line_cap_set(fmkr, p, cap, ierr);
    c_stroke(fmkr,p, ierr);
+   if(old_cap != cap)           /* Restore cap */
+      c_line_cap_set(fmkr, p, old_cap, ierr);
 }
 
 static void figure_join_and_stroke(OBJ_PTR fmkr, FM *p, 
@@ -759,7 +764,8 @@ static void draw_major_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
       did_line = true;
       if (*ierr != 0) return;
    }
-   if (did_line) axis_stroke(fmkr,p, ierr);
+   if (did_line)
+      axis_stroke(fmkr,p, ierr, LINE_CAP_BUTT);
 }
 
 static double log_subintervals[8] = {
@@ -864,7 +870,7 @@ static void draw_minor_ticks(OBJ_PTR fmkr, FM *p, PlotAxis *s, int *ierr)
    /* And we free the array returned by get_minor_ticks_location */
    free(locs);
    if (did_line) 
-      axis_stroke(fmkr,p, ierr);
+      axis_stroke(fmkr,p, ierr, LINE_CAP_BUTT);
 }
 
 static void show_numeric_label(OBJ_PTR fmkr, FM *p, PlotAxis *s, 
