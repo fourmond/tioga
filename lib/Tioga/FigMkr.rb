@@ -62,8 +62,14 @@ class FigureMaker
     end
     
     def FigureMaker.pdflatex
-      @@which_pdflatex = 'pdflatex' if @@which_pdflatex == nil
-      @@which_pdflatex
+      if ! @@which_pdflatex
+        @@which_pdflatex = if ENV.key? 'TIOGA_PDFLATEX'
+                             ENV['TIOGA_PDFLATEX']
+                           else
+                             "pdflatex"
+                           end
+      end
+      return @@which_pdflatex
     end
     
     def FigureMaker.pdflatex=(s)
@@ -2315,6 +2321,7 @@ class FigureMaker
       else
         syscmd = "cd #{@save_dir}; #{pdflatex} -interaction nonstopmode #{name}.tex"
       end
+
       # Now fun begins:
       # We use IO::popen for three reasons:
       # * first, we want to be able to read back information from
@@ -2326,21 +2333,49 @@ class FigureMaker
       #   for an input for which it didn't prompt.
 
       @measures = {}
-      IO::popen(syscmd, "r+") do |f|
-        f.close_write           # We don't need that.
-        log = File.open(logname, "w")
-        for line in f
-          log.print line
-          if line =~ /^(.*)\[(\d)\]=(.+pt)/
-            n = $1
-            num = $2.to_i
-            dim = Utils::tex_dimension_to_bp($3)
-            @measures[n] ||= []
-            @measures[n][num] = dim
+      popen_error = nil
+      begin
+        IO::popen(syscmd, "r+") do |f|
+          f.close_write           # We don't need that.
+          log = File.open(logname, "w")
+          for line in f
+            log.print line
+            if line =~ /^(.*)\[(\d)\]=(.+pt)/
+              n = $1
+              num = $2.to_i
+              dim = Utils::tex_dimension_to_bp($3)
+              @measures[n] ||= []
+              @measures[n][num] = dim
+            end
           end
         end
+      rescue SystemCallError => e
+        popen_error = e
       end
 
+      if ($?.exitstatus == 127) or popen_error
+        $stderr.puts <<"EOE"
+ERROR: Tioga doesn't seem to find pdflatex (as #{pdflatex}).
+
+This probably means that you don't have any working version of
+pdflatex, in which case you can get it there:
+
+http://www.tug.org/texlive/
+
+or try installing texlive with your favorite package manager.
+
+Alternatively, if you're positive that you have a working version of
+pdflatex installed, either make sur it is in your path or define the 
+TIOGA_PDFLATEX environment variable to its full path, by adding for 
+instance:
+
+export TIOGA_PDFLATEX=/path/to/pdflatex
+
+in your ~/.bashrc.
+EOE
+# ' # for ruby-mode
+      end
+        
       # Now passing the saved measures to the C code.
       for key, val in @measures
         # p @fm_data
@@ -2349,7 +2384,7 @@ class FigureMaker
         
       result = $?
         if !result
-            puts "ERROR: #{pdflatex} failed."
+            $stderr.puts "ERROR: #{pdflatex} failed with error code #{$?.exitstatus}"
             file = File.open(logname)
             if file == nil
                 puts "cannot open #{logname}"
