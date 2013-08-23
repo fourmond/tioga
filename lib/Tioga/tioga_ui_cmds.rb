@@ -21,7 +21,7 @@
 
 require 'Tioga/tioga.rb'
 require "rbconfig.rb"
-include Config
+include RbConfig
   
 include Tioga
 include FigureConstants
@@ -309,7 +309,7 @@ class TiogaUI
     # set the standard defaults
     $tioga_args = Array.new(args.length) {|i| args[i]} # copy the args
     $change_working_directory = true
-    if Config::CONFIG["target"] =~ /darwin/i
+    if RbConfig::CONFIG["target"] =~ /darwin/i
       $pdf_viewer = "repreview"
       #$mac_command_key = true
     else
