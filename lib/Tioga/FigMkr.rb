@@ -170,6 +170,8 @@ class FigureMaker
     # as it causes a systematic second run of pdflatex.
     attr_accessor :measure_legends
 
+    # Stores the errors recorded in the last run of pdflatex.
+    attr_accessor :pdflatex_errors
 
     # old preview attributes -- to be removed later
     
@@ -2316,6 +2318,7 @@ class FigureMaker
       syscmd = "#{pdflatex} -interaction nonstopmode #{name}.tex"
 
       popen_error = nil
+      @pdflatex_errors = []
       Dir.chdir(new_dir) do 
         # Now fun begins:
         # We use IO::popen for three reasons:
@@ -2332,6 +2335,7 @@ class FigureMaker
           IO::popen(syscmd, "r+") do |f|
             f.close_write           # We don't need that.
             log = File.open(logname, "w")
+            error_pending = false
             for line in f
               log.print line
               if line =~ /^(.*)\[(\d)\]=(.+pt)/
@@ -2340,6 +2344,13 @@ class FigureMaker
                 dim = Utils::tex_dimension_to_bp($3)
                 @measures[n] ||= []
                 @measures[n][num] = dim
+              elsif line =~ /^!/
+                error_pending = true
+              elsif line =~ /^\s*$/ # errors seem to stop at blank lines
+                error_pending = false
+              end
+              if error_pending
+                @pdflatex_errors << line
               end
             end
           end
