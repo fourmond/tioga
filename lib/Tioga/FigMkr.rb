@@ -2310,52 +2310,47 @@ class FigureMaker
       quiet = @quiet_mode
       run_directory = @run_dir
       
-      if (@save_dir == nil)
-        logname = "pdflatex.log"
-      else
-        logname = "#{@save_dir}/pdflatex.log"
-      end
-      
-      if (@save_dir == nil)
-        syscmd = "#{pdflatex} -interaction nonstopmode #{name}.tex"
-      else
-        syscmd = "cd #{@save_dir}; #{pdflatex} -interaction nonstopmode #{name}.tex"
-      end
+      logname = "pdflatex.log"
 
-      # Now fun begins:
-      # We use IO::popen for three reasons:
-      # * first, we want to be able to read back information from
-      #   pdflatex (see \tiogameasure)
-      # * second, this way of doing should be portable to win, while
-      #   the > trick might not be that much...
-      # * third, closing the standard input of pdflatex will remove
-      #   painful bugs, when pdflatex gets interrupted but waits
-      #   for an input for which it didn't prompt.
+      new_dir = @save_dir || "."
+      syscmd = "#{pdflatex} -interaction nonstopmode #{name}.tex"
 
-      @measures = {}
       popen_error = nil
-      begin
-        IO::popen(syscmd, "r+") do |f|
-          f.close_write           # We don't need that.
-          log = File.open(logname, "w")
-          for line in f
-            log.print line
-            if line =~ /^(.*)\[(\d)\]=(.+pt)/
-              n = $1
-              num = $2.to_i
-              dim = Utils::tex_dimension_to_bp($3)
-              @measures[n] ||= []
-              @measures[n][num] = dim
+      Dir.chdir(new_dir) do 
+        # Now fun begins:
+        # We use IO::popen for three reasons:
+        # * first, we want to be able to read back information from
+        #   pdflatex (see \tiogameasure)
+        # * second, this way of doing should be portable to win, while
+        #   the > trick might not be that much...
+        # * third, closing the standard input of pdflatex will remove
+        #   painful bugs, when pdflatex gets interrupted but waits
+        #   for an input for which it didn't prompt.
+        
+        @measures = {}
+        begin
+          IO::popen(syscmd, "r+") do |f|
+            f.close_write           # We don't need that.
+            log = File.open(logname, "w")
+            for line in f
+              log.print line
+              if line =~ /^(.*)\[(\d)\]=(.+pt)/
+                n = $1
+                num = $2.to_i
+                dim = Utils::tex_dimension_to_bp($3)
+                @measures[n] ||= []
+                @measures[n][num] = dim
+              end
             end
           end
+        rescue SystemCallError => e
+          popen_error = e
         end
-      rescue SystemCallError => e
-        popen_error = e
       end
-
+        
       if ($?.exitstatus == 127) or popen_error
         $stderr.puts <<"EOE"
-ERROR: Tioga doesn't seem to find pdflatex (as #{pdflatex}).
+ERROR: Tioga doesn't seem to find pdflatex (as '#{pdflatex}').
 
 This probably means that you don't have any working version of
 pdflatex, in which case you can get it there:
@@ -2373,7 +2368,10 @@ export TIOGA_PDFLATEX=/path/to/pdflatex
 
 in your ~/.bashrc.
 EOE
-# ' # for ruby-mode
+
+        if popen_error
+          $stderr.puts "Error: #{popen_error.inspect}"
+        end
       end
         
       # Now passing the saved measures to the C code.
