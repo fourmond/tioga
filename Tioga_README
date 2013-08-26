@@ -22,8 +22,10 @@ This is the README for the Tioga kernel, version 1.14, June 10, 2011.
 
 << What's new >>
 
-    Tioga 1.15 brings in some new iterators in Dvector and some minor
-bug fixes (in particular for gem builds).
+    Tioga 1.16 brings in a bug fix by Josiah Schwab in handling some
+HLS triplets. It also provides facilities to extract the pdflatex
+errors.
+
 
 << Quick Installation of Tioga >>
 
@@ -166,6 +168,9 @@ Bill Paxton
 << What's old >>
 
 Here are the old release messages:
+
+    Tioga 1.15 brings in some new iterators in Dvector and some minor
+bug fixes (in particular for gem builds).
 
     Tioga 1.14 fixes all known problems of Tioga with Ruby 1.9.1 and
 higher (to the point that it runs with ctioga2, and the samples run
