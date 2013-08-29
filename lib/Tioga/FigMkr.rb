@@ -2359,7 +2359,7 @@ class FigureMaker
         end
       end
         
-      if ($?.exitstatus == 127) or popen_error
+      if !$? or ($?.exitstatus == 127) or popen_error
         $stderr.puts <<"EOE"
 ERROR: Tioga doesn't seem to find pdflatex (as '#{pdflatex}').
 
@@ -2393,7 +2393,7 @@ EOE
         
       result = $?
         if !result
-            $stderr.puts "ERROR: #{pdflatex} failed with error code #{$?.exitstatus}"
+            $stderr.puts "ERROR: #{pdflatex} failed with error code #{$? ? $?.exitstatus : 'no command run'}"
             file = File.open(logname)
             if file == nil
                 puts "cannot open #{logname}"
