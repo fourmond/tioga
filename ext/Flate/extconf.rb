@@ -1,8 +1,6 @@
 # Flate installation file
 require 'mkmf'
 
-
-
 if have_header("zlib.h") and have_library("z", "compress", "zlib.h")
   puts "Using the system zlib library"
 else
@@ -13,7 +11,7 @@ else
     target = File::basename(f)
     begin
       FileUtils::symlink(f, target)
-    rescue NotImplemented => e  # For platforms when that isn't implemented
+    rescue NotImplementedError => e  # For platforms when that isn't implemented
       FileUtils::copy(f, target)
     end
     $distcleanfiles << target
