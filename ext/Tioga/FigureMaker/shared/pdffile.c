@@ -193,7 +193,7 @@ Open_pdf(OBJ_PTR fmkr, FM *p, char *filename, bool quiet_mode, int *ierr)
    time_t now = time(NULL);
    char ofile[300], timestring[100];
    Get_pdf_name(ofile, filename, 300);
-   if ((OF = fopen(ofile, "w")) == NULL) {
+   if ((OF = fopen(ofile, "wb")) == NULL) { /* Write binary file ! */
       RAISE_ERROR_s("Sorry: can't open %s.\n", filename, ierr);
       return;
    }

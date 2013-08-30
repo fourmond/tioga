@@ -109,7 +109,7 @@ static void
 Write_Image_From_File(char *filename, int width, int height, char *out_info,
                       int mask_obj_num, int *ierr)
 {
-   FILE *jpg = fopen(filename, "r");
+   FILE *jpg = fopen(filename, "rb"); /* We read binary files ! */
    if (jpg == NULL) {
       RAISE_ERROR_s("Sorry: cannot open file for showing image (%s)\n",
                     filename, ierr);
