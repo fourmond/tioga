@@ -22,10 +22,9 @@ This is the README for the Tioga kernel, version 1.14, June 10, 2011.
 
 << What's new >>
 
-    Tioga 1.16 brings in a bug fix by Josiah Schwab in handling some
-HLS triplets. It also provides facilities to extract the pdflatex
-errors.
-
+    Tioga 1.17 provides all the necessary fixes to have it run on
+windows, so now we also support the Redmond operating system (works
+with the ProTeXt LaTeX distribution).
 
 << Quick Installation of Tioga >>
 
@@ -160,14 +159,14 @@ Best wishes,
 Bill Paxton
 
 
-
-
-	
-	
 	
 << What's old >>
 
 Here are the old release messages:
+
+    Tioga 1.16 brings in a bug fix by Josiah Schwab in handling some
+HLS triplets. It also provides facilities to extract the pdflatex
+errors.
 
     Tioga 1.15 brings in some new iterators in Dvector and some minor
 bug fixes (in particular for gem builds).
