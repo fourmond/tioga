@@ -340,8 +340,12 @@ static char *Create_Label(double val, int scale, int prec,
      /* Exponential, i.e. 10^-1, 1, 10, 10^2, etc */
      double abs_diff = fabs(val - exponent);
      if (abs_diff > 0.1) snprintf(buff, sizeof(buff), (s->vertical)? "\\tiogayaxisnumericlabel{10^{%0.1f}}" : "\\tiogaxaxisnumericlabel{10^{%0.1f}}", val);
-     else if (exponent == 0) strcpy(buff, "1");
-     else if (exponent == 1) strcpy(buff, "10");
+     else if (exponent == 0) strcpy(buff, (s->vertical)? 
+                                    "\\tiogayaxisnumericlabel{1}" : 
+                                    "\\tiogaxaxisnumericlabel{1}");
+     else if (exponent == 1) strcpy(buff, (s->vertical)? 
+                                    "\\tiogayaxisnumericlabel{10}" : 
+                                    "\\tiogaxaxisnumericlabel{10}");
      else snprintf(buff, sizeof(buff),  (s->vertical)? "\\tiogayaxisnumericlabel{10^{%d}}" : "\\tiogaxaxisnumericlabel{10^{%d}}", exponent);
    } else {   /* Linear */
       double scale2;
