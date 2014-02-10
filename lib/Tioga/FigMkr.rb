@@ -1944,19 +1944,20 @@ class FigureMaker
         elsif loc == BOTTOM
             shift = self.text_shift_on_bottom if shift == nil
         else
+            angle_add = 0
             if (loc == AT_X_ORIGIN)
                 shift = self.text_shift_from_x_origin if shift == nil
-                xloc = shift*self.char_height_dx
+                xloc = shift*self.default_text_height_dx
                 yloc = convert_frame_to_figure_y(position)
-                return
+                angle_add = 90
             elsif (loc == AT_Y_ORIGIN)
                 shift = self.text_shift_from_y_origin if shift == nil
-                yloc = shift*self.char_height_dy
+                yloc = shift*self.default_text_height_dx
                 xloc = convert_frame_to_figure_x(position)
             else
                 raise "Sorry: 'loc' must be LEFT, RIGHT, TOP, BOTTOM, AT_X_ORIGIN, or AT_Y_ORIGIN for show_text"
             end
-            show_rotated_label(text, xloc, yloc, scale, angle, just, align,
+            show_rotated_label(text, xloc, yloc, scale, angle + angle_add, just, align,
                                dict['measure'])
             return
         end
