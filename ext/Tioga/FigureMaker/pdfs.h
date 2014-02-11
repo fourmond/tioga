@@ -66,8 +66,14 @@ typedef struct jpg_info {
    int mask_obj_num;
    char *filename;
 } JPG_Info;
+
+
+/* Parses a JPEG file */
+JPG_Info * Parse_JPG(const char * file);
 extern void Write_JPG(JPG_Info *xo, int *ierr);
 extern void Free_JPG(JPG_Info *xo);
+
+
 
 typedef struct sampled_info {
    // start must match start of xobj_info

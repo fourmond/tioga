@@ -277,6 +277,22 @@ OBJ_PTR FM_private_show_jpg(OBJ_PTR fmkr, OBJ_PTR filename,
    OBJ_PTR width, OBJ_PTR height, OBJ_PTR image_destination, OBJ_PTR mask_obj_num) { int ierr=0;
    c_private_show_jpg(fmkr, Get_FM(fmkr, &ierr), String_Ptr(filename, &ierr), 
       Number_to_int(width, &ierr), Number_to_int(height, &ierr), image_destination, Number_to_int(mask_obj_num, &ierr), &ierr); RETURN_NIL; }
+
+/* Get info on a JPEG file */
+OBJ_PTR FM_jpg_info(OBJ_PTR fmkr, OBJ_PTR filename) {
+   int ierr = 0;
+   JPG_Info * info = Parse_JPG(String_Ptr(filename, &ierr));
+   if(info) {
+      OBJ_PTR hsh = Hash_New();
+      Hash_Set_Obj(hsh, "width", Integer_New(info->width));
+      Hash_Set_Obj(hsh, "height", Integer_New(info->height));
+      Hash_Set_Obj(hsh, "filename", filename);
+      Free_JPG(info);
+      return hsh;
+   }
+   else 
+      return OBJ_NIL;
+}
       
 OBJ_PTR FM_private_show_hls_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry,
     OBJ_PTR ulx, OBJ_PTR uly, OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_obj_num)

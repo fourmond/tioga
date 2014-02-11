@@ -74,7 +74,122 @@
       /Decode [1 0] means sample values of 1 are included in the output, values of 0 are excluded
       
 */     
-   
+
+/*
+  Reads next byte, and set *eof on end of file
+*/
+static int read_byte(FILE * file, int *eof)
+{
+  int c = fgetc(file);
+  if(c == EOF)
+    *eof = 1;
+  else
+    *eof = 0;
+  return c;
+}
+
+/* Reads a 16 bits word */
+static unsigned read_word(FILE * file, int *eof)
+{
+  int v = fgetc(file);
+  int c = fgetc(file);
+  if(v == EOF || c == EOF)
+    *eof = 1;
+  else
+    *eof = 0;
+  return ((unsigned) v) << 8 | ((unsigned) c);
+}
+
+/* Reads until the next tag, and returns its code */
+static int read_next_tag(FILE * file, int *eof)
+{
+  int c;
+  *eof = 0;
+
+  /* Discard non 0xFF bytes */
+  do {
+    c = read_byte(file, eof);
+    if(*eof)
+      return 0xFF;
+  } while(c != 0xFF);
+
+  do {
+    c = read_byte(file, eof);
+    if(*eof)
+      return 0xFF;
+  } while (c == 0xFF);
+  return c;
+}
+
+static void skip_variable_length(FILE * file, int *eof)
+{
+  *eof = 0;
+  int len = read_word(file, eof);
+  if(*eof)
+    return;
+  if(len < 2) {
+    *eof = 1;
+    return;
+  }
+  len -= 2;
+  while(len > 0) {
+    --len;
+    read_byte(file, eof);
+    if(*eof)
+      return;
+  }
+}
+
+
+/* Parses a JPEG file and extracts the resolution data from it, and
+   returns a newly allocated JPG_Info structure.
+*/
+JPG_Info * Parse_JPG(const char * file) 
+{
+
+  FILE * f = fopen(file, "rb");
+  if(! f)
+    return NULL;
+
+  int eof = 0;
+  int tag = read_next_tag(f, &eof);
+  if(tag != 0xD8 || eof) {
+    fclose(f);
+    return NULL;
+  }
+
+  while(1) {
+    tag = read_next_tag(f, &eof);
+    if(eof)  {
+      fclose(f);
+      return NULL;
+    }
+    switch(tag) {
+    case 0xC0: /* image data */
+      {
+        int len = read_word(f, &eof);
+        int bps = read_byte(f, &eof);
+        int y = read_word(f, &eof);
+        int x = read_word(f, &eof);
+        int cmps = read_byte(f, &eof);
+        fclose(f);
+        if(eof)
+          return NULL;
+          
+        JPG_Info * val = (JPG_Info *)calloc(1, sizeof(JPG_Info));
+        val->filename = ALLOC_N_char(strlen(file)+1);
+        strcpy(val->filename, file);
+        val->width = x;
+        val->height = y;
+        return val;
+      }
+    default:
+      skip_variable_length(f, &eof);
+    }
+  }
+}
+
+
 
 void
 Free_JPG(JPG_Info *xo)

@@ -154,6 +154,8 @@ extern OBJ_PTR FM_pdf_grestore(OBJ_PTR fmkr);
 // pdfimage.c
 extern OBJ_PTR FM_private_show_jpg(OBJ_PTR fmkr, OBJ_PTR filename, 
    OBJ_PTR width, OBJ_PTR height, OBJ_PTR image_destination, OBJ_PTR mask_xo_num);
+extern OBJ_PTR FM_jpg_info(OBJ_PTR fmkr, OBJ_PTR filename);
+
 extern OBJ_PTR FM_private_create_image_data(OBJ_PTR fmkr, OBJ_PTR data,
    OBJ_PTR first_row, OBJ_PTR last_row, OBJ_PTR first_column, OBJ_PTR last_column,
    OBJ_PTR min_OBJ_PTR, OBJ_PTR max_OBJ_PTR, OBJ_PTR max_code, OBJ_PTR if_below_range, OBJ_PTR if_above_range);
