@@ -86,6 +86,8 @@ module Dobjects
       'default' => 0.0/0.0, # defaults to NaN
       'initial_size' => 5001,
       'remove_space' => true ,# removes spaces at the beginning of the lines
+      'last_col' => -1,       # Read all columns
+      'text_columns' => [],   # Not a single column is text
     }
 
     # This function is a wrapper for #fast_fancy_read that reflects the

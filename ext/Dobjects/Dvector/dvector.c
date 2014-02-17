@@ -5666,11 +5666,63 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
   VALUE comments = rb_hash_aref(options, rb_str_new2("comments"));
   VALUE comment_out = rb_hash_aref(options, rb_str_new2("comment_out"));
 
+  /* Elements after that many columns  */
+  VALUE lc = rb_hash_aref(options, rb_str_new2("last_col"));
+  long last_col = RTEST(lc) ? FIX2LONG(lc) : -1;
+  VALUE text_columns = rb_hash_aref(options, rb_str_new2("text_columns"));
+
   /* Then, some various variables: */
   VALUE line;
 
   ID chomp_id = rb_intern("chomp!");
   ID gets_id = rb_intern("gets");
+  ID max_id = rb_intern("max");
+  ID size_id = rb_intern("size");
+  
+  /* We compute the maximum number of text columns */
+  long last_text_col = last_col+1;
+  VALUE mx = RTEST(text_columns) ? rb_funcall(text_columns, max_id, 0) : Qnil;
+  if(RTEST(mx) && last_text_col < 0) { /* Only taking the max into
+                                          account if the last col
+                                          stuff is not on */
+    long d = FIX2LONG(mx);
+    last_text_col = d;
+  }
+
+
+  /* array of Ruby arrays containing the text objects of interest */
+  VALUE * text_cols = NULL;
+
+  /*
+    Handling of text columns.
+
+    The number and position of text columns has to be known in
+    advance. For each of those, the value of text_columns isn't Qnil,
+    and the corresponding column is NULL.
+
+   */
+  if(last_text_col >= 0) {
+    text_cols = ALLOC_N(VALUE, last_text_col + 1);
+    int i;
+    for(i = 0; i < last_text_col + 1; i++)
+      text_cols[i] = Qnil;
+    if(last_col >= 0)
+      text_cols[last_col+1] = rb_ary_new();
+    if(RTEST(mx)) {
+      /* Todo */
+      int sz = RARRAY_LENINT(text_columns);
+      int i;
+      for(i = 0; i <  sz; i++) {
+        long idx = FIX2LONG(rb_ary_entry(text_columns, i));
+        if(idx >= 0 && (last_col < 0 || idx < last_col))
+          text_cols[idx] = rb_ary_new();
+      }
+    }
+  }
+
+
+
+
   long line_number = 0;
 
   /* 
@@ -5742,47 +5794,74 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
 	pre = post;
 	post = Qnil;
       }
-      a = StringValueCStr(pre);
-      double c = strtod(a, &b);
-      if(b == a) 
-	c = def;
-      if(col >= nb_vectors) {
-	nb_vectors++;
-	/* We need to create a new vector */
-	if(col >= current_size) { /* Increase the available size */
-	  current_size += 5;
-	  REALLOC_N(vectors, double * , current_size);
-	}
-	
-	double * vals = vectors[col] = ALLOC_N(double, allocated_size);
-	/* Filling it with the default value */
-	for(i = 0; i < index; i++) {
-	  vals[i] = def;
-	}
+      if(text_cols && col <= last_text_col && RTEST(text_cols[col])) {
+        rb_ary_push(text_cols[col], pre);
+        if(col >= nb_vectors) {
+          nb_vectors ++;
+        }
       }
-      vectors[col][index] = c;
+      else {
+        a = StringValueCStr(pre);
+        double c = strtod(a, &b);
+        if(b == a) 
+          c = def;
+        if(col >= nb_vectors) {
+          /* We need to create a new vector */
+          if(col >= current_size) { /* Increase the available size */
+            current_size = col + 5;
+            REALLOC_N(vectors, double * , current_size);
+          }
+          for(; nb_vectors <= col; nb_vectors++)
+            vectors[nb_vectors] = NULL; /* default to NULL */
+          
+          double * vals = vectors[col] = ALLOC_N(double, allocated_size);
+          /* Filling it with the default value */
+          for(i = 0; i < index; i++) {
+            vals[i] = def;
+          }
+        }
+        vectors[col][index] = c;
+      }
       col++;
+      if(last_col >= 0 && col > last_col) {
+        rb_ary_push(text_cols[last_col + 1], post);
+        nb_vectors = col + 1;
+        col++;
+        break;
+      }
     }
     /* Now, we finish the line */
-    for(; col < nb_vectors; col++)
-      vectors[col][index] = def;
+    for(; col < nb_vectors; col++) {
+      if(text_cols && col <= last_text_col && RTEST(text_cols[col]))
+        rb_ary_push(text_cols[col], Qnil);
+      else
+        vectors[col][index] = def;
+    }
     index++;
     /* Now, we reallocate memory if necessary */
     if(index >= allocated_size) {
       allocated_size *= 2;	/* We double the size */
-      for(col = 0; col < nb_vectors; col++)
-	REALLOC_N(vectors[col], double, allocated_size);
+      for(col = 0; col < nb_vectors; col++) {
+        if(vectors[col])
+          REALLOC_N(vectors[col], double, allocated_size);
+      }
     }
   }
   /* Now, we make up the array */
   ary = rb_ary_new();
   for(i = 0; i < nb_vectors; i++) {
     /* We create a vector */
-    rb_ary_store(ary, i, make_dvector_from_data(cDvector, index, vectors[i]));
-    /* And free the memory */
-    free(vectors[i]);
+    if(text_cols && i <= last_text_col && RTEST(text_cols[i]))
+      rb_ary_store(ary, i, text_cols[i]);
+    else {
+      rb_ary_store(ary, i, make_dvector_from_data(cDvector, index, vectors[i]));
+      /* And free the memory */
+      free(vectors[i]);
+    }
   }
   free(vectors);
+  if(text_cols)
+    free(text_cols);
   return ary;
 }
 
