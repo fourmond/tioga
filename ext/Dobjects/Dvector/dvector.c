@@ -5623,6 +5623,12 @@ static VALUE dvector_convolve(VALUE self, VALUE kernel, VALUE middle)
   return retval;
 }
 
+static VALUE marked_array()
+{
+  VALUE v = rb_ary_new();
+  rb_gc_register_mark_object(v);
+  return v;
+}
 
 /*
   :call-seq:
@@ -5706,16 +5712,18 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
     int i;
     for(i = 0; i < last_text_col + 1; i++)
       text_cols[i] = Qnil;
-    if(last_col >= 0)
-      text_cols[last_col+1] = rb_ary_new();
+    if(last_col >= 0) {
+      text_cols[last_col+1] = marked_array();
+    }
     if(RTEST(mx)) {
       /* Todo */
       int sz = RARRAY_LENINT(text_columns);
       int i;
       for(i = 0; i <  sz; i++) {
         long idx = FIX2LONG(rb_ary_entry(text_columns, i));
-        if(idx >= 0 && (last_col < 0 || idx < last_col))
-          text_cols[idx] = rb_ary_new();
+        if(idx >= 0 && (last_col < 0 || idx < last_col)) {
+          text_cols[idx] = marked_array();
+        }
       }
     }
   }
@@ -5742,6 +5750,8 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
 
 
   int i;
+  for(i = 0; i < current_size; i++)
+    vectors[i] = NULL;
 
   /* The return value */
   VALUE ary;
@@ -5798,6 +5808,8 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
         rb_ary_push(text_cols[col], pre);
         if(col >= nb_vectors) {
           nb_vectors ++;
+          if(col < current_size)
+            vectors[col] = NULL;
         }
       }
       else {
@@ -5842,7 +5854,7 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
     if(index >= allocated_size) {
       allocated_size *= 2;	/* We double the size */
       for(col = 0; col < nb_vectors; col++) {
-        if(vectors[col])
+        if(col < current_size && vectors[col])
           REALLOC_N(vectors[col], double, allocated_size);
       }
     }
