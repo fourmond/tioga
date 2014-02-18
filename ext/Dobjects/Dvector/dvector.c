@@ -5643,12 +5643,16 @@ static VALUE marked_array()
   * 'skip_first': skips that many lines before reading anything
   * 'index_col': if true, the first column returned contains the
     number of the line read
-  * 'remove_space': whether to remove spaces at the beginning of a line. *This 
-    option is currently not implemented !*
+  * 'remove_space': whether to remove spaces at the beginning of a line.
   * 'comment_out': this should be an array into which the comments
      will be dumped one by one.
   * 'default':  what to put when nothing was found but a number must be used
-
+  * 'last_col': when this is specified, it represents the last column which
+     is read and parsed as numbers (0-based, so the 3rd column is 2). 
+     The remaining is returned as text in one n+1 column
+  * 'text_columns': if provided, it is an array of integers containing the 
+    0-based indices of columns to be parsed as text rather than numbers.
+    
   In addition to these options that control the output, here are a few
   others to tune memory allocation; these can strongly improve the
   performance (or make it worse if you wish):

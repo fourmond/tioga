@@ -843,6 +843,51 @@ EOT
       assert_equal(cols, cols2)
     end
 
+    def test_ffr_2
+      text = ""
+      6.times do |i|
+        text << "#{i}\t#{i*0.5}\tmy_#{i}\t#{i**2}\tThis is the line number #{i}\n"
+      end
+      
+      stream = StringIO.new(text)
+      cols = Dvector.fancy_read(stream)
+      assert_equal(cols.size, 10)
+      6.times do |i|
+        assert_equal(cols[0][i], i.to_f)
+        assert_equal(cols[1][i], i.to_f*0.5)
+        assert(cols[2][i].nan?)
+        assert_equal(cols[3][i], i.to_f**2)
+        assert_equal(cols[9][i], i)
+      end
+
+      # Next try, slurping all lines
+      stream = StringIO.new(text)
+      cols = Dvector.fancy_read(stream, nil, { 'last_col' => 4})
+      assert_equal(cols.size, 6)
+      6.times do |i|
+        assert_equal(cols[0][i], i.to_f)
+        assert_equal(cols[1][i], i.to_f*0.5)
+        assert(cols[2][i].nan?)
+        assert_equal(cols[3][i], i.to_f**2)
+        assert(cols[4][i].nan?)
+        assert_equal(cols[5][i], "is the line number #{i}")
+      end
+
+      stream = StringIO.new(text)
+      cols = Dvector.fancy_read(stream, nil, { 
+                                  'last_col' => 3,
+                                  'text_columns' => [0, 2]
+                                })
+      assert_equal(cols.size, 5)
+      6.times do |i|
+        assert_equal(cols[0][i], i.to_s)
+        assert_equal(cols[1][i], i.to_f*0.5)
+        assert_equal(cols[2][i], "my_#{i}")
+        assert_equal(cols[3][i], i.to_f**2)
+        assert_equal(cols[4][i], "This is the line number #{i}")
+      end
+    end
+
     def test_compute_formula
       v = Dvector[1,2,3]
       w = Dvector[3,2,1]
