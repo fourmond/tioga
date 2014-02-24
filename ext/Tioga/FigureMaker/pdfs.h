@@ -94,6 +94,8 @@ typedef struct sampled_info {
    int hival;
    int lookup_len;
    unsigned char *lookup;
+  int components; /* number of bits per element (one color) */
+  char * filters; /* PDF filters to be used "as-is" */
 } Sampled_Info;
 extern void Write_Sampled(Sampled_Info *xo, int *ierr);
 extern void Free_Sampled(Sampled_Info *xo);

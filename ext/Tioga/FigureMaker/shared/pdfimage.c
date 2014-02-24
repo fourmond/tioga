@@ -203,6 +203,7 @@ Free_Sampled(Sampled_Info *xo)
 {
    if (xo->image_data != NULL) free(xo->image_data);
    if (xo->lookup != NULL) free(xo->lookup);
+   if (xo->filters != NULL) free(xo->filters);
 }
 
 
@@ -279,7 +280,7 @@ void
 Write_Sampled(Sampled_Info *xo, int *ierr)
 {
    fprintf(OF, "\n\t/Subtype /Image\n");
-   fprintf(OF, "\t/Filter /FlateDecode\n\t/Interpolate %s\n",
+   fprintf(OF, "\t/Interpolate %s\n",
            (xo->interpolate)? "true":"false");
    fprintf(OF, "\t/Height %i\n", xo->height);
    fprintf(OF, "\t/Width %i\n", xo->width);
@@ -287,19 +288,20 @@ Write_Sampled(Sampled_Info *xo, int *ierr)
    unsigned long new_len;
    unsigned char *image_data;
    unsigned char *buffer;
+   unsigned char *wd;
    switch (xo->image_type) {
       case RGB_IMAGE:
       case HLS_IMAGE:
          fprintf(OF, "\t/ColorSpace /DeviceRGB\n");
-         fprintf(OF, "\t/BitsPerComponent 8\n");
+         fprintf(OF, "\t/BitsPerComponent %d\n", xo->components);
          break;
       case CMYK_IMAGE:
          fprintf(OF, "\t/ColorSpace /DeviceCMYK\n");
-         fprintf(OF, "\t/BitsPerComponent 8\n");
+         fprintf(OF, "\t/BitsPerComponent %d\n", xo->components);
          break;
       case GRAY_IMAGE:
          fprintf(OF, "\t/ColorSpace /DeviceGray\n");
-         fprintf(OF, "\t/BitsPerComponent 8\n");
+         fprintf(OF, "\t/BitsPerComponent %d\n", xo->components);
          break;
       case MONO_IMAGE:
          fprintf(OF, "\t/ImageMask true\n");
@@ -317,7 +319,7 @@ Write_Sampled(Sampled_Info *xo, int *ierr)
             else fprintf(OF, "%x", c);
          }
          fprintf(OF, "> ]\n");
-         fprintf(OF, "\t/BitsPerComponent 8\n");
+         fprintf(OF, "\t/BitsPerComponent %d\n", xo->components);
    }
    if (xo->mask_obj_num > 0) {
       if (xo->image_type == MONO_IMAGE) {
@@ -341,22 +343,35 @@ Write_Sampled(Sampled_Info *xo, int *ierr)
    } else {
       image_data = xo->image_data;
    }
-      
-   new_len = (xo->length * 11)/10 + 100;
-   buffer = ALLOC_N_unsigned_char(new_len);
-   if (do_flate_compress(buffer, &new_len, image_data, xo->length)
-       != FLATE_OK) {
-      free(buffer);
-      RAISE_ERROR("Error compressing image data", ierr); 
-      return;
+
+   buffer = NULL;
+   wd = image_data;
+   
+   if(xo->filters) {
+     new_len = xo->length;
+     fprintf(OF, "%s", xo->filters);
+   }
+   else {
+     fprintf(OF, "\t/Filter /FlateDecode\n");
+   
+     new_len = (xo->length * 11)/10 + 100;
+     buffer = ALLOC_N_unsigned_char(new_len);
+     if (do_flate_compress(buffer, &new_len, image_data, xo->length)
+         != FLATE_OK) {
+       free(buffer);
+       RAISE_ERROR("Error compressing image data", ierr); 
+       return;
+     }
+     wd = buffer;
    }
    fprintf(OF, "\t/Length %li\n", new_len);
    fprintf(OF, "\t>>\nstream\n");
-   if (fwrite(buffer, 1, new_len, OF) < new_len) {
+   if (fwrite(wd, 1, new_len, OF) < new_len) {
       RAISE_ERROR("Error writing image data", ierr);
       return;
    }
-   free(buffer);
+   if(buffer)
+     free(buffer);
    if (xo->image_type == HLS_IMAGE) free(image_data);
    fprintf(OF, "\nendstream\nendobj\n");
 }
@@ -580,7 +595,9 @@ c_private_show_image(OBJ_PTR fmkr, FM *p, int image_type, double llx,
                      double uly, bool interpolate, bool reversed,
                      int w, int h, unsigned char* data, long len, 
                      OBJ_PTR mask_min, OBJ_PTR mask_max, OBJ_PTR hivalue,
-                     OBJ_PTR lookup_data, int mask_obj_num, int *ierr)
+                     OBJ_PTR lookup_data, int mask_obj_num, int components,
+                     const char * filters,
+                     int *ierr)
 {
    unsigned char *lookup = NULL;
    int value_mask_min = 256, value_mask_max = 256, lookup_len = 0, hival = 0;
@@ -598,12 +615,6 @@ c_private_show_image(OBJ_PTR fmkr, FM *p, int image_type, double llx,
       if (*ierr != 0) RETURN_NIL;
    }
    
-   llx = convert_figure_to_output_x(p, llx);
-   lly = convert_figure_to_output_y(p, lly);
-   lrx = convert_figure_to_output_x(p, lrx);
-   lry = convert_figure_to_output_y(p, lry);
-   ulx = convert_figure_to_output_x(p, ulx);
-   uly = convert_figure_to_output_y(p, uly);
 
    Sampled_Info *xo = (Sampled_Info *)calloc(1, sizeof(Sampled_Info));
    xo->xobj_subtype = SAMPLED_SUBTYPE;
@@ -617,8 +628,16 @@ c_private_show_image(OBJ_PTR fmkr, FM *p, int image_type, double llx,
    xo->length = len;
    xo->interpolate = interpolate;
    xo->reversed = reversed;
+   xo->components = components;
    memcpy(xo->image_data, data, len);
    xo->image_type = image_type;
+   if(filters) {
+     int len = strlen(filters) + 1;
+     xo->filters = calloc(1, len);
+     memcpy(xo->filters, filters, len);
+   }
+   else
+     xo->filters = NULL;
    if (image_type != COLORMAP_IMAGE) xo->lookup = NULL;
    else {
       if ((hival+1)*3 > lookup_len) {
@@ -641,6 +660,14 @@ c_private_show_image(OBJ_PTR fmkr, FM *p, int image_type, double llx,
    if (mask_obj_num == -1)
       return Integer_New(xo->obj_num); // this image is being used as
                                        // an opacity mask
+
+   llx = convert_figure_to_output_x(p, llx);
+   lly = convert_figure_to_output_y(p, lly);
+   lrx = convert_figure_to_output_x(p, lrx);
+   lry = convert_figure_to_output_y(p, lry);
+   ulx = convert_figure_to_output_x(p, ulx);
+   uly = convert_figure_to_output_y(p, uly);
+
    Create_Transform_from_Points(llx, lly, lrx, lry, ulx, uly,
                                 &a, &b, &c, &d, &e, &f);
    fprintf(TF, "q %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f cm /XObj%i Do Q\n",

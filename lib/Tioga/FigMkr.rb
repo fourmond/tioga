@@ -23,6 +23,9 @@
 require 'Tioga/FigureConstants.rb'
 require 'Tioga/Utils'
 
+require "tmpdir"
+require "fileutils"
+
 module Tioga
 class FigureMaker
     
@@ -1652,12 +1655,92 @@ class FigureMaker
     
     @@keys_for_show_image = FigureMaker.make_name_lookup_hash([
         'll', 'lr', 'ul', 'w', 'width', 'height', 'h',
-        'opacity_mask', 'stencil_mask', 
+        'opacity_mask', 'stencil_mask', 'bits', 'pdf_filters',
         'jpg', 'JPG', 'jpeg', 'JPEG', 'interpolate', 'data', 'value_mask',
         'color_space', 'color_map', 'colormap'])
     def show_image(dict)
         internal_show_image(dict, false)
     end
+
+    def load_png(file)
+      if File.readable?(file)
+        Dir::mktmpdir do |dir|
+          FileUtils::cp(file, "#{dir}/image.png")
+          Dir::chdir(dir) do
+            open("read.tex", "w") do |f|
+              f.puts <<'EOD'
+\documentclass{article}
+\usepackage{graphicx}
+\pdfcompresslevel=0
+\pdfobjcompresslevel=0
+\begin{document}
+\includegraphics[width=1cm]{image}
+\end{document}
+EOD
+            end
+            pdflatex = "pdflatex"
+            syscmd = "#{pdflatex} -interaction nonstopmode read.tex"
+            IO::popen(syscmd, "r+") do |f|
+              f.close_write      
+              for line in f
+                # Shall we do something with those ?
+              end
+            end
+            
+            # Now, we open the PDF file and have fun with it.
+            open("read.pdf", 'rb') do |f|
+              
+              ret = nil
+              cur = nil
+              len = nil
+              while l = f.gets("\n")
+                if ! ret && l =~ /\/Subtype\s*\/Image\s*/
+                  ret = {}
+                  cur = ret
+                elsif cur && l=~ /\/Width\s*(\d+)\s*/
+                  cur['width'] = $1.to_i
+                elsif cur && l=~ /\/Height\s*(\d+)\s*/
+                  cur['height'] = $1.to_i
+                elsif cur && l =~ /\/Length\s*(\d+)\s*/
+                  len = $1.to_i
+                  cur['data_size'] = len
+                elsif cur && l =~ /\/(Filter|DecodePar)/ && (!cur['data'])
+                  cur['pdf_filters'] ||= ''
+                  cur['pdf_filters'] << l
+                elsif cur && l =~ /^\s*\/BitsPerComponent\s*(\d+)\s*/
+                  cur['bits'] = $1.to_i
+                elsif cur && l =~ /\/ColorSpace\s*(\S+)\s*/
+                  cs = $1
+                  if cs == "/DeviceGray"
+                    cs = 'gray'
+                  elsif cs == "/DeviceRGB"
+                    cs = "rgb"
+                  else
+                    raise "Unsupported colorspace for file #{file}: '#{cs}'"
+                  end
+                  cur['color_space'] = cs
+                elsif cur && l =~ /\/SMask\s*(\d+)\s*/
+                  cur['opacity_mask'] = {}
+                elsif cur && len && l =~ /stream/
+                  cur['data'] = f.read(len)
+                  if cur['opacity_mask']
+                    cur = cur['opacity_mask']
+                    len = nil
+                  else
+                    return ret
+                  end
+                end
+              end
+              return ret
+            end
+            
+          end
+        end
+      else
+        raise "File #{file} not readable"
+      end
+    end
+
     
     @@keys_for_create_colormap = FigureMaker.make_name_lookup_hash(['length', 'points', 'Rs', 'Gs', 'Bs', 'Hs', 'Ls', 'Ss'])
     def create_colormap(dict)
@@ -2448,8 +2531,14 @@ EOE
         w = alt_names(dict, 'w', 'width')
         h = alt_names(dict, 'h', 'height')
         opacity_mask = alt_names(dict, 'opacity_mask', 'stencil_mask')
+        bits = dict['bits'] || 8
+        filters = dict['pdf_filters'] || nil
         if opacity_mask != nil
-            mask_xo_num = internal_show_image(opacity_mask, true)
+            om = opacity_mask.dup
+            om['ul'] ||= [0,0]
+            om['ll'] ||= [0,0]
+            om['lr'] ||= [0,0]
+            mask_xo_num = internal_show_image(om, true)
         else
             mask_xo_num = 0
         end
@@ -2471,7 +2560,7 @@ EOE
             raise "Sorry: monochrome image must not itself have a mask" unless mask_xo_num == 0
             reversed = get_if_given_else_default(dict, 'reversed', false)
             xo_obj = private_show_monochrome_image(ll[0], ll[1], lr[0], lr[1], ul[0], ul[1], 
-                            interpolate, reversed, w, h, data, ((is_mask)? -1 : 0))
+                            interpolate, reversed, w, h, data, ((is_mask)? -1 : 0), filters)
             return is_mask ? xo_obj : self
         end
         if color_space == 'GRAY' || color_space == 'gray' || color_space == 'GREY' || color_space == 'grey'
@@ -2480,22 +2569,22 @@ EOE
                 mask_xo_num = -1
             end
             xo_obj = private_show_grayscale_image(ll[0], ll[1], lr[0], lr[1], ul[0], ul[1],
-                            interpolate, w, h, data, mask_xo_num)
+                            interpolate, w, h, data, mask_xo_num, bits, filters)
             return is_mask ? xo_obj : self
         end
         if is_mask
             raise "Sorry: mask image must have 'color_space' set to 'gray' or 'mono'"
         end
         if color_space == 'RGB' || color_space == 'rgb'
-            private_show_rgb_image(ll[0], ll[1], lr[0], lr[1], ul[0], ul[1], interpolate, w, h, data, mask_xo_num)
+            private_show_rgb_image(ll[0], ll[1], lr[0], lr[1], ul[0], ul[1], interpolate, w, h, data, mask_xo_num, bits, filters)
             return self
         end
         if color_space == 'HLS' || color_space == 'hls'
-            private_show_hls_image(ll[0], ll[1], lr[0], lr[1], ul[0], ul[1], interpolate, w, h, data, mask_xo_num)
+            private_show_hls_image(ll[0], ll[1], lr[0], lr[1], ul[0], ul[1], interpolate, w, h, data, mask_xo_num, bits, filters)
             return self
         end
         if color_space == 'CMYK' || color_space == 'cmyk'
-            private_show_cmyk_image(ll[0], ll[1], lr[0], lr[1], ul[0], ul[1], interpolate, w, h, data, mask_xo_num)
+            private_show_cmyk_image(ll[0], ll[1], lr[0], lr[1], ul[0], ul[1], interpolate, w, h, data, mask_xo_num, bits, filters)
             return self
         end
         if value_mask == nil
@@ -2508,7 +2597,7 @@ EOE
         end
         private_show_image(
                     ll[0], ll[1], lr[0], lr[1], ul[0], ul[1], interpolate, 
-                    w, h, data, value_mask_min, value_mask_max, color_space[0], color_space[1], mask_xo_num)
+                    w, h, data, value_mask_min, value_mask_max, color_space[0], color_space[1], mask_xo_num, bits, filters)
         return self
     end
     
