@@ -48,6 +48,7 @@ class MyFigures
         t.def_figure("Math_Typesetting") { math_typesetting }
         t.def_figure("Squares") { both_squares }
         t.def_figure("Sample_Jpegs") { sample_jpegs }
+        t.def_figure("Many_Jpegs") { many_jpegs }
         t.def_figure("Monochrome_Image") { mono_image }
         t.def_figure("RGB_Image") { rgb_image }
         t.def_figure("HLS_Image") { hls_image }
@@ -330,6 +331,26 @@ class MyFigures
             t.subfigure(t.column_margins('num_columns' => 3, 'column' => 3, 'column_margin' => 0.01)) { stencil_mask }
         end
     end
+
+    def many_jpegs
+      ref = t.register_image('jpg' => "data/cassini.jpg", 'width' => 999, 'height' => 959) 
+
+      dx = 0.25
+      dy = 0.25
+      4.times do |i|
+        x = i * dx
+        4.times do |j|
+          y = j * dy
+
+          ul = [x, y]
+          ll = [x, y + dy * (0.8 + 0.2 * sin(y * 3.14 * 2))]
+          lr = [x+dx *(0.8 + 0.2 * sin(x * 3.14*2)), y + dy * (0.8 + 0.2 * sin(x * 3.14 * 2))]
+          
+          t.show_image('ll' => ll, 'lr' => lr, 'ul' => ul, 'ref' => ref)
+        end
+      end
+    end
+
     
     def strings
         t.stroke_rect(0,0,1,1)
