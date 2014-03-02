@@ -388,58 +388,7 @@ Create_Transform_from_Points(double llx, double lly, double lrx, double lry,
 }
 
 
-static void
-Get_Image_Dest(FM *p, OBJ_PTR image_destination, double *dest, int *ierr)
-{
-   int len = Array_Len(image_destination,ierr);
-   if (*ierr != 0) return;
-   if (len != 6) {
-      RAISE_ERROR("Sorry: invalid image destination array: "
-                  "must have 6 entries", ierr);
-      return;
-   }
-   int i;
-   for (i = 0; i < 6; i++) {
-      OBJ_PTR entry = Array_Entry(image_destination, i, ierr);
-      if (*ierr != 0) return;
-      if (i % 2 == 0)
-         dest[i] = convert_figure_to_output_x(p,Number_to_double(entry, ierr));
-      else
-         dest[i] = convert_figure_to_output_y(p,Number_to_double(entry, ierr));
-      if (*ierr != 0) return;
-   }
-}
-
-
-static void
-Show_JPEG(FM *p, char *filename, int width, int height, double *dest,
-          int subtype, int mask_obj_num)
-{
-   JPG_Info *xo = (JPG_Info *)calloc(1,sizeof(JPG_Info));
-   xo->xobj_subtype = subtype;
-   double llx = dest[0], lly = dest[1], lrx = dest[2], lry = dest[3],
-      ulx = dest[4], uly = dest[5];
-   double a, b, c, d, e, f; // the transform to position the image
-   xo->next = xobj_list;
-   xobj_list = (XObject_Info *)xo;
-   xo->xo_num = next_available_xo_number++;
-   xo->obj_num = next_available_object_number++;
-   xo->filename = ALLOC_N_char(strlen(filename)+1);
-   strcpy(xo->filename, filename);
-   xo->width = width;
-   xo->height = height;
-   xo->mask_obj_num = mask_obj_num;
-   Create_Transform_from_Points(llx, lly, lrx, lry, ulx, uly,
-                                &a, &b, &c, &d, &e, &f);
-   fprintf(TF, "q %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f cm /XObj%i Do Q\n",
-           a, b, c, d, e, f, xo->xo_num);
-   update_bbox(p, llx, lly);
-   update_bbox(p, lrx, lry);
-   update_bbox(p, ulx, uly);
-   update_bbox(p, lrx+ulx-llx, lry+uly-lly);
-}
-
-
+/* Read the image here ?*/
 int
 c_private_register_jpg(OBJ_PTR fmkr, FM *p, char *filename, 
                        int width, int height,
@@ -456,9 +405,28 @@ c_private_register_jpg(OBJ_PTR fmkr, FM *p, char *filename,
   xo->width = width;
   xo->height = height;
   xo->mask_obj_num = mask_obj_num;
-  return xo->mask_obj_num;
+  return xo->obj_num;
 }
 
+
+static void
+Expand_Array(OBJ_PTR image_destination, double *dest, int *ierr)
+{
+   int len = Array_Len(image_destination,ierr);
+   if (*ierr != 0) return;
+   if (len != 6) {
+      RAISE_ERROR("Sorry: invalid image destination array: "
+                  "must have 6 entries", ierr);
+      return;
+   }
+   int i;
+   for (i = 0; i < 6; i++) {
+      OBJ_PTR entry = Array_Entry(image_destination, i, ierr);
+      if (*ierr != 0) return;
+      dest[i] = Number_to_double(entry, ierr);
+      if (*ierr != 0) return;
+   }
+}
 
 void
 c_private_show_jpg(OBJ_PTR fmkr, FM *p, char *filename, 
@@ -466,14 +434,20 @@ c_private_show_jpg(OBJ_PTR fmkr, FM *p, char *filename,
                    int mask_obj_num, int *ierr)
 {
    double dest[6];
+   int ref;
    if (constructing_path) {
       RAISE_ERROR("Sorry: must finish with current path before "
                   "calling show_jpg", ierr);
       return;
    }
-   Get_Image_Dest(p, image_destination, dest, ierr);
+   ref = c_private_register_jpg(fmkr, p, filename, width, height, 
+                                mask_obj_num, *ierr);
+   Expand_Array(image_destination, dest, ierr);
    if (*ierr != 0) return;
-   Show_JPEG(p, filename, width, height, dest, JPG_SUBTYPE, mask_obj_num);
+
+   c_private_show_image_from_ref(fmkr, p, ref, dest[0], dest[1], 
+                                 dest[2], dest[3], dest[4], dest[5],
+                                 ierr);
 }
 
 
@@ -624,7 +598,6 @@ c_private_show_image(OBJ_PTR fmkr, FM *p, int image_type, double llx,
                                      w, h, data, len, mask_min, 
                                      mask_max, hivalue, lookup_data, 
                                      mask_obj_num, components, filters, ierr);
-  printf("Image: %d, %d\n", ref, mask_obj_num);
   if (mask_obj_num != -1)
     c_private_show_image_from_ref(fmkr, p, ref, llx, lly, 
                                   lrx, lry, ulx, uly, ierr);
