@@ -21,9 +21,18 @@ right corners of the image.  This allows the image to be rotated, streched, and 
 it is placed -- or even reflected in either the horizontal or vertical by suitable choices
 for the corner locations.
 
-For a JPEG, you can simply give the filename for the image along with the location and the
-width and height.  Sampled images can be monochrome, gray scale, RGB, or CMYK according to the value of the
-'color_space' entry.
+For a JPEG, you can simply give the filename for the image along with
+the location and the width and height.  Sampled images can be
+monochrome, gray scale, RGB, or CMYK according to the value of the
+'color_space' entry. In most of the cases, it is actually unlikely
+that you'll know the widths and heights of the images. For that, you
+can use the #jpg_info function.
+
+To display PNG images, use #load_png function that returns a
+dictionnary suitable for use with #show_image. You just need to add
+the coordinates to the dictionnary.  Be warned that some PNG images,
+such as the ones that use a fixed color palette, cannot be used for
+the time being, and #load_png will raise an exception.
 
 The 'color_space' entry is set to 'MONO' or 'mono' for a monochrome image.  The monochrome image is used as
 a 'stencil mask' for painting in the current fill color.  The default is to paint places corresponding
@@ -55,7 +64,7 @@ are stored as three bytes, corresponding to red, green, and blue intensities
 If the 'color_space' entry is 'HLS' or 'hls', then samples
 are stored as three bytes, corresponding to hue, lightness, and saturation 
 (the hue angle in the range 0.0 to 360.0 is stored as round(hue*256/360)).
-[Note: internally, the hls data is copied and converted to rgb -- see string_hls_to_rgb.]
+*Note* internally, the hls data is copied and converted to rgb -- see string_hls_to_rgb.
 
 In 4-color printing, as in ink-jet printers, images are painted using cyan, magenta, yellow, and black inks.
 The corresponding 'color_space' is 'CMYK' or 'cmyk'.  For this case, samples are stored as four bytes,
@@ -87,6 +96,13 @@ default in Tioga; setting the 'interpolate' entry
 in the image dictionary to +false+ should disable it
 (but note that some PDF viewer implementations seem to ignore this flag).
 
+Defining figures for later use: when calling #show_image, it returns an 
+internal reference to the image. If you need to display this image again 
+(with different values of the coordinates), you can skip the whole image 
+definition again, and pass the returned value as the 'ref' key in the image 
+dictionnary. In that case, you still need the 'll', 'lr', 'ul' keys of the 
+image display.
+
 Dictionary Entries
     'll'           => [x, y]             # location for the lower-left corner of the image
     'lr'           => [x, y]             # location for the lower-right corner of the image
@@ -95,6 +111,7 @@ Dictionary Entries
     'w'                                  # alias for 'width'
     'height'       => an_integer         # number of rows of samples in the image
     'h'                                  # alias for 'height'
+    'ref'          => a_value            # a value previously returned by #show_image or #register_image, to reuse and already defined image
     'jpg'          => a_string           # file containing the JPEG image
     'jpeg', 'JPEG', 'JPG'                # aliases for 'jpg'
     'color_space'  => string_or_colormap # tells how to interpret the image data
@@ -225,6 +242,49 @@ link:images/Sampled_Data.png
 =end
     def show_image(dict)
     end
+
+
+
+=begin rdoc 
+
+Registers an image for later use. This function does not actually
+display anythig, but the return value can be passed an arbitrary
+number of times as the 'ref' key of the argument to #show_image. The
+values understood for dict are the same as for #show_image, excepted
+that the coordinates are not used.
+
+You can even embed images you don't display.
+
+=end
+
+    def register_image(dict)
+    end
+
+=begin rdoc
+
+Loads a PNG image from a png file. It returns a dictionnary that can
+be passed directly to #register_image, or to #show_image (but in the
+latter case, you need to add the coordinates, of course).
+
+This function will fail on some types of PNG images for some
+colorspaces (in particular for indexed images). 
+
+The alpha channel is transformed into a grayscale mask.
+
+=end
+
+    def load_png(file)
+    end
+
+=begin rdoc
+
+Returns some information about the given JPEG file, and in particular
+its width and height.
+=end
+
+    def jpg_info(file)
+    end
+
 
 =begin rdoc
 Creates a data representation suitable for use with show_image from the values in the Dtable _data_
