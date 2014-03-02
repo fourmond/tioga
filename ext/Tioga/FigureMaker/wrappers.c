@@ -287,7 +287,7 @@ OBJ_PTR FM_jpg_info(OBJ_PTR fmkr, OBJ_PTR filename) {
       OBJ_PTR hsh = Hash_New();
       Hash_Set_Obj(hsh, "width", Integer_New(info->width));
       Hash_Set_Obj(hsh, "height", Integer_New(info->height));
-      Hash_Set_Obj(hsh, "filename", filename);
+      Hash_Set_Obj(hsh, "jpg", filename);
       Free_JPG(info);
       return hsh;
    }
