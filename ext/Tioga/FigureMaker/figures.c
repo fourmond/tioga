@@ -507,14 +507,18 @@ void Init_FigureMaker(void) {
    rb_define_method(cFM, "private_show_marker", FM_private_show_marker, 1);
    rb_define_method(cFM, "marker_string_info", FM_marker_string_info, 3);
 /* images */
-   rb_define_method(cFM, "private_show_jpg", FM_private_show_jpg, 5);
+
+   rb_define_method(cFM, "private_register_jpg", FM_private_register_jpg, 4);
    rb_define_method(cFM, "jpg_info", FM_jpg_info, 1);
-   rb_define_method(cFM, "private_show_rgb_image", FM_private_show_rgb_image, 13);
-   rb_define_method(cFM, "private_show_hls_image", FM_private_show_hls_image, 13);
-   rb_define_method(cFM, "private_show_cmyk_image", FM_private_show_cmyk_image, 13);
-   rb_define_method(cFM, "private_show_grayscale_image", FM_private_show_grayscale_image, 13);
-   rb_define_method(cFM, "private_show_monochrome_image", FM_private_show_monochrome_image, 13);
-   rb_define_method(cFM, "private_show_image", FM_private_show_image, 17);
+   rb_define_method(cFM, "private_register_rgb_image", FM_private_register_rgb_image, 7);
+   rb_define_method(cFM, "private_register_hls_image", FM_private_register_hls_image, 7);
+   rb_define_method(cFM, "private_register_cmyk_image", FM_private_register_cmyk_image, 7);
+   rb_define_method(cFM, "private_register_grayscale_image", FM_private_register_grayscale_image, 7);
+   rb_define_method(cFM, "private_register_monochrome_image", FM_private_register_monochrome_image, 7);
+   rb_define_method(cFM, "private_register_image", FM_private_register_image, 11);
+   rb_define_method(cFM, "private_show_image_from_ref", FM_private_show_image_from_ref, 7);
+
+
    rb_define_method(cFM, "private_create_image_data", FM_private_create_image_data, 10);
    rb_define_method(cFM, "private_create_monochrome_image_data", FM_private_create_monochrome_image_data, 7);
 /* colormaps */

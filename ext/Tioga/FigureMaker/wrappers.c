@@ -273,10 +273,11 @@ OBJ_PTR FM_private_create_monochrome_image_data(OBJ_PTR fmkr, OBJ_PTR data,
       Number_to_int(first_row, &ierr), Number_to_int(last_row, &ierr), Number_to_int(first_column, &ierr), Number_to_int(last_column, &ierr),
       Number_to_double(boundary, &ierr), reverse != OBJ_FALSE, &ierr);
 }
-OBJ_PTR FM_private_show_jpg(OBJ_PTR fmkr, OBJ_PTR filename, 
-   OBJ_PTR width, OBJ_PTR height, OBJ_PTR image_destination, OBJ_PTR mask_obj_num) { int ierr=0;
-   c_private_show_jpg(fmkr, Get_FM(fmkr, &ierr), String_Ptr(filename, &ierr), 
-      Number_to_int(width, &ierr), Number_to_int(height, &ierr), image_destination, Number_to_int(mask_obj_num, &ierr), &ierr); RETURN_NIL; }
+OBJ_PTR FM_private_register_jpg(OBJ_PTR fmkr, OBJ_PTR filename, 
+   OBJ_PTR width, OBJ_PTR height, OBJ_PTR mask_obj_num) { int ierr=0;
+   return Integer_New(c_private_register_jpg(fmkr, Get_FM(fmkr, &ierr), String_Ptr(filename, &ierr), 
+                                             Number_to_int(width, &ierr), Number_to_int(height, &ierr), Number_to_int(mask_obj_num, &ierr), &ierr)); 
+}
 
 /* Get info on a JPEG file */
 OBJ_PTR FM_jpg_info(OBJ_PTR fmkr, OBJ_PTR filename) {
@@ -296,76 +297,72 @@ OBJ_PTR FM_jpg_info(OBJ_PTR fmkr, OBJ_PTR filename) {
 
 #define Str_Or_NULL(obj, ierr) ((obj == OBJ_NIL) ? NULL : CString_Ptr(obj, ierr))
       
-OBJ_PTR FM_private_show_hls_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry,
-                                  OBJ_PTR ulx, OBJ_PTR uly, OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_obj_num, OBJ_PTR components, OBJ_PTR filters)
+OBJ_PTR FM_private_register_hls_image(OBJ_PTR fmkr, 
+                                      OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_obj_num, OBJ_PTR components, OBJ_PTR filters)
 { int ierr=0;
-   return c_private_show_image(fmkr, Get_FM(fmkr, &ierr), HLS_IMAGE, Number_to_double(llx, &ierr), Number_to_double(lly, &ierr), 
-      Number_to_double(lrx, &ierr), Number_to_double(lry, &ierr), 
-      Number_to_double(ulx, &ierr), Number_to_double(uly, &ierr), (interpolate != OBJ_FALSE), OBJ_FALSE, 
+   return Integer_New(c_private_register_image(fmkr, Get_FM(fmkr, &ierr), HLS_IMAGE, 
+                                   (interpolate != OBJ_FALSE), OBJ_FALSE, 
       Number_to_int(w, &ierr), Number_to_int(h, &ierr), (unsigned char *)String_Ptr(data, &ierr), String_Len(data, &ierr), 
       OBJ_NIL, OBJ_NIL, OBJ_NIL, OBJ_NIL, Number_to_int(mask_obj_num, &ierr),
                                Number_to_int(components, &ierr), 
-                               Str_Or_NULL(filters, &ierr), &ierr);
+                                               Str_Or_NULL(filters, &ierr), &ierr));
 }
       
-OBJ_PTR FM_private_show_rgb_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry,
-    OBJ_PTR ulx, OBJ_PTR uly, OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_obj_num, OBJ_PTR components, OBJ_PTR filters)
+OBJ_PTR FM_private_register_rgb_image(OBJ_PTR fmkr, OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_obj_num, OBJ_PTR components, OBJ_PTR filters)
 { int ierr=0;
-   return c_private_show_image(fmkr, Get_FM(fmkr, &ierr), RGB_IMAGE, Number_to_double(llx, &ierr), Number_to_double(lly, &ierr), 
-      Number_to_double(lrx, &ierr), Number_to_double(lry, &ierr), 
-      Number_to_double(ulx, &ierr), Number_to_double(uly, &ierr), (interpolate != OBJ_FALSE), OBJ_FALSE, 
+   return Integer_New(c_private_register_image(fmkr, Get_FM(fmkr, &ierr), RGB_IMAGE, 
+                                   (interpolate != OBJ_FALSE), OBJ_FALSE, 
       Number_to_int(w, &ierr), Number_to_int(h, &ierr), (unsigned char *)String_Ptr(data, &ierr), String_Len(data, &ierr), 
       OBJ_NIL, OBJ_NIL, OBJ_NIL, OBJ_NIL, Number_to_int(mask_obj_num, &ierr),
                                Number_to_int(components, &ierr), 
-                               Str_Or_NULL(filters, &ierr), &ierr);
+                                               Str_Or_NULL(filters, &ierr), &ierr));
 }
 
-OBJ_PTR FM_private_show_cmyk_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry,
-    OBJ_PTR ulx, OBJ_PTR uly, OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_obj_num, OBJ_PTR components, OBJ_PTR filters)
+OBJ_PTR FM_private_register_cmyk_image(OBJ_PTR fmkr, OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_obj_num, OBJ_PTR components, OBJ_PTR filters)
 { int ierr=0;
-   return c_private_show_image(fmkr, Get_FM(fmkr, &ierr), CMYK_IMAGE, Number_to_double(llx, &ierr), Number_to_double(lly, &ierr), 
-      Number_to_double(lrx, &ierr), Number_to_double(lry, &ierr), 
-      Number_to_double(ulx, &ierr), Number_to_double(uly, &ierr), (interpolate != OBJ_FALSE), false, 
+   return Integer_New(c_private_register_image(fmkr, Get_FM(fmkr, &ierr), CMYK_IMAGE, (interpolate != OBJ_FALSE), false, 
       Number_to_int(w, &ierr), Number_to_int(h, &ierr), (unsigned char *)String_Ptr(data, &ierr), String_Len(data, &ierr), 
       OBJ_NIL, OBJ_NIL, OBJ_NIL, OBJ_NIL, Number_to_int(mask_obj_num, &ierr),
                                Number_to_int(components, &ierr), 
-                               Str_Or_NULL(filters, &ierr), &ierr);
+                                               Str_Or_NULL(filters, &ierr), &ierr));
 }
 
-OBJ_PTR FM_private_show_grayscale_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry,
-    OBJ_PTR ulx, OBJ_PTR uly, OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_obj_num, OBJ_PTR components, OBJ_PTR filters)
+OBJ_PTR FM_private_register_grayscale_image(OBJ_PTR fmkr, OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_obj_num, OBJ_PTR components, OBJ_PTR filters)
 { int ierr=0;
-   return c_private_show_image(fmkr, Get_FM(fmkr, &ierr), GRAY_IMAGE, Number_to_double(llx, &ierr), Number_to_double(lly, &ierr), 
-      Number_to_double(lrx, &ierr), Number_to_double(lry, &ierr), 
-      Number_to_double(ulx, &ierr), Number_to_double(uly, &ierr), (interpolate != OBJ_FALSE), false, 
+   return Integer_New(c_private_register_image(fmkr, Get_FM(fmkr, &ierr), GRAY_IMAGE, (interpolate != OBJ_FALSE), false, 
       Number_to_int(w, &ierr), Number_to_int(h, &ierr), (unsigned char *)String_Ptr(data, &ierr), String_Len(data, &ierr), 
       OBJ_NIL, OBJ_NIL, OBJ_NIL, OBJ_NIL, Number_to_int(mask_obj_num, &ierr),
                                Number_to_int(components, &ierr), 
-                               Str_Or_NULL(filters, &ierr), &ierr);
+                                               Str_Or_NULL(filters, &ierr), &ierr));
 }
 
-OBJ_PTR FM_private_show_monochrome_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry,
-                                         OBJ_PTR ulx, OBJ_PTR uly, OBJ_PTR interpolate, OBJ_PTR reversed, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_obj_num, OBJ_PTR filters)
+OBJ_PTR FM_private_register_monochrome_image(OBJ_PTR fmkr, OBJ_PTR interpolate, OBJ_PTR reversed, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_obj_num, OBJ_PTR filters)
 { int ierr=0;
-   return c_private_show_image(fmkr, Get_FM(fmkr, &ierr), MONO_IMAGE, Number_to_double(llx, &ierr), Number_to_double(lly, &ierr), 
-      Number_to_double(lrx, &ierr), Number_to_double(lry, &ierr), 
-      Number_to_double(ulx, &ierr), Number_to_double(uly, &ierr), (interpolate != OBJ_FALSE), (reversed == OBJ_TRUE), 
+   return Integer_New(c_private_register_image(fmkr, Get_FM(fmkr, &ierr), MONO_IMAGE, (interpolate != OBJ_FALSE), (reversed == OBJ_TRUE), 
       Number_to_int(w, &ierr), Number_to_int(h, &ierr), (unsigned char *)String_Ptr(data, &ierr), String_Len(data, &ierr), 
                                OBJ_NIL, OBJ_NIL, OBJ_NIL, OBJ_NIL, Number_to_int(mask_obj_num, &ierr), 1, 
-                               Str_Or_NULL(filters, &ierr), &ierr);
+                                               Str_Or_NULL(filters, &ierr), &ierr));
 }
 
-OBJ_PTR FM_private_show_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry,
-    OBJ_PTR ulx, OBJ_PTR uly, OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data,
+OBJ_PTR FM_private_register_image(OBJ_PTR fmkr,OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data,
     OBJ_PTR value_mask_min, OBJ_PTR value_mask_max, OBJ_PTR hival, OBJ_PTR lookup, OBJ_PTR mask_obj_num, OBJ_PTR components, OBJ_PTR filters)
 { int ierr=0;
-   return c_private_show_image(fmkr, Get_FM(fmkr, &ierr), COLORMAP_IMAGE, Number_to_double(llx, &ierr), Number_to_double(lly, &ierr), 
-      Number_to_double(lrx, &ierr), Number_to_double(lry, &ierr), 
-      Number_to_double(ulx, &ierr), Number_to_double(uly, &ierr), (interpolate != OBJ_FALSE), false, 
+   return Integer_New(c_private_register_image(fmkr, Get_FM(fmkr, &ierr), COLORMAP_IMAGE, (interpolate != OBJ_FALSE), false, 
       Number_to_int(w, &ierr), Number_to_int(h, &ierr), (unsigned char *)String_Ptr(data, &ierr), String_Len(data, &ierr), 
       value_mask_min, value_mask_max, hival, lookup, Number_to_int(mask_obj_num, &ierr),
                                Number_to_int(components, &ierr), 
-                               Str_Or_NULL(filters, &ierr), &ierr);
+                                               Str_Or_NULL(filters, &ierr), &ierr));
+}
+
+OBJ_PTR FM_private_show_image_from_ref(OBJ_PTR fmkr, OBJ_PTR ref, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly)
+{
+   int ierr=0;
+   c_private_show_image_from_ref(fmkr, Get_FM(fmkr, &ierr), 
+                                 Number_to_int(ref, &ierr),
+                                 Number_to_double(llx, &ierr), Number_to_double(lly, &ierr), 
+                                 Number_to_double(lrx, &ierr), Number_to_double(lry, &ierr), 
+                                 Number_to_double(ulx, &ierr), Number_to_double(uly, &ierr), &ierr);
+   RETURN_NIL;
 }
 
 

@@ -152,32 +152,34 @@ extern OBJ_PTR FM_pdf_grestore(OBJ_PTR fmkr);
 
 /*======================================================================*/
 // pdfimage.c
-extern OBJ_PTR FM_private_show_jpg(OBJ_PTR fmkr, OBJ_PTR filename, 
-   OBJ_PTR width, OBJ_PTR height, OBJ_PTR image_destination, OBJ_PTR mask_xo_num);
-extern OBJ_PTR FM_jpg_info(OBJ_PTR fmkr, OBJ_PTR filename);
-
 extern OBJ_PTR FM_private_create_image_data(OBJ_PTR fmkr, OBJ_PTR data,
    OBJ_PTR first_row, OBJ_PTR last_row, OBJ_PTR first_column, OBJ_PTR last_column,
    OBJ_PTR min_OBJ_PTR, OBJ_PTR max_OBJ_PTR, OBJ_PTR max_code, OBJ_PTR if_below_range, OBJ_PTR if_above_range);
 extern OBJ_PTR FM_private_create_monochrome_image_data(OBJ_PTR fmkr, OBJ_PTR data,
    OBJ_PTR first_row, OBJ_PTR last_row, OBJ_PTR first_column, OBJ_PTR last_column,
    OBJ_PTR boundary, OBJ_PTR reverse);
-extern OBJ_PTR FM_private_show_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly,
-   OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR OBJ_PTR_mask_min, OBJ_PTR OBJ_PTR_mask_max,
+
+extern OBJ_PTR FM_private_show_image_from_ref(OBJ_PTR fmkr, OBJ_PTR ref, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly);
+
+extern OBJ_PTR FM_private_register_jpg(OBJ_PTR fmkr, OBJ_PTR filename, 
+                                       OBJ_PTR width, OBJ_PTR height, 
+                                       OBJ_PTR mask_xo_num);
+
+extern OBJ_PTR FM_jpg_info(OBJ_PTR fmkr, OBJ_PTR filename);
+
+extern OBJ_PTR FM_private_register_image(OBJ_PTR fmkr,
+                                         OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR OBJ_PTR_mask_min, OBJ_PTR OBJ_PTR_mask_max,
    OBJ_PTR hival, OBJ_PTR lookup, OBJ_PTR mask_xo_num, OBJ_PTR components);
-extern OBJ_PTR FM_private_show_hls_image(OBJ_PTR fmkr, 
-   OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly,
+
+extern OBJ_PTR FM_private_register_hls_image(OBJ_PTR fmkr, 
    OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_xo_num, OBJ_PTR components);
-extern OBJ_PTR FM_private_show_rgb_image(OBJ_PTR fmkr, 
-   OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly,
+extern OBJ_PTR FM_private_register_rgb_image(OBJ_PTR fmkr, 
    OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_xo_num, OBJ_PTR components);
-extern OBJ_PTR FM_private_show_cmyk_image(OBJ_PTR fmkr, 
-   OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly,
+extern OBJ_PTR FM_private_register_cmyk_image(OBJ_PTR fmkr, 
    OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_xo_num, OBJ_PTR components);
-extern OBJ_PTR FM_private_show_grayscale_image(OBJ_PTR fmkr, 
-   OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly,
+extern OBJ_PTR FM_private_register_grayscale_image(OBJ_PTR fmkr, 
    OBJ_PTR interpolate, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_xo_num, OBJ_PTR components);
-extern OBJ_PTR FM_private_show_monochrome_image(OBJ_PTR fmkr, OBJ_PTR llx, OBJ_PTR lly, OBJ_PTR lrx, OBJ_PTR lry, OBJ_PTR ulx, OBJ_PTR uly,
+extern OBJ_PTR FM_private_register_monochrome_image(OBJ_PTR fmkr, 
    OBJ_PTR interpolate, OBJ_PTR reversed, OBJ_PTR w, OBJ_PTR h, OBJ_PTR data, OBJ_PTR mask_xo_num);
 
 /*======================================================================*/

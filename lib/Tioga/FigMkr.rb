@@ -1654,12 +1654,17 @@ class FigureMaker
     
     
     @@keys_for_show_image = FigureMaker.make_name_lookup_hash([
-        'll', 'lr', 'ul', 'w', 'width', 'height', 'h',
+        'll', 'lr', 'ul', 'w', 'width', 'height', 'h', 'ref',
         'opacity_mask', 'stencil_mask', 'bits', 'pdf_filters',
         'jpg', 'JPG', 'jpeg', 'JPEG', 'interpolate', 'data', 'value_mask',
         'color_space', 'color_map', 'colormap'])
     def show_image(dict)
         internal_show_image(dict, false)
+    end
+
+    # Only register an image
+    def register_image(dict)
+        internal_show_image(dict, true)
     end
 
     def load_png(file)
@@ -2525,80 +2530,71 @@ EOE
         return false
     end
 
-    def internal_show_image(dict, is_mask)
-        check_dict(dict, @@keys_for_show_image, 'show_image')
-        ll = dict['ll']; lr = dict['lr']; ul = dict['ul']
-        w = alt_names(dict, 'w', 'width')
-        h = alt_names(dict, 'h', 'height')
-        opacity_mask = alt_names(dict, 'opacity_mask', 'stencil_mask')
-        bits = dict['bits'] || 8
-        filters = dict['pdf_filters'] || nil
-        if opacity_mask != nil
-            om = opacity_mask.dup
-            om['ul'] ||= [0,0]
-            om['ll'] ||= [0,0]
-            om['lr'] ||= [0,0]
-            mask_xo_num = internal_show_image(om, true)
-        else
-            mask_xo_num = 0
-        end
-        filename = alt_names(dict, 'jpg', 'JPG')
-        filename = dict['jpeg'] if filename == nil
-        filename = dict['JPEG'] if filename == nil
-        if filename != nil
-            return private_show_jpg(filename, w, h, [ll[0], ll[1], lr[0], lr[1], ul[0], ul[1]], mask_xo_num)
-        end
+    def internal_show_image(dict, register_only)
+      check_dict(dict, @@keys_for_show_image, 'show_image')
+      ll = dict['ll']; lr = dict['lr']; ul = dict['ul']
+      w = alt_names(dict, 'w', 'width')
+      h = alt_names(dict, 'h', 'height')
+      opacity_mask = alt_names(dict, 'opacity_mask', 'stencil_mask')
+      bits = dict['bits'] || 8
+      filters = dict['pdf_filters'] || nil
+      ref = dict['ref'] || nil
+      if opacity_mask != nil
+        om = opacity_mask.dup
+        mask_xo_num = om['ref'] || internal_show_image(om, true)
+      else
+        mask_xo_num = 0
+      end
+      filename = alt_names(dict, 'jpg', 'JPG')
+      filename = dict['jpeg'] if filename == nil
+      filename = dict['JPEG'] if filename == nil
+      if ref
+        # Nothing to register, just reuse the image
+      elsif filename != nil
+        ref =  private_register_jpg(filename, w, h, mask_xo_num)
+      else
         interpolate = get_if_given_else_default(dict, 'interpolate', true)
         data = dict['data']
         value_mask = dict['value_mask']
         color_space = alt_names(dict, 'color_space', 'colormap')
         color_space = dict['color_map'] if color_space == nil
-        if color_space == nil
-            raise "Sorry: must specify 'color_space' for the image"
-        end
-        if color_space == 'MONO' || color_space == 'mono'
-            raise "Sorry: monochrome image must not itself have a mask" unless mask_xo_num == 0
-            reversed = get_if_given_else_default(dict, 'reversed', false)
-            xo_obj = private_show_monochrome_image(ll[0], ll[1], lr[0], lr[1], ul[0], ul[1], 
-                            interpolate, reversed, w, h, data, ((is_mask)? -1 : 0), filters)
-            return is_mask ? xo_obj : self
-        end
-        if color_space == 'GRAY' || color_space == 'gray' || color_space == 'GREY' || color_space == 'grey'
-            if is_mask
-                raise("Sorry: mask must not itself have a mask") unless mask_xo_num == 0
-                mask_xo_num = -1
-            end
-            xo_obj = private_show_grayscale_image(ll[0], ll[1], lr[0], lr[1], ul[0], ul[1],
-                            interpolate, w, h, data, mask_xo_num, bits, filters)
-            return is_mask ? xo_obj : self
-        end
-        if is_mask
-            raise "Sorry: mask image must have 'color_space' set to 'gray' or 'mono'"
-        end
-        if color_space == 'RGB' || color_space == 'rgb'
-            private_show_rgb_image(ll[0], ll[1], lr[0], lr[1], ul[0], ul[1], interpolate, w, h, data, mask_xo_num, bits, filters)
-            return self
-        end
-        if color_space == 'HLS' || color_space == 'hls'
-            private_show_hls_image(ll[0], ll[1], lr[0], lr[1], ul[0], ul[1], interpolate, w, h, data, mask_xo_num, bits, filters)
-            return self
-        end
-        if color_space == 'CMYK' || color_space == 'cmyk'
-            private_show_cmyk_image(ll[0], ll[1], lr[0], lr[1], ul[0], ul[1], interpolate, w, h, data, mask_xo_num, bits, filters)
-            return self
-        end
-        if value_mask == nil
+        case color_space
+        when nil
+          raise "Sorry: must specify 'color_space' for the image"
+        when 'MONO', 'mono'
+          raise "Sorry: monochrome image must not itself have a mask" unless mask_xo_num == 0
+          reversed = get_if_given_else_default(dict, 'reversed', false)
+          ref = private_register_monochrome_image(interpolate, reversed, w, h, data, ((register_only)? -1 : 0), filters)
+        when 'GRAY', 'gray', 'GREY', 'grey'
+          if register_only
+            raise("Sorry: mask must not itself have a mask") unless mask_xo_num == 0
+            mask_xo_num = -1
+          end
+          ref = private_register_grayscale_image(interpolate, w, h, data, mask_xo_num, bits, filters)
+        when 'RGB', 'rgb'
+          ref = private_register_rgb_image(interpolate, w, h, data, mask_xo_num, bits, filters)
+        when 'HLS', 'hls'
+          ref = private_register_hls_image(interpolate, w, h, data, mask_xo_num, bits, filters)
+        when 'CMYK', 'cmyk'
+          ref = private_register_cmyk_image(interpolate, w, h, data, mask_xo_num, bits, filters)
+        else 
+          if value_mask == nil
             value_mask_min = value_mask_max = 256
-        elsif value_mask.kind_of?Integer
+          elsif value_mask.kind_of?Integer
             value_mask_min = value_mask_max = value_mask
-        else
+          else
             value_mask_min = value_mask[0];
             value_mask_max = value_mask[1];
+          end
+          ref = private_register_image(interpolate, 
+                                   w, h, data, value_mask_min, value_mask_max, color_space[0], color_space[1], mask_xo_num, bits, filters)
         end
-        private_show_image(
-                    ll[0], ll[1], lr[0], lr[1], ul[0], ul[1], interpolate, 
-                    w, h, data, value_mask_min, value_mask_max, color_space[0], color_space[1], mask_xo_num, bits, filters)
-        return self
+      end
+      if ! register_only
+        private_show_image_from_ref(ref, 
+                                    ll[0], ll[1], lr[0], lr[1], ul[0], ul[1])
+      end
+      return ref
     end
     
     def report_error(er, msg)
