@@ -1708,7 +1708,6 @@ EOD
                   cur['height'] = $1.to_i
                 elsif cur && l =~ /\/Length\s*(\d+)\s*/
                   len = $1.to_i
-                  cur['data_size'] = len
                 elsif cur && l =~ /\/(Filter|DecodePar)/ && (!cur['data'])
                   cur['pdf_filters'] ||= ''
                   cur['pdf_filters'] << l
