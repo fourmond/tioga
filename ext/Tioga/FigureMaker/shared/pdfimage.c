@@ -619,84 +619,16 @@ c_private_show_image(OBJ_PTR fmkr, FM *p, int image_type, double llx,
                      const char * filters,
                      int *ierr)
 {
-   unsigned char *lookup = NULL;
-   int value_mask_min = 256, value_mask_max = 256, lookup_len = 0, hival = 0;
-   if (constructing_path) {
-      RAISE_ERROR("Sorry: must finish with current path before calling "
-                  "show_image", ierr);
-      RETURN_NIL;
-   }
-   if (image_type == COLORMAP_IMAGE) {
-      value_mask_min = Number_to_int(mask_min, ierr);
-      value_mask_max = Number_to_int(mask_max, ierr);
-      hival = Number_to_int(hivalue, ierr);
-      lookup = (unsigned char *)(String_Ptr(lookup_data, ierr));
-      lookup_len = String_Len(lookup_data, ierr);
-      if (*ierr != 0) RETURN_NIL;
-   }
-   
-
-   Sampled_Info *xo = (Sampled_Info *)calloc(1, sizeof(Sampled_Info));
-   xo->xobj_subtype = SAMPLED_SUBTYPE;
-   double a, b, c, d, e, f; // the transform to position the image
-   //int ir, ic, id;
-   xo->next = xobj_list;
-   xobj_list = (XObject_Info *)xo;
-   xo->xo_num = next_available_xo_number++;
-   xo->obj_num = next_available_object_number++;
-   xo->image_data = ALLOC_N_unsigned_char(len);
-   xo->length = len;
-   xo->interpolate = interpolate;
-   xo->reversed = reversed;
-   xo->components = components;
-   memcpy(xo->image_data, data, len);
-   xo->image_type = image_type;
-   if(filters) {
-     int len = strlen(filters) + 1;
-     xo->filters = calloc(1, len);
-     memcpy(xo->filters, filters, len);
-   }
-   else
-     xo->filters = NULL;
-   if (image_type != COLORMAP_IMAGE) xo->lookup = NULL;
-   else {
-      if ((hival+1)*3 > lookup_len) {
-         RAISE_ERROR_ii("Sorry: color space hival (%i) is too large for "
-                        "length of lookup table (%i)", hival, lookup_len,
-                        ierr);
-         RETURN_NIL;
-      }
-      xo->hival = hival;
-      lookup_len = (hival+1) * 3;
-      xo->lookup = ALLOC_N_unsigned_char(lookup_len);
-      xo->lookup_len = lookup_len;
-      memcpy(xo->lookup, lookup, lookup_len);
-   }
-   xo->width = w;
-   xo->height = h;   
-   xo->value_mask_min = value_mask_min;
-   xo->value_mask_max = value_mask_max;
-   xo->mask_obj_num = mask_obj_num;
-   if (mask_obj_num == -1)
-      return Integer_New(xo->obj_num); // this image is being used as
-                                       // an opacity mask
-
-   llx = convert_figure_to_output_x(p, llx);
-   lly = convert_figure_to_output_y(p, lly);
-   lrx = convert_figure_to_output_x(p, lrx);
-   lry = convert_figure_to_output_y(p, lry);
-   ulx = convert_figure_to_output_x(p, ulx);
-   uly = convert_figure_to_output_y(p, uly);
-
-   Create_Transform_from_Points(llx, lly, lrx, lry, ulx, uly,
-                                &a, &b, &c, &d, &e, &f);
-   fprintf(TF, "q %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f cm /XObj%i Do Q\n",
-           a, b, c, d, e, f, xo->xo_num);
-   update_bbox(p, llx, lly);
-   update_bbox(p, lrx, lry);
-   update_bbox(p, ulx, uly);
-   update_bbox(p, lrx+ulx-llx, lry+uly-lly);
-   return Integer_New(xo->obj_num);
+  int ref = c_private_register_image(fmkr, p, image_type,
+                                     interpolate, reversed,
+                                     w, h, data, len, mask_min, 
+                                     mask_max, hivalue, lookup_data, 
+                                     mask_obj_num, components, filters, ierr);
+  printf("Image: %d, %d\n", ref, mask_obj_num);
+  if (mask_obj_num != -1)
+    c_private_show_image_from_ref(fmkr, p, ref, llx, lly, 
+                                  lrx, lry, ulx, uly, ierr);
+  return Integer_New(ref);
 }
 
 int
@@ -766,7 +698,24 @@ c_private_register_image(OBJ_PTR fmkr, FM *p, int image_type,
    xo->value_mask_min = value_mask_min;
    xo->value_mask_max = value_mask_max;
    xo->mask_obj_num = mask_obj_num;
-   return Integer_New(xo->obj_num);
+   return xo->obj_num;
+}
+
+/* Goes through the xobject list and find the one whose object number
+   matches the one given, and returns the Xobject number. -1 if not
+   found. */
+
+int Find_XObjRef(int ref)
+{
+  XObject_Info * info = xobj_list;
+  while(1) {
+    if(info->obj_num == ref)
+      return info->xo_num;
+    info = info->next;
+    if(! info)
+      break;
+  }
+  return -1;
 }
 
 void
@@ -775,7 +724,19 @@ c_private_show_image_from_ref(OBJ_PTR fmkr, FM *p, int ref, double llx,
                               double uly,
                               int *ierr)
 {
+   if (constructing_path) {
+      RAISE_ERROR("Sorry: must finish with current path before calling "
+                  "show_image", ierr);
+      return;
+   }
+
    double a, b, c, d, e, f; // the transform to position the image
+   int xo_num = Find_XObjRef(ref);
+   if(xo_num < 0) {
+     RAISE_ERROR_i("Could not find image PDF object %d", ref,
+                    ierr);
+     return;
+   }
 
    llx = convert_figure_to_output_x(p, llx);
    lly = convert_figure_to_output_y(p, lly);
@@ -787,7 +748,7 @@ c_private_show_image_from_ref(OBJ_PTR fmkr, FM *p, int ref, double llx,
    Create_Transform_from_Points(llx, lly, lrx, lry, ulx, uly,
                                 &a, &b, &c, &d, &e, &f);
    fprintf(TF, "q %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f cm /XObj%i Do Q\n",
-           a, b, c, d, e, f, ref);
+           a, b, c, d, e, f, xo_num);
    update_bbox(p, llx, lly);
    update_bbox(p, lrx, lry);
    update_bbox(p, ulx, uly);
