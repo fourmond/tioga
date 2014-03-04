@@ -168,6 +168,10 @@ class FigureMaker
     attr_accessor :measures_info
 
 
+    # Maximum number of pdflatex calls. If nil, then unlimited, but
+    # that could be a very bad idea.
+    attr_accessor :max_nested_pdflatex_calls
+
 
     # If we want to use #legend_bounding_box. It is off by default
     # as it causes a systematic second run of pdflatex.
@@ -319,6 +323,9 @@ class FigureMaker
 
         # We don't measure legends by default.
         @measure_legends = false
+
+        # Max number of pdflatex runs
+        @max_nested_pdflatex_calls = 3
 
         # By default, we use Bill's algorithm for major ticks positions
         self.vincent_or_bill = false
@@ -2242,11 +2249,18 @@ EOD
         rescue Exception => e
           p e, e.backtrace
         end
-          
+
+        @cur_calls ||= 0
         if @measures.keys != old_measure_keys
-          # we dont need to pass &cmd since it has now been defined
-          make_pdf(num)
+          @cur_calls += 1
+
+          # We limit
+          if (!@max_nested_pdflatex_calls || (@cur_calls < @max_nested_pdflatex_calls))
+            # we dont need to pass &cmd since it has now been defined
+            make_pdf(num)
+          end
         end
+        @cur_calls = nil
         return @figure_pdfs[num]
     end
     
