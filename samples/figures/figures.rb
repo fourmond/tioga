@@ -67,6 +67,8 @@ class MyFigures
 
         t.def_figure("Text_size") { text_size }
         t.def_figure("Text_size_with_rotation") { text_size_with_rotation }
+        t.def_figure("Text_size_with_rotation_and_subframes") { 
+        text_size_with_rotation_and_subframes }
         
 
         hues
@@ -471,6 +473,15 @@ class MyFigures
                       })
       end
     end
+
+    def text_size_with_rotation_and_subframes
+      t.context do 
+        t.subfigure([0.1,0.4,0.3,0.3]) do 
+          text_size_with_rotation
+        end
+      end
+    end
+
 
     # In this example, we show how we can use measures of the text
     # transparently with Tioga:

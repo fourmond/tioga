@@ -171,6 +171,7 @@ class FigureMaker
     # Maximum number of pdflatex calls. If nil, then unlimited, but
     # that could be a very bad idea.
     attr_accessor :max_nested_pdflatex_calls
+    attr_reader   :current_pdflatex_call
 
 
     # If we want to use #legend_bounding_box. It is off by default
@@ -2243,6 +2244,8 @@ EOD
         num = get_num_for_pdf(num)
         result = start_making_pdf(num)
         return unless result
+
+        @current_pdflatex_call ||= 0
         begin
         @figure_pdfs[num] = finish_making_pdf(@figure_names[num])
         # If the keys have changed, we run that again.
@@ -2250,17 +2253,16 @@ EOD
           p e, e.backtrace
         end
 
-        @cur_calls ||= 0
         if @measures.keys != old_measure_keys
-          @cur_calls += 1
+          @current_pdflatex_call += 1
 
           # We limit
-          if (!@max_nested_pdflatex_calls || (@cur_calls < @max_nested_pdflatex_calls))
+          if (!@max_nested_pdflatex_calls || (@current_pdflatex_call < @max_nested_pdflatex_calls))
             # we dont need to pass &cmd since it has now been defined
             make_pdf(num)
           end
         end
-        @cur_calls = nil
+        @current_pdflatex_call = nil
         return @figure_pdfs[num]
     end
     
@@ -2491,6 +2493,12 @@ EOE
       for key, val in @measures
         # p @fm_data
         private_save_measure(key, *val)
+      end
+
+      # Delete all keys in @
+      extra = @measures_info.keys - @measures.keys
+      for e in extra
+        @measures_info.delete(e)
       end
         
       result = $?
