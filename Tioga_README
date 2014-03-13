@@ -22,9 +22,16 @@ This is the README for the Tioga kernel, version 1.14, June 10, 2011.
 
 << What's new >>
 
-    Tioga 1.17 provides all the necessary fixes to have it run on
-windows, so now we also support the Redmond operating system (works
-with the ProTeXt LaTeX distribution).
+   Tioga 1.18 brings in a few new features. First, Dvector.fancy_read
+is now able to extract pure text columns. Second, a jpg_info function
+has been added that read the width and height from within a JPEG file,
+for use with show_image: you now don't have to know the image size
+beforehand. A load_png function was added that relies on pdflatex to
+read PNG files (except those with a custom palette). Feed the return
+value of load_png to show_image. It is now possible to reuse an image
+over and over again by saving its reference and using itagain.Finally,
+more control over the number of pdflatex executions is now available.
+There are also a couple of bug fixes.
 
 << Quick Installation of Tioga >>
 
@@ -163,6 +170,10 @@ Bill Paxton
 << What's old >>
 
 Here are the old release messages:
+
+    Tioga 1.17 provides all the necessary fixes to have it run on
+windows, so now we also support the Redmond operating system (works
+with the ProTeXt LaTeX distribution).
 
     Tioga 1.16 brings in a bug fix by Josiah Schwab in handling some
 HLS triplets. It also provides facilities to extract the pdflatex
