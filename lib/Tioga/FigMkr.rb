@@ -678,6 +678,9 @@ class FigureMaker
             dict['marker_color'] = self.line_color if dict['marker_color'] == nil
             dict['marker_scale'] = 0.5 if dict['marker_scale'] == nil
         end
+        if self.legend_line_width >= 0 then
+            dict['line_width'] = self.legend_line_width
+        end
         @legend_info << dict
     end
     
