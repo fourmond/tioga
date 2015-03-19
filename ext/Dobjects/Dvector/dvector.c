@@ -5626,7 +5626,9 @@ static VALUE dvector_convolve(VALUE self, VALUE kernel, VALUE middle)
 static VALUE marked_array()
 {
   VALUE v = rb_ary_new();
+#if defined(RUBY_VERSION_MINOR) && (RUBY_VERSION_MINOR != 8)
   rb_gc_register_mark_object(v);
+#endif
   return v;
 }
 
@@ -5721,7 +5723,12 @@ static VALUE dvector_fast_fancy_read(VALUE self, VALUE stream, VALUE options)
     }
     if(RTEST(mx)) {
       /* Todo */
-      int sz = RARRAY_LENINT(text_columns);
+      int sz = 
+#ifdef RARRAY_LENINT
+      RARRAY_LENINT(text_columns);
+#else
+      RARRAY_LEN(text_columns);
+#endif
       int i;
       for(i = 0; i <  sz; i++) {
         long idx = FIX2LONG(rb_ary_entry(text_columns, i));
