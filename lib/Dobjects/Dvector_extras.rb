@@ -34,12 +34,15 @@ module Dobjects
     #  e = MathEvaluator.new("x*y", "x,y")
     #  e.compute(1,2)         -> 2
     #
-    # If an exception arises, NaN is returned. Note that compilation
-    # problems will be caught before ;-)...
+    # If an exception arises, NaN is returned, unless the problem is a
+    # NameError (which means syntax problems). Other compilation
+    # problems should be caught before that.
     def compute(*args)
       begin
         return compute_unsafe(*args)
-      rescue
+      rescue NameError => e
+        raise e
+      rescue 
         return 0.0/0.0
       end
     end
