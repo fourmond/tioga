@@ -10,7 +10,7 @@ as determined by the boundary attributes.  Things like the title and axis labels
 "frame" coordinates that run from (0, 0) at the lower left corner of the frame to (1, 1) at the upper right
 corner.  The frame is positioned on the page using "page" coordinates that run from (0, 0)
 at the lower left of the page to (1, 1) at the upper right.  The actual numbers used in PDF and TeX files
-are given in "output" coordinates which are a tenth of a point (i.e., 720 in output coords equals 1 inch).
+are given in "output" coordinates which are a by default tenth of a point (i.e., 720 in output coords equals 1 inch) (but you can redefined the scaling factor as the optional argument to FigureMaker.new).
 
 The coordinate systems are naturally related in the following manner:
 
@@ -23,6 +23,12 @@ by conversion routines between figure and output coordinates.
 =end
 
 module Coordinate_Conversions
+
+  # Returns the scaling factor from postscript points to output
+  # coordinates (10 by default)
+  def scaling_factor
+  end
+    
 # Convert the position _x_ measured in page x coordinates to the 
 # position in output x coordinates.
     def convert_page_to_output_x(x)

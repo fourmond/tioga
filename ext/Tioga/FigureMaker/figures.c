@@ -83,6 +83,8 @@ FM *Get_FM(OBJ_PTR fmkr, int *ierr) {
    RO_BOOL_ATTR(root_figure)
    RO_BOOL_ATTR(in_subplot)
 
+   RO_DBL_ATTR(scaling_factor)
+
 /* device page size accessors -- can set these using set_device_pagesize */
    RO_DBL_ATTR(page_left)
    RO_DBL_ATTR(page_bottom)
@@ -316,11 +318,12 @@ void Init_FigureMaker(void) {
    rb_define_method(cFM, "private_make", FM_private_make, 2);
    rb_define_method(cFM, "get_save_filename", FM_get_save_filename, 1);
    rb_define_method(cFM, "private_make_portfolio", FM_private_make_portfolio, 3);
-   rb_define_method(cFM, "private_init_fm_data", FM_private_init_fm_data, 0);
+   rb_define_method(cFM, "private_init_fm_data", FM_private_init_fm_data, 1);
 
 /* page attribute accessors */
    attr_reader(root_figure)
    attr_reader(in_subplot)
+   attr_reader(scaling_factor)
    attr_reader(page_left)
    attr_reader(page_right)
    attr_reader(page_bottom)

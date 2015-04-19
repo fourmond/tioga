@@ -456,8 +456,8 @@ class MyFigures
           xs = Dvector.new
           ys = Dvector.new
           for x,y in size['points']
-            xs << t.convert_output_to_figure_x(10*x)
-            ys << t.convert_output_to_figure_y(10*y)
+            xs << t.convert_output_to_figure_x(t.scaling_factor*x)
+            ys << t.convert_output_to_figure_y(t.scaling_factor*y)
           end
           xs << xs[0]
           ys << ys[0]
@@ -509,8 +509,8 @@ class MyFigures
           xs = Dvector.new
           ys = Dvector.new
           for x,y in size['points']
-            xs << t.convert_output_to_figure_x(10*x)
-            ys << t.convert_output_to_figure_y(10*y)
+            xs << t.convert_output_to_figure_x(t.scaling_factor*x)
+            ys << t.convert_output_to_figure_y(t.scaling_factor*y)
           end
           t.stroke_color = color
           t.line_type = Line_Type_Dashes

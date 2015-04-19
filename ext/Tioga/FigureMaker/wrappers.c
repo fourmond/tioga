@@ -59,8 +59,9 @@ OBJ_PTR FM_axis_information(OBJ_PTR fmkr, OBJ_PTR spec)
 }
 
 // init.c
-OBJ_PTR FM_private_init_fm_data(OBJ_PTR fmkr) { int ierr=0; 
-   c_private_init_fm_data(fmkr, Get_FM(fmkr, &ierr), &ierr); RETURN_NIL; }
+OBJ_PTR FM_private_init_fm_data(OBJ_PTR fmkr, OBJ_PTR scale) { int ierr=0;
+   double scl = Number_to_double(scale, &ierr);
+   c_private_init_fm_data(fmkr, Get_FM(fmkr, &ierr), scl, &ierr); RETURN_NIL; }
 OBJ_PTR FM_set_frame_sides(OBJ_PTR fmkr, OBJ_PTR left, OBJ_PTR right, OBJ_PTR top, OBJ_PTR bottom) { int ierr=0;
    c_set_frame_sides(fmkr, Get_FM(fmkr, &ierr),
       Number_to_double(left, &ierr), Number_to_double(right, &ierr), 

@@ -203,7 +203,7 @@ class FigureMaker
             #attr_accessor :tex_preview_minwhitespace
             #attr_accessor :tex_preview_fullpage
     
-    def reset_figures # set the state to default values
+    def reset_figures(scaling = 10.0) # set the state to default values
         @figure_commands = []
         @num_figures = 0
         @create_save_dir = true # creates +save_dir+ by default
@@ -247,7 +247,7 @@ class FigureMaker
         
         @num_error_lines = 10
         
-        reset_plot_attrs
+        reset_plot_attrs(scaling)
         
         @tex_xoffset = 0
         @tex_yoffset = 0
@@ -334,7 +334,7 @@ class FigureMaker
     end
     
 
-    def reset_plot_attrs
+    def reset_plot_attrs(scaling = 10.0)
         @title = nil
         @xlabel = nil
         @ylabel = nil
@@ -345,13 +345,13 @@ class FigureMaker
         @yaxis_locations_for_major_ticks = nil
         @yaxis_locations_for_minor_ticks = nil
         @yaxis_tick_labels = nil
-        private_init_fm_data
+        private_init_fm_data(scaling)
     end
     
 
-    def initialize
+    def initialize(scaling = 10.0)
         @fm_data = Dvector.new(@@fm_data_size)
-        reset_figures
+        reset_figures(scaling)
     end
 
 
@@ -376,7 +376,7 @@ class FigureMaker
 
 
     def reset_state        
-        reset_figures
+        reset_figures(self.scaling_factor)
     end
     
     
@@ -415,7 +415,7 @@ class FigureMaker
     end
 
     def page_setup(width,height) # in big-points (1/72 inch)
-        set_device_pagesize(width*10-1, height*10-1)
+        set_device_pagesize(width*scaling_factor-1, height*scaling_factor-1)
         @tex_preview_figure_width = width.to_s + 'bp'
         @tex_preview_figure_height = height.to_s + 'bp'
         @tex_preview_paper_height = "#{height}bp"
@@ -791,7 +791,7 @@ class FigureMaker
         end
         index += 1
       end
-      return 10 * width
+      return scaling_factor * width
     end
 
     def legend_height
@@ -2245,14 +2245,18 @@ EOD
         result = start_making_pdf(num)
         return unless result
 
-        @current_pdflatex_call ||= 0
+        if ! @current_pdflatex_call
+          # Clear the measures at the first call
+          @measures.clear
+          @current_pdflatex_call = 0
+        end
         begin
-        @figure_pdfs[num] = finish_making_pdf(@figure_names[num])
-        # If the keys have changed, we run that again.
+          @figure_pdfs[num] = finish_making_pdf(@figure_names[num])
         rescue Exception => e
           p e, e.backtrace
         end
 
+        # If the keys have changed, we run that again.
         if @measures.keys != old_measure_keys
           @current_pdflatex_call += 1
 
@@ -2325,7 +2329,7 @@ EOD
         cmd = @figure_commands[num]
         return false unless cmd.kind_of?(Proc)
         begin
-            reset_plot_attrs
+            reset_plot_attrs(self.scaling_factor)
             reset_legend_info
             private_make(name, cmd)
             return true

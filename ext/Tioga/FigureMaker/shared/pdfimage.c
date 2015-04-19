@@ -441,7 +441,7 @@ c_private_show_jpg(OBJ_PTR fmkr, FM *p, char *filename,
       return;
    }
    ref = c_private_register_jpg(fmkr, p, filename, width, height, 
-                                mask_obj_num, *ierr);
+                                mask_obj_num, ierr);
    Expand_Array(image_destination, dest, ierr);
    if (*ierr != 0) return;
 

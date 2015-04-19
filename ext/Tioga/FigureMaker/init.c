@@ -417,8 +417,9 @@ void c_set_frame_sides(OBJ_PTR fmkr, FM *p, double left, double right, double to
 }
 
 
-void c_private_init_fm_data(OBJ_PTR fmkr, FM *p, int *ierr) {
+void c_private_init_fm_data(OBJ_PTR fmkr, FM *p, double scale, int *ierr) {
    /* Page */
+   p->scaling_factor = scale;
    p->root_figure = true;
    p->in_subplot = false;
    c_private_set_default_font_size(fmkr, p, 12.0, ierr);

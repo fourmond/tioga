@@ -50,7 +50,7 @@ extern OBJ_PTR FM_axis_information(OBJ_PTR fmkr, OBJ_PTR loc);
 
 /*======================================================================*/
 // init.c
-extern OBJ_PTR FM_private_init_fm_data(OBJ_PTR fmkr);
+extern OBJ_PTR FM_private_init_fm_data(OBJ_PTR fmkr, OBJ_PTR scaling);
 extern OBJ_PTR FM_set_frame_sides(OBJ_PTR fmkr, OBJ_PTR left, OBJ_PTR right, OBJ_PTR top, OBJ_PTR bottom); // in page coords [0..1]
 extern OBJ_PTR FM_set_device_pagesize(OBJ_PTR fmkr, OBJ_PTR width, OBJ_PTR height); // size in output coords (decipoints)
 extern OBJ_PTR FM_get_save_filename(OBJ_PTR fmkr, OBJ_PTR name);

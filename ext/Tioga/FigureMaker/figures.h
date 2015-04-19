@@ -110,6 +110,14 @@ typedef struct {
 /* page attributes */
     bool root_figure;
     bool in_subplot;
+
+    /* 
+       the scaling factor from a postscript point to the smallest unit
+       representable in the PDF file. Higher numbers give you more
+       precision at the cost of a larger PDF file
+    */
+    double scaling_factor;
+  
     double page_left, page_bottom, page_top, page_right, page_width, page_height;
         // in output units.    READ ONLY.
     
@@ -400,7 +408,7 @@ extern OBJ_PTR Get_yaxis_tick_labels(OBJ_PTR fmkr, int *ierr);
 extern OBJ_PTR Get_yaxis_locations_for_major_ticks(OBJ_PTR fmkr, int *ierr);
 extern OBJ_PTR Get_yaxis_locations_for_minor_ticks(OBJ_PTR fmkr, int *ierr);
 
-extern void c_private_init_fm_data(OBJ_PTR fmkr, FM *p, int *ierr);
+extern void c_private_init_fm_data(OBJ_PTR fmkr, FM *p, double scale, int *ierr);
 extern void c_set_frame_sides(OBJ_PTR fmkr, FM *p, 
    double left, double right, double top, double bottom, int *ierr);
 extern void c_set_device_pagesize(OBJ_PTR fmkr, FM *p, double width, double height, int *ierr);
@@ -708,7 +716,7 @@ extern void c_private_save_measure(OBJ_PTR fmkr, OBJ_PTR measure_name,
 /*======================================================================*/
 
 // ENLARGE = the conversion factor from "big points" to output units
-#define ENLARGE 10.0
+#define ENLARGE (p->scaling_factor)
 #define BIG_POINTS_PER_INCH 72.0
 #define INCHES_PER_MM 0.0393700787
 

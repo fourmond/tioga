@@ -215,6 +215,7 @@ void Open_tex(OBJ_PTR fmkr, char *filename, bool quiet_mode, int *ierr)
 {
    char ofile[300];
    Get_tex_name(ofile, filename, 300);
+   FM *p = Get_FM(fmkr,ierr);
    fp = fopen(ofile, "w");
    fprintf(fp,"\\setlength{\\unitlength}{%fbp}%%\n", 1.0/ENLARGE);
    cur_pos = ftell(fp);
@@ -227,6 +228,7 @@ void Open_tex(OBJ_PTR fmkr, char *filename, bool quiet_mode, int *ierr)
 void Close_tex(OBJ_PTR fmkr, bool quiet_mode, int *ierr)
 {
    double x, y, xoff, yoff;
+   FM *p = Get_FM(fmkr,ierr);
    x = bbox_urx - bbox_llx; if (x < 0) x = bbox_urx = bbox_llx = 0;
    y = bbox_ury - bbox_lly; if (y < 0) y = bbox_ury = bbox_lly = 0;
    xoff = bbox_llx + Get_tex_xoffset(fmkr,ierr)*ENLARGE;
