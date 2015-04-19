@@ -2385,13 +2385,16 @@ EOD
     
       
     def finish_making_pdfs(fignums,report)
-      if @multithreads_okay_for_tioga # run separate threads for the pdflatex processing
+      if false # Process.respond_to? :fork
         threads = []
+        
         fignums.each do |num|
-          threads << Thread.new(num) { |i| finish_1_pdf(i,report) }
+          treads << Process.fork { finish_1_pdf(num,report) }
         end
-        threads.each {|thr| thr.join}
+        threads.each {|thr| Process.wait(thr)}
       else
+        
+        # Less fast, but will create real problems with Dir.chdir block...
         fignums.each {|num| finish_1_pdf(num,report)}
       end
       return true
