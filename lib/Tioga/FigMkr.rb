@@ -47,7 +47,9 @@ class FigureMaker
                        $1
                      else
                        "SVN version"
-                     end
+                    end
+
+    TIOGA_VERSION = 1.19
 
 
     def FigureMaker.version
