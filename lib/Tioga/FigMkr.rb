@@ -43,13 +43,13 @@ class FigureMaker
     # SVN repository. This is where we'll look for version information.
     SVN_URL = '$HeadURL$'
 
-    TIOGA_VERSION = if SVN_URL =~ /tags\/tioga\/Tioga%20([^\/]+)/
-                       $1
-                     else
-                       "SVN version"
-                    end
+    # TIOGA_VERSION = if SVN_URL =~ /tags\/tioga\/Tioga%20([^\/]+)/
+    #                    $1
+    #                  else
+    #                    "SVN version"
+    #                 end
 
-    TIOGA_VERSION = 1.19
+    TIOGA_VERSION = "1.19"
 
 
     def FigureMaker.version
