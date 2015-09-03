@@ -22,12 +22,8 @@ This is the README for the Tioga kernel, version 1.14, June 10, 2011.
 
 << What's new >>
 
-    Tioga 1.19 is essentially a bugfix release, but it brings in an
-important new feature: the ability to customize the resolution of the
-PDF file produced. Up until version 1.18, the resolution was always
-1/10th of a postscript point, but from now on, you can change that by
-giving the scaling factor (default 10, as before), as an argument to
-FigureMaker.new.
+    Tioga 1.19.1 is a bugfix release that fixes installation problems
+with recent Ruby versions and gets rid of an ugly warning.
 
 << Quick Installation of Tioga >>
 
@@ -166,6 +162,13 @@ Bill Paxton
 << What's old >>
 
 Here are the old release messages:
+
+    Tioga 1.19 is essentially a bugfix release, but it brings in an
+important new feature: the ability to customize the resolution of the
+PDF file produced. Up until version 1.18, the resolution was always
+1/10th of a postscript point, but from now on, you can change that by
+giving the scaling factor (default 10, as before), as an argument to
+FigureMaker.new.
 
     Tioga 1.18 brings in a few new features. First, Dvector.fancy_read
 is now able to extract pure text columns. Second, a jpg_info function

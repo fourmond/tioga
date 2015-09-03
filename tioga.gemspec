@@ -18,7 +18,7 @@ spec = Gem::Specification.new do |s|
   s.bindir = 'bin'
   s.executables << 'tioga'
   s.name = 'tioga'
-  s.version = '1.19'
+  s.version = '1.19.1'
   s.summary = 'Tioga - a powerful scientific plotting library'
   s.homepage = 'http://tioga.sf.net'
   s.authors = [
@@ -32,7 +32,6 @@ scientific graphs of high quality. It is fairly complete and
 extensive, and comes with examples and (online) complete
 documentation.
 EOD
-  s.rubyforge_project = 'tioga'
   # s.email = ['tioga-users@rubyforge.org']
   s.license = "LGPL 2.1"
 end

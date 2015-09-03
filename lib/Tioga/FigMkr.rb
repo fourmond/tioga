@@ -49,7 +49,7 @@ class FigureMaker
     #                    "SVN version"
     #                 end
 
-    TIOGA_VERSION = "1.19"
+    TIOGA_VERSION = "1.19.1"
 
 
     def FigureMaker.version
