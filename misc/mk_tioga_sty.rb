@@ -4,7 +4,7 @@
 require 'date'
 
 # We make up the color constants from the Tioga file.
-require 'lib/Tioga/ColorConstants.rb'
+require_relative '../lib/Tioga/ColorConstants.rb'
 
 # Generate colors
 color_specs = "% Color constants, generated from ColorConstants.rb\n"

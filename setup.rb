@@ -1266,6 +1266,7 @@ class Installer
   def update_shebang_line(path)
     return if no_harm?
     return if config('shebang') == 'never'
+    return if path.split('.').last == 'scpt' # don't update shebang on applescript files
     old = Shebang.load(path)
     if old
       $stderr.puts "warning: #{path}: Shebang line includes too many args.  It is not portable and your program may not work." if old.args.size > 1
