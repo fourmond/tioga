@@ -4,6 +4,7 @@
 require 'date'
 
 # We make up the color constants from the Tioga file.
+$: << "."
 require 'lib/Tioga/ColorConstants.rb'
 
 # Generate colors
